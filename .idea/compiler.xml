@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="api" />
+        <module name="GameSystem" />
+        <module name="GameSystemAPI" />
+        <module name="GamesystemAPI" />
+        <module name="Gameystem" />
+        <module name="plugin" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="api" target="1.8" />
+      <module name="game-api" target="1.8" />
+      <module name="gameapi" target="1.8" />
+      <module name="GameSystem" target="1.8" />
+      <module name="gamesystem" target="1.8" />
+      <module name="GamesystemAPI" target="1.8" />
+      <module name="GameSystemAPI" target="1.8" />
+      <module name="Gameystem" target="1.8" />
+      <module name="plugin" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
