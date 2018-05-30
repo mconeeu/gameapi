@@ -10,8 +10,8 @@
     <version>1.0.1-SNAPSHOT</version>
 
     <modules>
-        <module>api</module>
         <module>plugin</module>
+        <module>api</module>
     </modules>
 
     <properties>
