@@ -5,6 +5,7 @@
 
 package eu.mcone.gamesystem.gamestate;
 
+import eu.mcone.gamesystem.GameSystem;
 import eu.mcone.gamesystem.api.gamestate.GameState;
 import eu.mcone.gamesystem.api.gamestate.GameStateID;
 import org.bukkit.Bukkit;
@@ -35,7 +36,7 @@ public class GameStateHandler implements eu.mcone.gamesystem.api.gamestate.GameS
             currentStateID = id;
             currentState.init();
         } else {
-            Bukkit.getConsoleSender().sendMessage("§cGameState: " + id + " not exists...");
+            GameSystem.getInstance().sendConsoleMessage("§cGameState: " + id + " not exists...");
         }
     }
 
