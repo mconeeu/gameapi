@@ -41,8 +41,7 @@ public class GameStateHandler implements eu.mcone.gamesystem.api.gamestate.GameS
     }
 
     public boolean hasGameState(GameStateID type) {
-        if(currentStateID == type) return true;
-        return false;
+        return currentStateID == type;
     }
 
     public GameState getCurrentState() {
