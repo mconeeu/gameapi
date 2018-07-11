@@ -1,5 +1,6 @@
 package eu.mcone.gamesystem;
 
+import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.gamesystem.api.GameSystemAPI;
 import eu.mcone.gamesystem.gamestate.GameStateHandler;
 import eu.mcone.gamesystem.listener.*;
@@ -19,6 +20,7 @@ public class GameSystem extends GameSystemAPI {
 
         damageLogger = new DamageLogger();
         gameStateHandler = new GameStateHandler();
+        CoreSystem.getInstance().getTranslationManager().loadCategories(this);
 
         sendConsoleMessage("§aRegistering Events...");
         getServer().getPluginManager().registerEvents(new EntityDamageByEntity(), this);

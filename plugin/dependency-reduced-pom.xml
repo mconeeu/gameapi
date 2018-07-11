@@ -8,6 +8,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>plugin</artifactId>
   <build>
+    <finalName>${project.parent.name}-${project.name}-${project.version}</finalName>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -28,33 +29,6 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>com.github.wvengen</groupId>
-        <artifactId>proguard-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>proguard</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <options>
-            <option>-ignorewarnings</option>
-            <option>-dontnote</option>
-            <option>-keepattributes Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,LocalVariable*Table,*Annotation*,Synthetic,EnclosingMethod,EventHandler,Override</option>
-            <option>-keepclassmembers class ** { @org.bukkit.event.EventHandler *; }</option>
-            <option>-keep class eu.mcone.gamesystem.api.** { *; }</option>
-            <option>-keep class ** extends org.bukkit.plugin.java.JavaPlugin { public void onEnable(); public void onDisable(); }</option>
-          </options>
-          <obfuscate>true</obfuscate>
-          <libs>
-            <lib>${java.home}/lib/rt.jar</lib>
-            <lib>${java.home}/lib/jsse.jar</lib>
-          </libs>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
   <repositories>
@@ -74,6 +48,10 @@
         <exclusion>
           <artifactId>core-api</artifactId>
           <groupId>eu.mcone.coresystem</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>bukkit</artifactId>
+          <groupId>net.labymod.serverapi</groupId>
         </exclusion>
       </exclusions>
     </dependency>
