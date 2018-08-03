@@ -26,6 +26,10 @@
             <id>mcone-systems</id>
             <url>http://repo.mcone.eu/nexus/content/repositories/system/</url>
         </repository>
+        <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
     </repositories>
 
     <dependencies>

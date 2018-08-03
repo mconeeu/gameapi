@@ -6,20 +6,20 @@
 
 package eu.mcone.gamesystem.api.countdown;
 
-public abstract class countdown {
+public abstract class GameCountdown {
 
     /**
-     * Start method of the countdown
+     * Start method of the GameCountdown
      */
     public abstract void start();
 
     /**
-     * Stop method of the countdown
+     * Stop method of the GameCountdown
      */
     public abstract void stop();
 
     /**
-     * countdown reset method (suitable for lobby, end countdowns)
+     * GameCountdown reset method (suitable for lobby, end countdowns)
      */
     public abstract void reset();
 }

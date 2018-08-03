@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: eu.mcone.coresystem:bukkit-api:10.1.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/eu/mcone/coresystem/bukkit-api/10.1.0-SNAPSHOT/bukkit-api-10.1.0-20180730.113633-7.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/eu/mcone/coresystem/bukkit-api/10.1.0-SNAPSHOT/bukkit-api-10.1.0-20180730.113633-7-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/eu/mcone/coresystem/bukkit-api/10.1.0-SNAPSHOT/bukkit-api-10.1.0-20180730.113633-7-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

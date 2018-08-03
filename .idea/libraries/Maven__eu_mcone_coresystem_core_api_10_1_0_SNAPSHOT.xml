@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: eu.mcone.coresystem:core-api:10.1.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/eu/mcone/coresystem/core-api/10.1.0-SNAPSHOT/core-api-10.1.0-20180730.113614-7.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/eu/mcone/coresystem/core-api/10.1.0-SNAPSHOT/core-api-10.1.0-20180730.113614-7-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/eu/mcone/coresystem/core-api/10.1.0-SNAPSHOT/core-api-10.1.0-20180730.113614-7-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
