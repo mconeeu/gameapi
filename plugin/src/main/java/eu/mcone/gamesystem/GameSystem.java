@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2017 - 2018 Dominik Lippl, Rufus Maiwald and the MC ONE Minecraftnetwork. All rights reserved
+ * You are not allowed to decompile the code
+ */
+
 package eu.mcone.gamesystem;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
@@ -25,8 +30,6 @@ public class GameSystem extends GameSystemAPI {
         sendConsoleMessage("§aRegistering Events...");
         getServer().getPluginManager().registerEvents(new EntityDamageByEntity(), this);
         getServer().getPluginManager().registerEvents(new PlayerAchievementAwarded(), this);
-        getServer().getPluginManager().registerEvents(new PlayerJoin(), this);
-        getServer().getPluginManager().registerEvents(new PlayerQuit(), this);
         getServer().getPluginManager().registerEvents(new WeatherChange(), this);
 
         sendConsoleMessage("§aVersion §f" + this.getDescription().getVersion() + "§a enabled...");

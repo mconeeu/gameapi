@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 - 2018 Rufus Maiwald and the MC ONE Minecraftnetwork. All rights reserved
+ * Copyright (c) 2017 - 2018 Dominik Lippl, Rufus Maiwald and the MC ONE Minecraftnetwork. All rights reserved
  * You are not allowed to decompile the code
  */
 
@@ -11,6 +11,7 @@ public interface DamageLogger {
 
     /**
      * Logs the last hit of the player
+     *
      * @param damaged Attacked player
      * @param damager Attacker
      */
@@ -18,6 +19,7 @@ public interface DamageLogger {
 
     /**
      * Returns the player who was last hit
+     *
      * @param p Specifies the target player
      * @return Returns the player who last hit the target player
      */

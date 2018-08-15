@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2017 - 2018 Dominik Lippl, Rufus Maiwald and the MC ONE Minecraftnetwork. All rights reserved
+ * You are not allowed to decompile the code
+ */
+
 package eu.mcone.gamesystem.api.manager.team;
 
 public enum Team {
@@ -7,7 +12,7 @@ public enum Team {
     VIOLET(0, "violet", false, "§5", "§5Violet", "violet.bed", "violet.spawn", "violet.spawner.", "violet,npc"),
     YELLOW(0, "yellow", false, "§e", "§eGelb", "yellow.bed", "yellow.spawn", "yellow.spawner.", "yellow.npc"),
     GREEN(0, "green", false, "§2", "§2Grün", "green.bed", "green.spawn", "green.spawner.", "green.npc"),
-    GOLD(0, "gold", false, "§6", "§6Gold", "gold.bed", "gold.spawn", "gold.spawner.", "gold.npc"),
+    GRAY(0, "gray", false, "§7", "§7Grau", "gray.bed", "gray.spawn", "gray.spawner.", "gray.npc"),
     WHITE(0, "white", false, "§f", "§fWeiß", "white.bed", "white.spawn", "white.spawner.", "white.npc"),
     BLACK(0, "black", false, "§1", "§0Schwarz", "black.bed", "black.spawn", "black.spawner.", "black.npc"),
     ERROR(0, "error", false, "§4", "§4ERROR", "error", "error", "error", "error");

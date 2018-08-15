@@ -1,11 +1,12 @@
 /*
- * Copyright (c) 2017 - 2018 Rufus Maiwald and the MC ONE Minecraftnetwork. All rights reserved
+ * Copyright (c) 2017 - 2018 Dominik Lippl, Rufus Maiwald and the MC ONE Minecraftnetwork. All rights reserved
  * You are not allowed to decompile the code
  */
 
 package eu.mcone.gamesystem.listener;
 
 import eu.mcone.gamesystem.GameSystem;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -14,6 +15,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 public class EntityDamageByEntity implements Listener {
+
+    public EntityDamageByEntity() {
+        Bukkit.getServer().getPluginManager().registerEvents(this, GameSystem.getInstance());
+    }
 
     @EventHandler
     public void on(EntityDamageByEntityEvent e) {

@@ -1,50 +1,61 @@
+/*
+ * Copyright (c) 2017 - 2018 Dominik Lippl, Rufus Maiwald and the MC ONE Minecraftnetwork. All rights reserved
+ * You are not allowed to decompile the code
+ */
+
 package eu.mcone.gamesystem.api.manager;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
+import eu.mcone.coresystem.api.core.player.GlobalCorePlayer;
 import eu.mcone.gamesystem.api.GameSystemAPI;
 import eu.mcone.gamesystem.api.ecxeptions.Team.TeamNotFoundEcxeption;
 import eu.mcone.gamesystem.api.manager.team.Team;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 public abstract class TeamManager {
 
     @Getter
-    private ArrayList<Player> playing = new ArrayList<>();
+    private List<Player> playing = new ArrayList<>();
     @Getter
-    private HashMap<UUID, String> teams = new HashMap<>();
+    private Map<UUID, String> teams = new HashMap<>();
     @Getter
-    private HashMap<Team, ArrayList<Player>> chats = new HashMap<>();
-    @Getter
-    private ArrayList<Player> spectators = new ArrayList<>();
-    @Getter
-    private ArrayList<Integer> roundkills = new ArrayList<>();
+    private Map<Team, List<Player>> chats = new HashMap<>();
 
     @Getter
-    private ArrayList<Player> players_red = new ArrayList<>();
+    private List<Player> spectators = new ArrayList<>();
+
     @Getter
-    private ArrayList<Player> players_blue = new ArrayList<>();
+    private List<Player> red = new ArrayList<>();
     @Getter
-    private ArrayList<Player> players_violet = new ArrayList<>();
+    private List<Player> blue = new ArrayList<>();
     @Getter
-    private ArrayList<Player> players_yellow = new ArrayList<>();
+    private List<Player> violet = new ArrayList<>();
     @Getter
-    private ArrayList<Player> players_green = new ArrayList<>();
+    private List<Player> yellow = new ArrayList<>();
     @Getter
-    private ArrayList<Player> players_gold = new ArrayList<>();
+    private List<Player> green = new ArrayList<>();
     @Getter
-    private ArrayList<Player> players_white = new ArrayList<>();
+    private List<Player> gray = new ArrayList<>();
     @Getter
-    private ArrayList<Player> players_black = new ArrayList<>();
+    private List<Player> white = new ArrayList<>();
+    @Getter
+    private List<Player> black = new ArrayList<>();
+
     @Getter
     private int numberOfTeams;
     @Getter
     private int playersPerTeam;
     @Getter
+    @Setter
+    private int roundKills;
+    @Getter
+    @Setter
     private Team winner_team;
 
     public TeamManager(final int numberOfTeams, final int playersPerTeam) {
@@ -118,8 +129,8 @@ public abstract class TeamManager {
                     return Team.YELLOW;
                 } else if (teams.get(uuid).equalsIgnoreCase("green")) {
                     return Team.GREEN;
-                } else if (teams.get(uuid).equalsIgnoreCase("gold")) {
-                    return Team.GOLD;
+                } else if (teams.get(uuid).equalsIgnoreCase("gray")) {
+                    return Team.GRAY;
                 } else if (teams.get(uuid).equalsIgnoreCase("white")) {
                     return Team.WHITE;
                 } else if (teams.get(uuid).equalsIgnoreCase("black")) {
@@ -148,8 +159,8 @@ public abstract class TeamManager {
                 return Team.YELLOW;
             } else if (string.equalsIgnoreCase(Team.GREEN.getString())) {
                 return Team.GREEN;
-            } else if (string.equalsIgnoreCase(Team.GOLD.getString())) {
-                return Team.GOLD;
+            } else if (string.equalsIgnoreCase(Team.GRAY.getString())) {
+                return Team.GRAY;
             } else if (string.equalsIgnoreCase(Team.WHITE.getString())) {
                 return Team.WHITE;
             } else if (string.equalsIgnoreCase(Team.BLACK.getString())) {
@@ -163,24 +174,24 @@ public abstract class TeamManager {
         return Team.ERROR;
     }
 
-    public void addToTeamChat(final Team team, final Player player) {
+    public void addChat(final Team team, final Player player) {
         try {
             if (team.equals(Team.RED)) {
-                players_red.add(player);
+                red.add(player);
             } else if (team.equals(Team.BLUE)) {
-                players_blue.add(player);
+                blue.add(player);
             } else if (team.equals(Team.VIOLET)) {
-                players_violet.add(player);
+                violet.add(player);
             } else if (team.equals(Team.YELLOW)) {
-                players_yellow.add(player);
+                yellow.add(player);
             } else if (team.equals(Team.GREEN)) {
-                players_green.add(player);
-            } else if (team.equals(Team.GOLD)) {
-                players_gold.add(player);
+                green.add(player);
+            } else if (team.equals(Team.GRAY)) {
+                gray.add(player);
             } else if (team.equals(Team.WHITE)) {
-                players_white.add(player);
+                white.add(player);
             } else if (team.equals(Team.BLACK)) {
-                players_black.add(player);
+                black.add(player);
             } else {
                 throw new TeamNotFoundEcxeption("The team with the key `" + team.getString() + "` could not be found.");
             }
@@ -192,43 +203,43 @@ public abstract class TeamManager {
     public void reloadChat() {
         for (Team team : Team.values()) {
             if (team.equals(Team.RED)) {
-                chats.put(team, players_red);
+                chats.put(team, red);
             } else if (team.equals(Team.BLUE)) {
-                chats.put(team, players_blue);
+                chats.put(team, blue);
             } else if (team.equals(Team.VIOLET)) {
-                chats.put(team, players_violet);
+                chats.put(team, violet);
             } else if (team.equals(Team.YELLOW)) {
-                chats.put(team, players_yellow);
+                chats.put(team, yellow);
             } else if (team.equals(Team.GREEN)) {
-                chats.put(team, players_green);
-            } else if (team.equals(Team.GOLD)) {
-                chats.put(team, players_gold);
+                chats.put(team, green);
+            } else if (team.equals(Team.GRAY)) {
+                chats.put(team, gray);
             } else if (team.equals(Team.WHITE)) {
-                chats.put(team, players_white);
+                chats.put(team, white);
             } else if (team.equals(Team.BLACK)) {
-                chats.put(team, players_black);
+                chats.put(team, black);
             }
         }
     }
 
-    public ArrayList<Player> getTeamChat(Team team) {
+    public List<Player> getChat(Team team) {
         return chats.get(team);
     }
 
-    public void hasTeam() {
+    public void setupTeam() {
         GameSystemAPI.getInstance().sendConsoleMessage("check if all players have a team");
         for (Player p : playing) {
             if (getTeam(p.getUniqueId()) == Team.ERROR) {
-                int i = numberOfTeams;
+                int i = 1;
                 for (Team team : Team.values()) {
-                    if (i >= numberOfTeams) {
+                    if (i <= numberOfTeams) {
                         if (!teams.containsKey(p.getUniqueId())) {
                             if (team.getValue() == 0 || team.getValue() < playersPerTeam) {
                                 addSize(team, 1);
                                 teams.put(p.getUniqueId(), team.getString());
-                                addToTeamChat(team, p);
+                                addChat(team, p);
 
-                                GameSystemAPI.getInstance().getMessager().send(p, CoreSystem.getInstance().getTranslationManager().get("GameSystemAPI.team.join").replace("%team%", team.getPrefix()));
+                                GameSystemAPI.getInstance().getMessager().send(p, CoreSystem.getInstance().getTranslationManager().get("game.team.join").replace("%team%", team.getPrefix()));
                                 GameSystemAPI.getInstance().sendConsoleMessage("set player " + p.getName() + " to team " + team.getString());
                             }
                         }
@@ -242,7 +253,7 @@ public abstract class TeamManager {
         }
     }
 
-    public void clean(final Player player) {
+    public void cleanSystem(final Player player) {
         GameSystemAPI.getInstance().sendConsoleMessage("start cleanup for player " + player.getName());
         if (teams.containsKey(player.getUniqueId())) {
             if (getTeam(player.getUniqueId()) != Team.ERROR) {
@@ -261,14 +272,14 @@ public abstract class TeamManager {
         }
     }
 
-    public void chek() {
+    public void chekWinntection() {
         /* Winntection Rot, Blau, Gelb, Lila for Player == null */
         if (getTeamsize(Team.RED) > 0
                 && getTeamsize(Team.BLUE) == 0
                 && getTeamsize(Team.VIOLET) == 0
                 && getTeamsize(Team.YELLOW) == 0
                 && getTeamsize(Team.GREEN) == 0
-                && getTeamsize(Team.GOLD) == 0
+                && getTeamsize(Team.GRAY) == 0
                 && getTeamsize(Team.WHITE) == 0
                 && getTeamsize(Team.BLACK) == 0) {
 
@@ -278,7 +289,7 @@ public abstract class TeamManager {
                 && getTeamsize(Team.VIOLET) == 0
                 && getTeamsize(Team.YELLOW) == 0
                 && getTeamsize(Team.GREEN) == 0
-                && getTeamsize(Team.GOLD) == 0
+                && getTeamsize(Team.GRAY) == 0
                 && getTeamsize(Team.WHITE) == 0
                 && getTeamsize(Team.BLACK) == 0) {
 
@@ -288,7 +299,7 @@ public abstract class TeamManager {
                 && getTeamsize(Team.BLUE) == 0
                 && getTeamsize(Team.YELLOW) == 0
                 && getTeamsize(Team.GREEN) == 0
-                && getTeamsize(Team.GOLD) == 0
+                && getTeamsize(Team.GRAY) == 0
                 && getTeamsize(Team.WHITE) == 0
                 && getTeamsize(Team.BLACK) == 0) {
 
@@ -298,7 +309,7 @@ public abstract class TeamManager {
                 && getTeamsize(Team.BLUE) == 0
                 && getTeamsize(Team.VIOLET) == 0
                 && getTeamsize(Team.GREEN) == 0
-                && getTeamsize(Team.GOLD) == 0
+                && getTeamsize(Team.GRAY) == 0
                 && getTeamsize(Team.WHITE) == 0
                 && getTeamsize(Team.BLACK) == 0) {
 
@@ -308,12 +319,12 @@ public abstract class TeamManager {
                 && getTeamsize(Team.BLUE) == 0
                 && getTeamsize(Team.VIOLET) == 0
                 && getTeamsize(Team.YELLOW) == 0
-                && getTeamsize(Team.GOLD) == 0
+                && getTeamsize(Team.GRAY) == 0
                 && getTeamsize(Team.WHITE) == 0
                 && getTeamsize(Team.BLACK) == 0) {
 
             initWin(Team.GREEN.getString());
-        } else if (getTeamsize(Team.GOLD) > 0
+        } else if (getTeamsize(Team.GRAY) > 0
                 && getTeamsize(Team.RED) == 0
                 && getTeamsize(Team.BLUE) == 0
                 && getTeamsize(Team.VIOLET) == 0
@@ -322,14 +333,14 @@ public abstract class TeamManager {
                 && getTeamsize(Team.WHITE) == 0
                 && getTeamsize(Team.BLACK) == 0) {
 
-            initWin(Team.GOLD.getString());
+            initWin(Team.GRAY.getString());
         } else if (getTeamsize(Team.WHITE) > 0
                 && getTeamsize(Team.RED) == 0
                 && getTeamsize(Team.BLUE) == 0
                 && getTeamsize(Team.VIOLET) == 0
                 && getTeamsize(Team.YELLOW) == 0
                 && getTeamsize(Team.GREEN) == 0
-                && getTeamsize(Team.GOLD) == 0
+                && getTeamsize(Team.GRAY) == 0
                 && getTeamsize(Team.BLACK) == 0) {
 
             initWin(Team.WHITE.getString());
@@ -339,7 +350,7 @@ public abstract class TeamManager {
                 && getTeamsize(Team.VIOLET) == 0
                 && getTeamsize(Team.YELLOW) == 0
                 && getTeamsize(Team.GREEN) == 0
-                && getTeamsize(Team.GOLD) == 0
+                && getTeamsize(Team.GRAY) == 0
                 && getTeamsize(Team.WHITE) == 0) {
 
             initWin(Team.BLACK.getString());
@@ -347,7 +358,23 @@ public abstract class TeamManager {
         }
     }
 
-    public abstract void initDeath();
+    public String getKillMessage(final GlobalCorePlayer globalCorePlayer, final Player killer, final Player victim) {
+        if (killer == null) {
+            return CoreSystem.getInstance().getTranslationManager().get("game.death.normal", globalCorePlayer)
+                    .replace("%victim_team%", getTeam(victim.getUniqueId()).getColor())
+                    .replace("%victim%", victim.getName());
+        } else {
+            return CoreSystem.getInstance().getTranslationManager().get("game.death.bykiller", globalCorePlayer)
+                    .replace("%victim_team%", getTeam(victim.getUniqueId()).getColor())
+                    .replace("%victim%", victim.getName())
+                    .replace("%killer_team%", getTeam(killer.getUniqueId()).getColor())
+                    .replace("%killer%", killer.getName());
+        }
+    }
+
+    public abstract void onPlayerDeath(final PlayerDeathEvent e);
+
+    public abstract void onPlayerRespawn(final PlayerRespawnEvent e);
 
     public abstract void initWin(final String team);
 }

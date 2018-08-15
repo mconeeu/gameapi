@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 - 2018 Rufus Maiwald and the MC ONE Minecraftnetwork. All rights reserved
+ * Copyright (c) 2017 - 2018 Dominik Lippl, Rufus Maiwald and the MC ONE Minecraftnetwork. All rights reserved
  * You are not allowed to decompile the code
  */
 
@@ -18,10 +18,11 @@ public class GameStateHandler implements eu.mcone.gamesystem.api.gamestate.GameS
     private static GameStateID currentStateID;
     private static HashMap<GameStateID, GameState> states = new HashMap<>();
 
-    public GameStateHandler() {}
+    public GameStateHandler() {
+    }
 
     public void registerGameStateClass(GameState gameState, GameStateID type) {
-        if(states.containsKey(type)) {
+        if (states.containsKey(type)) {
             states.remove(type);
             states.put(type, gameState);
         } else {
@@ -31,7 +32,7 @@ public class GameStateHandler implements eu.mcone.gamesystem.api.gamestate.GameS
 
     public void setGameState(GameStateID id) {
         if (currentState != null) currentState.end();
-        if(states.size() > id.getValue() || states.size() == id.getValue()) {
+        if (states.size() > id.getValue() || states.size() == id.getValue()) {
             currentState = states.get(id);
             currentStateID = id;
             currentState.init();
