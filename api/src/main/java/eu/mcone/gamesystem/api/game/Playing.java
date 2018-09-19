@@ -3,7 +3,7 @@
  * You are not allowed to decompile the code
  */
 
-package eu.mcone.gamesystem.api.manager;
+package eu.mcone.gamesystem.api.game;
 
 public enum Playing {
 
@@ -26,12 +26,11 @@ public enum Playing {
 
     /**
      * set the value of the Enum
-     * @param playing_enum type Playing Enum
      * @param value        type int
      * @return new value of the enum
      */
-    public int setValue(Playing playing_enum, int value) {
-        return playing_enum.value = value;
+    public void setValue(int value) {
+        this.value = value;
     }
 
     /**

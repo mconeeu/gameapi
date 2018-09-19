@@ -3,7 +3,7 @@
  * You are not allowed to decompile the code
  */
 
-package eu.mcone.gamesystem.api.manager.map;
+package eu.mcone.gamesystem.api.game.manager.map;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

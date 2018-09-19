@@ -6,16 +6,14 @@
 package eu.mcone.gamesystem.api;
 
 import eu.mcone.coresystem.api.bukkit.CorePlugin;
+import eu.mcone.gamesystem.api.game.countdown.handler.GameCountdown;
+import eu.mcone.gamesystem.api.game.countdown.handler.GameCountdownID;
+import eu.mcone.gamesystem.api.game.manager.map.MapManager;
+import eu.mcone.gamesystem.api.game.manager.team.TeamManager;
 import eu.mcone.gamesystem.api.gamestate.GameStateHandler;
 import eu.mcone.gamesystem.api.player.DamageLogger;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Server;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.HashMap;
 
 public abstract class GameSystemAPI extends CorePlugin {
 
@@ -44,4 +42,24 @@ public abstract class GameSystemAPI extends CorePlugin {
      */
     public abstract DamageLogger getDamageLogger();
 
+    /**
+     * Create a new MapManager object
+     * @param instance CorePlugin
+     * @return new MapManager object
+     */
+    public abstract MapManager createMapManager(CorePlugin instance);
+
+    /**
+     * Create a new TeamManager object
+     * @return new TeamManager object
+     */
+    public abstract TeamManager createTeamManager();
+
+    /**
+     * Create a new GameCountdown and returns the GameCountdown interface
+     * @param countdownID
+     * @param seconds
+     * @return GameCountdown interface
+     */
+    public abstract GameCountdown registerCountdown(GameCountdownID countdownID, int seconds);
 }

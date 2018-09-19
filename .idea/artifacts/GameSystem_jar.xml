@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="GameSystem:jar">
-    <output-path>$PROJECT_DIR$/../../../Jars</output-path>
+    <output-path>$PROJECT_DIR$/../../../Servers</output-path>
     <root id="archive" name="GameSystem.jar">
       <element id="module-output" name="plugin" />
       <element id="module-output" name="api" />

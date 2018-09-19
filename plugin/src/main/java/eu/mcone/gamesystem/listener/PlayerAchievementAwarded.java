@@ -6,6 +6,8 @@
 package eu.mcone.gamesystem.listener;
 
 import eu.mcone.gamesystem.GameSystem;
+import eu.mcone.gamesystem.api.GameSystemAPI;
+import eu.mcone.gamesystem.api.gamestate.GameStateID;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

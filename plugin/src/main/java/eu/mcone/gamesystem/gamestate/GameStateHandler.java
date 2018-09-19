@@ -5,52 +5,45 @@
 
 package eu.mcone.gamesystem.gamestate;
 
-import eu.mcone.gamesystem.GameSystem;
-import eu.mcone.gamesystem.api.gamestate.GameState;
+import eu.mcone.gamesystem.api.GameSystemAPI;
+import eu.mcone.gamesystem.api.game.event.GameStateChangeEvenet;
 import eu.mcone.gamesystem.api.gamestate.GameStateID;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class GameStateHandler implements eu.mcone.gamesystem.api.gamestate.GameStateHandler {
 
-    private static GameState currentState;
-    private static GameStateID currentStateID;
-    private static HashMap<GameStateID, GameState> states = new HashMap<>();
+    @Getter
+    private GameStateID currentStateID;
+    @Getter
+    private Map<GameStateID, Long> changeList;
 
     public GameStateHandler() {
-    }
-
-    public void registerGameStateClass(GameState gameState, GameStateID type) {
-        if (states.containsKey(type)) {
-            states.remove(type);
-            states.put(type, gameState);
-        } else {
-            states.put(type, gameState);
-        }
+        currentStateID = GameStateID.ERROR;
+        changeList = new HashMap<>();
     }
 
     public void setGameState(GameStateID id) {
-        if (currentState != null) currentState.end();
-        if (states.size() > id.getValue() || states.size() == id.getValue()) {
-            currentState = states.get(id);
-            currentStateID = id;
-            currentState.init();
-        } else {
-            GameSystem.getInstance().sendConsoleMessage("§cGameState: " + id + " not exists...");
+        int i = 0;
+        for (GameStateID gameStateID : GameStateID.values()) {
+            if (i <= GameStateID.values().length) {
+                if (gameStateID.equals(id)) {
+                    currentStateID = gameStateID;
+                    changeList.put(id, System.currentTimeMillis() / 1000);
+                    Bukkit.getPluginManager().callEvent(new GameStateChangeEvenet(id));
+                    break;
+                }
+            } else {
+                GameSystemAPI.getInstance().sendConsoleMessage("§cThe GameState with the ID `" + id + "` does not exist");
+            }
         }
     }
 
     public boolean hasGameState(GameStateID type) {
         return currentStateID == type;
-    }
-
-    public GameState getCurrentState() {
-        return currentState;
-    }
-
-    public GameStateID getCurrentStateID() {
-        return currentStateID;
     }
 
 }

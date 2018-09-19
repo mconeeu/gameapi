@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: eu.mcone.networkmanager:core-api:0.1.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/eu/mcone/networkmanager/core-api/0.1.0-SNAPSHOT/core-api-0.1.0-20180826.111746-1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/eu/mcone/networkmanager/core-api/0.1.0-SNAPSHOT/core-api-0.1.0-20180826.111746-1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/eu/mcone/networkmanager/core-api/0.1.0-SNAPSHOT/core-api-0.1.0-20180826.111746-1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

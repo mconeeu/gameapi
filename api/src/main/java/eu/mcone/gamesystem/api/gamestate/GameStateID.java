@@ -10,9 +10,7 @@ public enum GameStateID {
     ERROR(0),
     LOBBY(1),
     INGAME(2),
-    END(3),
-    RESTART(4),
-    MAINTENANCE(5);
+    END(3);
 
     private int value;
 

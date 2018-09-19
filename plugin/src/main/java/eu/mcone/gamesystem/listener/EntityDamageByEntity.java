@@ -6,6 +6,7 @@
 package eu.mcone.gamesystem.listener;
 
 import eu.mcone.gamesystem.GameSystem;
+import eu.mcone.gamesystem.api.GameSystemAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -24,7 +25,6 @@ public class EntityDamageByEntity implements Listener {
     public void on(EntityDamageByEntityEvent e) {
         Entity ent = e.getEntity();
         Entity byEnt = e.getDamager();
-
         if (ent instanceof Player) {
             if (byEnt instanceof Player) {
                 GameSystem.getInstance().getDamageLogger().logDamage((Player) ent, (Player) byEnt);
@@ -37,5 +37,4 @@ public class EntityDamageByEntity implements Listener {
             }
         }
     }
-
 }
