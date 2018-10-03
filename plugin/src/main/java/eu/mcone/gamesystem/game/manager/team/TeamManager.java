@@ -1,10 +1,9 @@
 package eu.mcone.gamesystem.game.manager.team;
 
 import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
-import eu.mcone.gamesystem.GameSystem;
 import eu.mcone.gamesystem.api.GameSystemAPI;
 import eu.mcone.gamesystem.api.GameTemplate;
-import eu.mcone.gamesystem.api.ecxeptions.gamesystem.GameSystemException;
+import eu.mcone.gamesystem.api.ecxeptions.GameSystemException;
 import eu.mcone.gamesystem.api.game.Team;
 import eu.mcone.gamesystem.api.game.event.GameWinEvent;
 import eu.mcone.gamesystem.api.game.player.GamePlayer;

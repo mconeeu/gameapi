@@ -15,10 +15,6 @@ import org.bukkit.event.player.PlayerAchievementAwardedEvent;
 
 public class PlayerAchievementAwarded implements Listener{
 
-    public PlayerAchievementAwarded() {
-        Bukkit.getServer().getPluginManager().registerEvents(this, GameSystem.getInstance());
-    }
-
     @EventHandler
     public void on(PlayerAchievementAwardedEvent e) {
         e.setCancelled(true);

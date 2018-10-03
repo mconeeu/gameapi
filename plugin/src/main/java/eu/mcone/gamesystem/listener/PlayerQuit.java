@@ -14,12 +14,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 public class PlayerQuit implements Listener {
 
-    public PlayerQuit() {
-        Bukkit.getServer().getPluginManager().registerEvents(this, GameSystem.getInstance());
-    }
-
     @EventHandler
-    public void PlayerQuit(PlayerQuitEvent e) {
+    public void on(PlayerQuitEvent e) {
         Player p = e.getPlayer();
 
         if (GameTemplate.getInstance().getPlaying().contains(p)) {

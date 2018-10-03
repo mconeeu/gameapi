@@ -1,4 +1,21 @@
-.gitignore
-.ide/
-api/target/
-plugin/target/
+# IntelliJ
+.idea/
+*.iml
+*.ipr
+*.ivs
+
+# Eclipse
+.settings/
+.classpath
+.project
+
+# Netbeans
+nbproject/
+nbactions.xml
+
+# maven
+target/
+dependency-reduced-pom.xml
+
+# OS X
+.DS_Store

@@ -3,7 +3,7 @@
  * You are not allowed to decompile the code
  */
 
-package eu.mcone.gamesystem.api.ecxeptions.gamesystem;
+package eu.mcone.gamesystem.api.ecxeptions;
 
 public class GameSystemException extends Exception {
 

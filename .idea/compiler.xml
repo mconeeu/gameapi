@@ -19,10 +19,10 @@
       <module name="game-api" target="1.8" />
       <module name="gameapi" target="1.8" />
       <module name="GameSystem" target="1.8" />
-      <module name="gamesystem" target="1.8" />
       <module name="GamesystemAPI" target="1.8" />
       <module name="GameSystemAPI" target="1.8" />
       <module name="Gameystem" target="1.8" />
+      <module name="mcone-gamesystem" target="1.8" />
       <module name="plugin" target="1.8" />
     </bytecodeTargetLevel>
   </component>

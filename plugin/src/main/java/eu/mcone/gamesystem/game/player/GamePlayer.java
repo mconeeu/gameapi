@@ -4,7 +4,7 @@ import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.gamesystem.api.GameSystemAPI;
 import eu.mcone.gamesystem.api.GameTemplate;
-import eu.mcone.gamesystem.api.ecxeptions.gamesystem.GameSystemException;
+import eu.mcone.gamesystem.api.ecxeptions.GameSystemException;
 import eu.mcone.gamesystem.api.game.Team;
 import lombok.Getter;
 import lombok.Setter;

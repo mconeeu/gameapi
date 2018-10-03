@@ -8,7 +8,7 @@ package eu.mcone.gamesystem;
 import eu.mcone.coresystem.api.bukkit.CorePlugin;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.gamesystem.api.GameSystemAPI;
-import eu.mcone.gamesystem.api.ecxeptions.gamesystem.GameSystemException;
+import eu.mcone.gamesystem.api.ecxeptions.GameSystemException;
 import eu.mcone.gamesystem.api.game.countdown.handler.GameCountdown;
 import eu.mcone.gamesystem.api.game.countdown.handler.GameCountdownID;
 import eu.mcone.gamesystem.game.command.GameCommand;
@@ -27,6 +27,8 @@ import java.util.logging.Logger;
 
 public class GameSystem extends GameSystemAPI {
 
+    @Getter
+    private static GameSystem system;
     private Logger apiLog;
 
     @Getter
@@ -37,6 +39,8 @@ public class GameSystem extends GameSystemAPI {
     @Override
     public void onEnable() {
         setInstance(this);
+        system = this;
+
         apiLog = GameSystemAPI.getInstance().getLogger();
 
         CoreSystem.getInstance().getTranslationManager().loadCategories(this);
@@ -45,15 +49,19 @@ public class GameSystem extends GameSystemAPI {
         gameStateHandler = new GameStateHandler();
 
         sendConsoleMessage("§aRegistering Events...");
-        new EntityDamageByEntity();
-        new PlayerAchievementAwarded();
-        new WeatherChange();
-        new AsyncPlayerChat();
-        new PlayerJoin();
-        new PlayerQuit();
+        registerEvents(
+                new EntityDamageByEntity(),
+                new PlayerAchievementAwarded(),
+                new WeatherChange(),
+                new AsyncPlayerChat(),
+                new PlayerJoin(),
+                new PlayerQuit()
+        );
 
         sendConsoleMessage("§aRegistering Commands...");
-        CoreSystem.getInstance().getPluginManager().registerCoreCommand(new GameCommand(), this);
+        registerCommands(
+                new GameCommand()
+        );
 
         sendConsoleMessage("§aVersion §f" + this.getDescription().getVersion() + "§a enabled...");
     }

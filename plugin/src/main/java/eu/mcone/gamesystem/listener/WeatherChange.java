@@ -13,10 +13,6 @@ import org.bukkit.event.weather.WeatherChangeEvent;
 
 public class WeatherChange implements Listener{
 
-    public WeatherChange() {
-        Bukkit.getServer().getPluginManager().registerEvents(this, GameSystem.getInstance());
-    }
-
     @EventHandler
     public void on(WeatherChangeEvent e) {
         if (e.toWeatherState()) {

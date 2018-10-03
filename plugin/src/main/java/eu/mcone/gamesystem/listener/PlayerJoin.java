@@ -7,21 +7,22 @@ import eu.mcone.gamesystem.api.game.countdown.handler.GameCountdown;
 import eu.mcone.gamesystem.api.game.countdown.handler.GameCountdownID;
 import eu.mcone.gamesystem.api.gamestate.GameStateID;
 import eu.mcone.gamesystem.game.player.GamePlayer;
+import eu.mcone.gamesystem.player.DamageLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
+import java.util.HashMap;
+
 public class PlayerJoin implements Listener {
 
-    public PlayerJoin() {
-        Bukkit.getServer().getPluginManager().registerEvents(this, GameSystem.getInstance());
-    }
-
     @EventHandler
-    public void PlayerJoin(PlayerJoinEvent e) {
+    public void on(PlayerJoinEvent e) {
         Player p = e.getPlayer();
+
+        GameSystem.getSystem().getDamageLogger().getPlayers().put(e.getPlayer().getUniqueId(), new HashMap<>());
         new GamePlayer(p);
 
         if (GameSystem.getInstance().getGameStateHandler().hasGameState(GameStateID.LOBBY)) {

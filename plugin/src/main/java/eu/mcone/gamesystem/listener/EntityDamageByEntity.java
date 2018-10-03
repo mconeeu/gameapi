@@ -17,10 +17,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 public class EntityDamageByEntity implements Listener {
 
-    public EntityDamageByEntity() {
-        Bukkit.getServer().getPluginManager().registerEvents(this, GameSystem.getInstance());
-    }
-
     @EventHandler
     public void on(EntityDamageByEntityEvent e) {
         Entity ent = e.getEntity();

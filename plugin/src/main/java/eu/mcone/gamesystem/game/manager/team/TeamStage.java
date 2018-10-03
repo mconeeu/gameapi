@@ -1,6 +1,7 @@
 package eu.mcone.gamesystem.game.manager.team;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
+import eu.mcone.coresystem.api.bukkit.npc.NpcData;
 import eu.mcone.coresystem.api.bukkit.npc.NpcManager;
 import eu.mcone.coresystem.api.bukkit.world.CoreWorld;
 import eu.mcone.coresystem.api.core.exception.CoreException;
@@ -32,28 +33,24 @@ public class TeamStage implements eu.mcone.gamesystem.api.game.manager.team.Team
     }
 
     public void setPlayer(GamePlayer gamePlayer) {
-        try {
-            for (int i = 1; i <= GameTemplate.getInstance().getPlayerPreTeam(); i++) {
-                Location loc = coreWorld.getLocation(gamePlayer.getTeam().getString() + ".stage." + i).bukkit(coreWorld);
-                if (!(teamStageCached.containsKey(loc))) {
-                    teamStage.put(loc, gamePlayer);
-                    teamStageCached.put(loc, gamePlayer);
+        for (int i = 1; i <= GameTemplate.getInstance().getPlayerPreTeam(); i++) {
+            Location loc = coreWorld.getLocation(gamePlayer.getTeam().getString() + ".stage." + i).bukkit(coreWorld);
+            if (!(teamStageCached.containsKey(loc))) {
+                teamStage.put(loc, gamePlayer);
+                teamStageCached.put(loc, gamePlayer);
 
-                    SkinInfo skinInfo = CoreSystem.getInstance().getPlayerUtils().getSkinInfo(gamePlayer.getName(), "player");
-                    skinInfo.uploadSkindata();
-                    npcManager.addLocalNPC
-                            (
-                                    gamePlayer.getTeam() + "-" + gamePlayer.getName(),
-                                    gamePlayer.getTeam().getColor() + gamePlayer.getName(),
-                                    skinInfo.getName(), loc
-                            );
+                npcManager.addLocalNPC
+                        (
+                                gamePlayer.getTeam() + "-" + gamePlayer.getName(),
+                                gamePlayer.getTeam().getColor() + gamePlayer.getName(),
+                                gamePlayer.getName(),
+                                NpcData.SkinKind.PLAYER,
+                                loc
+                        );
 
-                    log.info("Add player `" + gamePlayer.getName() + "` to TeamStage `" + gamePlayer.getTeam() + "`");
-                    break;
-                }
+                log.info("Add player `" + gamePlayer.getName() + "` to TeamStage `" + gamePlayer.getTeam() + "`");
+                break;
             }
-        } catch (CoreException e) {
-            e.printStackTrace();
         }
     }
 

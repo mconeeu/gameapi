@@ -2,7 +2,7 @@ package eu.mcone.gamesystem.game.countdown;
 
 import eu.mcone.gamesystem.api.GameSystemAPI;
 import eu.mcone.gamesystem.api.GameTemplate;
-import eu.mcone.gamesystem.api.ecxeptions.gamesystem.GameSystemException;
+import eu.mcone.gamesystem.api.ecxeptions.GameSystemException;
 import eu.mcone.gamesystem.api.game.countdown.handler.GameCountdown;
 import eu.mcone.gamesystem.api.game.countdown.handler.GameCountdownID;
 import eu.mcone.gamesystem.api.game.event.GameCountdownEvent;

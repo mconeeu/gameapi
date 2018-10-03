@@ -13,12 +13,8 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 public class AsyncPlayerChat implements Listener {
 
-    public AsyncPlayerChat() {
-        Bukkit.getServer().getPluginManager().registerEvents(this, GameSystem.getInstance());
-    }
-
     @EventHandler
-    public void onAsyncPlayerChat(AsyncPlayerChatEvent e) {
+    public void on(AsyncPlayerChatEvent e) {
         Player p = e.getPlayer();
         String message = e.getMessage();
 

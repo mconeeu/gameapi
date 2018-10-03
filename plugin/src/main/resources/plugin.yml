@@ -3,4 +3,9 @@ version: 1.0.0-SNAPHOT
 authors: [Domink Lippl, Rufus Maiwald]
 main: eu.mcone.gamesystem.GameSystem
 
-commands:
+permissions:
+  gamesystem:
+    description: Gamesystem root permission
+    children:
+      gamesystem.admin:
+        description: Gamesystem admin permission

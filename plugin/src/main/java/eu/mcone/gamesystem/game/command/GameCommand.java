@@ -66,4 +66,5 @@ public class GameCommand extends CorePlayerCommand {
             GameSystem.getInstance().getMessager().send(player, "§cBitte benutze /game info");
         }
     }
+
 }

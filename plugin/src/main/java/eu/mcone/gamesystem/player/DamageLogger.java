@@ -6,6 +6,7 @@
 package eu.mcone.gamesystem.player;
 
 import eu.mcone.gamesystem.GameSystem;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,22 +18,17 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class DamageLogger implements Listener, eu.mcone.gamesystem.api.player.DamageLogger {
+public class DamageLogger implements eu.mcone.gamesystem.api.player.DamageLogger {
 
+    @Getter
     private Map<UUID, Map<UUID, Long>> players;
 
     public DamageLogger() {
         this.players = new LinkedHashMap<>();
-        Bukkit.getPluginManager().registerEvents(this,  GameSystem.getInstance());
 
         for (Player p : Bukkit.getOnlinePlayers()) {
             players.put(p.getUniqueId(), new LinkedHashMap<>());
         }
-    }
-
-    @EventHandler
-    public void on(PlayerJoinEvent e) {
-        players.put(e.getPlayer().getUniqueId(), new HashMap<>());
     }
 
     public void logDamage(Player damaged, Player damager) {
