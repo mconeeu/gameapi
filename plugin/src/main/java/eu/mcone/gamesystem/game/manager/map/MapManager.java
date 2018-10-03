@@ -21,8 +21,11 @@ import org.bukkit.entity.Player;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Logger;
 
 public class MapManager implements eu.mcone.gamesystem.api.game.manager.map.MapManager {
+
+    private Logger log;
 
     @Getter
     private CorePlugin instance;
@@ -40,6 +43,7 @@ public class MapManager implements eu.mcone.gamesystem.api.game.manager.map.MapM
 
     public MapManager(CorePlugin instance) {
         this.instance = instance;
+        log = GameSystemAPI.getInstance().getLogger();
 
         maps = new ArrayList<>();
         mapPopularity = new HashMap<>();
@@ -50,6 +54,7 @@ public class MapManager implements eu.mcone.gamesystem.api.game.manager.map.MapM
         jsonFile = new File("./plugins/" + instance.getPluginName() + "/worlds.json");
         if (!jsonFile.exists()) {
             GameSystemAPI.getInstance().sendConsoleMessage("§aCreating json file...");
+            log.info("Creating world.json in folder `" + jsonFile.getPath() + "`");
             jsonFile.createNewFile();
         }
     }
@@ -76,21 +81,21 @@ public class MapManager implements eu.mcone.gamesystem.api.game.manager.map.MapM
                 for (Map.Entry<String, Integer> entry : this.mapPopularity.entrySet()) {
                     if (entry.getValue() < i || entry.getValue() == i) {
                         gainedMap = getMap(entry.getKey());
-                        instance.sendConsoleMessage("§aReturn world " + entry.getKey());
+                        log.info("Return the world `" + entry.getKey() + "`");
                         return gainedMap;
                     }
                 }
             }
         } else {
             gainedMap = maps.get(new Random().nextInt(maps.size()));
-            instance.sendConsoleMessage("§aReturn random map");
+            log.info("Return the random map `" + gainedMap.getName() + "`");
             return gainedMap;
         }
         return null;
     }
 
     public void createMapInventory(final Player player, CoreInventory returnInventory) {
-        new MapInventory(this, player, returnInventory);
+        new MapInventory(this, player);
     }
 
 }

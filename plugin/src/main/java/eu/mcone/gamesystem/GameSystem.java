@@ -22,7 +22,12 @@ import eu.mcone.gamesystem.listener.*;
 import eu.mcone.gamesystem.player.DamageLogger;
 import lombok.Getter;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class GameSystem extends GameSystemAPI {
+
+    private Logger apiLog;
 
     @Getter
     private DamageLogger damageLogger;
@@ -32,6 +37,8 @@ public class GameSystem extends GameSystemAPI {
     @Override
     public void onEnable() {
         setInstance(this);
+        apiLog = GameSystemAPI.getInstance().getLogger();
+
         CoreSystem.getInstance().getTranslationManager().loadCategories(this);
 
         damageLogger = new DamageLogger();
@@ -58,11 +65,13 @@ public class GameSystem extends GameSystemAPI {
 
     @Override
     public MapManager createMapManager(CorePlugin instance) {
+        apiLog.info("Create new MapManager instance");
         return new MapManager(instance);
     }
 
     @Override
     public TeamManager createTeamManager() {
+        apiLog.info("Create new MapManager instance");
         return new TeamManager();
     }
 
@@ -80,6 +89,7 @@ public class GameSystem extends GameSystemAPI {
             }
         } catch (GameSystemException e) {
             e.printStackTrace();
+            GameSystemAPI.getInstance().getLogger().log(Level.SEVERE, "Exception in class GameSystem", e);
         }
         return null;
     }

@@ -36,6 +36,10 @@ public class PlayerJoin implements Listener {
                 }
             } else {
                 if (!(Bukkit.getScheduler().isCurrentlyRunning(gameCountdown.getIdleTaskID()))) {
+                    if (Bukkit.getScheduler().isCurrentlyRunning(gameCountdown.getRunTaskID())) {
+                        Bukkit.getScheduler().cancelTask(gameCountdown.getRunTaskID());
+                    }
+
                     gameCountdown.idle();
                 }
             }

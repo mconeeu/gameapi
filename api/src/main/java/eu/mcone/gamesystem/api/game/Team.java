@@ -15,7 +15,7 @@ public enum Team {
     GOLD(0, "gold", "§6Gold", "§6", false, "gold.bed", "gold.spawn", "gold.spawner.", "gold.npc"),
     GRAY(0, "gray", "§7Grau", "§7", false, "gray.bed", "gray.spawn", "gray.spawner.", "gray.npc"),
     WHITE(0, "white", "§fWeiß", "§f", false, "white.bed", "white.spawn", "white.spawner.", "white.npc"),
-    BLACK(0, "black", "§0Weiß", "§0", false, "black.bed", "black.spawn", "black.spawner.", "black.npc"),
+    BLACK(0, "black", "§0Schwarz", "§0", false, "black.bed", "black.spawn", "black.spawner.", "black.npc"),
     LIGHT_PURPLE(0, "lightPurple", "§dRosa", "§d", false, "lightPurple.bed", "lightPurple.spawn", "lightPurple.spawner.", "lightPurple.npc"),
     DARK_BLUE(0, "darkBlue", "§1Dunkelblau", "§1", false, "darkBlue.bed", "darkBlue.spawn", "darkBlue.spawner.", "darkBlue.npc"),
     DARK_GREEN(0, "darkGreen", "§2Dunkelgrün", "§2", false, "darkGreen.bed", "darkGreen.spawn", "darkGreen.spawner.", "darkGreen.npc"),

@@ -4,12 +4,12 @@ import eu.mcone.gamesystem.api.gamestate.GameStateID;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class GameStateChangeEvenet extends Event {
+public final class GameStateChangeEvent extends Event {
 
     private static final HandlerList handlerlist = new HandlerList();
     private final GameStateID gameStateID;
 
-    public GameStateChangeEvenet(GameStateID gameStateID) {
+    public GameStateChangeEvent(GameStateID gameStateID) {
         this.gameStateID = gameStateID;
     }
 

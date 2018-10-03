@@ -2,6 +2,7 @@ package eu.mcone.gamesystem.api.game.player;
 
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.gamesystem.api.game.Team;
+import eu.mcone.gamesystem.api.game.manager.team.TeamStage;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -10,27 +11,29 @@ public interface GamePlayer {
 
     Team getTeam();
 
+    String getName();
+
     CorePlayer getCorePlayer();
 
     Player getBukkitPlayer();
 
-    void setSpectator(boolean var);
+    void setSpectator(final boolean var);
 
-    void setPlaying(boolean var);
+    void setPlaying(final boolean var);
 
     boolean isSpectator();
 
     boolean isPlaying();
 
-    void setTeam(Team team);
+    void setTeam(final Team team);
 
-    void updateTeamLive(boolean var);
+    void updateTeamLive(final boolean var);
 
-    void setTeamSize(int size);
+    void setTeamSize(final int size);
 
-    void addTeamSize(int size);
+    void addTeamSize(final int size);
 
-    void removeTeamSize(int size);
+    void removeTeamSize(final int size);
 
     int getTeamSize();
 
@@ -46,13 +49,13 @@ public interface GamePlayer {
 
     void addCoins(int coins);
 
-    void addKill();
+    void addRoundKill();
 
-    void addKill(int var);
+    void addRoundKill(int var);
 
-    void addDeath();
+    void addRoundDeath();
 
-    void addDeath(int var);
+    void addRoundDeath(int var);
 
     void addDestroyedBed();
 

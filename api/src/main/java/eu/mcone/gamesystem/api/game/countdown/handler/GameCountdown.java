@@ -24,4 +24,6 @@ public interface GameCountdown {
 
     void stop();
 
+    void forceStop();
+
 }

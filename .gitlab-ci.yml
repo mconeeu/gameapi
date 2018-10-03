@@ -1,0 +1,16 @@
+build:
+  script:
+  - mvn clean install --settings /home/gitlab-runner/settings.xml
+  artifacts:
+    paths:
+    - $CI_PROJECT_DIR/*/target/*.jar
+  only:
+  - master
+  stage: build
+
+deploy:
+  script:
+  - mvn deploy --settings /home/gitlab-runner/settings.xml
+  only:
+  - master
+  stage: deploy

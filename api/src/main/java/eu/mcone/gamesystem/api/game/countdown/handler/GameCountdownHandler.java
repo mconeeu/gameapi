@@ -1,13 +1,11 @@
 package eu.mcone.gamesystem.api.game.countdown.handler;
 
-import lombok.Getter;
-
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 public class GameCountdownHandler {
 
-    @Getter
     private Map<GameCountdownID, GameCountdown> gameCountdowns;
 
     public GameCountdownHandler() {
@@ -22,5 +20,9 @@ public class GameCountdownHandler {
 
     public GameCountdown getGameCountdown(GameCountdownID gameCountdownID) {
         return gameCountdowns.get(gameCountdownID);
+    }
+
+    public Collection<GameCountdown> getGameCountdowns() {
+        return gameCountdowns.values();
     }
 }

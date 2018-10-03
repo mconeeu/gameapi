@@ -1,5 +1,6 @@
 package eu.mcone.gamesystem.game.countdown;
 
+import eu.mcone.gamesystem.api.GameSystemAPI;
 import eu.mcone.gamesystem.api.GameTemplate;
 import eu.mcone.gamesystem.api.ecxeptions.gamesystem.GameSystemException;
 import eu.mcone.gamesystem.api.game.countdown.handler.GameCountdown;
@@ -10,7 +11,12 @@ import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class SpawnCountdown implements GameCountdown {
+
+    private Logger log;
 
     @Getter
     private final GameCountdownID ID = GameCountdownID.SPAWN_COUNTDOWN;
@@ -25,6 +31,8 @@ public class SpawnCountdown implements GameCountdown {
     private boolean isRunning;
 
     public SpawnCountdown(int seconds) {
+        log = GameSystemAPI.getInstance().getLogger();
+
         try {
             if (GameTemplate.getInstance() != null) {
                 if (seconds >= 5) {
@@ -39,6 +47,8 @@ public class SpawnCountdown implements GameCountdown {
             }
         } catch (GameSystemException e) {
             e.printStackTrace();
+
+            log.log(Level.SEVERE, "Exception in SpawnCountdown", e);
         }
     }
 
@@ -85,22 +95,32 @@ public class SpawnCountdown implements GameCountdown {
 
     @Override
     public void idle() {
-        System.out.println("No idling defined");
+        log.info("No idling task defined for this countdown");
     }
 
     public void reset() {
+        log.info("Reset SpawnCountdown");
+
         for (Player all : GameTemplate.getInstance().getPlaying()) {
             all.setLevel(staticSeconds);
         }
     }
 
     public void stop() {
-        for (Player all : GameTemplate.getInstance().getPlaying()) {
-            all.setLevel(staticSeconds);
-        }
+        log.info("Stop SpawnCountdown");
+
+        reset();
 
         this.seconds = staticSeconds;
         this.isRunning = false;
-        Bukkit.getScheduler().cancelTask(this.runTaskID);
+
+        Bukkit.getScheduler().cancelTask(runTaskID);
+    }
+
+    public void forceStop() {
+        log.log(Level.WARNING, "Forcestop SpawnCountdown");
+
+        Bukkit.getScheduler().cancelTask(runTaskID);
+        log.log(Level.WARNING, "Cancel running Task");
     }
 }

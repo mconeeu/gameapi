@@ -1,6 +1,8 @@
 package eu.mcone.gamesystem.game.countdown;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
+import eu.mcone.gamesystem.GameSystem;
+import eu.mcone.gamesystem.api.GameSystemAPI;
 import eu.mcone.gamesystem.api.GameTemplate;
 import eu.mcone.gamesystem.api.ecxeptions.gamesystem.GameSystemException;
 import eu.mcone.gamesystem.api.game.Playing;
@@ -13,8 +15,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class LobbyCountdown implements GameCountdown {
 
+    private Logger log;
     @Getter
     private final GameCountdownID ID = GameCountdownID.LOBBY_COUNTDOWN;
     @Setter
@@ -28,6 +34,8 @@ public class LobbyCountdown implements GameCountdown {
     private boolean isWaiting, isRunning;
 
     public LobbyCountdown(int seconds) {
+        log = GameSystemAPI.getInstance().getLogger();
+
         try {
             if (GameTemplate.getInstance() != null) {
                 if (seconds >= 60) {
@@ -42,12 +50,13 @@ public class LobbyCountdown implements GameCountdown {
             }
         } catch (GameSystemException e) {
             e.printStackTrace();
+            log.log(Level.SEVERE, "Exception in LobbyCountdown", e);
         }
     }
 
     public void run() {
         if (!(Bukkit.getScheduler().isCurrentlyRunning(runTaskID))) {
-            this.runTaskID = Bukkit.getScheduler().runTaskTimerAsynchronously(GameTemplate.getInstance(), () -> {
+            this.runTaskID = Bukkit.getScheduler().runTaskTimer(GameTemplate.getInstance(), () -> {
                 Bukkit.getServer().getPluginManager().callEvent(
                         new GameCountdownEvent
                                 (
@@ -109,16 +118,22 @@ public class LobbyCountdown implements GameCountdown {
 
             this.idleTaskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(GameTemplate.getInstance(), () -> {
                 int missing = Playing.Min_Players.getValue() - GameTemplate.getInstance().getPlaying().size();
-                for (Player playing : GameTemplate.getInstance().getPlaying()) {
-                    GameTemplate.getInstance().getMessager()
-                            .send(playing, CoreSystem.getInstance().getTranslationManager().get("game.countdown.lobby.missing", CoreSystem.getInstance().getGlobalCorePlayer(playing.getUniqueId()))
-                                    .replace("%missing%", Integer.toString(missing)));
+                if (missing > 0) {
+                    for (Player playing : GameTemplate.getInstance().getPlaying()) {
+                        GameTemplate.getInstance().getMessager()
+                                .send(playing, CoreSystem.getInstance().getTranslationManager().get("game.countdown.lobby.missing", CoreSystem.getInstance().getGlobalCorePlayer(playing.getUniqueId()))
+                                        .replace("%missing%", Integer.toString(missing)));
+                    }
+                } else {
+                    Bukkit.getScheduler().cancelTask(idleTaskID);
                 }
             }, 0L, 500L);
         }
     }
 
     public void reset() {
+        log.info("Reset LobbyCountdown");
+
         this.seconds = staticSeconds;
 
         for (Player all : GameTemplate.getInstance().getPlaying()) {
@@ -127,10 +142,27 @@ public class LobbyCountdown implements GameCountdown {
     }
 
     public void stop() {
+        log.info("Stop LobbyCountdown");
+
         reset();
         this.isWaiting = false;
         this.isRunning = false;
-        if (Bukkit.getScheduler().isCurrentlyRunning(runTaskID)) Bukkit.getScheduler().cancelTask(runTaskID);
-        if (Bukkit.getScheduler().isCurrentlyRunning(idleTaskID)) Bukkit.getScheduler().cancelTask(idleTaskID);
+        if (Bukkit.getScheduler().isCurrentlyRunning(runTaskID)) {
+            Bukkit.getScheduler().cancelTask(runTaskID);
+        }
+
+        if (Bukkit.getScheduler().isCurrentlyRunning(idleTaskID)) {
+            Bukkit.getScheduler().cancelTask(idleTaskID);
+        }
+    }
+
+    public void forceStop() {
+        log.log(Level.WARNING, "Forcestop LobbyCountdown");
+
+        Bukkit.getScheduler().cancelTask(runTaskID);
+        log.log(Level.WARNING, "Cancel running Task");
+
+        Bukkit.getScheduler().cancelTask(idleTaskID);
+        log.log(Level.WARNING, "Cancel idle Task");
     }
 }

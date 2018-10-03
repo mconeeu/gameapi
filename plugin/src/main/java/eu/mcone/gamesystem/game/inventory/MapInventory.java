@@ -18,13 +18,11 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 public class MapInventory extends CoreInventory {
 
     private MapManager mapManager;
-    private CoreInventory returnInventory;
 
-    public MapInventory(MapManager mapManager, Player player, CoreInventory returnInventory) {
-        super("§8» §c§lVoting | §f§oMapvoting", player, InventorySlot.ROW_2, Option.FILL_EMPTY_SLOTS);
+    public MapInventory(MapManager mapManager, Player player) {
+        super("§8» §c§lVoting §8┋ §f§oMapvoting", player, InventorySlot.ROW_2, Option.FILL_EMPTY_SLOTS);
 
         this.mapManager = mapManager;
-        this.returnInventory = returnInventory;
 
         int i = 0;
         for (MapItem mapItems : this.mapManager.getMaps()) {
@@ -34,32 +32,28 @@ public class MapInventory extends CoreInventory {
             }
         }
 
-        setItem(InventorySlot.ROW_2_SLOT_9, new ItemBuilder(Material.IRON_DOOR, 1).displayName("§c§l↩ Zurück").create(), e -> player.openInventory(returnInventory.getInventory()));
+        setItem(InventorySlot.ROW_2_SLOT_9, new ItemBuilder(Material.IRON_DOOR, 1).displayName("§c§l↩ Zurück").create());
 
-        player.playSound(player.getLocation(), Sound.LEVEL_UP, 1,1);
+        player.playSound(player.getLocation(), Sound.LEVEL_UP, 1, 1);
         openInventory();
     }
 
 
     private void function(InventoryClickEvent e) {
         Player p = (Player) e.getWhoClicked();
-        if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase("§7§l↩ Zurück")) {
-            p.openInventory(returnInventory.getInventory());
-        } else {
-            for (MapItem items : mapManager.getMaps()) {
-                if (items.getDisplayname().equalsIgnoreCase(e.getCurrentItem().getItemMeta().getDisplayName())) {
-                    this.mapManager.getMapVoting().put(p, items.getName());
+        for (MapItem items : mapManager.getMaps()) {
+            if (items.getDisplayname().equalsIgnoreCase(e.getCurrentItem().getItemMeta().getDisplayName())) {
+                this.mapManager.getMapVoting().put(p, items.getName());
 
-                    if (this.mapManager.getMapPopularity().containsKey(items.getName())) {
-                        this.mapManager.getMapPopularity().put(items.getName(), this.mapManager.getMapPopularity().get(items.getName()) + 1);
-                    } else {
-                        this.mapManager.getMapPopularity().put(items.getName(), 1);
-                    }
-
-                    update(e);
-                    p.playSound(p.getLocation(), Sound.NOTE_BASS, 1, 1);
-                    mapManager.getInstance().getMessager().send(p, "§7Du hast für die map §b" + items.getName() + " §7gevotet.");
+                if (this.mapManager.getMapPopularity().containsKey(items.getName())) {
+                    this.mapManager.getMapPopularity().put(items.getName(), this.mapManager.getMapPopularity().get(items.getName()) + 1);
+                } else {
+                    this.mapManager.getMapPopularity().put(items.getName(), 1);
                 }
+
+                update(e);
+                p.playSound(p.getLocation(), Sound.NOTE_BASS, 1, 1);
+                mapManager.getInstance().getMessager().send(p, "§7Du hast für die map §b" + items.getName() + " §7gevotet.");
             }
         }
     }
@@ -69,11 +63,15 @@ public class MapInventory extends CoreInventory {
         int i = 0;
         for (MapItem mapItems : this.mapManager.getMaps()) {
             if (mapItems.isUse()) {
-                setItem(i, new ItemBuilder(mapItems.getMaterial(), mapManager.getMapPopularity().get(mapItems.getName())).displayName(mapItems.getDisplayname()).lore(mapItems.getLore()).create());
+                setItem(i, new ItemBuilder(mapItems.getMaterial(), getSize(mapItems)).displayName(mapItems.getDisplayname()).lore(mapItems.getLore()).create());
                 i++;
             }
         }
 
         p.updateInventory();
+    }
+
+    private int getSize(final MapItem mapItem) {
+        return mapManager.getMapPopularity().getOrDefault(mapItem.getName(), 0);
     }
 }

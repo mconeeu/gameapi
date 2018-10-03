@@ -4,7 +4,7 @@ import eu.mcone.gamesystem.api.game.countdown.handler.GameCountdownID;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class GameCountdownEvent extends Event {
+public final class GameCountdownEvent extends Event {
 
     public static final HandlerList handlerList = new HandlerList();
     private GameCountdownID ID;

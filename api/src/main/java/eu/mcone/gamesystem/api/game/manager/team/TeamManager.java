@@ -1,10 +1,15 @@
 package eu.mcone.gamesystem.api.game.manager.team;
 
-import eu.mcone.coresystem.api.core.player.GlobalCorePlayer;
 import eu.mcone.gamesystem.api.game.Team;
 import org.bukkit.entity.Player;
 
 public interface TeamManager {
+
+    /**
+     * Returns the teamStage
+     * @return TeamStage interface
+     */
+    TeamStage getTeamStage();
 
     /**
      * Returns the team where the team name

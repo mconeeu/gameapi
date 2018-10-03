@@ -1,62 +1,56 @@
 package eu.mcone.gamesystem.game.manager.team;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
+import eu.mcone.coresystem.api.bukkit.npc.NpcManager;
 import eu.mcone.coresystem.api.bukkit.world.CoreWorld;
 import eu.mcone.coresystem.api.core.exception.CoreException;
 import eu.mcone.coresystem.api.core.player.SkinInfo;
+import eu.mcone.gamesystem.api.GameSystemAPI;
 import eu.mcone.gamesystem.api.GameTemplate;
 import eu.mcone.gamesystem.api.game.player.GamePlayer;
 import org.bukkit.Location;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
-public class TeamStage {
+public class TeamStage implements eu.mcone.gamesystem.api.game.manager.team.TeamStage {
 
-    private Map<Location, GamePlayer> teamStages;
+    private Logger log;
+    private Map<Location, GamePlayer> teamStage;
     private Map<Location, GamePlayer> teamStageCached;
+    private NpcManager npcManager;
     private CoreWorld coreWorld;
 
     TeamStage() {
-        teamStages = new HashMap<>();
+        log = GameSystemAPI.getInstance().getLogger();
+        teamStage = new HashMap<>();
         teamStageCached = new HashMap<>();
+        npcManager = CoreSystem.getInstance().getNpcManager();
 
         coreWorld = CoreSystem.getInstance().getWorldManager().getWorld(GameTemplate.getInstance().getGameSettings().getConfig().getString("lobbyWorld"));
     }
 
     public void setPlayer(GamePlayer gamePlayer) {
         try {
-            for (int i = 1; i > GameTemplate.getInstance().getPlayerPreTeam(); i++) {
-                Location location = coreWorld.getLocation(gamePlayer.getTeam().getString() + ".stagePlace.1").bukkit(coreWorld);
-                if (!(teamStageCached.containsKey(location))) {
-                    teamStages.put(location, gamePlayer);
-                    teamStageCached.put(location, gamePlayer);
+            for (int i = 1; i <= GameTemplate.getInstance().getPlayerPreTeam(); i++) {
+                Location loc = coreWorld.getLocation(gamePlayer.getTeam().getString() + ".stage." + i).bukkit(coreWorld);
+                if (!(teamStageCached.containsKey(loc))) {
+                    teamStage.put(loc, gamePlayer);
+                    teamStageCached.put(loc, gamePlayer);
 
-                    SkinInfo skinInfo = CoreSystem.getInstance().getPlayerUtils().getSkinInfo(gamePlayer.getBukkitPlayer().getName(), "player");
+                    SkinInfo skinInfo = CoreSystem.getInstance().getPlayerUtils().getSkinInfo(gamePlayer.getName(), "player");
                     skinInfo.uploadSkindata();
-                    CoreSystem.getInstance().getNpcManager().addLocalNPC(gamePlayer.getTeam().getString() + "-" + gamePlayer.getBukkitPlayer().getName(), gamePlayer.getTeam().getColor() + gamePlayer.getBukkitPlayer().getName(), skinInfo.getName(), location);
+                    npcManager.addLocalNPC
+                            (
+                                    gamePlayer.getTeam() + "-" + gamePlayer.getName(),
+                                    gamePlayer.getTeam().getColor() + gamePlayer.getName(),
+                                    skinInfo.getName(), loc
+                            );
+
+                    log.info("Add player `" + gamePlayer.getName() + "` to TeamStage `" + gamePlayer.getTeam() + "`");
                     break;
-
-                } else {
-                    location.setY(location.getY() + i - 1);
                 }
-
-                /*
-                if ((coreWorld.getLocation(gamePlayer.getTeam().getString() + ".stagePlace").getY() + i) != null) {
-                    Location location = coreWorld.getLocation(gamePlayer.getTeam().getString() + ".stagePlace." + i).bukkit(coreWorld);
-                    if (!teamStages.containsKey(location)) {
-                        teamStages.put(location, gamePlayer);
-                        oldCached.put(location, gamePlayer);
-
-                        SkinInfo skinInfo = CoreSystem.getInstance().getPlayerUtils().getSkinInfo(gamePlayer.getPlayer().getName());
-                        skinInfo.uploadSkindata();
-                        CoreSystem.getInstance().getNpcManager().addLocalNPC(gamePlayer.getTeam().getString() + "-" + gamePlayer.getPlayer().getName(), gamePlayer.getTeam().getColor() + gamePlayer.getPlayer().getName(), skinInfo.getName(), location);
-                        break;
-                    }
-                } else {
-                    throw new GameSystemException("Error the Location " + gamePlayer.getTeam().getString() + ".stagePlace." + i + " does not exist.");
-                }
-                */
             }
         } catch (CoreException e) {
             e.printStackTrace();
@@ -67,8 +61,12 @@ public class TeamStage {
         if (teamStageCached.containsValue(gamePlayer)) {
             for (Map.Entry<Location, GamePlayer> entry : teamStageCached.entrySet()) {
                 if (entry.getValue().equals(gamePlayer)) {
-                    teamStages.remove(entry.getKey());
-                    CoreSystem.getInstance().getNpcManager().removeNPC(CoreSystem.getInstance().getNpcManager().getNPC(coreWorld, gamePlayer.getTeam().getString() + "-" + gamePlayer.getBukkitPlayer().getName()));
+                    teamStage.remove(entry.getKey());
+                    npcManager.removeNPC
+                            (
+                                    npcManager.getNPC(coreWorld, gamePlayer.getTeam() + "-" + gamePlayer.getName())
+                            );
+                    log.info("Remove `" + gamePlayer.getName() + "` from TeamStage `" + gamePlayer.getTeam() + "`");
                 }
             }
         }

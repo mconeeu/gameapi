@@ -17,8 +17,8 @@ public class TeamInventory extends CoreInventory {
 
     private TeamStage teamStage;
 
-    public TeamInventory(Player player, TeamStage teamStage) {
-        super("§8» §c§oTeamauswahl", player, InventorySlot.ROW_3, Option.FILL_EMPTY_SLOTS);
+    public TeamInventory(Player player, TeamStage teamStage, int inventorySize) {
+        super("§8» §c§oTeamauswahl", player, inventorySize, Option.FILL_EMPTY_SLOTS);
         this.teamStage = teamStage;
 
         int i = 1;
@@ -109,19 +109,19 @@ public class TeamInventory extends CoreInventory {
             }
         } else if (GameTemplate.getInstance().getNumberOfTeams() == 8) {
             if (team.equals(Team.RED)) {
-                return InventorySlot.ROW_2_SLOT_1;
+                return InventorySlot.ROW_1_SLOT_1;
             } else if (team.equals(Team.BLUE)) {
-                return InventorySlot.ROW_2_SLOT_2;
+                return InventorySlot.ROW_3_SLOT_2;
             } else if (team.equals(Team.AQUA)) {
-                return InventorySlot.ROW_2_SLOT_3;
+                return InventorySlot.ROW_1_SLOT_3;
             } else if (team.equals(Team.GREEN)) {
-                return InventorySlot.ROW_2_SLOT_4;
+                return InventorySlot.ROW_3_SLOT_4;
             } else if (team.equals(Team.YELLOW)) {
-                return InventorySlot.ROW_2_SLOT_5;
+                return InventorySlot.ROW_1_SLOT_5;
             } else if (team.equals(Team.GOLD)) {
-                return InventorySlot.ROW_2_SLOT_6;
+                return InventorySlot.ROW_3_SLOT_6;
             } else if (team.equals(Team.GRAY)) {
-                return InventorySlot.ROW_2_SLOT_7;
+                return InventorySlot.ROW_1_SLOT_7;
             } else if (team.equals(Team.WHITE)) {
                 return InventorySlot.ROW_3_SLOT_8;
             }

@@ -26,9 +26,11 @@ public class PlayerQuit implements Listener {
             GameTemplate.getInstance().getGamePlayer(p.getUniqueId()).destroy();
 
             if (GameSystem.getInstance().getGameStateHandler().hasGameState(GameStateID.LOBBY)) {
+                GameCountdown gameCountdown = GameTemplate.getInstance().getGameCountdownHandler().getGameCountdown(GameCountdownID.LOBBY_COUNTDOWN);
                 if (Playing.Min_Players.getValue() - GameTemplate.getInstance().getPlaying().size() > 0) {
-                    GameCountdown gameCountdown = GameTemplate.getInstance().getGameCountdownHandler().getGameCountdown(GameCountdownID.LOBBY_COUNTDOWN);
                     if (!(Bukkit.getScheduler().isCurrentlyRunning(gameCountdown.getIdleTaskID()))) gameCountdown.idle();
+                } else if (Bukkit.getScheduler().isCurrentlyRunning(gameCountdown.getIdleTaskID())) {
+                    Bukkit.getScheduler().cancelTask(gameCountdown.getIdleTaskID());
                 }
             }
         }

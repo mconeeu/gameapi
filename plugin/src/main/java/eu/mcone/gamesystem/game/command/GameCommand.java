@@ -4,6 +4,7 @@ import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.command.CorePlayerCommand;
 import eu.mcone.gamesystem.GameSystem;
 import eu.mcone.gamesystem.api.game.Team;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 public class GameCommand extends CorePlayerCommand {
@@ -25,12 +26,16 @@ public class GameCommand extends CorePlayerCommand {
             }
         } else if (args.length == 4) {
             if (player.hasPermission("gamesystem.admin")) {
-                if (args[0].equalsIgnoreCase("stage")) {
-                        if (args[1].equalsIgnoreCase("set")) {
+                if (args[0].equalsIgnoreCase("set")) {
+                        if (args[1].equalsIgnoreCase("stage")) {
                             for (Team team : Team.values()) {
                                 if (args[2].equalsIgnoreCase(team.getString())) {
                                     try {
-                                        CoreSystem.getInstance().getWorldManager().getWorld(player.getWorld()).setLocation(team.getString() + ".stagePlace." + Integer.parseInt(args[3]), player.getLocation()).save();
+                                        Location loc = player.getLocation();
+                                        loc.setYaw(Math.round(loc.getYaw()));
+                                        loc.setPitch(Math.round(loc.getPitch()));
+
+                                        CoreSystem.getInstance().getWorldManager().getWorld(player.getWorld()).setLocation(team.getString() + ".stage." + Integer.parseInt(args[3]), loc).save();
                                         GameSystem.getInstance().getMessager().send(player, "§aDu hast für das Team " + team.getColor() + team + " §aden Stageplatz §7" + args[3] + " §agesetzt.");
                                     } catch (NumberFormatException e) {
                                         GameSystem.getInstance().getMessager().send(player, "§cDer angegebenen Stageplatz ist keine Zahl!");
@@ -56,7 +61,7 @@ public class GameCommand extends CorePlayerCommand {
     private void sendHelpTopic(Player player) {
         if (player.hasPermission("gamesystem.admin")) {
             GameSystem.getInstance().getMessager().send(player, "§c/game info");
-            GameSystem.getInstance().getMessager().send(player, "§c/game stage set <team> <platz>");
+            GameSystem.getInstance().getMessager().send(player, "§c/game set stage <team> <place>");
         } else {
             GameSystem.getInstance().getMessager().send(player, "§cBitte benutze /game info");
         }
