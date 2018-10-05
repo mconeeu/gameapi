@@ -21,27 +21,29 @@ public class PlayerJoin implements Listener {
     @EventHandler
     public void on(PlayerJoinEvent e) {
         Player p = e.getPlayer();
-
         GameSystem.getSystem().getDamageLogger().getPlayers().put(e.getPlayer().getUniqueId(), new HashMap<>());
-        new GamePlayer(p);
 
-        if (GameSystem.getInstance().getGameStateHandler().hasGameState(GameStateID.LOBBY)) {
-            GameCountdown gameCountdown = GameTemplate.getInstance().getGameCountdownHandler().getGameCountdown(GameCountdownID.LOBBY_COUNTDOWN);
-            if (Playing.Min_Players.getValue() - GameTemplate.getInstance().getPlaying().size() <= 0) {
-                if (!(gameCountdown.isRunning())) {
-                    if (Bukkit.getScheduler().isCurrentlyRunning(gameCountdown.getIdleTaskID())) {
-                        Bukkit.getScheduler().cancelTask(gameCountdown.getIdleTaskID());
+        if (GameTemplate.getInstance() != null) {
+            new GamePlayer(p);
+
+            if (GameSystem.getInstance().getGameStateHandler().hasGameState(GameStateID.LOBBY)) {
+                GameCountdown gameCountdown = GameTemplate.getInstance().getGameCountdownHandler().getGameCountdown(GameCountdownID.LOBBY_COUNTDOWN);
+                if (Playing.Min_Players.getValue() - GameTemplate.getInstance().getPlaying().size() <= 0) {
+                    if (!(gameCountdown.isRunning())) {
+                        if (Bukkit.getScheduler().isCurrentlyRunning(gameCountdown.getIdleTaskID())) {
+                            Bukkit.getScheduler().cancelTask(gameCountdown.getIdleTaskID());
+                        }
+
+                        gameCountdown.run();
                     }
+                } else {
+                    if (!(Bukkit.getScheduler().isCurrentlyRunning(gameCountdown.getIdleTaskID()))) {
+                        if (Bukkit.getScheduler().isCurrentlyRunning(gameCountdown.getRunTaskID())) {
+                            Bukkit.getScheduler().cancelTask(gameCountdown.getRunTaskID());
+                        }
 
-                    gameCountdown.run();
-                }
-            } else {
-                if (!(Bukkit.getScheduler().isCurrentlyRunning(gameCountdown.getIdleTaskID()))) {
-                    if (Bukkit.getScheduler().isCurrentlyRunning(gameCountdown.getRunTaskID())) {
-                        Bukkit.getScheduler().cancelTask(gameCountdown.getRunTaskID());
+                        gameCountdown.idle();
                     }
-
-                    gameCountdown.idle();
                 }
             }
         }
