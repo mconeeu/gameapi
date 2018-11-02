@@ -1,5 +1,5 @@
 name: MCONE-GameSystem
-version: 1.0.0-SNAPHOT
+version: ${project.version}
 authors: [Domink Lippl, Rufus Maiwald]
 main: eu.mcone.gamesystem.GameSystem
 
