@@ -5,27 +5,25 @@
 
 package eu.mcone.gamesystem.api.game.event;
 
-import eu.mcone.gamesystem.api.game.countdown.handler.GameCountdownID;
+import eu.mcone.gamesystem.api.game.achivements.SolvedAchievement;
 import lombok.Getter;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public final class GameCountdownEvent extends Event {
+import java.util.UUID;
+
+public class GameAchievementEvent extends Event {
 
     public static final HandlerList handlerList = new HandlerList();
 
     @Getter
-    private final GameCountdownID ID;
+    private final UUID uuid;
     @Getter
-    private final int seconds, runningTaskID;
-    @Getter
-    private final boolean isRunning;
+    private final SolvedAchievement solvedAchievement;
 
-    public GameCountdownEvent(final GameCountdownID ID, final int seconds, final boolean isRunning, final int runningTaskID) {
-        this.ID = ID;
-        this.seconds = seconds;
-        this.isRunning = isRunning;
-        this.runningTaskID = runningTaskID;
+    public GameAchievementEvent(final UUID uuid, final SolvedAchievement solvedAchievement) {
+        this.uuid = uuid;
+        this.solvedAchievement = solvedAchievement;
     }
 
     @Override

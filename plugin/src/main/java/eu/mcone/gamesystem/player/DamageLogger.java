@@ -1,24 +1,21 @@
 /*
- * Copyright (c) 2017 - 2018 Dominik Lippl, Rufus Maiwald and the MC ONE Minecraftnetwork. All rights reserved
+ * Copyright (c) 2017 - 2019 Dominik Lippl, Rufus Maiwald and the MC ONE Minecraftnetwork. All rights reserved
  * You are not allowed to decompile the code
  */
 
 package eu.mcone.gamesystem.player;
 
-import eu.mcone.gamesystem.GameSystem;
+import eu.mcone.gamesystem.api.player.IDamageLogger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class DamageLogger implements eu.mcone.gamesystem.api.player.DamageLogger {
+public class DamageLogger implements IDamageLogger {
 
     @Getter
     private Map<UUID, Map<UUID, Long>> players;
@@ -32,7 +29,7 @@ public class DamageLogger implements eu.mcone.gamesystem.api.player.DamageLogger
     }
 
     public void logDamage(Player damaged, Player damager) {
-        players.get(damaged.getUniqueId()).put(damager.getUniqueId(), System.currentTimeMillis()/1000);
+        players.get(damaged.getUniqueId()).put(damager.getUniqueId(), System.currentTimeMillis() / 1000);
     }
 
     public Player getKiller(Player p) {
@@ -43,11 +40,7 @@ public class DamageLogger implements eu.mcone.gamesystem.api.player.DamageLogger
             }
 
             if ((entry != null) && (entry.getValue() > (System.currentTimeMillis() / 1000) - 5)) {
-                Player k = Bukkit.getPlayer(entry.getKey());
-
-                if (k != null) {
-                    return k;
-                }
+                return Bukkit.getPlayer(entry.getKey());
             }
         }
         return null;

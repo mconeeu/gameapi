@@ -1,13 +1,18 @@
+/*
+ * Copyright (c) 2017 - 2019 Dominik Lippl, Rufus Maiwald and the MC ONE Minecraftnetwork. All rights reserved
+ * You are not allowed to decompile the code
+ */
+
 package eu.mcone.gamesystem.api.game.player;
 
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
+import eu.mcone.coresystem.api.bukkit.player.Stats;
 import eu.mcone.gamesystem.api.game.Team;
-import eu.mcone.gamesystem.api.game.manager.team.TeamStage;
 import org.bukkit.entity.Player;
 
 import java.util.List;
 
-public interface GamePlayer {
+public interface IGamePlayer {
 
     Team getTeam();
 
@@ -27,7 +32,7 @@ public interface GamePlayer {
 
     void setTeam(final Team team);
 
-    void updateTeamLive(final boolean var);
+    void updateTeamAlive(final boolean var);
 
     void setTeamSize(final int size);
 
@@ -57,9 +62,9 @@ public interface GamePlayer {
 
     void addRoundDeath(int var);
 
-    void addDestroyedBed();
+    void addGoal();
 
-    void addDestroyedBed(int var);
+    void addGoals(int var);
 
     int getRoundKills();
 
@@ -67,7 +72,9 @@ public interface GamePlayer {
 
     int getRoundCoins();
 
-    int getRoundBeds();
+    int getRoundGoals();
+
+    Stats getStats();
 
     double getRoundKD();
 }

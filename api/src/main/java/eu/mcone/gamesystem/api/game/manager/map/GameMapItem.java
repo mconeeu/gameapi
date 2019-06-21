@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 - 2018 Dominik Lippl, Rufus Maiwald and the MC ONE Minecraftnetwork. All rights reserved
+ * Copyright (c) 2017 - 2019 Dominik Lippl, Rufus Maiwald and the MC ONE Minecraftnetwork. All rights reserved
  * You are not allowed to decompile the code
  */
 
@@ -11,11 +11,11 @@ import org.bukkit.Material;
 
 @AllArgsConstructor
 @Getter
-public class MapItem {
+public class GameMapItem {
 
-    private String name;
-    private boolean use;
+    private String world;
+    private String displayName;
+    private boolean useMap;
     private Material material;
-    private String displayname;
     private String[] lore;
 }

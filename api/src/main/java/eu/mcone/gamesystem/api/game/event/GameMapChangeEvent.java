@@ -5,28 +5,29 @@
 
 package eu.mcone.gamesystem.api.game.event;
 
-import eu.mcone.gamesystem.api.gamestate.GameStateID;
+import eu.mcone.gamesystem.api.game.manager.map.GameMapItem;
 import lombok.Getter;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public final class GameStateChangeEvent extends Event {
+public class GameMapChangeEvent extends Event {
 
-    private static final HandlerList handlerlist = new HandlerList();
+    public static final HandlerList handlerList = new HandlerList();
 
     @Getter
-    private final GameStateID gameStateID;
+    private final GameMapItem mapItem;
 
-    public GameStateChangeEvent(final GameStateID gameStateID) {
-        this.gameStateID = gameStateID;
+    public GameMapChangeEvent(final GameMapItem mapItem) {
+        this.mapItem = mapItem;
     }
 
     @Override
     public HandlerList getHandlers() {
-        return handlerlist;
+        return handlerList;
     }
 
     public static HandlerList getHandlerList() {
-        return handlerlist;
+        return handlerList;
     }
 }
+

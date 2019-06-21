@@ -1,14 +1,23 @@
+/*
+ * Copyright (c) 2017 - 2019 Dominik Lippl, Rufus Maiwald and the MC ONE Minecraftnetwork. All rights reserved
+ * You are not allowed to decompile the code
+ */
+
 package eu.mcone.gamesystem.api;
 
 import eu.mcone.coresystem.api.bukkit.CorePlugin;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
-import eu.mcone.coresystem.api.bukkit.config.YAML_Config;
+import eu.mcone.coresystem.api.bukkit.config.ConfigParser;
+import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
+import eu.mcone.gamesystem.api.config.GameSettingsConfig;
 import eu.mcone.gamesystem.api.game.Playing;
 import eu.mcone.gamesystem.api.game.Team;
+import eu.mcone.gamesystem.api.game.achivements.IAchievementManager;
 import eu.mcone.gamesystem.api.game.countdown.handler.GameCountdownHandler;
-import eu.mcone.gamesystem.api.game.manager.map.MapManager;
+import eu.mcone.gamesystem.api.game.manager.map.IMapManager;
 import eu.mcone.gamesystem.api.game.manager.team.TeamManager;
-import eu.mcone.gamesystem.api.game.player.GamePlayer;
+import eu.mcone.gamesystem.api.game.player.IGamePlayer;
+import eu.mcone.gamesystem.api.gamestate.GameStateHandler;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.ChatColor;
@@ -20,11 +29,15 @@ public abstract class GameTemplate extends CorePlugin {
 
     @Getter
     private static GameTemplate instance;
-    @Getter
-    private YAML_Config gameSettings;
 
     @Getter
-    private Map<UUID, GamePlayer> gamePlayers;
+    private GameSettingsConfig gameSettingsConfig;
+
+    @Getter
+    private List<Options> options;
+
+    @Getter
+    private Map<UUID, IGamePlayer> gamePlayers;
     @Getter
     private List<Player> playing;
     @Getter
@@ -36,53 +49,65 @@ public abstract class GameTemplate extends CorePlugin {
 
     @Getter
     @Setter
-    private MapManager mapManager;
+    private IMapManager mapManager;
     @Getter
     @Setter
     private TeamManager teamManager;
+    @Setter
+    @Getter
+    private IAchievementManager achievementManager;
+    @Getter
+    private GameStateHandler gameStateHandler;
     @Getter
     private GameCountdownHandler gameCountdownHandler;
 
-    @Getter
-    private int numberOfTeams;
-    @Getter
-    private int playerPreTeam;
 
-    protected GameTemplate(String pluginName, ChatColor pluginColor, String prefixTranslation) {
+    @Getter
+    private Gamemode gamemode;
+    @Getter
+    private ConfigParser configParser;
+
+    protected GameTemplate(String pluginName, Gamemode gamemode, ChatColor pluginColor, String prefixTranslation, Options... options) {
         super(pluginName, pluginColor, prefixTranslation);
 
         instance = this;
+
+        this.gamemode = gamemode;
+        this.options = Arrays.asList(options);
+        this.configParser = new ConfigParser();
         gamePlayers = new HashMap<>();
         playing = new ArrayList<>();
         teams = new HashMap<>();
         chats = new HashMap<>();
         spectators = new ArrayList<>();
-
-        this.gameSettings = new YAML_Config(this, "GameSettings.yml");
-        setGameSettings();
-
-        gameCountdownHandler = new GameCountdownHandler();
-
-        this.numberOfTeams = gameSettings.getConfig().getInt("teams");
-        this.playerPreTeam = gameSettings.getConfig().getInt("playersPerTeam");
-
-        Playing.Min_Players.setValue(gameSettings.getConfig().getInt("minPlayers"));
-        Playing.Max_Players.setValue(gameSettings.getConfig().getInt("maxPlayers"));
     }
 
-    private void setGameSettings() {
-        this.gameSettings.getConfig().options()
-                .header("Copyright (c) 2017 - 2018 Dominik Lippl, Rufus Maiwald and the MC ONE Minecraftnetwork. All rights reserved\n" +
-                        "Current version: " + getDescription().getVersion());
-        this.gameSettings.getConfig().options().copyHeader(true);
-        this.gameSettings.getConfig().options().copyDefaults(true);
-        this.gameSettings.getConfig().addDefault("lobbyWorld", "null");
-        this.gameSettings.getConfig().addDefault("minPlayers", 2);
-        this.gameSettings.getConfig().addDefault("maxPlayers", 2);
-        this.gameSettings.getConfig().addDefault("teams", 4);
-        this.gameSettings.getConfig().addDefault("playersPerTeam", 1);
-        this.gameSettings.save();
+    @Override
+    public void onEnable() {
+        this.gameSettingsConfig = configParser.loadAndParseConfig("./plugins/" + GameTemplate.getInstance().getPluginName(), "gameSettings.json", GameSettingsConfig.class);
+
+        if (this.options.contains(Options.USE_GAME_STATE_HANDLER)
+                || this.options.contains(Options.USE_TEAM_MANAGER)) {
+
+            Playing.Min_Players.setValue(gameSettingsConfig.getMinimalPlayers());
+            Playing.Max_Players.setValue(gameSettingsConfig.getMaximalPlayers());
+
+            gameStateHandler = new GameStateHandler();
+
+            gameCountdownHandler = new GameCountdownHandler();
+        }
+
+        onGameEnable();
     }
+
+    @Override
+    public void onDisable() {
+        onGameDisable();
+    }
+
+    public abstract void onGameEnable();
+
+    public abstract void onGameDisable();
 
     /**
      * Returns a GamePlayer object with the UUID
@@ -90,7 +115,7 @@ public abstract class GameTemplate extends CorePlugin {
      * @param uuid Player UniqueId
      * @return GamePlayer object
      */
-    public GamePlayer getGamePlayer(UUID uuid) {
+    public IGamePlayer getGamePlayer(UUID uuid) {
         return gamePlayers.get(uuid);
     }
 
@@ -100,7 +125,7 @@ public abstract class GameTemplate extends CorePlugin {
      * @param player Player
      * @return GamePlayer object
      */
-    public GamePlayer getGamePlayer(Player player) {
+    public IGamePlayer getGamePlayer(Player player) {
         return gamePlayers.get(player.getUniqueId());
     }
 
@@ -110,7 +135,24 @@ public abstract class GameTemplate extends CorePlugin {
      * @param name Player name
      * @return GamePlayer object
      */
-    public GamePlayer getGamePlayer(String name) {
+    public IGamePlayer getGamePlayer(String name) {
         return gamePlayers.get(CoreSystem.getInstance().getPlayerUtils().fetchUuid(name));
+    }
+
+    /**
+     * Returns a Collection with all registered GamePlayer objects
+     *
+     * @return A Collection of all registered GamePlayers objects
+     */
+    public Collection<IGamePlayer> getGamePlayersAsList() {
+        return this.gamePlayers.values();
+    }
+
+    public enum Options {
+        USE_GAME_STATE_HANDLER(),
+        USE_TEAM_MANAGER(),
+        USE_TEAM_STAGE(),
+        USE_MAP_MANAGER(),
+        USE_ACHIEVEMENTS()
     }
 }

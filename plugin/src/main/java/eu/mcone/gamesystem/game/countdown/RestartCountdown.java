@@ -1,11 +1,16 @@
+/*
+ * Copyright (c) 2017 - 2019 Dominik Lippl, Rufus Maiwald and the MC ONE Minecraftnetwork. All rights reserved
+ * You are not allowed to decompile the code
+ */
+
 package eu.mcone.gamesystem.game.countdown;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.gamesystem.api.GameSystemAPI;
 import eu.mcone.gamesystem.api.GameTemplate;
 import eu.mcone.gamesystem.api.ecxeptions.GameSystemException;
-import eu.mcone.gamesystem.api.game.countdown.handler.GameCountdown;
 import eu.mcone.gamesystem.api.game.countdown.handler.GameCountdownID;
+import eu.mcone.gamesystem.api.game.countdown.handler.IGameCountdown;
 import eu.mcone.gamesystem.api.game.event.GameCountdownEvent;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,7 +20,7 @@ import org.bukkit.entity.Player;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class RestartCountdown implements GameCountdown {
+public class RestartCountdown implements IGameCountdown {
 
     private Logger log;
 
@@ -36,12 +41,16 @@ public class RestartCountdown implements GameCountdown {
 
         try {
             if (GameTemplate.getInstance() != null) {
-                if (seconds >= 30) {
-                    this.seconds = seconds;
-                    this.staticSeconds = seconds;
-                    this.isRunning = true;
+                if (GameTemplate.getInstance().getOptions().contains(GameTemplate.Options.USE_GAME_STATE_HANDLER)) {
+                    if (seconds >= 30) {
+                        this.seconds = seconds;
+                        this.staticSeconds = seconds;
+                        this.isRunning = true;
+                    } else {
+                        throw new GameSystemException("The specified seconds must be bigger than 30 seconds");
+                    }
                 } else {
-                    throw new GameSystemException("The specified seconds must be bigger than 30 seconds");
+                    throw new GameSystemException("The option 'USE_GAME_STATE_HANDLER' was not activated");
                 }
             } else {
                 throw new GameSystemException("GameTemplate was not initialized");
@@ -54,6 +63,8 @@ public class RestartCountdown implements GameCountdown {
 
     public void run() {
         if (!(Bukkit.getScheduler().isCurrentlyRunning(runTaskID))) {
+            isRunning = true;
+
             this.runTaskID = Bukkit.getScheduler().runTaskTimerAsynchronously(GameTemplate.getInstance(), () -> {
                 Bukkit.getServer().getPluginManager().callEvent(
                         new GameCountdownEvent
@@ -86,6 +97,7 @@ public class RestartCountdown implements GameCountdown {
 
                     case 0:
                         Bukkit.getServer().shutdown();
+                        this.forceStop();
                         break;
                     default:
                         break;
@@ -102,6 +114,8 @@ public class RestartCountdown implements GameCountdown {
 
     public void reset() {
         log.info("Reset RestartCountdown");
+        this.seconds = staticSeconds;
+
         for (Player all : GameTemplate.getInstance().getPlaying()) {
             all.setLevel(staticSeconds);
         }
@@ -111,10 +125,20 @@ public class RestartCountdown implements GameCountdown {
         log.info("Stop RestartCountdown");
         reset();
 
-        this.seconds = staticSeconds;
         this.isRunning = false;
-
         Bukkit.getScheduler().cancelTask(runTaskID);
+
+    }
+
+    @Override
+    public void stopRunning() {
+        this.isRunning = false;
+        Bukkit.getScheduler().cancelTask(runTaskID);
+    }
+
+    @Override
+    public void stopIdling() {
+        log.info("The method stopIdling(); is not defined on, RestartCountdown");
     }
 
     public void forceStop() {

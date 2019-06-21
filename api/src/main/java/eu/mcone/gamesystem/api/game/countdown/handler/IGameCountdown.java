@@ -1,6 +1,11 @@
+/*
+ * Copyright (c) 2017 - 2019 Dominik Lippl, Rufus Maiwald and the MC ONE Minecraftnetwork. All rights reserved
+ * You are not allowed to decompile the code
+ */
+
 package eu.mcone.gamesystem.api.game.countdown.handler;
 
-public interface GameCountdown {
+public interface IGameCountdown {
 
     GameCountdownID getID();
 
@@ -23,6 +28,10 @@ public interface GameCountdown {
     void reset();
 
     void stop();
+
+    void stopRunning();
+
+    void stopIdling();
 
     void forceStop();
 

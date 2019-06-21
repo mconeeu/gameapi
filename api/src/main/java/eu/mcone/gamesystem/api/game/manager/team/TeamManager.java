@@ -1,7 +1,13 @@
+/*
+ * Copyright (c) 2017 - 2019 Dominik Lippl, Rufus Maiwald and the MC ONE Minecraftnetwork. All rights reserved
+ * You are not allowed to decompile the code
+ */
+
 package eu.mcone.gamesystem.api.game.manager.team;
 
 import eu.mcone.gamesystem.api.game.Team;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public interface TeamManager {
 
@@ -9,7 +15,13 @@ public interface TeamManager {
      * Returns the teamStage
      * @return TeamStage interface
      */
-    TeamStage getTeamStage();
+    ITeamStageHandler getTeamStageHandler();
+
+    /**
+     * Returns the team selection item for the player inventory
+     * @return ItemStack
+     */
+    ItemStack getTeamSelectionItem();
 
     /**
      * Returns the team where the team name
@@ -26,7 +38,7 @@ public interface TeamManager {
     /**
      * Check if there is already a winner of the current round
      */
-    void chekWinntection();
+    boolean checkChanceToWin();
 
     /**
      * Returns the death message as a string
