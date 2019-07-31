@@ -7,15 +7,12 @@ package eu.mcone.gamesystem.api.game.manager.map;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.bukkit.Material;
 
-@AllArgsConstructor
 @Getter
-public class GameMapItem {
-
+@AllArgsConstructor
+public class GameMap {
     private String world;
-    private String displayName;
-    private boolean useMap;
-    private Material material;
-    private String[] lore;
+    private String spawnLocation;
+    private boolean use;
+    private MapItem mapItem;
 }

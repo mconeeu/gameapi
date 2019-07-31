@@ -10,9 +10,9 @@ import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.gamesystem.GameSystem;
 import eu.mcone.gamesystem.api.GameTemplate;
 import eu.mcone.gamesystem.api.game.Playing;
-import eu.mcone.gamesystem.api.game.countdown.handler.IGameCountdown;
 import eu.mcone.gamesystem.api.game.countdown.handler.GameCountdownID;
-import eu.mcone.gamesystem.api.gamestate.GameStateID;
+import eu.mcone.gamesystem.api.game.countdown.handler.IGameCountdown;
+import eu.mcone.gamesystem.api.game.gamestate.GameStateID;
 import eu.mcone.gamesystem.game.player.GamePlayer;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -34,59 +34,62 @@ public class PlayerJoin implements Listener {
         if (GameTemplate.getInstance() != null) {
             GamePlayer gp = new GamePlayer(p);
 
-            if (GameTemplate.getInstance().getGameStateHandler().hasGameState(GameStateID.LOBBY)) {
-                IGameCountdown gameCountdown = GameTemplate.getInstance().getGameCountdownHandler().getGameCountdown(GameCountdownID.LOBBY_COUNTDOWN);
-                if (Playing.Min_Players.getValue() - GameTemplate.getInstance().getPlaying().size() <= 0) {
-                    gameCountdown.stopIdling();
-                    gameCountdown.run();
-                } else {
-                    gameCountdown.idle();
-                    gameCountdown.stopRunning();
-                }
+            if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_GAME_STATE_HANDLER)) {
+                if (GameTemplate.getInstance().getGameStateHandler().hasGameState(GameStateID.LOBBY)) {
+                    IGameCountdown gameCountdown = GameTemplate.getInstance().getGameStateHandler().getGameCountdown(GameCountdownID.LOBBY_COUNTDOWN);
 
-                p.setGameMode(GameMode.SURVIVAL);
+                    if (Playing.Min_Players.getValue() - GameTemplate.getInstance().getPlaying().size() <= 0) {
+                        gameCountdown.stopIdling();
+                        gameCountdown.run();
+                    } else {
+                        gameCountdown.idle();
+                        gameCountdown.stopRunning();
+                    }
 
-                p.setHealth(20);
-                p.setFoodLevel(20);
-                p.setLevel(0);
+                    p.setGameMode(GameMode.SURVIVAL);
 
-                p.getInventory().clear();
-                p.getInventory().setHelmet(null);
-                p.getInventory().setChestplate(null);
-                p.getInventory().setLeggings(null);
-                p.getInventory().setBoots(null);
+                    p.setHealth(20);
+                    p.setFoodLevel(20);
+                    p.setLevel(0);
 
-                p.getActivePotionEffects().clear();
+                    p.getInventory().clear();
+                    p.getInventory().setHelmet(null);
+                    p.getInventory().setChestplate(null);
+                    p.getInventory().setLeggings(null);
+                    p.getInventory().setBoots(null);
 
-                for (CorePlayer cps : CoreSystem.getInstance().getOnlineCorePlayers()) {
-                    GameTemplate.getInstance().getMessager().send(cps.bukkit(), CoreSystem.getInstance().getTranslationManager().get("game.join", cps)
-                            .replace("%player%", p.getName())
-                            .replace("%playing%", Integer.toString(GameTemplate.getInstance().getPlaying().size()))
-                            .replace("%max%", Playing.Max_Players.getString()));
+                    p.getActivePotionEffects().clear();
+
+                    for (CorePlayer cps : CoreSystem.getInstance().getOnlineCorePlayers()) {
+                        GameTemplate.getInstance().getMessager().send(cps.bukkit(), CoreSystem.getInstance().getTranslationManager().get("game.join", cps)
+                                .replace("%player%", p.getName())
+                                .replace("%playing%", Integer.toString(GameTemplate.getInstance().getPlaying().size()))
+                                .replace("%max%", Playing.Max_Players.getString()));
+
+                        CoreSystem.getInstance().createTitle()
+                                .stay(5)
+                                .fadeIn(2)
+                                .fadeOut(2)
+                                .title(CoreSystem.getInstance().getTranslationManager().get("game.prefix", cps))
+                                .subTitle(CoreSystem.getInstance().getTranslationManager().get("game.join.title", cps)
+                                        .replace("%player%", p.getName())
+                                        .replace("%playing%", Integer.toString(GameTemplate.getInstance().getPlaying().size()))
+                                        .replace("%max%", Playing.Max_Players.getString())).send(cps.bukkit());
+                    }
+                } else if (GameTemplate.getInstance().getGameStateHandler().hasGameState(GameStateID.INGAME)) {
+                    gp.setSpectator(true);
+                    p.setGameMode(GameMode.SPECTATOR);
+                    p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1));
+                    GameTemplate.getInstance().getMessager().sendTransl(p, "game.spectators.join");
 
                     CoreSystem.getInstance().createTitle()
-                            .stay(5)
-                            .fadeIn(2)
-                            .fadeOut(2)
-                            .title(CoreSystem.getInstance().getTranslationManager().get("game.prefix", cps))
-                            .subTitle(CoreSystem.getInstance().getTranslationManager().get("game.join.title", cps)
-                                    .replace("%player%", p.getName())
-                                    .replace("%playing%", Integer.toString(GameTemplate.getInstance().getPlaying().size()))
-                                    .replace("%max%", Playing.Max_Players.getString())).send(cps.bukkit());
+                            .fadeIn(1)
+                            .stay(3)
+                            .fadeOut(1)
+                            .title(CoreSystem.getInstance().getTranslationManager().get("bedwars.prefix", gp.getCorePlayer()))
+                            .subTitle(CoreSystem.getInstance().getTranslationManager().get("game.spectators.join", gp.getCorePlayer()))
+                            .send(p);
                 }
-            } else if (GameTemplate.getInstance().getGameStateHandler().hasGameState(GameStateID.INGAME)) {
-                gp.setSpectator(true);
-                p.setGameMode(GameMode.SPECTATOR);
-                p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1));
-                GameTemplate.getInstance().getMessager().sendTransl(p, "game.spectators.join");
-
-                CoreSystem.getInstance().createTitle()
-                        .fadeIn(1)
-                        .stay(3)
-                        .fadeOut(1)
-                        .title(CoreSystem.getInstance().getTranslationManager().get("bedwars.prefix", gp.getCorePlayer()))
-                        .subTitle(CoreSystem.getInstance().getTranslationManager().get("game.spectators.join", gp.getCorePlayer()))
-                        .send(p);
             }
         }
     }

@@ -5,18 +5,21 @@
 
 package eu.mcone.gamesystem.api.game.countdown.handler;
 
+import eu.mcone.gamesystem.api.game.gamestate.GameStateID;
+import lombok.Getter;
+
 public enum GameCountdownID {
-    LOBBY_COUNTDOWN(1),
-    RESTART_COUNTDOWN(3),
-    SPAWN_COUNTDOWN(2);
+    LOBBY_COUNTDOWN(1, GameStateID.LOBBY),
+    SPAWN_COUNTDOWN(2, GameStateID.INGAME),
+    RESTART_COUNTDOWN(3, GameStateID.END);
 
+    @Getter
     private int ID;
+    @Getter
+    private GameStateID gameStateID;
 
-    GameCountdownID(int ID) {
+    GameCountdownID(int ID, GameStateID gameStateID) {
         this.ID = ID;
-    }
-
-    public int getID() {
-        return ID;
+        this.gameStateID = gameStateID;
     }
 }

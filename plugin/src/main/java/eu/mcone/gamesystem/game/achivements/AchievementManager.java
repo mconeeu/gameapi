@@ -44,7 +44,7 @@ public class AchievementManager implements IAchievementManager {
     public AchievementManager() {
         try {
             if (GameTemplate.getInstance() != null) {
-                if (GameTemplate.getInstance().getOptions().contains(GameTemplate.Options.USE_ACHIEVEMENTS)) {
+                if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_ACHIEVEMENTS)) {
                     gamemode = GameTemplate.getInstance().getGamemode();
                     achievements = new TreeMap<>(Comparator.naturalOrder());
                     solvedAchievements = new HashMap<>();
@@ -231,6 +231,6 @@ public class AchievementManager implements IAchievementManager {
     }
 
     public void openAchievementInventory(final Player player) {
-        new AchievementInventory().createInventory(player);
+        new AchievementInventory(player);
     }
 }

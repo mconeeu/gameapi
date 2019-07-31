@@ -7,6 +7,7 @@ package eu.mcone.gamesystem.game.manager.team;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
+import eu.mcone.coresystem.api.bukkit.inventory.InventoryOption;
 import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
 import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
 import eu.mcone.coresystem.api.bukkit.item.Skull;
@@ -20,12 +21,8 @@ import java.util.ArrayList;
 
 public class StageNpcInteractInventory extends CoreInventory {
 
-    public StageNpcInteractInventory() {
-        super(InventorySlot.ROW_5, Option.FILL_EMPTY_SLOTS);
-    }
-
-    public void createInventory(final String name, final Player player, final IGamePlayer stageGamePlayer) {
-        setTitle("§8» " + name);
+    public StageNpcInteractInventory(final Player player, final IGamePlayer stageGamePlayer) {
+        super("§8» " + player.getName(), player, InventorySlot.ROW_5, InventoryOption.FILL_EMPTY_SLOTS);
 
         setItem(InventorySlot.ROW_2_SLOT_5, new ItemBuilder(Material.BED)
                 .displayName("§8» " + stageGamePlayer.getTeam().getChatColor().toString() + stageGamePlayer.getName() + " §7Stats")
@@ -75,11 +72,11 @@ public class StageNpcInteractInventory extends CoreInventory {
                     ).create(), e -> {
 
                 player.closeInventory();
-                CoreSystem.getInstance().getChannelHandler().createSetRequest(player,"CMD", "party invite " + stageGamePlayer.getName());
+                CoreSystem.getInstance().getChannelHandler().createSetRequest(player, "CMD", "party invite " + stageGamePlayer.getName());
             });
         }
 
         player.playSound(player.getLocation(), Sound.LEVEL_UP, 1.0F, 1.0F);
-        openInventory(player);
+        openInventory();
     }
 }

@@ -1,8 +1,8 @@
 name: MCONE-GameSystem
 version: ${project.version}
 authors: [Domink Lippl, Rufus Maiwald]
-depend: [MCONE-BukkitCoreSystem]
 main: eu.mcone.gamesystem.GameSystem
+depend: [MCONE-BukkitCoreSystem]
 
 permissions:
   gamesystem:

@@ -6,6 +6,7 @@
 package eu.mcone.gamesystem.game.player;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
+import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.coresystem.api.bukkit.player.Stats;
 import eu.mcone.gamesystem.api.GameSystemAPI;
@@ -14,9 +15,14 @@ import eu.mcone.gamesystem.api.ecxeptions.GameSystemException;
 import eu.mcone.gamesystem.api.game.Team;
 import eu.mcone.gamesystem.api.game.achivements.SolvedAchievement;
 import eu.mcone.gamesystem.api.game.player.IGamePlayer;
+import eu.mcone.gamesystem.game.inventory.SpectatorInventory;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -60,9 +66,12 @@ public class GamePlayer implements IGamePlayer {
                 this.name = player.getName();
                 this.team = Team.ERROR;
                 this.stats = corePlayer.getStats(GameTemplate.getInstance().getGamemode());
+                this.solvedAchievements = new ArrayList<>();
 
-                GameTemplate.getInstance().getAchievementManager().loadSolvedAchievement(player.getUniqueId());
-                solvedAchievements = GameTemplate.getInstance().getAchievementManager().getSolvedAchievements(player.getUniqueId());
+                if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_ACHIEVEMENTS)) {
+                    GameTemplate.getInstance().getAchievementManager().loadSolvedAchievement(player.getUniqueId());
+                    solvedAchievements = GameTemplate.getInstance().getAchievementManager().getSolvedAchievements(player.getUniqueId());
+                }
 
                 GameTemplate.getInstance().getPlaying().add(player);
                 GameTemplate.getInstance().getGamePlayers().put(player.getUniqueId(), this);
@@ -133,7 +142,8 @@ public class GamePlayer implements IGamePlayer {
     }
 
     public void addCoins(final int coins) {
-        this.roundCoins = this.roundCoins + coins;
+        corePlayer.addCoins(coins);
+        this.roundCoins += coins;
     }
 
     public void addRoundKill() {
@@ -180,6 +190,10 @@ public class GamePlayer implements IGamePlayer {
     }
 
     public void setPlaying(boolean var) {
+        if (spectator) {
+            setSpectator(false);
+        }
+
         this.playing = var;
 
         if (var) {
@@ -192,14 +206,30 @@ public class GamePlayer implements IGamePlayer {
     }
 
     public void setSpectator(boolean var) {
+        if (playing) {
+            setPlaying(false);
+        }
+
         this.spectator = var;
 
         if (var) {
             if (!GameTemplate.getInstance().getSpectators().contains(bukkitPlayer)) {
                 GameTemplate.getInstance().getSpectators().add(bukkitPlayer);
+                bukkitPlayer.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 0, false, false));
+                bukkitPlayer.getInventory().setItem(InventorySlot.ROW_1_SLOT_5, SpectatorInventory.NAVIGATOR);
+
+                for (Player all : Bukkit.getOnlinePlayers()) {
+                    all.hidePlayer(bukkitPlayer);
+                }
             }
         } else {
             GameTemplate.getInstance().getSpectators().remove(bukkitPlayer);
+            bukkitPlayer.removePotionEffect(PotionEffectType.INVISIBILITY);
+            bukkitPlayer.getInventory().remove(SpectatorInventory.NAVIGATOR);
+
+            for (Player all : Bukkit.getOnlinePlayers()) {
+                all.showPlayer(bukkitPlayer);
+            }
         }
     }
 

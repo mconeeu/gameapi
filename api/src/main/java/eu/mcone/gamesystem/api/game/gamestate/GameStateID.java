@@ -3,7 +3,7 @@
  * You are not allowed to decompile the code
  */
 
-package eu.mcone.gamesystem.api.gamestate;
+package eu.mcone.gamesystem.api.game.gamestate;
 
 public enum GameStateID {
 

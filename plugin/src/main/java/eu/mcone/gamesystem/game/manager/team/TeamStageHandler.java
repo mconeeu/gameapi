@@ -29,8 +29,8 @@ public class TeamStageHandler implements ITeamStageHandler {
     @Getter
     private Map<Team, TeamStage> stages;
 
-    private TeamStageHandler() {
-        if (GameTemplate.getInstance().getOptions().contains(GameTemplate.Options.USE_TEAM_STAGE)) {
+    public TeamStageHandler() {
+        if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_TEAM_STAGE)) {
             stages = new HashMap<>();
             registerInteract();
         } else {
@@ -50,7 +50,7 @@ public class TeamStageHandler implements ITeamStageHandler {
                         if (teamStage.getNpcs().containsValue(playerNpc)) {
                             for (Map.Entry<IGamePlayer, PlayerNpc> entry : teamStage.getNpcs().entrySet()) {
                                 if (entry.getValue().getData().getName().equalsIgnoreCase(playerNpc.getData().getName())) {
-                                    new StageNpcInteractInventory().createInventory(teamStage.getTeam().getChatColor().toString() + player.getName(), player, entry.getKey());
+                                    new StageNpcInteractInventory(player, entry.getKey());
                                     break;
                                 }
                             }

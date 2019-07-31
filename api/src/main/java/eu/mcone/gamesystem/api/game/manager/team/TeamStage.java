@@ -43,13 +43,13 @@ public class TeamStage {
 
     public TeamStage(final Team team) {
         this.team = team;
-        this.stageWorld = CoreSystem.getInstance().getWorldManager().getWorld(GameTemplate.getInstance().getGameSettingsConfig().getLobbyWorld());
+        this.stageWorld = CoreSystem.getInstance().getWorldManager().getWorld(GameTemplate.getInstance().getGameConfigAsClass().getLobbyWorld());
         npcs = new HashMap<>();
         occupiedLocations = new HashMap<>();
 
         availableLocations = new ArrayList<>();
 
-        for (int i = 0; i < GameTemplate.getInstance().getGameSettingsConfig().getTeams(); i++) {
+        for (int i = 0; i < GameTemplate.getInstance().getGameConfigAsClass().getTeams(); i++) {
             Location location = stageWorld.getLocation(team.toString().toLowerCase() + ":stage:" + i);
             if (location != null) {
                 availableLocations.add(location);

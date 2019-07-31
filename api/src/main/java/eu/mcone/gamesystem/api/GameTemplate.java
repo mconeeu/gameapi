@@ -7,17 +7,17 @@ package eu.mcone.gamesystem.api;
 
 import eu.mcone.coresystem.api.bukkit.CorePlugin;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
-import eu.mcone.coresystem.api.bukkit.config.ConfigParser;
+import eu.mcone.coresystem.api.bukkit.config.CoreJsonConfig;
 import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import eu.mcone.gamesystem.api.config.GameSettingsConfig;
+import eu.mcone.gamesystem.api.ecxeptions.GameSystemException;
 import eu.mcone.gamesystem.api.game.Playing;
 import eu.mcone.gamesystem.api.game.Team;
 import eu.mcone.gamesystem.api.game.achivements.IAchievementManager;
-import eu.mcone.gamesystem.api.game.countdown.handler.GameCountdownHandler;
 import eu.mcone.gamesystem.api.game.manager.map.IMapManager;
-import eu.mcone.gamesystem.api.game.manager.team.TeamManager;
+import eu.mcone.gamesystem.api.game.manager.team.ITeamManager;
 import eu.mcone.gamesystem.api.game.player.IGamePlayer;
-import eu.mcone.gamesystem.api.gamestate.GameStateHandler;
+import eu.mcone.gamesystem.api.game.gamestate.GameStateHandler;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.ChatColor;
@@ -31,10 +31,7 @@ public abstract class GameTemplate extends CorePlugin {
     private static GameTemplate instance;
 
     @Getter
-    private GameSettingsConfig gameSettingsConfig;
-
-    @Getter
-    private List<Options> options;
+    private List<GameSystemOptions> options;
 
     @Getter
     private Map<UUID, IGamePlayer> gamePlayers;
@@ -47,34 +44,33 @@ public abstract class GameTemplate extends CorePlugin {
     @Getter
     private List<Player> spectators;
 
-    @Getter
     @Setter
     private IMapManager mapManager;
-    @Getter
+
     @Setter
-    private TeamManager teamManager;
+    private ITeamManager teamManager;
+
     @Setter
-    @Getter
     private IAchievementManager achievementManager;
+
     @Getter
     private GameStateHandler gameStateHandler;
-    @Getter
-    private GameCountdownHandler gameCountdownHandler;
-
 
     @Getter
     private Gamemode gamemode;
     @Getter
-    private ConfigParser configParser;
+    private CoreJsonConfig<GameSettingsConfig> gameConfig;
+    @Getter
+    private GameSettingsConfig gameConfigAsClass;
 
-    protected GameTemplate(String pluginName, Gamemode gamemode, ChatColor pluginColor, String prefixTranslation, Options... options) {
+    protected GameTemplate(String pluginName, Gamemode gamemode, ChatColor pluginColor, String prefixTranslation, GameSystemOptions... options) {
         super(pluginName, pluginColor, prefixTranslation);
 
         instance = this;
 
         this.gamemode = gamemode;
         this.options = Arrays.asList(options);
-        this.configParser = new ConfigParser();
+
         gamePlayers = new HashMap<>();
         playing = new ArrayList<>();
         teams = new HashMap<>();
@@ -84,17 +80,16 @@ public abstract class GameTemplate extends CorePlugin {
 
     @Override
     public void onEnable() {
-        this.gameSettingsConfig = configParser.loadAndParseConfig("./plugins/" + GameTemplate.getInstance().getPluginName(), "gameSettings.json", GameSettingsConfig.class);
+        this.gameConfig = new CoreJsonConfig<>(this, GameSettingsConfig.class, "gameSettings.json");
+        this.gameConfigAsClass = gameConfig.parseConfig();
 
-        if (this.options.contains(Options.USE_GAME_STATE_HANDLER)
-                || this.options.contains(Options.USE_TEAM_MANAGER)) {
+        if (this.options.contains(GameSystemOptions.USE_GAME_STATE_HANDLER)
+                || this.options.contains(GameSystemOptions.USE_TEAM_MANAGER)) {
 
-            Playing.Min_Players.setValue(gameSettingsConfig.getMinimalPlayers());
-            Playing.Max_Players.setValue(gameSettingsConfig.getMaximalPlayers());
+            Playing.Min_Players.setValue(getGameConfigAsClass().getMinimalPlayers());
+            Playing.Max_Players.setValue(getGameConfigAsClass().getMaximalPlayers());
 
             gameStateHandler = new GameStateHandler();
-
-            gameCountdownHandler = new GameCountdownHandler();
         }
 
         onGameEnable();
@@ -102,6 +97,7 @@ public abstract class GameTemplate extends CorePlugin {
 
     @Override
     public void onDisable() {
+        gameConfig.save();
         onGameDisable();
     }
 
@@ -140,6 +136,63 @@ public abstract class GameTemplate extends CorePlugin {
     }
 
     /**
+     * Returns the instance of the mapManager
+     *
+     * @return IMapManager
+     */
+    public IMapManager getMapManager() {
+        try {
+            if (this.mapManager != null) {
+                return mapManager;
+            } else {
+                throw new GameSystemException("MapManager is not initialized!");
+            }
+        } catch (GameSystemException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the instance of the TeamManager
+     *
+     * @return ITeamManager
+     */
+    public ITeamManager getTeamManager() {
+        try {
+            if (this.teamManager != null) {
+                return teamManager;
+            } else {
+                throw new GameSystemException("TeamManager is not initialized!");
+            }
+        } catch (GameSystemException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the instance of the AchievementManager
+     *
+     * @return IAchievementManager
+     */
+    public IAchievementManager getAchievementManager() {
+        try {
+            if (this.achievementManager != null) {
+                return achievementManager;
+            } else {
+                throw new GameSystemException("AchievementManager is not initialized!");
+            }
+        } catch (GameSystemException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /**
      * Returns a Collection with all registered GamePlayer objects
      *
      * @return A Collection of all registered GamePlayers objects
@@ -148,7 +201,7 @@ public abstract class GameTemplate extends CorePlugin {
         return this.gamePlayers.values();
     }
 
-    public enum Options {
+    public enum GameSystemOptions {
         USE_GAME_STATE_HANDLER(),
         USE_TEAM_MANAGER(),
         USE_TEAM_STAGE(),

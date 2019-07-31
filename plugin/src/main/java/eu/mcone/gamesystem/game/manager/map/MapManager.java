@@ -5,122 +5,132 @@
 
 package eu.mcone.gamesystem.game.manager.map;
 
+import com.google.gson.reflect.TypeToken;
 import eu.mcone.coresystem.api.bukkit.CorePlugin;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
-import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
-import eu.mcone.coresystem.api.bukkit.world.CoreWorld;
 import eu.mcone.gamesystem.api.GameSystemAPI;
 import eu.mcone.gamesystem.api.GameTemplate;
-import eu.mcone.gamesystem.api.game.event.GameMapChangeEvent;
-import eu.mcone.gamesystem.api.game.manager.map.GameMapItem;
-import eu.mcone.gamesystem.api.game.manager.map.GameWorldItemHandler;
-import eu.mcone.gamesystem.api.game.manager.map.IMapManager;
-import eu.mcone.gamesystem.game.inventory.inventories.MapInventory;
-import eu.mcone.networkmanager.core.api.console.ConsoleColor;
+import eu.mcone.gamesystem.api.ecxeptions.GameSystemException;
+import eu.mcone.gamesystem.api.game.manager.map.*;
 import lombok.Getter;
-import lombok.Setter;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class MapManager implements IMapManager {
 
-    private Logger log;
-
     @Getter
-    private final CorePlugin instance;
-    @Getter
-    private GameMapItem gainedMap;
-    @Getter
-    @Setter
-    private CoreWorld currentWorld;
-
-    private int rotationInterval;
+    private final CorePlugin coreInstance;
 
     @Getter
     private List<Options> options;
     @Getter
-    private List<GameMapItem> gameWorldItems;
-    @Getter
-    private Map<String, Integer> mapPopularity;
-    @Getter
-    private Map<Player, String> mapVoting;
+    private List<GameMap> gameMaps;
+
+    private IMapRotationHandler mapRotationHandler;
+    private IMapVotingHandler mapVotingHandler;
 
     private File dir;
     private File file;
 
-    public MapManager(final CorePlugin instance, final Options... options) {
-        log = GameSystemAPI.getInstance().getLogger();
-        this.instance = instance;
+    public MapManager(final CorePlugin coreInstance, final Options... options) {
+        this.coreInstance = coreInstance;
 
-        this.options = Arrays.asList(options);
-        gameWorldItems = new ArrayList<>();
-        mapPopularity = new HashMap<>();
-        mapVoting = new HashMap<>();
+        this.options = new ArrayList<>(Arrays.asList(options));
+        gameMaps = new ArrayList<>();
 
         dir = new File("./plugins/" + GameTemplate.getInstance().getPluginName());
         file = new File(dir, "/worlds.json");
 
-        if (loadGameWorldItems()) {
-            log.info("Es wurden alle Items geladen!");
+        if (loadGameWorlds()) {
+            GameSystemAPI.getInstance().sendConsoleMessage("§aEs wurden alle Gamemaps geladen!");
         } else {
-            log.log(Level.SEVERE, ConsoleColor.RED + "Es konnten nicht alle Items geladen werden!");
+            GameSystemAPI.getInstance().sendConsoleMessage("§cEs konnten nicht alle Maps geladen werden!");
         }
     }
 
-    public void useMapRotation(final int rotationInterval) {
-        if (options.contains(Options.MAP_ROTATION)) {
-            this.rotationInterval = rotationInterval;
-        } else {
-            options.add(Options.MAP_ROTATION);
-            this.rotationInterval = rotationInterval;
+    public IMapRotationHandler createMapRotationHandler(int rotationInterval) {
+        try {
+            if (gameMaps.size() >= 2) {
+                options.add(Options.MAP_ROTATION);
+                this.mapRotationHandler = new MapRotationHandler(this, rotationInterval);
+                return mapRotationHandler;
+            } else {
+                throw new GameSystemException("There are not enough maps available");
+            }
+        } catch (GameSystemException e) {
+            e.printStackTrace();
         }
+
+        return null;
     }
 
-    public boolean loadGameWorldItems() {
+    public IMapVotingHandler createMapVotingHandler() {
+        options.add(Options.MAP_INVENTORY);
+        this.mapVotingHandler = new MapVotingHandler(this);
+        return mapVotingHandler;
+    }
+
+    public IMapRotationHandler getMapRotationHandler() {
+        try {
+            if (mapRotationHandler != null) {
+                return mapRotationHandler;
+            } else {
+                throw new GameSystemException("mapRotationHandler is not initialized!");
+            }
+        } catch (GameSystemException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public IMapVotingHandler getMapVotingHandler() {
+        try {
+            if (mapVotingHandler != null) {
+                return mapVotingHandler;
+            } else {
+                throw new GameSystemException("mapVotingHandler is not initialized!");
+            }
+        } catch (GameSystemException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public boolean loadGameWorlds() {
         try {
             if (dir.exists()) {
                 if (file.exists()) {
-                    GameWorldItemHandler gameWorldItemHandler = CoreSystem.getInstance().getGson().fromJson(new FileReader(file), GameWorldItemHandler.class);
-                    this.gameWorldItems = gameWorldItemHandler.getGameWorldItems();
-
-                    if (options.contains(Options.MAP_ROTATION)) {
-                        if (gameWorldItems.size() >= 2) {
-                            log.info("Start map rotation...");
-                            new MapRotationHandler(this, rotationInterval);
-                        } else {
-                            log.log(Level.SEVERE, ConsoleColor.RED + "There are not enough maps available");
-                        }
-                    }
+                    this.gameMaps = CoreSystem.getInstance().getGson().fromJson(new FileReader(file), new TypeToken<ArrayList<GameMap>>() {}.getType());
                     return true;
                 } else {
                     if (file.createNewFile()) {
-                        createGameWorldHandler();
+                        createGameMapTemplate();
                         return true;
                     } else {
-                        log.log(Level.WARNING, ConsoleColor.RED + "Cannot create file...");
+                        GameSystemAPI.getInstance().sendConsoleMessage("§cDie Datei world.json konnte nicht erstellt werden!");
                         return false;
                     }
                 }
             } else {
                 if (dir.mkdir()) {
                     if (file.createNewFile()) {
-                        createGameWorldHandler();
+                        createGameMapTemplate();
                         return true;
                     } else {
-                        log.log(Level.WARNING, ConsoleColor.RED + "Cannot create file...");
+                        GameSystemAPI.getInstance().sendConsoleMessage("§cDie Datei world.json konnte nicht erstellt werden!");
                         return false;
                     }
                 } else {
-                    log.log(Level.WARNING, ConsoleColor.RED + "Cannot create dir...");
+                    GameSystemAPI.getInstance().sendConsoleMessage("§cDie Datei world.json konnte nicht erstellt werden!");
                     return false;
                 }
             }
@@ -131,115 +141,66 @@ public class MapManager implements IMapManager {
         return false;
     }
 
-    public String parseToJson(final GameMapItem gameWorldItem) {
-        try {
-            if (dir.exists()) {
-                if (file.exists()) {
-                    GameWorldItemHandler gameWorldItemHandler = CoreSystem.getInstance().getGson().fromJson(new FileReader(file), GameWorldItemHandler.class);
-                    gameWorldItemHandler.getGameWorldItems().add(gameWorldItem);
-                    FileWriter fileWriter = new FileWriter(file);
-                    fileWriter.write(CoreSystem.getInstance().getGson().toJson(gameWorldItemHandler));
-                    fileWriter.flush();
-                    fileWriter.close();
-                } else {
-                    log.log(Level.WARNING, ConsoleColor.RED + "Not file found!");
-                }
-            } else {
-                log.log(Level.WARNING, ConsoleColor.RED + "Not dir found!");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//    public String parseToJson(final GameMapItem gameWorldItem) {
+//        try {
+//            if (dir.exists()) {
+//                if (file.exists()) {
+//                    GameWorldItemHandler gameWorldItemHandler = CoreSystem.getInstance().getGson().fromJson(new FileReader(file), GameWorldItemHandler.class);
+//                    gameWorldItemHandler.getGameWorldItems().add(gameWorldItem);
+//                    FileWriter fileWriter = new FileWriter(file);
+//                    fileWriter.write(CoreSystem.getInstance().getGson().toJson(gameWorldItemHandler));
+//                    fileWriter.flush();
+//                    fileWriter.close();
+//                } else {
+//                    log.log(Level.WARNING, ConsoleColor.RED + "Not file found!");
+//                }
+//            } else {
+//                log.log(Level.WARNING, ConsoleColor.RED + "Not dir found!");
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        return null;
+//    }
+//
+//    public String parseToJson(final GameWorldItemHandler gameWorldItemHandler) {
+//        try {
+//            if (dir.exists()) {
+//                if (file.exists()) {
+//                    FileWriter fileWriter = new FileWriter(file);
+//                    fileWriter.write(CoreSystem.getInstance().getGson().toJson(gameWorldItemHandler));
+//                    fileWriter.flush();
+//                    fileWriter.close();
+//                } else {
+//                    log.log(Level.WARNING, ConsoleColor.RED + "Not file found!");
+//                }
+//            } else {
+//                log.log(Level.WARNING, ConsoleColor.RED + "Not dir found!");
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        return null;
+//    }
 
+    public GameMap getGameMap(final String world) {
+        for (GameMap gameMap : this.gameMaps) {
+            if (gameMap.getWorld().equalsIgnoreCase(world)) {
+                return gameMap;
+            }
+        }
         return null;
     }
 
-    public String parseToJson(final GameWorldItemHandler gameWorldItemHandler) {
-        try {
-            if (dir.exists()) {
-                if (file.exists()) {
-                    FileWriter fileWriter = new FileWriter(file);
-                    fileWriter.write(CoreSystem.getInstance().getGson().toJson(gameWorldItemHandler));
-                    fileWriter.flush();
-                    fileWriter.close();
-                } else {
-                    log.log(Level.WARNING, ConsoleColor.RED + "Not file found!");
-                }
-            } else {
-                log.log(Level.WARNING, ConsoleColor.RED + "Not dir found!");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public GameMapItem getMap(final String world) {
-        for (GameMapItem mapItems : this.gameWorldItems) {
-            if (mapItems.getWorld().equalsIgnoreCase(world)) {
-                return mapItems;
-            }
-        }
-        return null;
-    }
-
-    public GameMapItem closeVoting() {
-        if (!options.contains(Options.MAP_ROTATION)) {
-            if (mapVoting.size() != 0) {
-                for (int i = 0; i <= mapVoting.size(); i++) {
-                    for (Map.Entry<String, Integer> entry : this.mapPopularity.entrySet()) {
-                        if (entry.getValue() < i || entry.getValue() == i) {
-                            gainedMap = getMap(entry.getKey());
-                            log.info(ConsoleColor.GREEN + "Return the world `" + entry.getKey() + "`");
-                            return gainedMap;
-                        }
-                    }
-                }
-            } else {
-                gainedMap = gameWorldItems.get(new Random().nextInt(gameWorldItems.size()));
-                log.info(ConsoleColor.GREEN + "Return the random map `" + gainedMap.getWorld() + "`");
-                return gainedMap;
-            }
-
-            Bukkit.getServer().getPluginManager().callEvent(
-                    new GameMapChangeEvent(
-                            gainedMap
-                    )
-            );
-        } else {
-            instance.sendConsoleMessage("§cSorry can not return a Map Item because the Map Rotation option is activated");
-        }
-
-        return null;
-    }
-
-    public void createMapInventory(final Player player, CoreInventory returnInventory) {
-        if (options.contains(Options.MAP_INVENTORY)) {
-            new MapInventory().createInventory(player, this);
-        } else if (options.contains(Options.MAP_ROTATION)) {
-            //TODO: Add inventory for map rotation option
-        }
-    }
-
-    private void createGameWorldHandler() {
+    private void createGameMapTemplate() {
         try {
             FileWriter fileWriter = new FileWriter(file);
-            fileWriter.write(CoreSystem.getInstance().getGson().toJson(
-                    new GameWorldItemHandler(
-                            new ArrayList<GameMapItem>() {{
-                                add(new GameMapItem(
-                                        "Test",
-                                        "Test",
-                                        true,
-                                        Material.BARRIER,
-                                        new String[]
-                                                {
-                                                        "Test",
-                                                        "Test"
-                                                }));
-                            }})
-            ));
+            ArrayList<GameMap> test = new ArrayList<>();
+            test.add(new GameMap("world", "spawn", false, new MapItem("world", Material.STONE, new String[]{"world-item", "Build by Server"})));
+
+            fileWriter.write(CoreSystem.getInstance().getGson().toJson(test));
             fileWriter.flush();
             fileWriter.close();
         } catch (IOException e) {

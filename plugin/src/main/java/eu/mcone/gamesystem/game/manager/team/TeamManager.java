@@ -11,8 +11,9 @@ import eu.mcone.gamesystem.api.GameTemplate;
 import eu.mcone.gamesystem.api.ecxeptions.GameSystemException;
 import eu.mcone.gamesystem.api.game.Team;
 import eu.mcone.gamesystem.api.game.event.GameWinEvent;
+import eu.mcone.gamesystem.api.game.manager.team.ITeamManager;
 import eu.mcone.gamesystem.api.game.player.IGamePlayer;
-import eu.mcone.gamesystem.game.inventory.inventories.TeamInventory;
+import eu.mcone.gamesystem.game.inventory.TeamInventory;
 import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -23,7 +24,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class TeamManager implements eu.mcone.gamesystem.api.game.manager.team.TeamManager {
+public class TeamManager implements ITeamManager {
 
     private Logger log;
 
@@ -35,8 +36,8 @@ public class TeamManager implements eu.mcone.gamesystem.api.game.manager.team.Te
 
         try {
             if (GameTemplate.getInstance() != null) {
-                if (GameTemplate.getInstance().getOptions().contains(GameTemplate.Options.USE_TEAM_MANAGER)) {
-                    if (GameTemplate.getInstance().getOptions().contains(GameTemplate.Options.USE_TEAM_STAGE)) {
+                if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_TEAM_MANAGER)) {
+                    if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_TEAM_STAGE)) {
                         teamStageHandler = new TeamStageHandler();
                     } else {
                         GameTemplate.getInstance().sendConsoleMessage("§cTeamStageHandler deaktiviert!");
@@ -77,9 +78,9 @@ public class TeamManager implements eu.mcone.gamesystem.api.game.manager.team.Te
             if (gp.getTeam() == Team.ERROR) {
                 int i = 1;
                 for (Team team : Team.values()) {
-                    if (i < GameTemplate.getInstance().getGameSettingsConfig().getTeams()) {
-                        if (GameTemplate.getInstance().getGameSettingsConfig().getPlayersPreTeam() >= 2) {
-                            if (GameTemplate.getInstance().getPlaying().size() < GameTemplate.getInstance().getGameSettingsConfig().getTeams()) {
+                    if (i < GameTemplate.getInstance().getGameConfigAsClass().getTeams()) {
+                        if (GameTemplate.getInstance().getGameConfigAsClass().getPlayersPreTeam() >= 2) {
+                            if (GameTemplate.getInstance().getPlaying().size() < GameTemplate.getInstance().getGameConfigAsClass().getTeams()) {
                                 if (!GameTemplate.getInstance().getTeams().containsKey(p.getUniqueId())) {
                                     if (team.getValue() == 0) {
                                         gp.setTeam(team);
@@ -87,14 +88,14 @@ public class TeamManager implements eu.mcone.gamesystem.api.game.manager.team.Te
                                     }
                                     i++;
                                 }
-                            } else if (team.getValue() < GameTemplate.getInstance().getGameSettingsConfig().getPlayersPreTeam()) {
+                            } else if (team.getValue() < GameTemplate.getInstance().getGameConfigAsClass().getPlayersPreTeam()) {
                                 gp.setTeam(team);
                                 team.setBedAlive(true);
                                 i++;
                             }
                         } else {
                             if (!GameTemplate.getInstance().getTeams().containsKey(p.getUniqueId())) {
-                                if (team.getValue() == 0 || team.getValue() < GameTemplate.getInstance().getGameSettingsConfig().getPlayersPreTeam()) {
+                                if (team.getValue() == 0 || team.getValue() < GameTemplate.getInstance().getGameConfigAsClass().getPlayersPreTeam()) {
                                     gp.setTeam(team);
                                     team.setBedAlive(true);
                                 }
@@ -111,7 +112,7 @@ public class TeamManager implements eu.mcone.gamesystem.api.game.manager.team.Te
 
     public boolean checkChanceToWin() {
         int playingSize = GameTemplate.getInstance().getPlaying().size();
-        if (playingSize >= GameTemplate.getInstance().getGameSettingsConfig().getPlayersPreTeam()) {
+        if (playingSize >= GameTemplate.getInstance().getGameConfigAsClass().getPlayersPreTeam()) {
             Team team = GameTemplate.getInstance().getGamePlayer(GameTemplate.getInstance().getPlaying().get(0)).getTeam();
             if (team.getValue() == playingSize) {
                 List<IGamePlayer> winners = new ArrayList<>();
@@ -145,6 +146,6 @@ public class TeamManager implements eu.mcone.gamesystem.api.game.manager.team.Te
     }
 
     public void createTeamInventory(Player p) {
-        new TeamInventory().createInventory(p);
+        new TeamInventory(p);
     }
 }

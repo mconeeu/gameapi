@@ -5,7 +5,7 @@
 
 package eu.mcone.gamesystem.api.game.event;
 
-import eu.mcone.gamesystem.api.gamestate.GameStateID;
+import eu.mcone.gamesystem.api.game.gamestate.GameStateID;
 import lombok.Getter;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;

@@ -5,59 +5,51 @@
 
 package eu.mcone.gamesystem.api.game.manager.map;
 
-import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
-import eu.mcone.coresystem.api.bukkit.world.CoreWorld;
-import org.bukkit.entity.Player;
-
-import java.io.IOException;
-
 public interface IMapManager {
 
-    GameMapItem getGainedMap();
-
-    void setCurrentWorld(final CoreWorld coreWorld);
-
-    CoreWorld getCurrentWorld();
-
-    //    /**
-//     * Create a json file in which all maps that are to be available for voting can be entered.
-//     *
-//     * @throws IOException Catches a possible IOException that could be thrown when creating the JSON file.
-//     */
-    boolean loadGameWorldItems() throws IOException;
-
-   /* *//**
-     * Inserts all maps in the JSON file into an ArrayList.
+    /**
+     * Creates an MapRotationHandler for the mapManager
      *
-     * @throws IOException Catches a possible IOException that might occur while reading the JSON file.
-     *//*
-    void addMaps() throws IOException;*/
+     * @param rotationInterval rotation interval in seconds
+     * @return IMapRotationHandler
+     */
+    IMapRotationHandler createMapRotationHandler(int rotationInterval);
 
     /**
-     * Returns the map with the specified map name
+     * Creates an MapVotingHandler for the mapManager
      *
-     * @param map Map name after being searched
-     * @return returns a MapItem object.
+     * @return IMapVotingHandler
      */
-    GameMapItem getMap(final String map);
-
-    String parseToJson(final GameMapItem gameWorldItem);
-
-    String parseToJson(final GameWorldItemHandler gameWorldItemHandler);
+    IMapVotingHandler createMapVotingHandler();
 
     /**
-     * Ends the voting and returns the won Map as MapItem
+     * Returns the created MapRotationHandler
      *
-     * @return returns a MapItem object that won the voting.
+     * @return IMapRotationHandler
+     * @throws eu.mcone.gamesystem.api.ecxeptions.GameSystemException if the object is null
      */
-    GameMapItem closeVoting();
+    IMapRotationHandler getMapRotationHandler();
 
     /**
-     * Creates the Map Voting Inventory.
+     * Returns the created MapVotingHandler
      *
-     * @param player Player for which the inventory is to be created.
+     * @return IMapVotingHandler
+     * @throws eu.mcone.gamesystem.api.ecxeptions.GameSystemException if the object is null
      */
-    void createMapInventory(final Player player, CoreInventory returnInventory);
+    IMapVotingHandler getMapVotingHandler();
+
+    /**
+     * Returns a GameMap object for the specified world name
+     *
+     * @param world Name of the world
+     * @return GameMap
+     */
+    GameMap getGameMap(final String world);
+
+    /**
+     * Create a json file in which all maps that are to be available for voting can be entered.
+     */
+    boolean loadGameWorlds();
 
     enum Options {
         MAP_INVENTORY(),

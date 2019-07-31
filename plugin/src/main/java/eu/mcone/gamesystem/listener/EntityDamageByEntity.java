@@ -6,6 +6,8 @@
 package eu.mcone.gamesystem.listener;
 
 import eu.mcone.gamesystem.GameSystem;
+import eu.mcone.gamesystem.api.GameTemplate;
+import eu.mcone.gamesystem.api.game.gamestate.GameStateID;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -19,6 +21,14 @@ public class EntityDamageByEntity implements Listener {
     public void on(EntityDamageByEntityEvent e) {
         Entity ent = e.getEntity();
         Entity byEnt = e.getDamager();
+
+        if (GameTemplate.getInstance() != null) {
+            if (GameTemplate.getInstance().getGameStateHandler().hasGameState(GameStateID.LOBBY)
+                    || GameTemplate.getInstance().getGameStateHandler().hasGameState(GameStateID.END)) {
+                e.setCancelled(true);
+            }
+        }
+
         if (ent instanceof Player) {
             if (byEnt instanceof Player) {
                 GameSystem.getInstance().getDamageLogger().logDamage((Player) ent, (Player) byEnt);

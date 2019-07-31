@@ -7,106 +7,144 @@ package eu.mcone.gamesystem.game.manager.map;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.world.CoreWorld;
-import eu.mcone.gamesystem.api.GameSystemAPI;
 import eu.mcone.gamesystem.api.GameTemplate;
+import eu.mcone.gamesystem.api.ecxeptions.GameSystemException;
 import eu.mcone.gamesystem.api.game.event.GameMapChangeEvent;
-import eu.mcone.gamesystem.api.game.manager.map.GameMapItem;
-import eu.mcone.networkmanager.core.api.console.ConsoleColor;
+import eu.mcone.gamesystem.api.game.event.GameMapCountdownChangeEvent;
+import eu.mcone.gamesystem.api.game.manager.map.GameMap;
+import eu.mcone.gamesystem.api.game.manager.map.IMapRotationHandler;
+import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-public class MapRotationHandler {
+public class MapRotationHandler implements IMapRotationHandler {
 
-    private Logger log;
+    private MapManager mapManager;
+    private int rotationInterval;
     private int bukkitTask;
 
-    private List<GameMapItem> maps;
-    private int rotationInterval;
-    private GameMapItem currentMapItem;
+    @Getter
+    private GameMap currentGameMap;
+    @Getter
+    private CoreWorld currentCoreWorld;
+
 
     public MapRotationHandler(final MapManager mapManager, final int rotationInterval) {
-        log = GameSystemAPI.getInstance().getLogger();
+        this.mapManager = mapManager;
+        this.rotationInterval = rotationInterval;
 
-        this.maps = mapManager.getGameWorldItems();
+        GameTemplate.getInstance().sendConsoleMessage("§aStart map rotation...");
 
-        if (mapManager.getOptions().contains(MapManager.Options.MAP_ROTATION)) {
-            this.rotationInterval = rotationInterval;
-            startRotation();
-        } else {
-            log.log(Level.SEVERE, ConsoleColor.RED +  "You can not use the Map Rotation manager because the option is not activated");
+        try {
+            if (!mapManager.getGameMaps().isEmpty()) {
+                GameMap firstGameMap = mapManager.getGameMaps().get(0);
+                CoreWorld coreWorld = CoreSystem.getInstance().getWorldManager().getWorld(firstGameMap.getWorld());
+                if (coreWorld != null) {
+                    this.currentGameMap = mapManager.getGameMaps().get(0);
+                    this.currentCoreWorld = coreWorld;
+                    GameTemplate.getInstance().sendConsoleMessage("§cSet currentWorld to §7" + firstGameMap.getWorld());
+                } else {
+                    throw new GameSystemException("Core world with the name " + firstGameMap.getWorld() + " not found");
+                }
+            } else {
+                throw new GameSystemException("No game maps found!");
+            }
+        } catch (GameSystemException e) {
+            e.printStackTrace();
         }
     }
 
-    private void startRotation() {
+    public void startRotation() {
         if (!Bukkit.getScheduler().isCurrentlyRunning(bukkitTask)) {
             AtomicInteger seconds = new AtomicInteger(rotationInterval);
+
             this.bukkitTask = Bukkit.getScheduler().runTaskTimer(GameTemplate.getInstance(), () -> {
                 seconds.getAndDecrement();
 
-                //      4 Minuten               3 Minuten               2 Minuten               1 Minute                30 Secunden
-                if (seconds.get() == 240 || seconds.get() == 180 || seconds.get() == 120 || seconds.get() == 60 || seconds.get() == 30) {
-                    for (Player player : Bukkit.getOnlinePlayers()) {
-                        CoreSystem.getInstance().createActionBar().message("§7Map wird in §a" + seconds.get() + " §7Sekunden geändert!").send(player);
-                    }
-                }  else if (seconds.get() == 0) {
-                    seconds.set(rotationInterval);
+                Bukkit.getServer().getPluginManager().callEvent(
+                        new GameMapCountdownChangeEvent
+                                (
+                                        seconds.get(),
+                                        true,
+                                        bukkitTask
+                                )
+                );
 
-                    int i = 0;
-                    for (GameMapItem gameMapItem : maps) {
-                        if (currentMapItem != null) {
-                            if (gameMapItem.getWorld().equalsIgnoreCase(currentMapItem.getWorld())) {
-                                i++;
+                if (!Bukkit.getOnlinePlayers().isEmpty()) {
+                    //     10 minuten                5 Minuten              2 Minuten               1 Minute                30 Secunden
+                    if (seconds.get() == 600 || seconds.get() == 300 || seconds.get() == 120 || seconds.get() == 60 || seconds.get() == 30 || seconds.get() == 15 || seconds.get() == 10 || seconds.get() == 5 || seconds.get() == 1) {
+                        int min = Math.round(seconds.get() / 60);
+                        if (min > 1) {
+                            Bukkit.getOnlinePlayers().forEach((player) -> {
+                                CoreSystem.getInstance().createActionBar().message("§7§oMap wird in §a§o" + min + " §7§oMinute(n) gewechselt!").send(player);
+                                player.playSound(player.getLocation(), Sound.NOTE_BASS, 1, 1);
+                            });
+                        } else {
+                            Bukkit.getOnlinePlayers().forEach((player) -> {
+                                CoreSystem.getInstance().createActionBar().message("§7§oMap wird in §a§o" + seconds.get() + " §7§oSekunde(n) gewechselt!").send(player);
+                                player.playSound(player.getLocation(), Sound.NOTE_BASS, 1, 1);
+                            });
+                        }
+                    } else if (seconds.get() == 0) {
+                        seconds.set(rotationInterval);
 
-                                if (maps.size() != i && maps.get(i) != null) {
-                                    currentMapItem = maps.get(i);
-                                    break;
+                        int i = 0;
+                        for (GameMap gameMapItem : mapManager.getGameMaps()) {
+                            if (currentGameMap != null) {
+                                if (gameMapItem.getWorld().equalsIgnoreCase(currentGameMap.getWorld())) {
+                                    i++;
+
+                                    if (mapManager.getGameMaps().size() != i && mapManager.getGameMaps().get(i) != null) {
+                                        currentGameMap = mapManager.getGameMaps().get(i);
+                                        break;
+                                    } else {
+                                        currentGameMap = mapManager.getGameMaps().get(0);
+                                        break;
+                                    }
                                 } else {
-                                    currentMapItem = maps.get(0);
-                                    break;
+                                    i++;
                                 }
                             } else {
-                                i++;
+                                currentGameMap = mapManager.getGameMaps().get(0);
+                                break;
                             }
+                        }
+
+                        CoreWorld coreWorld = CoreSystem.getInstance().getWorldManager().getWorld(currentGameMap.getWorld());
+
+                        if (coreWorld != null) {
+                            currentCoreWorld = coreWorld;
+
+                            for (Player player : Bukkit.getOnlinePlayers()) {
+                                CoreSystem.getInstance().createTitle().fadeIn(2).fadeOut(5).title("§8» " + currentGameMap.getMapItem().getDisplayName() + " §8«").subTitle("§a§oDie Map wurde gewechselt!").stay(2).send(player);
+                                coreWorld.teleportSilently(player, currentGameMap.getSpawnLocation());
+                                player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 1);
+                            }
+
+                            Bukkit.getPluginManager().callEvent(
+                                    new GameMapChangeEvent(
+                                            currentGameMap
+                                    )
+                            );
                         } else {
-                            currentMapItem = maps.get(0);
-                            break;
+                            GameTemplate.getInstance().sendConsoleMessage("§cError world is null, please check if the world exists");
                         }
-                    }
-
-                    CoreWorld coreWorld = CoreSystem.getInstance().getWorldManager().getWorld(currentMapItem.getWorld());
-                    CoreSystem.getInstance().enableSpawnCommand(GameTemplate.getInstance(), coreWorld, 0);
-
-                    Bukkit.getPluginManager().callEvent(
-                            new GameMapChangeEvent(
-                                    currentMapItem
-                            )
-                    );
-
-                    if (coreWorld != null) {
-                        for (Player player : Bukkit.getOnlinePlayers()) {
-                            CoreSystem.getInstance().createTitle().fadeIn(2).fadeOut(5).title("§8» " + currentMapItem.getDisplayName() + " §8«").subTitle("§aDie Map wurde geändert").stay(2).send(player);
-                            GameTemplate.getInstance().getMapManager().setCurrentWorld(coreWorld);
-                            coreWorld.teleportSilently(player, "spawn");
-                        }
-                    } else {
-                        log.log(Level.SEVERE, ConsoleColor.RED + "Error world is null, please check if the world exists");
                     }
                 }
             }, 0, 20L).getTaskId();
         } else {
-            log.log(Level.INFO, "The rotation scheduler is already running...");
+            GameTemplate.getInstance().sendConsoleMessage("§cThe rotation scheduler is already running...");
         }
     }
 
     public void stopRotation() {
         if (Bukkit.getScheduler().isCurrentlyRunning(bukkitTask)) {
             Bukkit.getScheduler().cancelTask(bukkitTask);
-            log.info("Stop map rotation task...");
+
+            GameTemplate.getInstance().sendConsoleMessage("§aStop map rotation task...");
         }
     }
 }

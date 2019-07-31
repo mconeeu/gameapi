@@ -15,23 +15,25 @@ public class ServerListPing implements Listener {
     @EventHandler
     public void on(ServerListPingEvent e) {
         if (GameTemplate.getInstance() != null) {
-            switch (GameTemplate.getInstance().getGameStateHandler().getCurrentStateID()) {
-                case ERROR:
-                    e.setMotd("§f§lMCONE §3Minigamesnetzwerk §8» §f§lMC 1.12 §7[1.8 PVP]" +
-                            "\n§7§o" + GameTemplate.getInstance().getPluginName() + "-" + GameTemplate.getInstance().getGameSettingsConfig().getTeams() + "x" + GameTemplate.getInstance().getGameSettingsConfig().getPlayersPreTeam() + " §8» §4§lERROR");
-                    break;
-                case LOBBY:
-                    e.setMotd("§f§lMCONE §3Minigamesnetzwerk §8» §f§lMC 1.12 §7[1.8 PVP]" +
-                            "\n§7§o" + GameTemplate.getInstance().getPluginName() + "-" + GameTemplate.getInstance().getGameSettingsConfig().getTeams() + "x" + GameTemplate.getInstance().getGameSettingsConfig().getPlayersPreTeam() + " §8» §a§lLOBBY");
-                    break;
-                case INGAME:
-                    e.setMotd("§f§lMCONE §3Minigamesnetzwerk §8» §f§lMC 1.12 §7[1.8 PVP]" +
-                            "\n§7§o" + GameTemplate.getInstance().getPluginName() + "-" + GameTemplate.getInstance().getGameSettingsConfig().getTeams() + "x" + GameTemplate.getInstance().getGameSettingsConfig().getPlayersPreTeam() + " §8» §c§lINGAME");
-                    break;
-                case END:
-                    e.setMotd("§f§lMCONE §3Minigamesnetzwerk §8» §f§lMC 1.12 §7[1.8 PVP]" +
-                            "\n§7§o" + GameTemplate.getInstance().getPluginName() + "-" + GameTemplate.getInstance().getGameSettingsConfig().getTeams() + "x" + GameTemplate.getInstance().getGameSettingsConfig().getPlayersPreTeam() + " §8» §4§lEND");
-                    break;
+            if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_GAME_STATE_HANDLER)) {
+                switch (GameTemplate.getInstance().getGameStateHandler().getCurrentStateID()) {
+                    case ERROR:
+                        e.setMotd("§f§lMCONE §3Minigamesnetzwerk §8» §f§lMC 1.12 §7[1.8 PVP]" +
+                                "\n§7§o" + GameTemplate.getInstance().getPluginName() + "-" + GameTemplate.getInstance().getGameConfigAsClass().getTeams() + "x" + GameTemplate.getInstance().getGameConfigAsClass().getPlayersPreTeam() + " §8» §4§lERROR");
+                        break;
+                    case LOBBY:
+                        e.setMotd("§f§lMCONE §3Minigamesnetzwerk §8» §f§lMC 1.12 §7[1.8 PVP]" +
+                                "\n§7§o" + GameTemplate.getInstance().getPluginName() + "-" + GameTemplate.getInstance().getGameConfigAsClass().getTeams() + "x" + GameTemplate.getInstance().getGameConfigAsClass().getPlayersPreTeam() + " §8» §a§lLOBBY");
+                        break;
+                    case INGAME:
+                        e.setMotd("§f§lMCONE §3Minigamesnetzwerk §8» §f§lMC 1.12 §7[1.8 PVP]" +
+                                "\n§7§o" + GameTemplate.getInstance().getPluginName() + "-" + GameTemplate.getInstance().getGameConfigAsClass().getTeams() + "x" + GameTemplate.getInstance().getGameConfigAsClass().getPlayersPreTeam() + " §8» §c§lINGAME");
+                        break;
+                    case END:
+                        e.setMotd("§f§lMCONE §3Minigamesnetzwerk §8» §f§lMC 1.12 §7[1.8 PVP]" +
+                                "\n§7§o" + GameTemplate.getInstance().getPluginName() + "-" + GameTemplate.getInstance().getGameConfigAsClass().getTeams() + "x" + GameTemplate.getInstance().getGameConfigAsClass().getPlayersPreTeam() + " §8» §4§lEND");
+                        break;
+                }
             }
         }
     }

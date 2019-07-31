@@ -8,7 +8,7 @@ package eu.mcone.gamesystem.listener;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.gamesystem.api.GameTemplate;
 import eu.mcone.gamesystem.api.game.player.IGamePlayer;
-import eu.mcone.gamesystem.api.gamestate.GameStateID;
+import eu.mcone.gamesystem.api.game.gamestate.GameStateID;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -25,7 +25,7 @@ public class AsyncPlayerChat implements Listener {
         if (GameTemplate.getInstance() != null) {
             IGamePlayer gamePlayer = GameTemplate.getInstance().getGamePlayer(p.getUniqueId());
 
-            if (GameTemplate.getInstance().getOptions().contains(GameTemplate.Options.USE_GAME_STATE_HANDLER)) {
+            if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_GAME_STATE_HANDLER)) {
 
                 if (GameTemplate.getInstance().getGameStateHandler().hasGameState(GameStateID.LOBBY)
                         || GameTemplate.getInstance().getGameStateHandler().hasGameState(GameStateID.END)) {
