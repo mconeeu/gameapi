@@ -41,7 +41,8 @@ public class RestartCountdown implements IGameCountdown {
 
         try {
             if (GameTemplate.getInstance() != null) {
-                if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_GAME_STATE_HANDLER)) {
+                if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_GAME_STATE_HANDLER)
+                        || GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_ALL)) {
                     if (seconds >= 30) {
                         this.seconds = seconds;
                         this.staticSeconds = seconds;

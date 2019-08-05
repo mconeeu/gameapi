@@ -11,7 +11,7 @@ import eu.mcone.coresystem.api.bukkit.inventory.InventoryOption;
 import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
 import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
 import eu.mcone.coresystem.api.bukkit.item.Skull;
-import eu.mcone.gamesystem.api.game.player.IGamePlayer;
+import eu.mcone.gamesystem.api.game.player.GamePlayer;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -21,7 +21,7 @@ import java.util.ArrayList;
 
 public class StageNpcInteractInventory extends CoreInventory {
 
-    public StageNpcInteractInventory(final Player player, final IGamePlayer stageGamePlayer) {
+    public StageNpcInteractInventory(final Player player, final GamePlayer stageGamePlayer) {
         super("§8» " + player.getName(), player, InventorySlot.ROW_5, InventoryOption.FILL_EMPTY_SLOTS);
 
         setItem(InventorySlot.ROW_2_SLOT_5, new ItemBuilder(Material.BED)

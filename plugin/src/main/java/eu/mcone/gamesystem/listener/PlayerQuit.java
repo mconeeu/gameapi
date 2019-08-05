@@ -11,7 +11,7 @@ import eu.mcone.gamesystem.api.GameTemplate;
 import eu.mcone.gamesystem.api.game.Playing;
 import eu.mcone.gamesystem.api.game.countdown.handler.GameCountdownID;
 import eu.mcone.gamesystem.api.game.countdown.handler.IGameCountdown;
-import eu.mcone.gamesystem.api.game.player.IGamePlayer;
+import eu.mcone.gamesystem.api.game.player.GamePlayer;
 import eu.mcone.gamesystem.api.game.gamestate.GameStateID;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -25,15 +25,17 @@ public class PlayerQuit implements Listener {
     public void on(PlayerQuitEvent e) {
         Player p = e.getPlayer();
         if (GameTemplate.getInstance() != null) {
-            IGamePlayer gp = GameTemplate.getInstance().getGamePlayer(p.getUniqueId());
+            GamePlayer gp = GameTemplate.getInstance().getGamePlayer(p.getUniqueId());
             if (gp != null) {
                 gp.removeFromGame();
 
-                if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_TEAM_STAGE)) {
+                if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_TEAM_STAGE)
+                        || GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_ALL)) {
                     GameTemplate.getInstance().getTeamManager().getTeamStageHandler().removePlayerFromStage(gp);
                 }
 
-                if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_GAME_STATE_HANDLER)) {
+                if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_GAME_STATE_HANDLER)
+                        || GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_ALL)) {
                     if (GameTemplate.getInstance().getGameStateHandler().hasGameState(GameStateID.LOBBY)) {
                         IGameCountdown gameCountdown = GameTemplate.getInstance().getGameStateHandler().getGameCountdown(GameCountdownID.LOBBY_COUNTDOWN);
 

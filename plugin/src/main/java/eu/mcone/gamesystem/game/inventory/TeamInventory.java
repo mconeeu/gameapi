@@ -12,7 +12,7 @@ import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
 import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
 import eu.mcone.gamesystem.api.GameTemplate;
 import eu.mcone.gamesystem.api.game.Team;
-import eu.mcone.gamesystem.api.game.player.IGamePlayer;
+import eu.mcone.gamesystem.api.game.player.GamePlayer;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -23,7 +23,8 @@ public class TeamInventory extends CoreInventory {
     public TeamInventory(Player player) {
         super("§8» §c§oTeamauswahl", player, InventorySlot.ROW_4, InventoryOption.FILL_EMPTY_SLOTS);
 
-        if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_TEAM_MANAGER)) {
+        if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_TEAM_MANAGER)
+                || GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_ALL)) {
             int i = 1;
             for (Team team : Team.values()) {
                 if (i <= GameTemplate.getInstance().getGameConfigAsClass().getTeams()) {
@@ -45,7 +46,7 @@ public class TeamInventory extends CoreInventory {
 
     private void registerFunction(InventoryClickEvent e) {
         Player p = (Player) e.getWhoClicked();
-        IGamePlayer gp = GameTemplate.getInstance().getGamePlayer(p.getUniqueId());
+        GamePlayer gp = GameTemplate.getInstance().getGamePlayer(p.getUniqueId());
 
         for (Team team : Team.values()) {
             if (e.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase(team.getPrefix())) {

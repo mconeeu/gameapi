@@ -6,7 +6,7 @@
 package eu.mcone.gamesystem.api.game.event;
 
 import eu.mcone.gamesystem.api.game.Team;
-import eu.mcone.gamesystem.api.game.player.IGamePlayer;
+import eu.mcone.gamesystem.api.game.player.GamePlayer;
 import lombok.Getter;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -20,9 +20,9 @@ public final class GameWinEvent extends Event {
     @Getter
     private final Team team;
     @Getter
-    private final List<IGamePlayer> winners;
+    private final List<GamePlayer> winners;
 
-    public GameWinEvent(final Team team, final List<IGamePlayer> winners) {
+    public GameWinEvent(final Team team, final List<GamePlayer> winners) {
         this.team = team;
         this.winners = winners;
     }

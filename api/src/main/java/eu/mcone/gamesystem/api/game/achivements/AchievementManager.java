@@ -9,35 +9,18 @@ import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
-public interface IAchievementManager {
+public interface AchievementManager {
 
     Gamemode getGamemode();
 
     void loadAchievements();
 
-    void loadSolvedAchievement(UUID uuid);
-
-    void loadSolvedAchievements();
-
     void registerAchievement(final Achievement achievement);
 
     void registerAchievements(final Achievement... achievements);
 
-    SolvedAchievement solveAchievement(final UUID uuid, final String achievementName);
-
-    void solveAchievements(final UUID uuid, final String... solvedAchievementName);
-
-    void removeSolvedAchievement(final UUID uuid, final String achievementName);
-
-    void removeSolvedAchievements(final UUID uuid, final String... solvedAchievementNames);
-
-    boolean hasAchievement(final UUID uuid, final String achievementName);
-
     Achievement getAchievement(final String achievementName);
-
-    ArrayList<SolvedAchievement> getSolvedAchievements(final UUID uuid);
 
     ArrayList<Achievement> getAchievements();
 

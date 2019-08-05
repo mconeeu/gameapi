@@ -15,7 +15,7 @@ import lombok.Setter;
 public class SolvedAchievement {
 
     private long timestamp;
-    private Achievement achievement;
+    private String achievementName;
 
     public SolvedAchievement() {}
 

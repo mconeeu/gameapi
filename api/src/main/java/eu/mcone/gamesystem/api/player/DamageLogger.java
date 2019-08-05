@@ -7,7 +7,7 @@ package eu.mcone.gamesystem.api.player;
 
 import org.bukkit.entity.Player;
 
-public interface IDamageLogger {
+public interface DamageLogger {
 
     /**
      * Logs the last hit of the player

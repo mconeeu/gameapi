@@ -15,7 +15,8 @@ public class ServerListPing implements Listener {
     @EventHandler
     public void on(ServerListPingEvent e) {
         if (GameTemplate.getInstance() != null) {
-            if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_GAME_STATE_HANDLER)) {
+            if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_GAME_STATE_HANDLER)
+                    || GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_ALL)) {
                 switch (GameTemplate.getInstance().getGameStateHandler().getCurrentStateID()) {
                     case ERROR:
                         e.setMotd("§f§lMCONE §3Minigamesnetzwerk §8» §f§lMC 1.12 §7[1.8 PVP]" +

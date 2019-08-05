@@ -16,7 +16,7 @@ import eu.mcone.coresystem.api.bukkit.world.CoreWorld;
 import eu.mcone.coresystem.api.core.player.SkinInfo;
 import eu.mcone.gamesystem.api.GameTemplate;
 import eu.mcone.gamesystem.api.game.Team;
-import eu.mcone.gamesystem.api.game.player.IGamePlayer;
+import eu.mcone.gamesystem.api.game.player.GamePlayer;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -35,9 +35,9 @@ public class TeamStage {
     @Getter
     private final CoreWorld stageWorld;
     @Getter
-    private Map<IGamePlayer, PlayerNpc> npcs;
+    private Map<GamePlayer, PlayerNpc> npcs;
     @Getter
-    private Map<IGamePlayer, Location> occupiedLocations;
+    private Map<GamePlayer, Location> occupiedLocations;
 
     private List<Location> availableLocations;
 
@@ -59,7 +59,7 @@ public class TeamStage {
         }
     }
 
-    public void addPlayerToStage(final IGamePlayer gamePlayer) {
+    public void addPlayerToStage(final GamePlayer gamePlayer) {
         if (!npcs.containsKey(gamePlayer)) {
             Location freePlace = getFreePlace();
             if (freePlace != null) {
@@ -101,7 +101,7 @@ public class TeamStage {
     }
 
 
-    public void removePlayerFromStage(final IGamePlayer gamePlayer) {
+    public void removePlayerFromStage(final GamePlayer gamePlayer) {
         if (npcs.containsKey(gamePlayer)) {
             NPC playerNpc = CoreSystem.getInstance().getNpcManager().getNPC(stageWorld, "stage:" + team.getString().toLowerCase() + ":" + gamePlayer.getName());
 

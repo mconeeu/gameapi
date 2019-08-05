@@ -6,14 +6,14 @@
 package eu.mcone.gamesystem.api;
 
 import eu.mcone.coresystem.api.bukkit.CorePlugin;
-import eu.mcone.gamesystem.api.player.IDamageLogger;
+import eu.mcone.gamesystem.api.player.DamageLogger;
 import lombok.Getter;
 import org.bukkit.ChatColor;
 
 public abstract class GameSystemAPI extends CorePlugin {
 
     public GameSystemAPI() {
-        super("GameSystem", ChatColor.DARK_GRAY, "system.prefix.server");
+        super("gamesystem", ChatColor.DARK_GRAY, "system.prefix.server");
     }
 
     @Getter
@@ -30,5 +30,5 @@ public abstract class GameSystemAPI extends CorePlugin {
     /**
      * @return Returns the DamageLogger
      */
-    public abstract IDamageLogger getDamageLogger();
+    public abstract DamageLogger getDamageLogger();
 }

@@ -6,91 +6,458 @@
 package eu.mcone.gamesystem.game.player;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
+import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.coresystem.api.bukkit.player.Stats;
-import eu.mcone.gamesystem.api.GameSystemAPI;
+import eu.mcone.gamesystem.GameSystem;
 import eu.mcone.gamesystem.api.GameTemplate;
 import eu.mcone.gamesystem.api.ecxeptions.GameSystemException;
 import eu.mcone.gamesystem.api.game.Team;
+import eu.mcone.gamesystem.api.game.achivements.Achievement;
 import eu.mcone.gamesystem.api.game.achivements.SolvedAchievement;
-import eu.mcone.gamesystem.api.game.player.IGamePlayer;
+import eu.mcone.gamesystem.api.game.event.GameAchievementEvent;
+import eu.mcone.gamesystem.api.game.manager.kit.Kit;
+import eu.mcone.gamesystem.api.game.manager.kit.KitItem;
+import eu.mcone.gamesystem.api.game.manager.kit.sorting.CustomKit;
+import eu.mcone.gamesystem.api.lobby.cards.ItemCard;
 import eu.mcone.gamesystem.game.inventory.SpectatorInventory;
+import eu.mcone.lobby.api.enums.Item;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.*;
 
-public class GamePlayer implements IGamePlayer {
+@Getter
+public class GamePlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.GamePlayer<GamePlayerProfile> implements eu.mcone.gamesystem.api.game.player.GamePlayer {
 
-    private Logger log;
+    private List<Item> items = new ArrayList<>();
+    private Map<ItemCard, Boolean> itemCards = new HashMap<>();
+    private Map<String, CustomKit> customKits = new HashMap<>();
+    private HashSet<SolvedAchievement> solvedAchievements = new HashSet<>();
 
-    @Getter
-    private CorePlayer corePlayer;
-    @Getter
-    private Player bukkitPlayer;
-    @Getter
-    private Team team;
-    @Getter
-    private String name;
-    @Getter
-    boolean playing = false;
-    @Getter
-    boolean spectator = false;
-    @Getter
-    private Stats stats;
-    @Getter
-    private List<SolvedAchievement> solvedAchievements;
-    @Getter
-    private int roundCoins;
-    @Getter
-    private int roundKills;
-    @Getter
-    private int roundDeaths;
-    @Getter
-    private int roundGoals;
+    private transient Team team;
+    private transient String name;
+    private transient boolean playing = false;
+    private transient boolean spectator = false;
+    private transient Stats stats;
+    private transient int roundCoins;
+    private transient int roundKills;
+    private transient int roundDeaths;
+    private transient int roundGoals;
+
+    private transient Player player;
 
     public GamePlayer(Player player) {
-        log = GameSystemAPI.getInstance().getLogger();
+        super(CoreSystem.getInstance().getCorePlayer(player.getUniqueId()));
 
         try {
             if (GameTemplate.getInstance() != null) {
-                this.corePlayer = CoreSystem.getInstance().getCorePlayer(player.getUniqueId());
-                this.bukkitPlayer = player;
-                this.name = player.getName();
                 this.team = Team.ERROR;
+                this.name = player.getName();
                 this.stats = corePlayer.getStats(GameTemplate.getInstance().getGamemode());
-                this.solvedAchievements = new ArrayList<>();
 
-                if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_ACHIEVEMENTS)) {
-                    GameTemplate.getInstance().getAchievementManager().loadSolvedAchievement(player.getUniqueId());
-                    solvedAchievements = GameTemplate.getInstance().getAchievementManager().getSolvedAchievements(player.getUniqueId());
-                }
+                this.player = player;
 
                 GameTemplate.getInstance().getPlaying().add(player);
-                GameTemplate.getInstance().getGamePlayers().put(player.getUniqueId(), this);
-                log.info("Create new GamePlayer `" + name + "`");
+                GameTemplate.getInstance().sendConsoleMessage("Create new GamePlayer `" + name + "`");
             } else {
                 throw new GameSystemException("GameTemplate was not initialized");
             }
         } catch (GameSystemException e) {
             e.printStackTrace();
-            log.log(Level.SEVERE, "Exception in GamePlayer.class", e);
+            GameTemplate.getInstance().sendConsoleMessage("§cException in GamePlayer.class, " + e.getMessage());
         }
     }
 
+    @Override
+    public GamePlayerProfile reload() {
+        GamePlayerProfile profile = super.reload();
+
+        this.items = profile.getItemList();
+        this.itemCards = profile.getItemCardMap();
+        this.customKits = profile.getCustomKits();
+        this.solvedAchievements = profile.getSolvedAchievements();
+        GameTemplate.getInstance().registerGamePlayer(this);
+
+        return profile;
+    }
+
+    @Override
+    protected GamePlayerProfile loadData() {
+        return GameSystem.getInstance().loadGameProfile(corePlayer.bukkit(), GamePlayerProfile.class);
+    }
+
+    @Override
+    protected void saveData() {
+        GameSystem.getInstance().saveGameProfile(new GamePlayerProfile(corePlayer.bukkit(), items, itemCards, customKits, solvedAchievements));
+    }
+
+    //Lobby methods
+    public void addItem(Item item) {
+        if (!items.contains(item)) {
+            items.add(item);
+            saveData();
+        }
+    }
+
+    public void removeItem(Item item) {
+        if (items.contains(item)) {
+            items.remove(item);
+            saveData();
+        }
+    }
+
+    public boolean hasItem(Item i) {
+        return items.contains(i);
+    }
+
+    public void buyItem(Player p, Item item) {
+        if (!hasItem(item)) {
+            CorePlayer cp = CoreSystem.getInstance().getCorePlayer(p);
+
+            if ((cp.getCoins() - item.getEmeralds()) >= 0) {
+                cp.removeCoins(item.getEmeralds());
+                addItem(item);
+
+                p.closeInventory();
+                GameTemplate.getInstance().getMessager().send(p, "§2Du hast erfolgreich das Item " + item.getName() + "§2 gekauft!");
+                p.playSound(p.getLocation(), Sound.LEVEL_UP, 1, 1);
+            } else {
+                p.closeInventory();
+                GameTemplate.getInstance().getMessager().send(p, "§4Du hast nicht genügend Coins!");
+                p.playSound(p.getLocation(), Sound.NOTE_BASS, 1, 1);
+            }
+        } else {
+            p.closeInventory();
+            GameTemplate.getInstance().getMessager().send(p, "§4Du besitzt dieses Item bereits!");
+            p.playSound(p.getLocation(), Sound.NOTE_BASS, 1, 1);
+        }
+    }
+
+    private void addItemTemporary(Item i) {
+        if (!items.contains(i)) {
+            items.add(i);
+        }
+    }
+
+    private void removeItemTemporary(Item i) {
+        items.remove(i);
+    }
+
+    //ItemCards
+    public boolean hasItemCard(final String itemCardName) {
+        for (Map.Entry<ItemCard, Boolean> entry : itemCards.entrySet()) {
+            if (entry.getKey().getName().equalsIgnoreCase(itemCardName)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean hasItemCard(final ItemCard itemCard) {
+        for (Map.Entry<ItemCard, Boolean> entry : itemCards.entrySet()) {
+            if (entry.getKey().equals(itemCard)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public ItemCard getItemCard(final String itemCardName) {
+        for (Map.Entry<ItemCard, Boolean> entry : itemCards.entrySet()) {
+            if (entry.getKey().getName().equalsIgnoreCase(itemCardName)) {
+                return entry.getKey();
+            }
+        }
+
+        return null;
+    }
+
+    public boolean hasItemCardRedeemed(final String itemCardName) {
+        for (Map.Entry<ItemCard, Boolean> entry : itemCards.entrySet()) {
+            if (entry.getKey().getName().equalsIgnoreCase(itemCardName)) {
+                return entry.getValue();
+            }
+        }
+
+        return false;
+    }
+
+    public void redeemedItemCard(final ItemCard itemCard) {
+        itemCards.put(itemCard, true);
+        saveData();
+    }
+
+    public void redeemedItemCard(final String itemCardName) {
+        ItemCard itemCard = getItemCard(itemCardName);
+        if (itemCard != null) {
+            redeemedItemCard(itemCard);
+        } else {
+            GameTemplate.getInstance().sendConsoleMessage("§cCould not found itemCard with the name " + itemCardName);
+        }
+    }
+
+    public void unRedeemedItemCard(final ItemCard itemCard) {
+        itemCards.put(itemCard, false);
+        saveData();
+    }
+
+    public void unRedeemedItemCard(final String itemCardName) {
+        ItemCard itemCard = getItemCard(itemCardName);
+        if (itemCard != null) {
+            unRedeemedItemCard(itemCard);
+        } else {
+            GameTemplate.getInstance().sendConsoleMessage("§cCould not found itemCard with the name " + itemCardName);
+        }
+    }
+
+    public List<ItemCard> getItemCards() {
+        List<ItemCard> itemCards = new ArrayList<>();
+
+        for (Map.Entry<ItemCard, Boolean> entry : this.itemCards.entrySet()) {
+            itemCards.add(entry.getKey());
+        }
+
+        return itemCards;
+    }
+
+    public void removeItemCard(final ItemCard itemCard) {
+        itemCards.remove(itemCard);
+        saveData();
+    }
+
+    public void removeItemCard(final String itemCardName) {
+        ItemCard itemCard = getItemCard(itemCardName);
+        if (itemCard != null) {
+            removeItemCard(itemCard);
+        } else {
+            GameTemplate.getInstance().sendConsoleMessage("§cCould not found itemCard with the name " + itemCardName);
+        }
+    }
+
+    public void addItemCard(final ItemCard itemCard) {
+        itemCards.put(itemCard, false);
+        saveData();
+    }
+
+    public void addItemCard(final String itemCardName) {
+        ItemCard itemCard = GameTemplate.getInstance().getItemCardManager().getItemCard(itemCardName);
+        if (itemCard != null) {
+            addItemCard(itemCard);
+        } else {
+            GameTemplate.getInstance().sendConsoleMessage("§cCould not found itemCard with the name " + itemCardName);
+        }
+    }
+
+    public List<ItemCard> getRedeemedItemCards() {
+        List<ItemCard> redeemedItemCards = new ArrayList<>();
+        for (Map.Entry<ItemCard, Boolean> entry : itemCards.entrySet()) {
+            if (entry.getValue()) {
+                redeemedItemCards.add(entry.getKey());
+            }
+        }
+
+        return redeemedItemCards;
+    }
+
+    public List<ItemCard> getRedeemedItemCards(Gamemode gamemode) {
+        List<ItemCard> redeemedItemCards = new ArrayList<>();
+        for (Map.Entry<ItemCard, Boolean> entry : itemCards.entrySet()) {
+            if (entry.getKey().getGamemode().equals(gamemode)) {
+                if (entry.getValue()) {
+                    redeemedItemCards.add(entry.getKey());
+                }
+            }
+        }
+
+        return redeemedItemCards;
+    }
+
+    public void givePlayerRedeemedItemCards(Gamemode gamemode) {
+        Player player = bukkit();
+        List<ItemCard> redeemedItemCards = getRedeemedItemCards(gamemode);
+
+        if (redeemedItemCards.size() > 0) {
+            int freePlaceInInventory = 0;
+
+            for (ItemStack itemStack : player.getInventory().getContents()) {
+                if (itemStack == null || itemStack.getType().equals(Material.AIR)) {
+                    freePlaceInInventory++;
+                }
+            }
+
+            if (freePlaceInInventory > 0) {
+                for (ItemCard itemCard : redeemedItemCards) {
+                    if (freePlaceInInventory > 0) {
+                        player.getInventory().addItem(itemCard.getItemCardBuilder().createStack());
+                        itemCards.remove(itemCard);
+                        GameTemplate.getInstance().getMessager().send(player, "§2Du hast das Item " + itemCard.getItemCardBuilder().getDisplayName() + " erhalten!");
+                        freePlaceInInventory--;
+                    } else {
+                        GameTemplate.getInstance().sendConsoleMessage("§7Du hast §cnicht genügend Platz §7für alle Itemkarten in deinem Inventar, \n" +
+                                "§7sortiere zuerst dein Inventar aus um die restlichen Itemkarten zu erhalten.\n" +
+                                "§7Benutze hierfür /itemcards");
+                        break;
+                    }
+                }
+
+                saveData();
+            }
+        } else {
+            GameTemplate.getInstance().getMessager().send(player, "§7Du besitzt momentan keine Itemkarten!");
+        }
+    }
+
+    //Custom kits
+    public void modifyInventory(final Kit kit, final Map<String, Double> sortedItems) {
+        customKits.put(String.valueOf(kit.getKitID()), new CustomKit(System.currentTimeMillis() / 1000, sortedItems));
+    }
+
+    public CustomKit getModifiedKit(Kit kit) {
+        return customKits.getOrDefault(String.valueOf(kit.getKitID()), null);
+    }
+
+    public boolean isKitModified(Kit kit) {
+        return customKits.containsKey(String.valueOf(kit.getKitID()));
+    }
+
+    public void setKit(Kit kit) {
+        Player player = getCorePlayer().bukkit();
+        CustomKit customKit = getModifiedKit(kit);
+
+        if (customKit != null) {
+            for (Map.Entry<String, Double> kitEntry : customKit.getCustomItems().entrySet()) {
+                int slot = Integer.valueOf(kitEntry.getKey());
+                KitItem kitItem = kit.getKitItem(kitEntry.getValue());
+
+                if (kitItem != null) {
+                    switch (kitItem.getKitItemType()) {
+                        case WEAPON:
+                            player.getInventory().setItem(slot, kitItem.getItemStack());
+                        case HELMET:
+                            player.getInventory().setHelmet(kitItem.getItemStack());
+                        case CHESTPLATE:
+                            player.getInventory().setChestplate(kitItem.getItemStack());
+                        case LEGGINGS:
+                            player.getInventory().setLeggings(kitItem.getItemStack());
+                        case BOOTS:
+                            player.getInventory().setBoots(kitItem.getItemStack());
+                    }
+                }
+            }
+        } else {
+            int slot = 0;
+            for (KitItem kitItem : kit.getKitItems()) {
+                player.getInventory().setItem(slot, kitItem.getItemStack());
+                slot++;
+            }
+        }
+    }
+
+    public void setKit(final String kitName) {
+        Kit kit = GameTemplate.getInstance().getKitManager().getKit(kitName);
+        if (kit != null) {
+            setKit(kit);
+        }
+    }
+
+    public void setKit(final int kitID) {
+        Kit kit = GameTemplate.getInstance().getKitManager().getKit(kitID);
+        if (kit != null) {
+            setKit(kit);
+        }
+    }
+
+    //Achievements
+    public void addAchievement(String achievementName) {
+        try {
+            Achievement achievement = GameTemplate.getInstance().getAchievementManager().getAchievement(achievementName);
+
+            if (achievement != null) {
+                if (!hasAchievement(achievementName)) {
+                    SolvedAchievement solvedAchievement = new SolvedAchievement(System.currentTimeMillis() / 1000, achievementName);
+                    ChatColor gamemodeColor = GameTemplate.getInstance().getGamemode().getColor();
+                    addCoins(achievement.getReward());
+                    GameTemplate.getInstance().getMessager().sendSimple(player,
+                            "§8§kasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfsadfsadfsadfasdfasdf\n" +
+                                    "§aDu hast das folgendes Achievement freigeschaltet!\n" +
+                                    "\n" +
+                                    "§7Achievement: " + gamemodeColor + "§o" + achievementName + "\n" +
+                                    "§7Beschreibung: " + gamemodeColor + "§o" + achievement.getDescription() + "\n" +
+                                    "§7Coins:" + gamemodeColor + "§o" + achievement.getReward() + "\n" +
+                                    "§8§kasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfsadfsadfsadfasdfasdf"
+                    );
+
+                    saveData();
+
+                    //Call Event
+                    Bukkit.getPluginManager().callEvent(new GameAchievementEvent(getCorePlayer().getUuid(), solvedAchievement));
+                }
+            } else {
+                throw new GameSystemException("Cannot find achievement with the name " + achievementName);
+            }
+        } catch (GameSystemException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addAchievements(String... achievementName) {
+        for (String name : achievementName) {
+            addAchievement(name);
+        }
+    }
+
+    public void removeAchievement(final String achievementName) {
+        if (hasAchievement(achievementName)) {
+            SolvedAchievement solvedAchievement = getAchievement(achievementName);
+            solvedAchievements.remove(solvedAchievement);
+            saveData();
+        }
+    }
+
+    public void removeAchievements(final String... achievements) {
+        for (String achievementName : achievements) {
+            removeAchievement(achievementName);
+        }
+    }
+
+    public SolvedAchievement getAchievement(final String achievementName) {
+        for (SolvedAchievement solvedAchievement : solvedAchievements) {
+            if (solvedAchievement.getAchievementName().equalsIgnoreCase(achievementName)) {
+                return solvedAchievement;
+            }
+        }
+
+        return null;
+    }
+
+    public boolean hasAchievement(String achievementName) {
+        for (SolvedAchievement solvedAchievement : solvedAchievements) {
+            if (solvedAchievement.getAchievementName().equalsIgnoreCase(achievementName)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    //Ingame methods
     public void setTeam(Team team) {
         this.team = team;
         addTeamSize(1);
-        GameTemplate.getInstance().getChats().get(team).add(bukkitPlayer);
-        GameTemplate.getInstance().getTeams().put(bukkitPlayer.getUniqueId(), team);
-        log.info("Put the player `" + name + "` in team `" + team + "`");
+        GameTemplate.getInstance().getChats().get(team).add(player);
+        GameTemplate.getInstance().getTeams().put(player.getUniqueId(), team);
+        GameTemplate.getInstance().sendConsoleMessage("Put the player `" + name + "` in team `" + team + "`");
     }
 
     public void updateTeamAlive(boolean var) {
@@ -101,14 +468,14 @@ public class GamePlayer implements IGamePlayer {
         if (team != Team.ERROR) {
             if (size > -1) {
                 team.setValue(size);
-                log.info("set new size `" + size + "` for team `" + team + "`");
+                GameTemplate.getInstance().sendConsoleMessage("set new size `" + size + "` for team `" + team + "`");
             }
         }
     }
 
     public void addTeamSize(final int size) {
         if (team != Team.ERROR) {
-            log.info("add size `" + size + "` to team `" + team + "`");
+            GameTemplate.getInstance().sendConsoleMessage("add size `" + size + "` to team `" + team + "`");
             if (team.getValue() == 0) {
                 team.setValue(size);
             } else {
@@ -121,14 +488,14 @@ public class GamePlayer implements IGamePlayer {
     public void removeTeamSize(final int size) {
         if (team != Team.ERROR) {
             if (team.getValue() < 0) {
-                log.log(Level.WARNING, "Can not remove `" + size + "` from team, because the team size is smaller than 0");
+                GameTemplate.getInstance().sendConsoleMessage("§cCan not remove `" + size + "` from team, because the team size is smaller than 0");
             } else if (team.getValue() == 1) {
                 team.setValue(0);
-                log.info("Set team size to 0");
+                GameTemplate.getInstance().sendConsoleMessage("Set team size to 0");
             } else if (team.getValue() >= size) {
                 int var = team.getValue() - size;
                 team.setValue(var);
-                log.info("Remove `" + size + "` from team `" + team + "`");
+                GameTemplate.getInstance().sendConsoleMessage("Remove `" + size + "` from team `" + team + "`");
             }
         }
     }
@@ -148,32 +515,32 @@ public class GamePlayer implements IGamePlayer {
 
     public void addRoundKill() {
         this.roundKills = this.roundKills + 1;
-        log.info("Add 1 roundKill to player `" + name + "`");
+        GameTemplate.getInstance().sendConsoleMessage("Add 1 roundKill to player `" + name + "`");
     }
 
     public void addRoundKill(final int var) {
         this.roundKills = this.roundKills + var;
-        log.info("Add `" + var + "` roundKills to player `" + name + "`");
+        GameTemplate.getInstance().sendConsoleMessage("Add `" + var + "` roundKills to player `" + name + "`");
     }
 
     public void addRoundDeath() {
         this.roundDeaths = this.roundDeaths + 1;
-        log.info("Add 1 roundDeath to player `" + name + "`");
+        GameTemplate.getInstance().sendConsoleMessage("Add 1 roundDeath to player `" + name + "`");
     }
 
     public void addRoundDeath(final int var) {
         this.roundDeaths = this.roundDeaths + var;
-        log.info("Add `" + var + "` roundDeaths to player `" + name + "`");
+        GameTemplate.getInstance().sendConsoleMessage("Add `" + var + "` roundDeaths to player `" + name + "`");
     }
 
     public void addGoal() {
         this.roundGoals = this.roundGoals + 1;
-        log.info("Add 1 destroyed goals to player `" + name + "`");
+        GameTemplate.getInstance().sendConsoleMessage("Add 1 destroyed goals to player `" + name + "`");
     }
 
     public void addGoals(final int var) {
         this.roundGoals = this.roundGoals + var;
-        log.info("Add `" + var + "` destroyed goals to player `" + name + "`");
+        GameTemplate.getInstance().sendConsoleMessage("Add `" + var + "` destroyed goals to player `" + name + "`");
     }
 
     public double getRoundKD() {
@@ -197,11 +564,11 @@ public class GamePlayer implements IGamePlayer {
         this.playing = var;
 
         if (var) {
-            if (!GameTemplate.getInstance().getPlaying().contains(bukkitPlayer)) {
-                GameTemplate.getInstance().getPlaying().add(bukkitPlayer);
+            if (!GameTemplate.getInstance().getPlaying().contains(player)) {
+                GameTemplate.getInstance().getPlaying().add(player);
             }
         } else {
-            GameTemplate.getInstance().getPlaying().remove(bukkitPlayer);
+            GameTemplate.getInstance().getPlaying().remove(player);
         }
     }
 
@@ -213,69 +580,77 @@ public class GamePlayer implements IGamePlayer {
         this.spectator = var;
 
         if (var) {
-            if (!GameTemplate.getInstance().getSpectators().contains(bukkitPlayer)) {
-                GameTemplate.getInstance().getSpectators().add(bukkitPlayer);
-                bukkitPlayer.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 0, false, false));
-                bukkitPlayer.getInventory().setItem(InventorySlot.ROW_1_SLOT_5, SpectatorInventory.NAVIGATOR);
+            if (!GameTemplate.getInstance().getSpectators().contains(player)) {
+                GameTemplate.getInstance().getSpectators().add(player);
+                player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 0, false, false));
+                player.getInventory().setItem(InventorySlot.ROW_1_SLOT_5, SpectatorInventory.NAVIGATOR);
 
                 for (Player all : Bukkit.getOnlinePlayers()) {
-                    all.hidePlayer(bukkitPlayer);
+                    all.hidePlayer(player);
                 }
             }
         } else {
-            GameTemplate.getInstance().getSpectators().remove(bukkitPlayer);
-            bukkitPlayer.removePotionEffect(PotionEffectType.INVISIBILITY);
-            bukkitPlayer.getInventory().remove(SpectatorInventory.NAVIGATOR);
+            GameTemplate.getInstance().getSpectators().remove(player);
+            player.removePotionEffect(PotionEffectType.INVISIBILITY);
+            player.getInventory().remove(SpectatorInventory.NAVIGATOR);
 
             for (Player all : Bukkit.getOnlinePlayers()) {
-                all.showPlayer(bukkitPlayer);
+                all.showPlayer(player);
             }
         }
     }
 
     public void removeFromGame() {
-        if (GameTemplate.getInstance().getPlaying().contains(bukkitPlayer)) {
-            log.info("Remove player `" + name + "` from game");
+        if (GameTemplate.getInstance().getPlaying().contains(player)) {
+            GameTemplate.getInstance().sendConsoleMessage("Remove player `" + name + "` from game");
             if (team != Team.ERROR) {
                 remove();
             } else {
-                GameTemplate.getInstance().getPlaying().remove(bukkitPlayer);
+                saveData();
+                GameTemplate.getInstance().unregisterGamePlayer(this);
+                GameTemplate.getInstance().getPlaying().remove(player);
             }
         }
     }
 
     public void removeFromTeamSelection() {
-        if (GameTemplate.getInstance().getPlaying().contains(bukkitPlayer)) {
-            log.info("Remove player `" + name + "` from TeamSelection");
+        if (GameTemplate.getInstance().getPlaying().contains(player)) {
+            GameTemplate.getInstance().sendConsoleMessage("Remove player `" + name + "` from TeamSelection");
             if (team != Team.ERROR) {
                 removeTeamSize(1);
 
                 GameTemplate.getInstance().getTeamManager().getTeamStageHandler().removePlayerFromStage(this);
-                GameTemplate.getInstance().getChats().get(team).remove(bukkitPlayer);
-                GameTemplate.getInstance().getTeams().remove(bukkitPlayer.getUniqueId());
+                GameTemplate.getInstance().getChats().get(team).remove(player);
+                GameTemplate.getInstance().getTeams().remove(player.getUniqueId());
             }
         }
     }
 
     public void destroy() {
-        log.info("Destroy GamePlayer `" + name + "`");
-        if (GameTemplate.getInstance().getPlaying().contains(bukkitPlayer)) {
+        GameTemplate.getInstance().sendConsoleMessage("Destroy GamePlayer `" + name + "`");
+        if (GameTemplate.getInstance().getPlaying().contains(player)) {
             if (team != Team.ERROR) {
                 remove();
-                GameTemplate.getInstance().getGamePlayers().remove(bukkitPlayer.getUniqueId());
+
+                saveData();
+                GameTemplate.getInstance().unregisterGamePlayer(this);
             } else {
-                GameTemplate.getInstance().getGamePlayers().remove(bukkitPlayer.getUniqueId());
-                GameTemplate.getInstance().getPlaying().remove(bukkitPlayer);
+                saveData();
+                GameTemplate.getInstance().unregisterGamePlayer(this);
+                GameTemplate.getInstance().getPlaying().remove(player);
             }
         } else {
-            GameTemplate.getInstance().getGamePlayers().remove(bukkitPlayer.getUniqueId());
+            saveData();
+            GameTemplate.getInstance().unregisterGamePlayer(this);
         }
     }
 
     private void remove() {
         removeTeamSize(1);
-        GameTemplate.getInstance().getChats().get(team).remove(bukkitPlayer);
-        GameTemplate.getInstance().getTeams().remove(bukkitPlayer.getUniqueId());
-        GameTemplate.getInstance().getPlaying().remove(bukkitPlayer);
+        GameTemplate.getInstance().getChats().get(team).remove(player);
+        GameTemplate.getInstance().getTeams().remove(player.getUniqueId());
+        GameTemplate.getInstance().getPlaying().remove(player);
+        saveData();
+        GameTemplate.getInstance().unregisterGamePlayer(this);
     }
 }

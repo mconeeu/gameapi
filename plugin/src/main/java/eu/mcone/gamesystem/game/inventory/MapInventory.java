@@ -24,7 +24,8 @@ public class MapInventory extends CoreInventory {
     public MapInventory(Player player, MapVotingHandler mapVotingHandler) {
         super("§8» §c§lVoting §8┋ §f§oMapvoting", player, InventorySlot.ROW_2, InventoryOption.FILL_EMPTY_SLOTS);
 
-        if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_MAP_MANAGER)) {
+        if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_MAP_MANAGER)
+                || GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_ALL)) {
             this.mapVotingHandler = mapVotingHandler;
 
             int i = 0;

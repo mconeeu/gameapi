@@ -7,7 +7,7 @@ import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
 import eu.mcone.coresystem.api.bukkit.item.Skull;
 import eu.mcone.gamesystem.api.GameSystemAPI;
 import eu.mcone.gamesystem.api.GameTemplate;
-import eu.mcone.gamesystem.api.game.player.IGamePlayer;
+import eu.mcone.gamesystem.api.game.player.GamePlayer;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -27,7 +27,7 @@ public class SpectatorInventory extends CoreInventory {
     private void createInventory() {
         int slot = 0;
         for (Player playing : GameTemplate.getInstance().getPlaying()) {
-            IGamePlayer gamePlayer = GameTemplate.getInstance().getGamePlayer(playing.getUniqueId());
+            GamePlayer gamePlayer = GameTemplate.getInstance().getGamePlayer(playing.getUniqueId());
 
             setItem(slot, new Skull(playing.getName()).setDisplayName("§7" + playing.getName()).lore(
                     "§8» §7§oRanking Platz: §f§l" + gamePlayer.getStats().getUserRanking(),
@@ -38,7 +38,7 @@ public class SpectatorInventory extends CoreInventory {
                     "§8» §7§oVerloren: §f§l" + gamePlayer.getStats().getLose()
             ).getItemStack(), e -> {
                 if (gamePlayer.isPlaying()) {
-                    player.teleport(gamePlayer.getBukkitPlayer().getLocation());
+                    player.teleport(gamePlayer.getCorePlayer().bukkit().getLocation());
                     player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 1);
                     GameSystemAPI.getInstance().getMessager().send(player, "§7Du wurdest zu dem Spieler " + GameSystemAPI.getInstance().getPluginColor() + gamePlayer.getName() + " §7teleportiert");
                 } else {

@@ -11,8 +11,7 @@ import eu.mcone.gamesystem.api.GameTemplate;
 import eu.mcone.gamesystem.api.ecxeptions.GameSystemException;
 import eu.mcone.gamesystem.api.game.Team;
 import eu.mcone.gamesystem.api.game.event.GameWinEvent;
-import eu.mcone.gamesystem.api.game.manager.team.ITeamManager;
-import eu.mcone.gamesystem.api.game.player.IGamePlayer;
+import eu.mcone.gamesystem.api.game.player.GamePlayer;
 import eu.mcone.gamesystem.game.inventory.TeamInventory;
 import lombok.Getter;
 import org.bukkit.Material;
@@ -24,7 +23,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class TeamManager implements ITeamManager {
+public class TeamManager implements eu.mcone.gamesystem.api.game.manager.team.TeamManager {
 
     private Logger log;
 
@@ -36,8 +35,10 @@ public class TeamManager implements ITeamManager {
 
         try {
             if (GameTemplate.getInstance() != null) {
-                if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_TEAM_MANAGER)) {
-                    if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_TEAM_STAGE)) {
+                if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_TEAM_MANAGER)
+                        || GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_ALL)) {
+                    if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_TEAM_STAGE)
+                            || GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_ALL)) {
                         teamStageHandler = new TeamStageHandler();
                     } else {
                         GameTemplate.getInstance().sendConsoleMessage("§cTeamStageHandler deaktiviert!");
@@ -74,7 +75,7 @@ public class TeamManager implements ITeamManager {
     public void setupTeam() {
         log.info("Check if all players have a team");
         for (Player p : GameTemplate.getInstance().getPlaying()) {
-            IGamePlayer gp = GameTemplate.getInstance().getGamePlayer(p.getUniqueId());
+            GamePlayer gp = GameTemplate.getInstance().getGamePlayer(p.getUniqueId());
             if (gp.getTeam() == Team.ERROR) {
                 int i = 1;
                 for (Team team : Team.values()) {
@@ -115,8 +116,8 @@ public class TeamManager implements ITeamManager {
         if (playingSize >= GameTemplate.getInstance().getGameConfigAsClass().getPlayersPreTeam()) {
             Team team = GameTemplate.getInstance().getGamePlayer(GameTemplate.getInstance().getPlaying().get(0)).getTeam();
             if (team.getValue() == playingSize) {
-                List<IGamePlayer> winners = new ArrayList<>();
-                GameTemplate.getInstance().getGamePlayers().forEach((key, value) -> {
+                List<GamePlayer> winners = new ArrayList<>();
+                GameTemplate.getInstance().getGamePlayersAsList().forEach((value) -> {
                     if (value.getTeam().getString().equalsIgnoreCase(team.getString())) {
                         winners.add(value);
                     }

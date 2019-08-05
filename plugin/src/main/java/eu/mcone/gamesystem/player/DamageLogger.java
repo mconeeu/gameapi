@@ -5,7 +5,6 @@
 
 package eu.mcone.gamesystem.player;
 
-import eu.mcone.gamesystem.api.player.IDamageLogger;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -15,7 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class DamageLogger implements IDamageLogger {
+public class DamageLogger implements eu.mcone.gamesystem.api.player.DamageLogger {
 
     @Getter
     private Map<UUID, Map<UUID, Long>> players;

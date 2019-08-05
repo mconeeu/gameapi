@@ -13,11 +13,14 @@ import eu.mcone.gamesystem.api.config.GameSettingsConfig;
 import eu.mcone.gamesystem.api.ecxeptions.GameSystemException;
 import eu.mcone.gamesystem.api.game.Playing;
 import eu.mcone.gamesystem.api.game.Team;
-import eu.mcone.gamesystem.api.game.achivements.IAchievementManager;
-import eu.mcone.gamesystem.api.game.manager.map.IMapManager;
-import eu.mcone.gamesystem.api.game.manager.team.ITeamManager;
-import eu.mcone.gamesystem.api.game.player.IGamePlayer;
+import eu.mcone.gamesystem.api.game.achivements.AchievementManager;
 import eu.mcone.gamesystem.api.game.gamestate.GameStateHandler;
+import eu.mcone.gamesystem.api.game.manager.kit.KitManager;
+import eu.mcone.gamesystem.api.game.manager.map.IMapManager;
+import eu.mcone.gamesystem.api.game.manager.team.TeamManager;
+import eu.mcone.gamesystem.api.game.player.GamePlayer;
+import eu.mcone.gamesystem.api.lobby.cards.ItemCardManager;
+import eu.mcone.gamesystem.api.lobby.manager.TrailManager;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.ChatColor;
@@ -33,8 +36,8 @@ public abstract class GameTemplate extends CorePlugin {
     @Getter
     private List<GameSystemOptions> options;
 
-    @Getter
-    private Map<UUID, IGamePlayer> gamePlayers;
+    private Map<UUID, GamePlayer> gamePlayers;
+
     @Getter
     private List<Player> playing;
     @Getter
@@ -48,10 +51,19 @@ public abstract class GameTemplate extends CorePlugin {
     private IMapManager mapManager;
 
     @Setter
-    private ITeamManager teamManager;
+    private TeamManager teamManager;
 
     @Setter
-    private IAchievementManager achievementManager;
+    private AchievementManager achievementManager;
+
+    @Setter
+    private TrailManager trailManager;
+
+    @Setter
+    private ItemCardManager itemCardManager;
+
+    @Setter
+    private KitManager kitManager;
 
     @Getter
     private GameStateHandler gameStateHandler;
@@ -98,6 +110,19 @@ public abstract class GameTemplate extends CorePlugin {
     @Override
     public void onDisable() {
         gameConfig.save();
+
+        if (trailManager != null) {
+            trailManager.shutdown();
+        }
+
+        if (itemCardManager != null) {
+            itemCardManager.saveItemCards();
+        }
+
+        for (GamePlayer gamePlayer : getGamePlayersAsList()) {
+            gamePlayer.removeFromGame();
+        }
+
         onGameDisable();
     }
 
@@ -105,13 +130,25 @@ public abstract class GameTemplate extends CorePlugin {
 
     public abstract void onGameDisable();
 
+    public void registerGamePlayer(GamePlayer gamePlayer) {
+        this.gamePlayers.put(gamePlayer.getCorePlayer().getUuid(), gamePlayer);
+    }
+
+    public void unregisterGamePlayer(GamePlayer gamePlayer) {
+        this.gamePlayers.remove(gamePlayer.getCorePlayer().getUuid());
+    }
+
+    public void unregisterGamePlayer(UUID uuid) {
+        this.gamePlayers.remove(uuid);
+    }
+
     /**
      * Returns a GamePlayer object with the UUID
      *
      * @param uuid Player UniqueId
      * @return GamePlayer object
      */
-    public IGamePlayer getGamePlayer(UUID uuid) {
+    public GamePlayer getGamePlayer(UUID uuid) {
         return gamePlayers.get(uuid);
     }
 
@@ -121,7 +158,7 @@ public abstract class GameTemplate extends CorePlugin {
      * @param player Player
      * @return GamePlayer object
      */
-    public IGamePlayer getGamePlayer(Player player) {
+    public GamePlayer getGamePlayer(Player player) {
         return gamePlayers.get(player.getUniqueId());
     }
 
@@ -131,65 +168,106 @@ public abstract class GameTemplate extends CorePlugin {
      * @param name Player name
      * @return GamePlayer object
      */
-    public IGamePlayer getGamePlayer(String name) {
+    public GamePlayer getGamePlayer(String name) {
         return gamePlayers.get(CoreSystem.getInstance().getPlayerUtils().fetchUuid(name));
     }
 
     /**
      * Returns the instance of the mapManager
      *
-     * @return IMapManager
+     * @return MapManager
      */
     public IMapManager getMapManager() {
-        try {
-            if (this.mapManager != null) {
-                return mapManager;
-            } else {
-                throw new GameSystemException("MapManager is not initialized!");
-            }
-        } catch (GameSystemException e) {
-            e.printStackTrace();
+        if (checkObj(mapManager)) {
+            return mapManager;
+        } else {
+            return null;
         }
-
-        return null;
     }
 
     /**
      * Returns the instance of the TeamManager
      *
-     * @return ITeamManager
+     * @return TeamManager
      */
-    public ITeamManager getTeamManager() {
-        try {
-            if (this.teamManager != null) {
-                return teamManager;
-            } else {
-                throw new GameSystemException("TeamManager is not initialized!");
-            }
-        } catch (GameSystemException e) {
-            e.printStackTrace();
+    public TeamManager getTeamManager() {
+        if (checkObj(teamManager)) {
+            return teamManager;
+        } else {
+            return null;
         }
-
-        return null;
     }
 
     /**
      * Returns the instance of the AchievementManager
      *
-     * @return IAchievementManager
+     * @return AchievementManager
      */
-    public IAchievementManager getAchievementManager() {
+    public AchievementManager getAchievementManager() {
+        if (checkObj(achievementManager)) {
+            return achievementManager;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Returns the instance of the TrailManager
+     *
+     * @return TrailManager
+     */
+    public TrailManager getTrailManager() {
+        if (checkObj(trailManager)) {
+            return trailManager;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Returns the instance of the ItemCardManager
+     *
+     * @return ItemCardManager
+     */
+    public ItemCardManager getItemCardManager() {
+        if (checkObj(itemCardManager)) {
+            return itemCardManager;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Returns the instance of the KitManager
+     *
+     * @return KitManager
+     */
+    public KitManager getKitManager() {
+        if (checkObj(kitManager)) {
+            return kitManager;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Checks if the specified object is null
+     *
+     * @param object
+     * @return boolean
+     */
+    private boolean checkObj(Object object) {
         try {
-            if (this.achievementManager != null) {
-                return achievementManager;
+            if (object != null) {
+                return true;
             } else {
-                throw new GameSystemException("AchievementManager is not initialized!");
+                throw new GameSystemException("Object is not initialized!");
             }
         } catch (GameSystemException e) {
             e.printStackTrace();
         }
 
-        return null;
+        return false;
     }
 
     /**
@@ -197,7 +275,7 @@ public abstract class GameTemplate extends CorePlugin {
      *
      * @return A Collection of all registered GamePlayers objects
      */
-    public Collection<IGamePlayer> getGamePlayersAsList() {
+    public Collection<GamePlayer> getGamePlayersAsList() {
         return this.gamePlayers.values();
     }
 
@@ -206,6 +284,9 @@ public abstract class GameTemplate extends CorePlugin {
         USE_TEAM_MANAGER(),
         USE_TEAM_STAGE(),
         USE_MAP_MANAGER(),
-        USE_ACHIEVEMENTS()
+        USE_ACHIEVEMENTS(),
+        USE_BACKPACK(),
+        USE_ITEM_CARDS(),
+        USE_ALL()
     }
 }

@@ -11,9 +11,8 @@ import eu.mcone.coresystem.api.bukkit.npc.NPC;
 import eu.mcone.coresystem.api.bukkit.npc.entity.PlayerNpc;
 import eu.mcone.gamesystem.api.GameTemplate;
 import eu.mcone.gamesystem.api.game.Team;
-import eu.mcone.gamesystem.api.game.manager.team.ITeamStageHandler;
 import eu.mcone.gamesystem.api.game.manager.team.TeamStage;
-import eu.mcone.gamesystem.api.game.player.IGamePlayer;
+import eu.mcone.gamesystem.api.game.player.GamePlayer;
 import lombok.Getter;
 import net.minecraft.server.v1_8_R3.PacketPlayInUseEntity;
 import org.bukkit.Bukkit;
@@ -24,13 +23,14 @@ import org.bukkit.event.Listener;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TeamStageHandler implements ITeamStageHandler {
+public class TeamStageHandler implements eu.mcone.gamesystem.api.game.manager.team.TeamStageHandler {
 
     @Getter
     private Map<Team, TeamStage> stages;
 
     public TeamStageHandler() {
-        if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_TEAM_STAGE)) {
+        if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_TEAM_STAGE)
+                || GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_ALL)) {
             stages = new HashMap<>();
             registerInteract();
         } else {
@@ -48,7 +48,7 @@ public class TeamStageHandler implements ITeamStageHandler {
                 if (e.getAction().equals(PacketPlayInUseEntity.EnumEntityUseAction.INTERACT)) {
                     for (TeamStage teamStage : stages.values()) {
                         if (teamStage.getNpcs().containsValue(playerNpc)) {
-                            for (Map.Entry<IGamePlayer, PlayerNpc> entry : teamStage.getNpcs().entrySet()) {
+                            for (Map.Entry<GamePlayer, PlayerNpc> entry : teamStage.getNpcs().entrySet()) {
                                 if (entry.getValue().getData().getName().equalsIgnoreCase(playerNpc.getData().getName())) {
                                     new StageNpcInteractInventory(player, entry.getKey());
                                     break;
@@ -80,7 +80,7 @@ public class TeamStageHandler implements ITeamStageHandler {
         }
     }
 
-    public void removePlayerFromStage(final IGamePlayer gamePlayer) {
+    public void removePlayerFromStage(final GamePlayer gamePlayer) {
         if (gamePlayer.getTeam() == Team.ERROR) {
             if (stages.containsKey(gamePlayer.getTeam())) {
                 stages.get(gamePlayer.getTeam()).removePlayerFromStage(gamePlayer);
@@ -92,7 +92,7 @@ public class TeamStageHandler implements ITeamStageHandler {
         }
     }
 
-    public void addPlayerToStage(final IGamePlayer gamePlayer) {
+    public void addPlayerToStage(final GamePlayer gamePlayer) {
         if (gamePlayer.getTeam() == Team.ERROR) {
             if (stages.containsKey(gamePlayer.getTeam())) {
                 stages.get(gamePlayer.getTeam()).addPlayerToStage(gamePlayer);
