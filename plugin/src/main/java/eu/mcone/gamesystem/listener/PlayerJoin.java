@@ -13,12 +13,14 @@ import eu.mcone.gamesystem.api.GameTemplate;
 import eu.mcone.gamesystem.api.game.Playing;
 import eu.mcone.gamesystem.api.game.countdown.handler.GameCountdownID;
 import eu.mcone.gamesystem.api.game.countdown.handler.IGameCountdown;
+import eu.mcone.gamesystem.api.game.event.GamePlayerLoadedEvent;
 import eu.mcone.gamesystem.api.game.gamestate.GameStateID;
 import eu.mcone.gamesystem.game.player.GamePlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.potion.PotionEffect;
@@ -28,7 +30,7 @@ import java.util.HashMap;
 
 public class PlayerJoin implements Listener {
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void on(PlayerJoinEvent e) {
         Player player = e.getPlayer();
         GameSystem.getSystem().getDamageLogger().getPlayers().put(e.getPlayer().getUniqueId(), new HashMap<>());
@@ -41,17 +43,17 @@ public class PlayerJoin implements Listener {
     public static void loadPlayer(Player p) {
         Bukkit.getScheduler().runTask(GameSystemAPI.getInstance(), () -> {
             GamePlayer gp = new GamePlayer(p);
-            Bukkit.getPluginManager().callEvent(new GamePlayerLoaded(gp, GamePlayerLoaded.Reason.JOINED));
+            Bukkit.getPluginManager().callEvent(new GamePlayerLoadedEvent(gp, GamePlayerLoadedEvent.Reason.JOINED));
         });
     }
 
-    @EventHandler
-    public void on(GamePlayerLoaded e) {
-        GamePlayer gamePlayer = e.getPlayer();
-        Player player = e.getPlayer().bukkit();
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void on(GamePlayerLoadedEvent e) {
+        eu.mcone.gamesystem.api.game.player.GamePlayer gamePlayer = e.getPlayer();
+        Player player = e.getPlayer().getCorePlayer().bukkit();
 
-        if (e.getReason().equals(GamePlayerLoaded.Reason.JOINED)
-                || e.getReason().equals(GamePlayerLoaded.Reason.RELOADED)) {
+        if (e.getReason().equals(GamePlayerLoadedEvent.Reason.JOINED)
+                || e.getReason().equals(GamePlayerLoadedEvent.Reason.RELOADED)) {
 
             if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_ITEM_CARDS)
                     || GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_ALL)) {

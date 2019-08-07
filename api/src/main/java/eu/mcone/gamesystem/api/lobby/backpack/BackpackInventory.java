@@ -7,8 +7,8 @@ package eu.mcone.gamesystem.api.lobby.backpack;
 
 import eu.mcone.coresystem.api.bukkit.inventory.category.StaticClassCategoryInventory;
 import eu.mcone.gamesystem.api.GameTemplate;
-import eu.mcone.lobby.api.enums.Category;
-import eu.mcone.lobby.api.enums.Item;
+import eu.mcone.gamesystem.api.enums.Category;
+import eu.mcone.gamesystem.api.enums.Item;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.InvocationTargetException;

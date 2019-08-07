@@ -8,12 +8,12 @@ package eu.mcone.gamesystem.api.game.player;
 import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.coresystem.api.bukkit.player.Stats;
+import eu.mcone.gamesystem.api.enums.Item;
 import eu.mcone.gamesystem.api.game.Team;
 import eu.mcone.gamesystem.api.game.achivements.SolvedAchievement;
 import eu.mcone.gamesystem.api.game.manager.kit.Kit;
 import eu.mcone.gamesystem.api.game.manager.kit.sorting.CustomKit;
 import eu.mcone.gamesystem.api.lobby.cards.ItemCard;
-import eu.mcone.lobby.api.enums.Item;
 import org.bukkit.entity.Player;
 
 import java.util.HashSet;
@@ -124,6 +124,14 @@ public interface GamePlayer {
     int getPlayingSize();
 
     List<Player> getTeamChat();
+
+    void setCurrentKit(Kit kit);
+
+    void removeCurrentKit();
+
+    boolean hasCurrentKit();
+
+    Kit getCurrentKit();
 
     void removeFromGame();
 

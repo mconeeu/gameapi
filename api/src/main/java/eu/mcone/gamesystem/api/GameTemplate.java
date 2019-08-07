@@ -287,6 +287,7 @@ public abstract class GameTemplate extends CorePlugin {
         USE_ACHIEVEMENTS(),
         USE_BACKPACK(),
         USE_ITEM_CARDS(),
+        USE_KIT_MANAGER(),
         USE_ALL()
     }
 }

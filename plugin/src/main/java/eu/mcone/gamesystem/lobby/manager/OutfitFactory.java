@@ -7,8 +7,8 @@ package eu.mcone.gamesystem.lobby.manager;
 
 import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
 import eu.mcone.coresystem.api.bukkit.item.Skull;
-import eu.mcone.lobby.api.enums.Category;
-import eu.mcone.lobby.api.enums.Item;
+import eu.mcone.gamesystem.api.enums.Category;
+import eu.mcone.gamesystem.api.enums.Item;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

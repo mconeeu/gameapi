@@ -7,10 +7,10 @@ package eu.mcone.gamesystem.lobby.backpack;
 
 import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
 import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
+import eu.mcone.gamesystem.api.enums.Category;
+import eu.mcone.gamesystem.api.enums.Item;
 import eu.mcone.gamesystem.api.lobby.backpack.BackpackInventory;
 import eu.mcone.gamesystem.lobby.manager.OutfitFactory;
-import eu.mcone.lobby.api.enums.Category;
-import eu.mcone.lobby.api.enums.Item;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 

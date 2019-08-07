@@ -5,9 +5,9 @@
 
 package eu.mcone.gamesystem.lobby.backpack;
 
+import eu.mcone.gamesystem.api.enums.Category;
+import eu.mcone.gamesystem.api.enums.Item;
 import eu.mcone.gamesystem.api.lobby.backpack.BackpackInventory;
-import eu.mcone.lobby.api.enums.Category;
-import eu.mcone.lobby.api.enums.Item;
 import org.bukkit.entity.Player;
 
 public class GadgetInventory extends BackpackInventory {

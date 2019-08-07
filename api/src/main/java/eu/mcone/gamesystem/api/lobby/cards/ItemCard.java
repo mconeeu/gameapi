@@ -2,8 +2,8 @@ package eu.mcone.gamesystem.api.lobby.cards;
 
 import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import eu.mcone.gamesystem.api.GameTemplate;
-import eu.mcone.lobby.api.enums.Category;
-import eu.mcone.lobby.api.enums.Level;
+import eu.mcone.gamesystem.api.enums.Category;
+import eu.mcone.gamesystem.api.enums.Level;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

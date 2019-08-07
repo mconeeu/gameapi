@@ -7,8 +7,8 @@
 package eu.mcone.gamesystem.lobby.manager;
 
 import eu.mcone.gamesystem.GameSystem;
-import eu.mcone.lobby.api.LobbyPlugin;
-import eu.mcone.lobby.api.enums.Item;
+import eu.mcone.gamesystem.api.GameTemplate;
+import eu.mcone.gamesystem.api.enums.Item;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Sound;
@@ -86,7 +86,7 @@ public class TrailManager implements eu.mcone.gamesystem.api.lobby.manager.Trail
 
     public void removeTrail(Player p) {
         if (this.trails.get(p) != null) {
-            LobbyPlugin.getInstance().getMessager().send(p, "§7Trail entfernt!");
+            GameTemplate.getInstance().getMessager().send(p, "§7Trail entfernt!");
             this.trails.remove(p);
             p.closeInventory();
         }

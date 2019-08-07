@@ -1,5 +1,6 @@
 package eu.mcone.gamesystem.game.manager.kit;
 
+import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.gamesystem.api.GameTemplate;
 import eu.mcone.gamesystem.api.game.manager.kit.Kit;
 import eu.mcone.gamesystem.game.manager.kit.sorting.SortKitsInventory;
@@ -109,7 +110,11 @@ public class KitManager implements eu.mcone.gamesystem.api.game.manager.kit.KitM
     }
 
     public void openKitsInventory(Player player) {
-        new KitsInventory(player);
+        new KitsInventory(player, null);
+    }
+
+    public void openKitsInventory(Player player, CoreInventory returnInventory) {
+        new KitsInventory(player, returnInventory);
     }
 
     public void openKitSortingInventory(Player player) {

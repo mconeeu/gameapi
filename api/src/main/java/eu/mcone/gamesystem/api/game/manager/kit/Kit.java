@@ -3,6 +3,9 @@ package eu.mcone.gamesystem.api.game.manager.kit;
 import lombok.Getter;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 public class Kit {
 
@@ -49,5 +52,15 @@ public class Kit {
         }
 
         return null;
+    }
+
+    public List<ItemStack> getItems() {
+        List<ItemStack> items = new ArrayList<>();
+
+        for (KitItem kitItem : kitItems) {
+            items.add(kitItem.getItemStack());
+        }
+
+        return items;
     }
 }

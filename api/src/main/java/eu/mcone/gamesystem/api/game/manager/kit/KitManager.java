@@ -1,5 +1,6 @@
 package eu.mcone.gamesystem.api.game.manager.kit;
 
+import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -27,6 +28,8 @@ public interface KitManager {
     Kit getKit(final String kitName);
 
     void openKitsInventory(Player player);
+
+    void openKitsInventory(Player player, CoreInventory returnInventory);
 
     void openKitSortingInventory(Player player);
 }

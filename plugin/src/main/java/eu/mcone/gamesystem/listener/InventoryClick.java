@@ -1,9 +1,11 @@
 package eu.mcone.gamesystem.listener;
 
+import eu.mcone.gamesystem.GameSystem;
 import eu.mcone.gamesystem.api.GameTemplate;
 import eu.mcone.gamesystem.api.game.manager.kit.Kit;
 import eu.mcone.gamesystem.api.game.player.GamePlayer;
 import eu.mcone.gamesystem.game.manager.kit.sorting.SortKitsInventory;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,7 +21,7 @@ import java.util.HashMap;
 
 public class InventoryClick implements Listener {
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void on(InventoryClickEvent e) {
         Inventory inventory = e.getInventory();
         Player player = (Player) e.getWhoClicked();
@@ -39,34 +41,37 @@ public class InventoryClick implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void on(InventoryCloseEvent e) {
         Player player = (Player) e.getPlayer();
         Inventory inventory = e.getInventory();
 
         if (SortKitsInventory.getSorting().containsKey(player)) {
-            Kit kit = SortKitsInventory.getSorting().get(player);
-            if (inventory.getTitle().equalsIgnoreCase("§8» " + kit.getDisplayName())) {
-                GamePlayer knockITPlayer = GameTemplate.getInstance().getGamePlayer(player.getUniqueId());
+            Bukkit.getScheduler().runTaskAsynchronously(GameSystem.getSystem(), () -> {
+                Kit kit = SortKitsInventory.getSorting().get(player);
+                if (inventory.getTitle().equalsIgnoreCase("§8» " + kit.getDisplayName())) {
+                    GamePlayer knockITPlayer = GameTemplate.getInstance().getGamePlayer(player.getUniqueId());
 
-                HashMap<String, Double> sortedItems = new HashMap<>();
-                int slot = 0;
-                for (ItemStack itemStack : inventory.getContents()) {
-                    if (itemStack != null) {
-                        if (itemStack.getType() != null && itemStack.getType() != Material.AIR) {
-                            sortedItems.put(Integer.toString(slot), kit.getKitItem(itemStack).getKitItemID());
+                    HashMap<String, Double> sortedItems = new HashMap<>();
+                    int slot = 0;
+                    for (ItemStack itemStack : inventory.getContents()) {
+                        if (itemStack != null) {
+                            if (itemStack.getType() != null && itemStack.getType() != Material.AIR) {
+                                sortedItems.put(Integer.toString(slot), kit.getKitItem(itemStack).getKitItemID());
+                            }
                         }
+
+                        slot++;
                     }
 
-                    slot++;
+                    knockITPlayer.modifyInventory(kit, sortedItems);
+                    SortKitsInventory.getSorting().remove(player);
+
+                    new SortKitsInventory(player);
+
+                    GameTemplate.getInstance().getMessager().send(player, "§2Du hast die items für das Kit §f" + kit.getDisplayName() + " §2erfolgreich gesetzt!");
                 }
-
-                knockITPlayer.modifyInventory(kit, sortedItems);
-                SortKitsInventory.getSorting().remove(player);
-                new SortKitsInventory(player);
-
-                GameTemplate.getInstance().getMessager().send(player, "§2Du hast die items für das Kit §f" + kit.getDisplayName() + " §2erfolgreich gesetzt!");
-            }
+            });
         }
     }
 }

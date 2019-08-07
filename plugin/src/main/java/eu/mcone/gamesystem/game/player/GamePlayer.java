@@ -13,16 +13,17 @@ import eu.mcone.coresystem.api.bukkit.player.Stats;
 import eu.mcone.gamesystem.GameSystem;
 import eu.mcone.gamesystem.api.GameTemplate;
 import eu.mcone.gamesystem.api.ecxeptions.GameSystemException;
+import eu.mcone.gamesystem.api.enums.Item;
 import eu.mcone.gamesystem.api.game.Team;
 import eu.mcone.gamesystem.api.game.achivements.Achievement;
 import eu.mcone.gamesystem.api.game.achivements.SolvedAchievement;
 import eu.mcone.gamesystem.api.game.event.GameAchievementEvent;
 import eu.mcone.gamesystem.api.game.manager.kit.Kit;
 import eu.mcone.gamesystem.api.game.manager.kit.KitItem;
+import eu.mcone.gamesystem.api.game.manager.kit.KitItemType;
 import eu.mcone.gamesystem.api.game.manager.kit.sorting.CustomKit;
 import eu.mcone.gamesystem.api.lobby.cards.ItemCard;
 import eu.mcone.gamesystem.game.inventory.SpectatorInventory;
-import eu.mcone.lobby.api.enums.Item;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -38,15 +39,16 @@ import java.util.*;
 @Getter
 public class GamePlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.GamePlayer<GamePlayerProfile> implements eu.mcone.gamesystem.api.game.player.GamePlayer {
 
-    private List<Item> items = new ArrayList<>();
-    private Map<ItemCard, Boolean> itemCards = new HashMap<>();
-    private Map<String, CustomKit> customKits = new HashMap<>();
-    private HashSet<SolvedAchievement> solvedAchievements = new HashSet<>();
+    private List<Item> items;
+    private Map<ItemCard, Boolean> itemCards;
+    private Map<String, CustomKit> customKits;
+    private HashSet<SolvedAchievement> solvedAchievements;
 
     private transient Team team;
     private transient String name;
     private transient boolean playing = false;
     private transient boolean spectator = false;
+    private transient Kit currentKit;
     private transient Stats stats;
     private transient int roundCoins;
     private transient int roundKills;
@@ -286,6 +288,7 @@ public class GamePlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.Gam
     public void givePlayerRedeemedItemCards(Gamemode gamemode) {
         Player player = bukkit();
         List<ItemCard> redeemedItemCards = getRedeemedItemCards(gamemode);
+        int cards = redeemedItemCards.size();
 
         if (redeemedItemCards.size() > 0) {
             int freePlaceInInventory = 0;
@@ -301,11 +304,12 @@ public class GamePlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.Gam
                     if (freePlaceInInventory > 0) {
                         player.getInventory().addItem(itemCard.getItemCardBuilder().createStack());
                         itemCards.remove(itemCard);
+                        cards--;
                         GameTemplate.getInstance().getMessager().send(player, "§2Du hast das Item " + itemCard.getItemCardBuilder().getDisplayName() + " erhalten!");
                         freePlaceInInventory--;
                     } else {
                         GameTemplate.getInstance().sendConsoleMessage("§7Du hast §cnicht genügend Platz §7für alle Itemkarten in deinem Inventar, \n" +
-                                "§7sortiere zuerst dein Inventar aus um die restlichen Itemkarten zu erhalten.\n" +
+                                "§7sortiere zuerst dein Inventar aus um die restlichen Itemkarten (§f" + cards + "§7) zu erhalten.\n" +
                                 "§7Benutze hierfür /itemcards");
                         break;
                     }
@@ -334,32 +338,43 @@ public class GamePlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.Gam
     public void setKit(Kit kit) {
         Player player = getCorePlayer().bukkit();
         CustomKit customKit = getModifiedKit(kit);
+        setCurrentKit(kit);
 
         if (customKit != null) {
             for (Map.Entry<String, Double> kitEntry : customKit.getCustomItems().entrySet()) {
                 int slot = Integer.valueOf(kitEntry.getKey());
                 KitItem kitItem = kit.getKitItem(kitEntry.getValue());
 
-                if (kitItem != null) {
-                    switch (kitItem.getKitItemType()) {
-                        case WEAPON:
-                            player.getInventory().setItem(slot, kitItem.getItemStack());
-                        case HELMET:
-                            player.getInventory().setHelmet(kitItem.getItemStack());
-                        case CHESTPLATE:
-                            player.getInventory().setChestplate(kitItem.getItemStack());
-                        case LEGGINGS:
-                            player.getInventory().setLeggings(kitItem.getItemStack());
-                        case BOOTS:
-                            player.getInventory().setBoots(kitItem.getItemStack());
+                //Set armor
+                for (KitItem defaultKit : kit.getKitItems()) {
+                    if (defaultKit.getKitItemType().equals(KitItemType.HELMET)) {
+                        player.getInventory().setHelmet(defaultKit.getItemStack());
+                    } else if (defaultKit.getKitItemType().equals(KitItemType.CHESTPLATE)) {
+                        player.getInventory().setChestplate(defaultKit.getItemStack());
+                    } else if (defaultKit.getKitItemType().equals(KitItemType.LEGGINGS)) {
+                        player.getInventory().setLeggings(defaultKit.getItemStack());
+                    } else if (defaultKit.getKitItemType().equals(KitItemType.BOOTS)) {
+                        player.getInventory().setBoots(defaultKit.getItemStack());
                     }
                 }
+                //Set weapons
+                player.getInventory().setItem(slot, kitItem.getItemStack());
             }
         } else {
             int slot = 0;
             for (KitItem kitItem : kit.getKitItems()) {
-                player.getInventory().setItem(slot, kitItem.getItemStack());
-                slot++;
+                if (kitItem.getKitItemType().equals(KitItemType.HELMET)) {
+                    player.getInventory().setHelmet(kitItem.getItemStack());
+                } else if (kitItem.getKitItemType().equals(KitItemType.CHESTPLATE)) {
+                    player.getInventory().setChestplate(kitItem.getItemStack());
+                } else if (kitItem.getKitItemType().equals(KitItemType.LEGGINGS)) {
+                    player.getInventory().setLeggings(kitItem.getItemStack());
+                } else if (kitItem.getKitItemType().equals(KitItemType.BOOTS)) {
+                    player.getInventory().setBoots(kitItem.getItemStack());
+                } else {
+                    player.getInventory().setItem(slot, kitItem.getItemStack());
+                    slot++;
+                }
             }
         }
     }
@@ -598,6 +613,18 @@ public class GamePlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.Gam
                 all.showPlayer(player);
             }
         }
+    }
+
+    public void setCurrentKit(Kit kit) {
+        this.currentKit = kit;
+    }
+
+    public void removeCurrentKit() {
+        this.currentKit = null;
+    }
+
+    public boolean hasCurrentKit() {
+        return currentKit != null;
     }
 
     public void removeFromGame() {

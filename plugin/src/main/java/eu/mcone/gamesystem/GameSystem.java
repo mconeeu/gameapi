@@ -8,9 +8,11 @@ package eu.mcone.gamesystem;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.gamesystem.api.GameSystemAPI;
 import eu.mcone.gamesystem.api.GameTemplate;
+import eu.mcone.gamesystem.api.enums.Category;
 import eu.mcone.gamesystem.api.lobby.backpack.BackpackInventory;
 import eu.mcone.gamesystem.game.achivements.AchievementManager;
 import eu.mcone.gamesystem.game.command.GameCommand;
+import eu.mcone.gamesystem.game.manager.kit.KitManager;
 import eu.mcone.gamesystem.game.manager.map.MapManager;
 import eu.mcone.gamesystem.game.manager.team.TeamManager;
 import eu.mcone.gamesystem.listener.*;
@@ -18,7 +20,6 @@ import eu.mcone.gamesystem.lobby.backpack.*;
 import eu.mcone.gamesystem.lobby.cards.ItemCardManager;
 import eu.mcone.gamesystem.lobby.manager.TrailManager;
 import eu.mcone.gamesystem.player.DamageLogger;
-import eu.mcone.lobby.api.enums.Category;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -44,6 +45,11 @@ public class GameSystem extends GameSystemAPI {
                 sendConsoleMessage("§aLoaded Player " + player.getName());
                 //Creates a new GamePlayer object with the player from the collection
                 PlayerJoin.loadPlayer(player);
+            }
+
+            if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_KIT_MANAGER)
+                    || GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_ALL)) {
+                GameTemplate.getInstance().setKitManager(new KitManager());
             }
 
             if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_ITEM_CARDS)
@@ -91,6 +97,7 @@ public class GameSystem extends GameSystemAPI {
         registerEvents(
                 new EntityDamageByEntity(),
                 new EntityDamage(),
+                new InventoryClick(),
                 new InventoryMoveItem(),
                 new PlayerDropItem(),
                 new PlayerInteract(),

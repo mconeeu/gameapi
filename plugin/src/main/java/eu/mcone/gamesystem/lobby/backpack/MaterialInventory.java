@@ -6,10 +6,10 @@
 package eu.mcone.gamesystem.lobby.backpack;
 
 import eu.mcone.gamesystem.api.GameTemplate;
+import eu.mcone.gamesystem.api.enums.Category;
+import eu.mcone.gamesystem.api.enums.Item;
 import eu.mcone.gamesystem.api.game.player.GamePlayer;
 import eu.mcone.gamesystem.api.lobby.backpack.BackpackInventory;
-import eu.mcone.lobby.api.enums.Category;
-import eu.mcone.lobby.api.enums.Item;
 import org.bukkit.entity.Player;
 
 public class MaterialInventory extends BackpackInventory {
@@ -57,8 +57,7 @@ public class MaterialInventory extends BackpackInventory {
         for (Item item : Item.values()) {
             if (item.hasCategory() && item.getCategory().equals(Category.MATERIAL)) {
                 if (gamePlayer.hasItem(item)) {
-                    addItem(item.getItemStack(), e -> {
-                    });
+                    addItem(item.getItemStack(), e -> {});
                 }
             }
         }

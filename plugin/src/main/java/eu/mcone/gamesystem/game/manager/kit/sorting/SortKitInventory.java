@@ -10,6 +10,7 @@ import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
 import eu.mcone.gamesystem.api.GameTemplate;
 import eu.mcone.gamesystem.api.game.manager.kit.Kit;
 import eu.mcone.gamesystem.api.game.manager.kit.KitItem;
+import eu.mcone.gamesystem.api.game.manager.kit.KitItemType;
 import eu.mcone.gamesystem.api.game.player.GamePlayer;
 import org.bukkit.entity.Player;
 
@@ -26,14 +27,18 @@ public class SortKitInventory extends CoreInventory {
             for (Map.Entry<String, Double> itemEntry : gamePlayer.getModifiedKit(kit).getCustomItems().entrySet()) {
                 KitItem kitItem = kit.getKitItem(itemEntry.getValue());
                 if (kitItem != null) {
-                    setItem(Integer.valueOf(itemEntry.getKey()), kitItem.getItemStack());
+                    if (kitItem.getKitItemType().equals(KitItemType.WEAPON)) {
+                        setItem(Integer.valueOf(itemEntry.getKey()), kitItem.getItemStack());
+                    }
                 }
             }
         } else {
             int slot = 0;
             for (KitItem kitItem : kit.getKitItems()) {
-                inventory.setItem(slot, kitItem.getItemStack());
-                slot++;
+                if (kitItem.getKitItemType().equals(KitItemType.WEAPON)) {
+                    inventory.setItem(slot, kitItem.getItemStack());
+                    slot++;
+                }
             }
         }
 

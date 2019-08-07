@@ -2,10 +2,10 @@ package eu.mcone.gamesystem.game.player;
 
 import eu.mcone.coresystem.api.bukkit.player.profile.GameProfile;
 import eu.mcone.gamesystem.api.GameTemplate;
+import eu.mcone.gamesystem.api.enums.Item;
 import eu.mcone.gamesystem.api.game.achivements.SolvedAchievement;
 import eu.mcone.gamesystem.api.game.manager.kit.sorting.CustomKit;
 import eu.mcone.gamesystem.api.lobby.cards.ItemCard;
-import eu.mcone.lobby.api.enums.Item;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

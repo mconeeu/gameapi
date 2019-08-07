@@ -7,10 +7,10 @@ package eu.mcone.gamesystem.lobby.backpack;
 
 import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
 import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
+import eu.mcone.gamesystem.api.GameTemplate;
+import eu.mcone.gamesystem.api.enums.Category;
+import eu.mcone.gamesystem.api.enums.Item;
 import eu.mcone.gamesystem.api.lobby.backpack.BackpackInventory;
-import eu.mcone.lobby.api.LobbyPlugin;
-import eu.mcone.lobby.api.enums.Category;
-import eu.mcone.lobby.api.enums.Item;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -31,7 +31,7 @@ public class HatsInventory extends BackpackInventory {
 
         setItem(InventorySlot.ROW_6_SLOT_8, new ItemBuilder(Material.BARRIER).displayName("§c§lKopf absetzen").lore("§7§oFalls du einen deiner Köpfe", "§7§oaufgesetzt hast, kannst Du ihn", "§7§ohiermit absetzen.").create(), e -> {
             p.getInventory().setHelmet(null);
-            LobbyPlugin.getInstance().getMessager().send(p, "§2Du hast deinen Kopf erfolgreich abgesetzt!");
+            GameTemplate.getInstance().getMessager().send(p, "§2Du hast deinen Kopf erfolgreich abgesetzt!");
         });
     }
 
