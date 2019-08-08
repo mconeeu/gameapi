@@ -68,6 +68,7 @@ public class GameSystem extends GameSystemAPI {
                 BackpackInventory.registerBackpackInventory(Category.ARMOR, ArmorInventory.class);
                 BackpackInventory.registerBackpackInventory(Category.MATERIAL, MaterialInventory.class);
                 BackpackInventory.registerBackpackInventory(Category.EXCLUSIVE, ExclusiveInventory.class);
+                BackpackInventory.registerBackpackInventory(Category.INGAME, IngameInventory.class);
             }
 
             if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_MAP_MANAGER)

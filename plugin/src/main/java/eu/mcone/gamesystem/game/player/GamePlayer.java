@@ -125,8 +125,8 @@ public class GamePlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.Gam
         if (!hasItem(item)) {
             CorePlayer cp = CoreSystem.getInstance().getCorePlayer(p);
 
-            if ((cp.getCoins() - item.getEmeralds()) >= 0) {
-                cp.removeCoins(item.getEmeralds());
+            if ((cp.getCoins() - item.getBuyemeralds()) >= 0) {
+                cp.removeCoins(item.getBuyemeralds());
                 addItem(item);
 
                 p.closeInventory();
