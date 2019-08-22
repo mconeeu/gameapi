@@ -40,7 +40,6 @@ public enum Item {
     OFFICE_CARD_SILVER(22, "Büro Karte", Category.STORY_ITEMS, Level.LEGENDARY, 0,0, new ItemBuilder(Material.PAPER, 1, 0).displayName("§6§lBüro Karte").lore("§7Kategorie: §bItem", "§7Seltenheit: §6Legendär", "", "§7Ihre Büro SchlüsselKarte").create()),
     OFFICE_CARD_GOLD(23, "Büro Karte", Category.STORY_ITEMS, Level.LEGENDARY, 0,0, new ItemBuilder(Material.PAPER, 1, 0).displayName("§6§lBüro Karte").lore("§7Kategorie: §bItem", "§7Seltenheit: §6Legendär", "", "§7Ihre Büro SchlüsselKarte").create()),
 
-
     //bank robbery
 
     GOLD_BARDING(24, "Gold Barren", Category.STORY_ITEMS, Level.LEGENDARY, 0,0, new ItemBuilder(Material.GOLD_INGOT, 58).displayName("§6§lGold Barren").lore("§7Kategorie: §bItem", "§7Seltenheit: §6Legendär", "", "§724 Karat Barren").create()),
