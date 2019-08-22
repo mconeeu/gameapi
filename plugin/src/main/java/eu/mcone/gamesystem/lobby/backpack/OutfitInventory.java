@@ -25,6 +25,7 @@ public class OutfitInventory extends BackpackInventory {
                     OutfitFactory.setOutfit(p, item);
                     p.closeInventory();
                     p.sendMessage("§8[§7§l!§8] §fRucksack §8» §7Du hast das Outfit " + item.getName() + "§7 angezogen!");
+                    p.setWalkSpeed(0.20F);
                 });
             }
         }
@@ -33,6 +34,7 @@ public class OutfitInventory extends BackpackInventory {
             p.getInventory().setArmorContents(null);
             p.sendMessage("§8[§7§l!§8] §fRucksack §8» §7Du hast dein Outfit erfolgreich ausgezogen!");
             p.closeInventory();
+            p.setWalkSpeed(0.20F);
         });
     }
 

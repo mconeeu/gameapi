@@ -13,6 +13,8 @@ import eu.mcone.gamesystem.api.enums.Item;
 import eu.mcone.gamesystem.api.lobby.backpack.BackpackInventory;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class HatsInventory extends BackpackInventory {
 
@@ -22,9 +24,17 @@ public class HatsInventory extends BackpackInventory {
         for (Item item : Item.values()) {
             if (item.hasCategory() && item.getCategory().equals(Category.HAT) && playerHasItem(item)) {
                 addItem(item.getItemStack(), e -> {
-                    p.getInventory().setHelmet(item.getItemStack());
-                    p.closeInventory();
-                    p.sendMessage("§8[§7§l!§8] §fRucksack §8» §7Du hast den Kopf "+item.getName()+"§7 aufgesetzt!");
+                    if (item.getId() == 76) {
+                        p.getInventory().setHelmet(item.getItemStack());
+                        p.closeInventory();
+                        p.sendMessage("§8[§7§l!§8] §fRucksack §8» §7Du hast den Kopf "+item.getName()+"§7 aufgesetzt!");
+                        p.setWalkSpeed(0.25F);
+                    } else {
+                        p.getInventory().setHelmet(item.getItemStack());
+                        p.closeInventory();
+                        p.sendMessage("§8[§7§l!§8] §fRucksack §8» §7Du hast den Kopf "+item.getName()+"§7 aufgesetzt!");
+                        p.setWalkSpeed(0.20F);
+                    }
                 });
             }
         }
@@ -32,6 +42,7 @@ public class HatsInventory extends BackpackInventory {
         setItem(InventorySlot.ROW_6_SLOT_8, new ItemBuilder(Material.BARRIER).displayName("§c§lKopf absetzen").lore("§7§oFalls du einen deiner Köpfe", "§7§oaufgesetzt hast, kannst Du ihn", "§7§ohiermit absetzen.").create(), e -> {
             p.getInventory().setHelmet(null);
             GameTemplate.getInstance().getMessager().send(p, "§2Du hast deinen Kopf erfolgreich abgesetzt!");
+            p.setWalkSpeed(0.20F);
         });
     }
 

@@ -98,6 +98,8 @@ public enum Item {
     HEAD_DINOSAUR(74, "Dino Kopf", Category.HAT, Level.EPIC, 120,70, Skull.fromUrl("http://textures.minecraft.net/texture/d582ce1d9f6f34c087b4fbec5bdb758732dc0658b86e275a9b46bacd58ae899", 1).toItemBuilder().displayName("§5§lDino Kopf").lore("§7Kategorie: §bKopf", "§7Seltenheit: §5Episch", "", "§7UAHHHHH").create()),
     HEAD_PLAYCUBEHD(75, "Playcubes Kopf", Category.HAT, Level.UNUSUAL, 80,50, Skull.fromUrl("http://textures.minecraft.net/texture/ff747a6c6757cc7720059d7f5cdbbc32d6d45e1984262d11a92213f1812a4d0e", 1).toItemBuilder().displayName("§3§lPlaycubes Kopf").lore("§7Kategorie: §bKopf", "§7Seltenheit: §3Ungewöhnlich", "", "§7Will wer GTA").create()),
 
+    //Gadget Heads
+    HEAD_SECRET_STRIPCLUB(76, "Stripclub Kopf", Category.HAT, Level.EPIC, 80,50, Skull.fromUrl("http://textures.minecraft.net/texture/36aae86da0cd317a47fa6668fd4785b5a7a7e4ed9e7bc68652bae27984b84c", 1).toItemBuilder().displayName("§3§lLeichen Kopf").lore("§7Kategorie: §bKopf", "§7Seltenheit: §5Episch", "", "§7Kirphas 100 Jahre alter Kopf").create()),
 
     //Outfits
     OUTFIT_RABBIT(111, "Hasen Outfit", Category.OUTFITS, Level.UNUSUAL, 125,75, Skull.fromUrl("http://textures.minecraft.net/texture/dc7a317ec5c1ed7788f89e7f1a6af3d2eeb92d1e9879c05343c57f9d863de130", 1).toItemBuilder().displayName("§3§lHasen Outfit").lore("§7Kategorie: §bKleidung / Outfits", "§7Seltenheit: §3Ungewöhnlich", "", "§7Bringe die Eier raus").create()),
