@@ -22,7 +22,7 @@ import org.bukkit.scoreboard.DisplaySlot;
 
 public class PlayerQuit implements Listener {
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void on(PlayerQuitEvent e) {
         Player p = e.getPlayer();
         if (GameTemplate.getInstance() != null) {

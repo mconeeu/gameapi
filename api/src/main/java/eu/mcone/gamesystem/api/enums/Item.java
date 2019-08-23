@@ -152,7 +152,7 @@ public enum Item {
     ADMIN_BOOTS(196, "Admin Schuhe", Category.EXCLUSIVE, Level.MYSTICAL, 0,0, ItemBuilder.createLeatherArmorItem(Material.LEATHER_BOOTS, Color.RED).displayName("§c§lAdminstrator Schuhe").lore("§7Kategorie: §bExklusives Item", "§7Seltenheit: §cMythisch", "", "§7ADMIN SCHUHE ICH BIN DER BOSS").create()),
 
     //Armor
-    IRON_SWORD(226, "eisenschwert", Category.ARMOR, Level.UNUSUAL, 0,0, new ItemBuilder(Material.IRON_SWORD, 1, 0).displayName("§3§lEisen Schwerdt").lore("§7Kategorie: §bSchwerter", "§7Seltenheit: §3Ungewöhnlich", "§74 Eisen", "§7Mit dem Eisen Schwerdt in den Krieg").create()),
+    IRON_SWORD(226, "eisenschwert", Category.ARMOR, Level.UNUSUAL, 0,0, new ItemBuilder(Material.IRON_SWORD, 1, 0).displayName("§3§lEisen Schwerd").lore("§7Kategorie: §bSchwerter", "§7Seltenheit: §3Ungewöhnlich", "§74 Eisen", "§7Mit dem Eisen Schwerdt in den Krieg").create()),
     IRON_HEAD(227, "eisenhelm", Category.ARMOR, Level.UNUSUAL, 0,0, new ItemBuilder(Material.IRON_HELMET, 1, 0).displayName("§3§lEisen Helm").lore("§7Kategorie: §bRüstung", "§7Seltenheit: §3Ungewöhnlich", "§72 Eisen", "§7Mit dem Eisen Helm in den Krieg").create()),
     IRON_CHESTPLATE(228, "eisenbrustpanzer", Category.ARMOR, Level.UNUSUAL, 0,0, new ItemBuilder(Material.IRON_CHESTPLATE, 1, 0).displayName("§3§lEisen Brustpanzer").lore("§7Kategorie: §bRüstung", "§7Seltenheit: §3Ungewöhnlich", "§76 Eisen", "§7Mit der Eisen Platte in den Krieg").create()),
     IRON_LEGGINS(229, "eisenhose", Category.ARMOR, Level.UNUSUAL, 0,0, new ItemBuilder(Material.IRON_LEGGINGS, 1, 0).displayName("§3§lEisen Hose").lore("§7Kategorie: §bRüstung", "§7Seltenheit: §3Ungewöhnlich", "§74 Eisen", "§7Mit der Eisen Hose in den Krieg").create()),
