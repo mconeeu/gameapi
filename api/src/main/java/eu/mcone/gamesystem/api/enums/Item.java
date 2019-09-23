@@ -98,7 +98,7 @@ public enum Item {
     HEAD_PLAYCUBEHD(75, "Playcubes Kopf", Category.HAT, Level.UNUSUAL, 80,50, Skull.fromUrl("http://textures.minecraft.net/texture/ff747a6c6757cc7720059d7f5cdbbc32d6d45e1984262d11a92213f1812a4d0e", 1).toItemBuilder().displayName("§3§lPlaycubes Kopf").lore("§7Kategorie: §bKopf", "§7Seltenheit: §3Ungewöhnlich", "", "§7Will wer GTA").create()),
 
     //Gadget Heads
-    HEAD_SECRET_STRIPCLUB(76, "Stripclub Kopf", Category.HAT, Level.EPIC, 80,50, Skull.fromUrl("http://textures.minecraft.net/texture/36aae86da0cd317a47fa6668fd4785b5a7a7e4ed9e7bc68652bae27984b84c", 1).toItemBuilder().displayName("§3§lLeichen Kopf").lore("§7Kategorie: §bKopf", "§7Seltenheit: §5Episch", "", "§7Kirphas 100 Jahre alter Kopf").create()),
+    HEAD_SECRET_STRIPCLUB(76, "Kirphas Kopf", Category.HAT, Level.EPIC, 80,50, Skull.fromUrl("http://textures.minecraft.net/texture/36aae86da0cd317a47fa6668fd4785b5a7a7e4ed9e7bc68652bae27984b84c", 1).toItemBuilder().displayName("§5§lLeichen Kopf").lore("§7Kategorie: §bKopf", "§7Seltenheit: §5Episch", "", "§7Kirphas 100 Jahre alter Kopf").create()),
 
     //Outfits
     OUTFIT_RABBIT(111, "Hasen Outfit", Category.OUTFITS, Level.UNUSUAL, 125,75, Skull.fromUrl("http://textures.minecraft.net/texture/dc7a317ec5c1ed7788f89e7f1a6af3d2eeb92d1e9879c05343c57f9d863de130", 1).toItemBuilder().displayName("§3§lHasen Outfit").lore("§7Kategorie: §bKleidung / Outfits", "§7Seltenheit: §3Ungewöhnlich", "", "§7Bringe die Eier raus").create()),
@@ -125,7 +125,7 @@ public enum Item {
     ANIMAL_SPIDER(156, "Spinne", Category.ANIMAL, Level.UNUSUAL, 110,60, Skull.fromUrl("http://textures.minecraft.net/texture/cd541541daaff50896cd258bdbdd4cf80c3ba816735726078bfe393927e57f1", 1).toItemBuilder().displayName("§3§lSpinne").lore("§7Kategorie: §bTiere", "§7Seltenheit: §3Ungewöhnlich", "", "§7Nehme deine Spinne mit auf reisen").create()),
     ANIMAL_RABBIT(157, "Hase", Category.ANIMAL, Level.UNUSUAL, 100,45, Skull.fromUrl("http://textures.minecraft.net/texture/dc7a317ec5c1ed7788f89e7f1a6af3d2eeb92d1e9879c05343c57f9d863de130", 1).toItemBuilder().displayName("§3§lHase").lore("§7Kategorie: §bTiere", "§7Seltenheit: §3Ungewöhnlich", "", "§7Nehme dein Hase mit auf reisen").create()),
 
-    //Coin items (Chest opening)
+    //Emerald items (Chest opening)
     EMERALDS_20(171, "20+ Emeralds", null, Level.USUAL, 0,0, new ItemBuilder(Material.GOLD_INGOT, 1, 0).displayName("§7§lEmerald-Loot ").lore("§7Kategorie: §bEmeralds", "§7Seltenheit: §7Gewöhnlich").create()),
     EMERALDS_100(171, "100+ Emeralds", null, Level.UNUSUAL, 0, 0,new ItemBuilder(Material.GOLD_BLOCK, 1, 0).displayName("§3§lEmerald-Loot ").lore("§7Kategorie: §bEmeralds", "§7Seltenheit: §3Ungewöhnlich").create()),
     EMERALDS_250(171, "250+ Emeralds", null, Level.EPIC, 0, 0,new ItemBuilder(Material.DIAMOND_BLOCK, 1, 0).displayName("§5§lEmerald-Loot ").lore("§7Kategorie: §bEmeralds", "§7Seltenheit: §5Episch").create()),

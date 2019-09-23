@@ -19,7 +19,11 @@ public class GadgetInventory extends BackpackInventory {
             if (item.hasCategory() && item.getCategory().equals(Category.GADGET) && playerHasItem(item)) {
                 addItem(item.getItemStack(), e -> {
                     if (playerHasItem(item)) {
-                        p.getInventory().setItem(3, item.getItemStack());
+                        if (p.hasPermission("lobby.silenthub")) {
+                            p.getInventory().setItem(3, item.getItemStack());
+                        } else {
+                            p.getInventory().setItem(2, item.getItemStack());
+                        }
                     }
                 });
             }

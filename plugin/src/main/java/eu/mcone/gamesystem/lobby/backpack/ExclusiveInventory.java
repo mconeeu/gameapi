@@ -18,7 +18,11 @@ public class ExclusiveInventory extends BackpackInventory {
             if (item.hasCategory()) {
                 addItem(item.getItemStack(), e -> {
                     if (playerHasItem(item)) {
-                        p.getInventory().setItem(3, item.getItemStack());
+                        if (p.hasPermission("lobby.silenthub")) {
+                            p.getInventory().setItem(3, item.getItemStack());
+                        } else {
+                            p.getInventory().setItem(2, item.getItemStack());
+                        }
                     }
                 });
             }
