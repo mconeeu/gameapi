@@ -23,8 +23,8 @@ public class EntityDamageByEntity implements Listener {
         Entity byEnt = e.getDamager();
 
         if (GameTemplate.getInstance() != null) {
-            if (GameTemplate.getInstance().getGameStateHandler().hasGameState(GameStateID.LOBBY)
-                    || GameTemplate.getInstance().getGameStateHandler().hasGameState(GameStateID.END)) {
+            if (GameTemplate.getInstance().getGameStateHandler() == null
+                    || GameTemplate.getInstance().getGameStateHandler().hasGameState(GameStateID.LOBBY)) {
                 e.setCancelled(true);
             }
         }
