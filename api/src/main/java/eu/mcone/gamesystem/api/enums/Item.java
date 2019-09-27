@@ -24,7 +24,8 @@ public enum Item {
     COINBOMB(5, "CoinBombe", Category.GADGET, Level.UNUSUAL, 80, 50, new ItemBuilder(Material.IRON_INGOT).displayName("§3§lCoin Bombe").lore("§7Kategorie: §bGadget", "§7Seltenheit: §3Ungewöhnlich", "", "", "§7COIIIIIINSSS FÜR ALLE").create()),
     BOMB(6, "Bombe", Category.GADGET, Level.EPIC, 110, 80, new ItemBuilder(Material.MAGMA_CREAM, 1).displayName("§5§lBombe").lore("§7Kategorie: §bGadget", "§7Seltenheit: §5Episch", "", "", "§7Achtung Sprengung!").create()),
     GRAPPLING_HOOK(7, "Enterhacken", Category.GADGET, Level.EPIC, 120, 70, new ItemBuilder(Material.FISHING_ROD, 1, 0).displayName("§3§lEnterhacken").lore("§7Kategorie: §bGadget", "§7Seltenheit: §3Ungewöhnlich", "", "", "§7Fühle dich wie Spiderman!").unbreakable(true).itemFlags(ItemFlag.HIDE_UNBREAKABLE).create()),
-    COBWEBGUN(8, "Spinnenwebengun", Category.GADGET, Level.EPIC, 110, 80, new ItemBuilder(Material.BONE, 1, 0).displayName("§5§lSpinnenweben Gun").lore("§7Kategorie: §bGadget", "§7Seltenheit: §3Ungewöhnlich", "", "", "§7Schieße grussellig Spinnenweben durch die Insel").create()),
+    COBWEBGUN(8, "Spinnenwebengun", Category.GADGET, Level.EPIC, 110, 80, new ItemBuilder(Material.BONE, 1, 0).displayName("§5§lSpinnenweben Gun").lore("§7Kategorie: §bGadget", "§7Seltenheit: §5Episch", "", "", "§7Schieße grussellig Spinnenweben durch die Insel").create()),
+    SPLASH_POTION(9, "Hexen Wurf Trank", Category.GADGET, Level.UNUSUAL, 70, 45, new ItemBuilder(Material.POTION, 1, 16430).displayName("§3§lUnsichtsbarkeits Trank").lore("§7Kategorie: §bGadget", "§7Seltenheit: §3Ungewöhnlich", "", "", "§7Mache dich unsichtbar und erschrecke\nAhnungslose Spieler!").create()),
 
     //Story items
     MAGICDRINK(11, "ZauberTrank", Category.STORY_ITEMS, Level.EPIC, 0, 0, new ItemBuilder(Material.POTION, 1, 0).displayName("§5§lZauber Trank").lore("§7Kategorie: §bItem", "§7Seltenheit: §5Episch", "", "§7Helfe den Bürgermeister Rufi!").create()),
