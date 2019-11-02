@@ -11,7 +11,7 @@ import eu.mcone.gamesystem.api.GameTemplate;
 import eu.mcone.gamesystem.api.ecxeptions.GameSystemException;
 import eu.mcone.gamesystem.api.game.Playing;
 import eu.mcone.gamesystem.api.game.countdown.handler.GameCountdownID;
-import eu.mcone.gamesystem.api.game.countdown.handler.IGameCountdown;
+import eu.mcone.gamesystem.api.game.countdown.handler.GameCountdown;
 import eu.mcone.gamesystem.api.game.event.GameCountdownEvent;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,7 +22,7 @@ import org.bukkit.entity.Player;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class LobbyCountdown implements IGameCountdown {
+public class LobbyCountdown implements GameCountdown {
 
     private Logger log;
     @Getter

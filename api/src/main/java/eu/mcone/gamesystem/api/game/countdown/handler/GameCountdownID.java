@@ -14,11 +14,11 @@ public enum GameCountdownID {
     RESTART_COUNTDOWN(3, GameStateID.END);
 
     @Getter
-    private int ID;
+    private final int ID;
     @Getter
-    private GameStateID gameStateID;
+    private final GameStateID gameStateID;
 
-    GameCountdownID(int ID, GameStateID gameStateID) {
+    GameCountdownID(final int ID, final GameStateID gameStateID) {
         this.ID = ID;
         this.gameStateID = gameStateID;
     }

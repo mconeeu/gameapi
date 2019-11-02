@@ -12,7 +12,6 @@ import eu.mcone.gamesystem.api.ecxeptions.GameSystemException;
 import eu.mcone.gamesystem.api.game.event.GameMapChangeEvent;
 import eu.mcone.gamesystem.api.game.event.GameMapCountdownChangeEvent;
 import eu.mcone.gamesystem.api.game.manager.map.GameMap;
-import eu.mcone.gamesystem.api.game.manager.map.IMapRotationHandler;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -20,7 +19,7 @@ import org.bukkit.entity.Player;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MapRotationHandler implements IMapRotationHandler {
+public class MapRotationHandler implements eu.mcone.gamesystem.api.game.manager.map.MapRotationHandler {
 
     private MapManager mapManager;
     private int rotationInterval;

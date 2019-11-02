@@ -2,7 +2,9 @@ package eu.mcone.gamesystem.api.game.manager.map;
 
 import org.bukkit.entity.Player;
 
-public interface IMapVotingHandler {
+public interface MapVotingHandler {
+
+    GameMap getGainedMap();
 
     /**
      * Ends the voting and returns the won Map as MapItem

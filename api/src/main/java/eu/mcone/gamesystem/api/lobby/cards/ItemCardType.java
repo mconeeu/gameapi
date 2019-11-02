@@ -5,8 +5,10 @@ import lombok.Getter;
 @Getter
 public enum ItemCardType {
 
+    //TODO: Add Coins SUPPORT / D.L 29.9.2019
     KIT("KIT", "§c§lKit"),
-    ITEM("ITEM", "§7§lItem");
+    ITEM("ITEM", "§7§lItem"),
+    COINS("COINS", "§a§lCoins");
 
     private String name;
     private String displayName;

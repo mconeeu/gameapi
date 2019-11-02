@@ -2,7 +2,7 @@ package eu.mcone.gamesystem.api.game.manager.map;
 
 import eu.mcone.coresystem.api.bukkit.world.CoreWorld;
 
-public interface IMapRotationHandler {
+public interface MapRotationHandler {
 
     /**
      * Returns the currently selected gameMap

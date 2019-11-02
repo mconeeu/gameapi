@@ -5,7 +5,7 @@
 
 package eu.mcone.gamesystem.api.game.countdown.handler;
 
-public interface IGameCountdown {
+public interface GameCountdown {
 
     GameCountdownID getID();
 

@@ -9,6 +9,7 @@ import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.gamesystem.api.GameSystemAPI;
 import eu.mcone.gamesystem.api.GameTemplate;
 import eu.mcone.gamesystem.api.enums.Category;
+import eu.mcone.gamesystem.api.game.stats.StatsWall;
 import eu.mcone.gamesystem.api.lobby.backpack.BackpackInventory;
 import eu.mcone.gamesystem.game.achivements.AchievementManager;
 import eu.mcone.gamesystem.game.command.GameCommand;
@@ -47,9 +48,18 @@ public class GameSystem extends GameSystemAPI {
                 PlayerJoin.loadPlayer(player);
             }
 
+            GameTemplate.getInstance().createGameSettings();
+
             if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_KIT_MANAGER)
                     || GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_ALL)) {
                 GameTemplate.getInstance().setKitManager(new KitManager());
+            }
+
+            if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_STATS_WALL)
+                    || GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_ALL)) {
+                GameTemplate.getInstance().setStatsWall(new StatsWall());
+                GameTemplate.getInstance().getStatsWall().update();
+
             }
 
             if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_ITEM_CARDS)

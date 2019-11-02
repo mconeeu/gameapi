@@ -10,7 +10,7 @@ import eu.mcone.gamesystem.api.game.countdown.LobbyCountdown;
 import eu.mcone.gamesystem.api.game.countdown.RestartCountdown;
 import eu.mcone.gamesystem.api.game.countdown.SpawnCountdown;
 import eu.mcone.gamesystem.api.game.countdown.handler.GameCountdownID;
-import eu.mcone.gamesystem.api.game.countdown.handler.IGameCountdown;
+import eu.mcone.gamesystem.api.game.countdown.handler.GameCountdown;
 import eu.mcone.gamesystem.api.game.event.GameStateChangeEvent;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -25,7 +25,7 @@ public class GameStateHandler {
     @Getter
     private Map<GameStateID, Long> changeList;
     @Getter
-    private Map<GameStateID, IGameCountdown> gameCountdowns;
+    private Map<GameStateID, GameCountdown> gameCountdowns;
 
     public GameStateHandler() {
         currentStateID = GameStateID.ERROR;
@@ -48,19 +48,23 @@ public class GameStateHandler {
         switch (gameCountdownID) {
             case LOBBY_COUNTDOWN:
                 gameCountdowns.put(gameCountdownID.getGameStateID(), new LobbyCountdown(seconds));
+                break;
             case SPAWN_COUNTDOWN:
                 gameCountdowns.put(gameCountdownID.getGameStateID(), new SpawnCountdown(seconds));
+                break;
             case RESTART_COUNTDOWN:
                 gameCountdowns.put(gameCountdownID.getGameStateID(), new RestartCountdown(seconds));
+                break;
         }
     }
 
-    public IGameCountdown getGameCountdown(GameCountdownID gameCountdownID) {
+    public GameCountdown getGameCountdown(GameCountdownID gameCountdownID) {
         return getGameCountdown(gameCountdownID.getGameStateID());
     }
 
-    public IGameCountdown getGameCountdown(GameStateID gameStateID) {
+    public GameCountdown getGameCountdown(GameStateID gameStateID) {
         if (gameCountdowns.containsKey(gameStateID)) {
+            System.out.println(gameCountdowns.get(gameStateID).getID());
             return gameCountdowns.get(gameStateID);
         } else {
             GameTemplate.getInstance().sendConsoleMessage("§cCannot find GameCountdown for StateID " + gameStateID);
@@ -72,7 +76,7 @@ public class GameStateHandler {
         return gameCountdowns.containsKey(gameStateID);
     }
 
-    public IGameCountdown getCurrentGameCountdown() {
+    public GameCountdown getCurrentGameCountdown() {
         if (gameCountdowns.containsKey(currentStateID)) {
             return gameCountdowns.get(currentStateID);
         }

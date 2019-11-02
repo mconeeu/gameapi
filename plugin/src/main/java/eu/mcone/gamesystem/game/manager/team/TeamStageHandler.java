@@ -69,7 +69,7 @@ public class TeamStageHandler implements eu.mcone.gamesystem.api.game.manager.te
             return getTeamStage(team);
         }
 
-        return null;
+        return stages.get(team);
     }
 
     public TeamStage getTeamStage(final Team team) {
@@ -81,7 +81,7 @@ public class TeamStageHandler implements eu.mcone.gamesystem.api.game.manager.te
     }
 
     public void removePlayerFromStage(final GamePlayer gamePlayer) {
-        if (gamePlayer.getTeam() == Team.ERROR) {
+        if (gamePlayer.getTeam() != Team.ERROR) {
             if (stages.containsKey(gamePlayer.getTeam())) {
                 stages.get(gamePlayer.getTeam()).removePlayerFromStage(gamePlayer);
             } else {

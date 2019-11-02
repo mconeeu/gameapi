@@ -16,9 +16,10 @@ import eu.mcone.gamesystem.api.game.Team;
 import eu.mcone.gamesystem.api.game.achivements.AchievementManager;
 import eu.mcone.gamesystem.api.game.gamestate.GameStateHandler;
 import eu.mcone.gamesystem.api.game.manager.kit.KitManager;
-import eu.mcone.gamesystem.api.game.manager.map.IMapManager;
+import eu.mcone.gamesystem.api.game.manager.map.MapManager;
 import eu.mcone.gamesystem.api.game.manager.team.TeamManager;
 import eu.mcone.gamesystem.api.game.player.GamePlayer;
+import eu.mcone.gamesystem.api.game.stats.StatsWall;
 import eu.mcone.gamesystem.api.lobby.cards.ItemCardManager;
 import eu.mcone.gamesystem.api.lobby.manager.TrailManager;
 import lombok.Getter;
@@ -48,7 +49,7 @@ public abstract class GameTemplate extends CorePlugin {
     private List<Player> spectators;
 
     @Setter
-    private IMapManager mapManager;
+    private MapManager mapManager;
 
     @Setter
     private TeamManager teamManager;
@@ -64,6 +65,9 @@ public abstract class GameTemplate extends CorePlugin {
 
     @Setter
     private KitManager kitManager;
+
+    @Setter
+    private StatsWall statsWall;
 
     @Getter
     private GameStateHandler gameStateHandler;
@@ -92,24 +96,11 @@ public abstract class GameTemplate extends CorePlugin {
 
     @Override
     public void onEnable() {
-        this.gameConfig = new CoreJsonConfig<>(this, GameSettingsConfig.class, "gameSettings.json");
-        this.gameConfigAsClass = gameConfig.parseConfig();
-
-        if (this.options.contains(GameSystemOptions.USE_GAME_STATE_HANDLER)
-                || this.options.contains(GameSystemOptions.USE_TEAM_MANAGER)) {
-
-            Playing.Min_Players.setValue(getGameConfigAsClass().getMinimalPlayers());
-            Playing.Max_Players.setValue(getGameConfigAsClass().getMaximalPlayers());
-
-            gameStateHandler = new GameStateHandler();
-        }
-
         onGameEnable();
     }
 
     @Override
     public void onDisable() {
-        gameConfig.save();
 
         if (trailManager != null) {
             trailManager.shutdown();
@@ -129,6 +120,20 @@ public abstract class GameTemplate extends CorePlugin {
     public abstract void onGameEnable();
 
     public abstract void onGameDisable();
+
+    public void createGameSettings() {
+        this.gameConfig = new CoreJsonConfig<>(this, GameSettingsConfig.class, "gameSettings.json");
+        this.gameConfigAsClass = gameConfig.parseConfig();
+
+        if (this.options.contains(GameSystemOptions.USE_GAME_STATE_HANDLER)
+                || this.options.contains(GameSystemOptions.USE_TEAM_MANAGER)) {
+
+            Playing.Min_Players.setValue(getGameConfigAsClass().getMinimalPlayers());
+            Playing.Max_Players.setValue(getGameConfigAsClass().getMaximalPlayers());
+
+            gameStateHandler = new GameStateHandler();
+        }
+    }
 
     public void registerGamePlayer(GamePlayer gamePlayer) {
         this.gamePlayers.put(gamePlayer.getCorePlayer().getUuid(), gamePlayer);
@@ -177,7 +182,7 @@ public abstract class GameTemplate extends CorePlugin {
      *
      * @return MapManager
      */
-    public IMapManager getMapManager() {
+    public MapManager getMapManager() {
         if (checkObj(mapManager)) {
             return mapManager;
         } else {
@@ -251,6 +256,19 @@ public abstract class GameTemplate extends CorePlugin {
     }
 
     /**
+     * Returns the instance of the StatsWall
+     *
+     * @return StatsWall
+     */
+    public StatsWall getStatsWall() {
+        if (checkObj(statsWall)) {
+            return statsWall;
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Checks if the specified object is null
      *
      * @param object
@@ -288,6 +306,7 @@ public abstract class GameTemplate extends CorePlugin {
         USE_BACKPACK(),
         USE_ITEM_CARDS(),
         USE_KIT_MANAGER(),
+        USE_STATS_WALL(),
         USE_ALL()
     }
 }

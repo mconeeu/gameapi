@@ -71,7 +71,6 @@ public class TeamInventory extends CoreInventory {
                         GameTemplate.getInstance().getMessager().send(p, CoreSystem.getInstance().getTranslationManager().get("game.team.join", CoreSystem.getInstance().getGlobalCorePlayer(p.getUniqueId())).replace("%team%", team.getPrefix()));
                         update();
                         p.playSound(p.getLocation(), Sound.HORSE_ARMOR, 1, 1);
-                        p.updateInventory();
                         break;
                     } else {
                         GameTemplate.getInstance().getMessager().send(p, CoreSystem.getInstance().getTranslationManager().get("game.team.maxSize").replace("%max%", Integer.toString(GameTemplate.getInstance().getGameConfigAsClass().getPlayersPreTeam())));
@@ -93,6 +92,8 @@ public class TeamInventory extends CoreInventory {
                         ""
                 }).create(), this::registerFunction);
                 i++;
+
+                player.updateInventory();
             } else {
                 break;
             }

@@ -9,10 +9,17 @@ import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.command.CorePlayerCommand;
 import eu.mcone.gamesystem.GameSystem;
 import eu.mcone.gamesystem.api.game.Team;
+import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GameCommand extends CorePlayerCommand {
+
+    @Getter
+    private static List<Player> statsWall = new ArrayList<>();
 
     public GameCommand() {
         super("game");
@@ -29,27 +36,45 @@ public class GameCommand extends CorePlayerCommand {
                 GameSystem.getInstance().getMessager().send(player, "§7§oDeshalb sind auch alle von uns verwendeten Plugins ausschließlich selbst entwickelt!");
                 GameSystem.getInstance().getMessager().send(player, "§8§m---------- §r§8§lMCONE-GameSystem §8§m----------");
             }
+        } else if (args.length == 2) {
+            if (player.hasPermission("gamesystem.admin")) {
+                if (args[0].equalsIgnoreCase("set")) {
+                    if (args[1].equalsIgnoreCase("stats")) {
+                        if (statsWall.contains(player)) {
+                            statsWall.remove(player);
+                            GameSystem.getInstance().getMessager().send(player, "§cDu kannst nun keine Positionen mehr für die Statswand setzten!");
+                        } else {
+                            statsWall.add(player);
+                            GameSystem.getInstance().getMessager().send(player, "§aDu kannst nun die Positionen für die Statswand setzen (rechts/linksklick)");
+                        }
+                    } else {
+                        sendHelpTopic(player);
+                    }
+                }
+            } else {
+                sendHelpTopic(player);
+            }
         } else if (args.length == 4) {
             if (player.hasPermission("gamesystem.admin")) {
                 if (args[0].equalsIgnoreCase("set")) {
-                        if (args[1].equalsIgnoreCase("stage")) {
-                            for (Team team : Team.values()) {
-                                if (args[2].equalsIgnoreCase(team.getString())) {
-                                    try {
-                                        Location loc = player.getLocation();
-                                        loc.setYaw(Math.round(loc.getYaw()));
-                                        loc.setPitch(Math.round(loc.getPitch()));
+                    if (args[1].equalsIgnoreCase("stage")) {
+                        for (Team team : Team.values()) {
+                            if (args[2].equalsIgnoreCase(team.getString())) {
+                                try {
+                                    Location loc = player.getLocation();
+                                    loc.setYaw(Math.round(loc.getYaw()));
+                                    loc.setPitch(Math.round(loc.getPitch()));
 
-                                        CoreSystem.getInstance().getWorldManager().getWorld(player.getWorld()).setLocation(team.getString() + ".stage." + Integer.parseInt(args[3]), loc).save();
-                                        GameSystem.getInstance().getMessager().send(player, "§aDu hast für das Team " + team.getColor() + team + " §aden Stageplatz §7" + args[3] + " §agesetzt.");
-                                    } catch (NumberFormatException e) {
-                                        GameSystem.getInstance().getMessager().send(player, "§cDer angegebenen Stageplatz ist keine Zahl!");
-                                    }
+                                    CoreSystem.getInstance().getWorldManager().getWorld(player.getWorld()).setLocation(team.getString() + ".stage." + Integer.parseInt(args[3]), loc).save();
+                                    GameSystem.getInstance().getMessager().send(player, "§aDu hast für das Team " + team.getColor() + team + " §aden Stageplatz §7" + args[3] + " §agesetzt.");
+                                } catch (NumberFormatException e) {
+                                    GameSystem.getInstance().getMessager().send(player, "§cDer angegebenen Stageplatz ist keine Zahl!");
                                 }
                             }
-                        } else {
-                            sendHelpTopic(player);
                         }
+                    } else {
+                        sendHelpTopic(player);
+                    }
                 } else {
                     sendHelpTopic(player);
                 }
@@ -67,6 +92,7 @@ public class GameCommand extends CorePlayerCommand {
         if (player.hasPermission("gamesystem.admin")) {
             GameSystem.getInstance().getMessager().send(player, "§c/game info");
             GameSystem.getInstance().getMessager().send(player, "§c/game set stage <team> <place>");
+            GameSystem.getInstance().getMessager().send(player, "§c/game set stats");
         } else {
             GameSystem.getInstance().getMessager().send(player, "§cBitte benutze /game info");
         }

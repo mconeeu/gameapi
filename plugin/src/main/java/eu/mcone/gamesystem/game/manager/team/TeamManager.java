@@ -74,34 +74,51 @@ public class TeamManager implements eu.mcone.gamesystem.api.game.manager.team.Te
 
     public void setupTeam() {
         log.info("Check if all players have a team");
+
+        Team lastSelectedTeam = Team.ERROR;
+        int lastSelectedPlace = 0;
+
         for (Player p : GameTemplate.getInstance().getPlaying()) {
+            int i = 0;
             GamePlayer gp = GameTemplate.getInstance().getGamePlayer(p.getUniqueId());
             if (gp.getTeam() == Team.ERROR) {
-                int i = 1;
                 for (Team team : Team.values()) {
-                    if (i < GameTemplate.getInstance().getGameConfigAsClass().getTeams()) {
-                        if (GameTemplate.getInstance().getGameConfigAsClass().getPlayersPreTeam() >= 2) {
-                            if (GameTemplate.getInstance().getPlaying().size() < GameTemplate.getInstance().getGameConfigAsClass().getTeams()) {
-                                if (!GameTemplate.getInstance().getTeams().containsKey(p.getUniqueId())) {
-                                    if (team.getValue() == 0) {
-                                        gp.setTeam(team);
-                                        team.setBedAlive(true);
-                                    }
-                                    i++;
-                                }
-                            } else if (team.getValue() < GameTemplate.getInstance().getGameConfigAsClass().getPlayersPreTeam()) {
+                    if (i <= GameTemplate.getInstance().getGameConfigAsClass().getTeams()) {
+                        if (team.getValue() < GameTemplate.getInstance().getGameConfigAsClass().getPlayersPreTeam()) {
+                            if (team != lastSelectedTeam && i != lastSelectedPlace) {
                                 gp.setTeam(team);
                                 team.setBedAlive(true);
+
+                                lastSelectedTeam = team;
+                                lastSelectedPlace++;
+                                break;
+                            } else {
                                 i++;
                             }
                         } else {
-                            if (!GameTemplate.getInstance().getTeams().containsKey(p.getUniqueId())) {
-                                if (team.getValue() == 0 || team.getValue() < GameTemplate.getInstance().getGameConfigAsClass().getPlayersPreTeam()) {
-                                    gp.setTeam(team);
-                                    team.setBedAlive(true);
+                            i++;
+                        }
+                    } else if (gp.getTeam() == Team.ERROR) {
+                        i = 0;
+                        lastSelectedPlace = 0;
+                        lastSelectedTeam = Team.ERROR;
+
+                        for (Team team1 : Team.values()) {
+                            if (i <= GameTemplate.getInstance().getGameConfigAsClass().getTeams()) {
+                                if (team1.getValue() < GameTemplate.getInstance().getGameConfigAsClass().getPlayersPreTeam()) {
+                                    if (team1 != lastSelectedTeam && i != lastSelectedPlace) {
+                                        gp.setTeam(team1);
+
+                                        lastSelectedTeam = team1;
+                                        lastSelectedPlace++;
+                                        break;
+                                    } else {
+                                        i++;
+                                    }
+                                } else {
+                                    i++;
                                 }
                             }
-                            i++;
                         }
                     } else {
                         break;
@@ -109,6 +126,43 @@ public class TeamManager implements eu.mcone.gamesystem.api.game.manager.team.Te
                 }
             }
         }
+
+        //OLD METHOD work not correct
+//        for (Player p : GameTemplate.getInstance().getPlaying()) {
+//            GamePlayer gp = GameTemplate.getInstance().getGamePlayer(p.getUniqueId());
+//            if (gp.getTeam() == Team.ERROR) {
+//                int i = 1;
+//                for (Team team : Team.values()) {
+//                    if (i < GameTemplate.getInstance().getGameConfigAsClass().getTeams()) {
+//                        if (GameTemplate.getInstance().getGameConfigAsClass().getPlayersPreTeam() >= 2) {
+//                            if (GameTemplate.getInstance().getPlaying().size() < GameTemplate.getInstance().getGameConfigAsClass().getTeams()) {
+//                                if (!GameTemplate.getInstance().getTeams().containsKey(p.getUniqueId())) {
+//                                    if (team.getValue() == 0) {
+//                                        gp.setTeam(team);
+//                                        team.setBedAlive(true);
+//                                    }
+//                                    i++;
+//                                }
+//                            } else if (team.getValue() < GameTemplate.getInstance().getGameConfigAsClass().getPlayersPreTeam()) {
+//                                gp.setTeam(team);
+//                                team.setBedAlive(true);
+//                                i++;
+//                            }
+//                        } else {
+//                            if (!GameTemplate.getInstance().getTeams().containsKey(p.getUniqueId())) {
+//                                if (team.getValue() == 0 || team.getValue() < GameTemplate.getInstance().getGameConfigAsClass().getPlayersPreTeam()) {
+//                                    gp.setTeam(team);
+//                                    team.setBedAlive(true);
+//                                }
+//                            }
+//                            i++;
+//                        }
+//                    } else {
+//                        break;
+//                    }
+//                }
+//            }
+//        }
     }
 
     public boolean checkChanceToWin() {

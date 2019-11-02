@@ -5,7 +5,7 @@
 
 package eu.mcone.gamesystem.api.game.manager.map;
 
-public interface IMapManager {
+public interface MapManager {
 
     /**
      * Creates an MapRotationHandler for the mapManager
@@ -13,14 +13,14 @@ public interface IMapManager {
      * @param rotationInterval rotation interval in seconds
      * @return IMapRotationHandler
      */
-    IMapRotationHandler createMapRotationHandler(int rotationInterval);
+    MapRotationHandler createMapRotationHandler(int rotationInterval);
 
     /**
      * Creates an MapVotingHandler for the mapManager
      *
      * @return IMapVotingHandler
      */
-    IMapVotingHandler createMapVotingHandler();
+    MapVotingHandler createMapVotingHandler();
 
     /**
      * Returns the created MapRotationHandler
@@ -28,7 +28,7 @@ public interface IMapManager {
      * @return IMapRotationHandler
      * @throws eu.mcone.gamesystem.api.ecxeptions.GameSystemException if the object is null
      */
-    IMapRotationHandler getMapRotationHandler();
+    MapRotationHandler getMapRotationHandler();
 
     /**
      * Returns the created MapVotingHandler
@@ -36,7 +36,7 @@ public interface IMapManager {
      * @return IMapVotingHandler
      * @throws eu.mcone.gamesystem.api.ecxeptions.GameSystemException if the object is null
      */
-    IMapVotingHandler getMapVotingHandler();
+    MapVotingHandler getMapVotingHandler();
 
     /**
      * Returns a GameMap object for the specified world name

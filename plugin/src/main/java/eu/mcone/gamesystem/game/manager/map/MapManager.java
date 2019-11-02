@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MapManager implements IMapManager {
+public class MapManager implements eu.mcone.gamesystem.api.game.manager.map.MapManager {
 
     @Getter
     private final CorePlugin coreInstance;
@@ -33,8 +33,8 @@ public class MapManager implements IMapManager {
     @Getter
     private List<GameMap> gameMaps;
 
-    private IMapRotationHandler mapRotationHandler;
-    private IMapVotingHandler mapVotingHandler;
+    private eu.mcone.gamesystem.api.game.manager.map.MapRotationHandler mapRotationHandler;
+    private eu.mcone.gamesystem.api.game.manager.map.MapVotingHandler mapVotingHandler;
 
     private File dir;
     private File file;
@@ -55,7 +55,7 @@ public class MapManager implements IMapManager {
         }
     }
 
-    public IMapRotationHandler createMapRotationHandler(int rotationInterval) {
+    public eu.mcone.gamesystem.api.game.manager.map.MapRotationHandler createMapRotationHandler(int rotationInterval) {
         try {
             if (gameMaps.size() >= 2) {
                 options.add(Options.MAP_ROTATION);
@@ -71,13 +71,13 @@ public class MapManager implements IMapManager {
         return null;
     }
 
-    public IMapVotingHandler createMapVotingHandler() {
+    public eu.mcone.gamesystem.api.game.manager.map.MapVotingHandler createMapVotingHandler() {
         options.add(Options.MAP_INVENTORY);
         this.mapVotingHandler = new MapVotingHandler(this);
         return mapVotingHandler;
     }
 
-    public IMapRotationHandler getMapRotationHandler() {
+    public eu.mcone.gamesystem.api.game.manager.map.MapRotationHandler getMapRotationHandler() {
         try {
             if (mapRotationHandler != null) {
                 return mapRotationHandler;
@@ -91,7 +91,7 @@ public class MapManager implements IMapManager {
         return null;
     }
 
-    public IMapVotingHandler getMapVotingHandler() {
+    public eu.mcone.gamesystem.api.game.manager.map.MapVotingHandler getMapVotingHandler() {
         try {
             if (mapVotingHandler != null) {
                 return mapVotingHandler;

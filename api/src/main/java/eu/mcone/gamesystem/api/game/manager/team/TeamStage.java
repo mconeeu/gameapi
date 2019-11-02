@@ -6,7 +6,6 @@
 package eu.mcone.gamesystem.api.game.manager.team;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
-import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
 import eu.mcone.coresystem.api.bukkit.npc.NPC;
 import eu.mcone.coresystem.api.bukkit.npc.NpcData;
 import eu.mcone.coresystem.api.bukkit.npc.data.PlayerNpcData;
@@ -19,7 +18,6 @@ import eu.mcone.gamesystem.api.game.Team;
 import eu.mcone.gamesystem.api.game.player.GamePlayer;
 import lombok.Getter;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
@@ -80,13 +78,7 @@ public class TeamStage {
                                                 false,
                                                 false,
                                                 false,
-                                                new ArrayList<ItemStack>() {{
-                                                    add(0, null);
-                                                    add(1, ItemBuilder.createLeatherArmorItem(Material.LEATHER_HELMET, team.getColor()).create());
-                                                    add(2, ItemBuilder.createLeatherArmorItem(Material.LEATHER_CHESTPLATE, team.getColor()).create());
-                                                    add(3, ItemBuilder.createLeatherArmorItem(Material.LEATHER_LEGGINGS, team.getColor()).create());
-                                                    add(4, ItemBuilder.createLeatherArmorItem(Material.LEATHER_BOOTS, team.getColor()).create());
-                                                }}
+                                                new ArrayList<ItemStack>() {{}}
                                         )
                         );
 

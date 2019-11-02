@@ -10,14 +10,14 @@ import org.bukkit.Color;
 
 public enum Team {
 
-    RED(0, "red", "§cRot", ChatColor.RED, Color.RED, false, "red.bed", "red.spawn", "red.npc"),
-    BLUE(0, "blue", "§9Blau", ChatColor.BLUE, Color.BLUE, false, "blue.bed", "blue.spawn", "blue.npc"),
-    YELLOW(0, "yellow", "§eGelb", ChatColor.YELLOW, Color.YELLOW, false, "yellow.bed", "yellow.spawn", "yellow.npc"),
-    GREEN(0, "green", "§aGrün", ChatColor.GREEN, Color.GREEN, false, "green.bed", "green.spawn", "green.npc"),
-    ORANGE(0, "orange", "§6Orange", ChatColor.GOLD, Color.ORANGE, false, "gold.bed", "gold.spawn", "gold.npc"),
-    AQUA(0, "aqua", "§5Türkisch", ChatColor.AQUA, Color.AQUA, false, "aqua.bed", "aqua.spawn", "aqua.npc"),
-    WHITE(0, "white", "§fWeiß", ChatColor.WHITE, Color.WHITE, false, "white.bed", "white.spawn", "white.npc"),
-    PURPLE(0, "purple", "§5Lila", ChatColor.LIGHT_PURPLE, Color.PURPLE, false, "purple.bed", "purple.spawn", "purple.npc"),
+    RED(0, "red", "§cRot", ChatColor.RED, Color.RED, false, "game:red:bed", "game:red:spawn", "game:red:npc"),
+    BLUE(0, "blue", "§9Blau", ChatColor.BLUE, Color.BLUE, false, "game:blue:bed", "game:blue:spawn", "game:blue:npc"),
+    YELLOW(0, "yellow", "§eGelb", ChatColor.YELLOW, Color.YELLOW, false, "game:yellow:bed", "game:yellow:spawn", "game:yellow:npc"),
+    GREEN(0, "green", "§aGrün", ChatColor.GREEN, Color.GREEN, false, "game:green:bed", "game:green:spawn", "game:green:npc"),
+    ORANGE(0, "orange", "§6Orange", ChatColor.GOLD, Color.ORANGE, false, "game:gold:bed", "game:gold:spawn", "game:gold:npc"),
+    AQUA(0, "aqua", "§5Türkisch", ChatColor.AQUA, Color.AQUA, false, "game:aqua:bed", "game:aqua:spawn", "game:aqua:npc"),
+    WHITE(0, "white", "§fWeiß", ChatColor.WHITE, Color.WHITE, false, "game:white:bed", "game:white:spawn", "game:white:npc"),
+    PURPLE(0, "purple", "§5Lila", ChatColor.LIGHT_PURPLE, Color.PURPLE, false, "game:purple:bed", "game:purple:spawn", "game:purple:npc"),
     ERROR(0, "error", "§8» §4ERROR §8«", ChatColor.RED, Color.RED, false, "error", "error", "error");
 
     private int value;

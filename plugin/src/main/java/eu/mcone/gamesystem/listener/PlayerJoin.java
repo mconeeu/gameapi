@@ -12,7 +12,7 @@ import eu.mcone.gamesystem.api.GameSystemAPI;
 import eu.mcone.gamesystem.api.GameTemplate;
 import eu.mcone.gamesystem.api.game.Playing;
 import eu.mcone.gamesystem.api.game.countdown.handler.GameCountdownID;
-import eu.mcone.gamesystem.api.game.countdown.handler.IGameCountdown;
+import eu.mcone.gamesystem.api.game.countdown.handler.GameCountdown;
 import eu.mcone.gamesystem.api.game.event.GamePlayerLoadedEvent;
 import eu.mcone.gamesystem.api.game.gamestate.GameStateID;
 import eu.mcone.gamesystem.game.player.GamePlayer;
@@ -63,7 +63,7 @@ public class PlayerJoin implements Listener {
             if (GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_GAME_STATE_HANDLER)
                     || GameTemplate.getInstance().getOptions().contains(GameTemplate.GameSystemOptions.USE_ALL)) {
                 if (GameTemplate.getInstance().getGameStateHandler().hasGameState(GameStateID.LOBBY)) {
-                    IGameCountdown gameCountdown = GameTemplate.getInstance().getGameStateHandler().getGameCountdown(GameCountdownID.LOBBY_COUNTDOWN);
+                    GameCountdown gameCountdown = GameTemplate.getInstance().getGameStateHandler().getGameCountdown(GameCountdownID.LOBBY_COUNTDOWN);
 
                     if (Playing.Min_Players.getValue() - GameTemplate.getInstance().getPlaying().size() <= 0) {
                         gameCountdown.stopIdling();
