@@ -1,12 +1,14 @@
-name: MCONE-GameSystem
+name: MCONE-GameAPI
 version: ${project.version}
-authors: [Domink Lippl, Rufus Maiwald]
-main: eu.mcone.gamesystem.GameSystem
+authors: [Rufus Maiwald, Domink Lippl]
+main: eu.mcone.gameapi.GameAPIPlugin
 depend: [MCONE-BukkitCoreSystem]
 
 permissions:
-  gamesystem:
+  system.game:
     description: Gamesystem root permission
     children:
-      gamesystem.admin:
-        description: Gamesystem admin permission
+      system.game.map:
+        description: MapManager manage permission
+      system.game.item:
+        description: Manage BackpackItems of online users
