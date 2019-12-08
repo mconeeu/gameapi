@@ -76,7 +76,7 @@
         <repository>
             <id>mcone-systems</id>
             <name>MC ONE Repo</name>
-            <url>https://repo.mcone.eu/repository/mcone-systems/</url>
+            <url>https://repo.onegaming.group/repository/mcone-systems/</url>
         </repository>
     </distributionManagement>
 
