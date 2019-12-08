@@ -80,6 +80,14 @@
         </repository>
     </distributionManagement>
 
+    <repositories>
+        <repository>
+            <id>mcone-systems</id>
+            <name>MC ONE Repo</name>
+            <url>https://repo.onegaming.group/repository/mcone-systems/</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
