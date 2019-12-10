@@ -125,9 +125,10 @@ public class GameBackpackManager implements BackpackManager {
     }
 
     private void registerDefaultCategories(DefaultCategory... categories) {
+        int sort = 10;
         for (DefaultCategory defaultCategory : categories) {
             Category category = new Category(
-                    defaultCategory.name(), defaultCategory.getDescription(), true, true, Gamemode.UNDEFINED, defaultCategory.getItem()
+                    defaultCategory.name(), defaultCategory.getDescription(), true, true, sort++, Gamemode.UNDEFINED, defaultCategory.getItem()
             );
             Set<BackpackItem> items = new HashSet<>();
 
@@ -278,11 +279,12 @@ public class GameBackpackManager implements BackpackManager {
     }
 
     @Override
-    public Map<Category, Set<BackpackItem>> getBackpackItems(String... categories) {
+    public Map<Category, Set<BackpackItem>> getBackpackItems(String... names) {
+        List<String> categories = Arrays.asList(names);
         Map<Category, Set<BackpackItem>> result = new HashMap<>();
 
         for (BackpackItemCategory item : backpackItems) {
-            if (categories.length == 0 || Arrays.asList(categories).contains(item.getCategory().getName())) {
+            if (categories.size() == 0 || categories.contains(item.getCategory().getName())) {
                 result.put(item.getCategory(), item.getItems());
             }
         }

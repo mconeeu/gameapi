@@ -14,6 +14,7 @@ public class Category {
 
     private String name, description;
     private boolean sellable, showInBackpack;
+    private int sort;
     private Gamemode gamemode;
     private ItemStack itemStack;
 

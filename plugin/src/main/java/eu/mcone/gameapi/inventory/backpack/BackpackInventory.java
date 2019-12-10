@@ -14,6 +14,10 @@ import lombok.Setter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
+
 public class BackpackInventory extends CategoryInventory {
 
     @Setter
@@ -25,7 +29,12 @@ public class BackpackInventory extends CategoryInventory {
         super("§8» §3§lRucksack", p, category.getItemStack());
         this.gamePlayer = plugin.getGamePlayer(p.getUniqueId());
 
+        Map<Integer, Category> sortedCategories = new HashMap<>();
         for (Category cat : ((GameBackpackManager) plugin.getBackpackManager()).getCategories()) {
+            sortedCategories.put(cat.getSort(), cat);
+        }
+
+        for (Category cat : new TreeMap<>(sortedCategories).values()) {
             if (cat.isShowInBackpack()) {
                 addCategory(cat.getItemStack());
             }
