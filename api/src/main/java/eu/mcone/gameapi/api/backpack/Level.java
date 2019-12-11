@@ -12,8 +12,8 @@ public enum Level {
 
     USUAL("§7§lGewöhnlich", ChatColor.GRAY, 8),
     UNUSUAL("§3§lUngewöhnlich", ChatColor.DARK_AQUA, 3),
-    EPIC("§5§lEpisch", ChatColor.LIGHT_PURPLE, 10),
-    LEGENDARY("§6§lLegendär", ChatColor.GOLD, 11),
+    EPIC("§5§lEpisch", ChatColor.LIGHT_PURPLE, 2),
+    LEGENDARY("§6§lLegendär", ChatColor.GOLD, 1),
     MYSTICAL("§c§lMystisch", ChatColor.RED,14);
 
     @Getter
