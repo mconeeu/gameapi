@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,7 +33,12 @@ public class BackpackSellInventory extends CategoryInventory {
         this.gamePlayer = plugin.getGamePlayer(p.getUniqueId());
         this.ownItems = gamePlayer.getBackpackItems();
 
+        Map<Integer, Category> sortedCategories = new HashMap<>();
         for (Category cat : ((GameBackpackManager) plugin.getBackpackManager()).getCategories()) {
+            sortedCategories.put(cat.getSort(), cat);
+        }
+
+        for (Category cat : sortedCategories.values()) {
             if (cat.isSellable()) {
                 addCategory(cat.getItemStack());
             }

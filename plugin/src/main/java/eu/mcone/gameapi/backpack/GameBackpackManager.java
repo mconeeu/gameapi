@@ -79,6 +79,7 @@ public class GameBackpackManager implements BackpackManager {
         }
 
         BackpackInventory.setPlugin(gamePlugin);
+        BackpackSellInventory.setPlugin(gamePlugin);
         BackpackInventoryListener.setPlugin(gamePlugin);
         DefaultItem.setManager(this);
 
@@ -166,7 +167,7 @@ public class GameBackpackManager implements BackpackManager {
         } else {
             List<DefaultCategory> categories = new ArrayList<>();
 
-            if (optionList.contains(Option.BACKPACK_MANAGER_REGISTER_ANIMAL_CATEGORY)) {
+            if (optionList.contains(Option.BACKPACK_MANAGER_REGISTER_PET_CATEGORY)) {
                 system.sendConsoleMessage("§2Loading DefaultCategory ANIMAL");
                 categories.add(DefaultCategory.PET);
             }

@@ -30,15 +30,15 @@ public class ItemCMD extends CoreCommand {
                 Player t = Bukkit.getServer().getPlayer(args[1]);
 
                 if (t == null) {
-                    GameAPIPlugin.getInstance().getMessager().send(p, "§4Der Spieler "+args[1]+" ist Offline!");
+                    GameAPIPlugin.getInstance().getMessager().send(p, "§4Der Spieler " + args[1] + " ist offline!");
                     return false;
                 } else {
                     GameAPIPlayer<?> gp = GamePlugin.getPlugin().getGamePlayer(t);
                     Set<BackpackItem> items = manager.getCategoryItems(args[2]);
 
                     if (items != null) {
-                        for (BackpackItem item : items) {
-                            try {
+                        try {
+                            for (BackpackItem item : items) {
                                 if (item.getId() == Integer.parseInt(args[3])) {
                                     if (!gp.hasBackpackItem(args[2], Integer.parseInt(args[3]))) {
                                         gp.addBackpackItem(args[2], item);
@@ -56,16 +56,16 @@ public class ItemCMD extends CoreCommand {
                                         return false;
                                     }
                                 }
-                            } catch (NumberFormatException e) {
-                                GameAPIPlugin.getInstance().getMessager().send(p, "§c"+args[3]+"§4 ist keine Item ID!");
-                                return false;
                             }
+                        } catch (NumberFormatException e) {
+                            GameAPIPlugin.getInstance().getMessager().send(p, "§c" + args[3] + "§4 ist keine Item ID!");
+                            return false;
                         }
 
-                        GameAPIPlugin.getInstance().getMessager().send(p, "§4Das Item mit dem Name §c" + args[2] + "§4 existiert nicht!");
+                        GameAPIPlugin.getInstance().getMessager().send(p, "§4Das Item mit der ID §c" + args[2] + "§4 existiert nicht!");
                         return false;
                     } else {
-                        GameAPIPlugin.getInstance().getMessager().send(p, "§4Die Kategorie "+args[2]+" existiert nicht!");
+                        GameAPIPlugin.getInstance().getMessager().send(p, "§4Die Kategorie " + args[2] + " existiert nicht!");
                         return false;
                     }
                 }
@@ -73,15 +73,15 @@ public class ItemCMD extends CoreCommand {
                 Player t = Bukkit.getServer().getPlayer(args[1]);
 
                 if (t == null) {
-                    GameAPIPlugin.getInstance().getMessager().send(p, "§4Der Spieler "+args[1]+" ist Offline!");
+                    GameAPIPlugin.getInstance().getMessager().send(p, "§4Der Spieler " + args[1] + " ist Offline!");
                     return false;
                 } else {
                     GameAPIPlayer<?> gp = GamePlugin.getPlugin().getGamePlayer(t);
                     Set<BackpackItem> items = manager.getCategoryItems(args[2]);
 
                     if (items != null) {
-                        for (BackpackItem item : items) {
-                            try {
+                        try {
+                            for (BackpackItem item : items) {
                                 if (item.getId() == Integer.parseInt(args[3])) {
                                     if (gp.hasBackpackItem(args[2], Integer.parseInt(args[3]))) {
                                         gp.removeBackpackItem(args[2], item);
@@ -98,16 +98,16 @@ public class ItemCMD extends CoreCommand {
                                         return false;
                                     }
                                 }
-                            } catch (NumberFormatException e) {
-                                GameAPIPlugin.getInstance().getMessager().send(p, "§c"+args[3]+"§4 ist keine Item ID!");
-                                return false;
                             }
+                        } catch (NumberFormatException e) {
+                            GameAPIPlugin.getInstance().getMessager().send(p, "§c" + args[3] + "§4 ist keine Item ID!");
+                            return false;
                         }
 
-                        GameAPIPlugin.getInstance().getMessager().send(p, "§4Das Item mit dem Name §c" + args[2] + "§4 existiert nicht!");
+                        GameAPIPlugin.getInstance().getMessager().send(p, "§4Das Item mit der ID §c" + args[2] + "§4 existiert nicht!");
                         return false;
                     } else {
-                        GameAPIPlugin.getInstance().getMessager().send(p, "§4Die Kategorie "+args[2]+" existiert nicht!");
+                        GameAPIPlugin.getInstance().getMessager().send(p, "§4Die Kategorie " + args[2] + " existiert nicht!");
                         return false;
                     }
                 }
