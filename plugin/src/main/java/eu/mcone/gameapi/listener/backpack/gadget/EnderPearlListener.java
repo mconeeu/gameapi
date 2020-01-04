@@ -19,7 +19,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 public class EnderPearlListener extends GadgetListener {
 
-    public EnderPearlListener(GamePlugin<?> plugin) {
+    public EnderPearlListener(GamePlugin plugin) {
         super(plugin);
     }
 

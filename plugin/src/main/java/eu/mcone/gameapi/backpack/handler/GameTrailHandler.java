@@ -22,12 +22,12 @@ import java.util.HashMap;
 
 public class GameTrailHandler implements TrailHandler {
 
-    private final GamePlugin<?> plugin;
+    private final GamePlugin plugin;
 
     private BukkitTask task;
     private HashMap<Player, DefaultItem> trails = new HashMap<>();
 
-    public GameTrailHandler(GamePlugin<?> plugin) {
+    public GameTrailHandler(GamePlugin plugin) {
         plugin.registerEvents(new TrailListener(this));
 
         this.plugin = plugin;

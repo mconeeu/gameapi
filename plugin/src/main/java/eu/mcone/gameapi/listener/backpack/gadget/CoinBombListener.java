@@ -10,7 +10,7 @@ import eu.mcone.coresystem.api.core.util.Random;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
-import eu.mcone.gameapi.api.player.GameAPIPlayer;
+import eu.mcone.gameapi.player.GameAPIPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Sound;
@@ -24,7 +24,7 @@ import org.bukkit.util.Vector;
 
 public class CoinBombListener extends GadgetListener {
 
-    public CoinBombListener(GamePlugin<?> plugin) {
+    public CoinBombListener(GamePlugin plugin) {
         super(plugin);
     }
 
@@ -32,7 +32,7 @@ public class CoinBombListener extends GadgetListener {
     public void on(PlayerInteractEvent e) {
         if (e.hasItem() && e.getItem().equals(DefaultItem.COINBOMB.getItemStack()) && (e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_AIR))) {
             Player p = e.getPlayer();
-            GameAPIPlayer<?> gp = plugin.getGamePlayer(p);
+            GameAPIPlayer gp = GameAPIPlugin.getSystem().getGamePlayer(p);
 
             if (Bukkit.getOnlinePlayers().size() != 1) {
                 p.sendMessage("§aDu hast die Coin Bombe erfolgreich gezündet!");

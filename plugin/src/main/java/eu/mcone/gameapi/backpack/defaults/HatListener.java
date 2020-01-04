@@ -7,7 +7,7 @@ import eu.mcone.gameapi.api.backpack.BackpackInventoryListener;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
 import eu.mcone.gameapi.api.backpack.Category;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
-import eu.mcone.gameapi.api.player.GameAPIPlayer;
+import eu.mcone.gameapi.api.player.GamePlayer;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -16,7 +16,7 @@ import java.util.Set;
 public class HatListener extends BackpackInventoryListener {
 
     @Override
-    public void onBackpackInventoryClick(BackpackItem item, GameAPIPlayer<?> gamePlayer, Player p) {
+    public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player p) {
         if (item.getId() == DefaultItem.HEAD_SECRET_STRIPCLUB.getId()) {
             p.getInventory().setHelmet(item.getItem());
             p.closeInventory();
@@ -31,7 +31,7 @@ public class HatListener extends BackpackInventoryListener {
     }
 
     @Override
-    public void setBackpackItems(CategoryInventory inv, Category category, Set<BackpackItem> categoryItems, GameAPIPlayer<?> gamePlayer, Player p) {
+    public void setBackpackItems(CategoryInventory inv, Category category, Set<BackpackItem> categoryItems, GamePlayer gamePlayer, Player p) {
         super.setBackpackItems(inv, category, categoryItems, gamePlayer, p);
 
         inv.setItem(InventorySlot.ROW_6_SLOT_8, new ItemBuilder(Material.BARRIER).displayName("§c§lKopf absetzen").lore("§7§oFalls du einen deiner Köpfe", "§7§oaufgesetzt hast, kannst Du ihn", "§7§ohiermit absetzen.").create(), e -> {

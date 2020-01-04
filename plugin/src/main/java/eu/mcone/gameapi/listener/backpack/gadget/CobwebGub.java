@@ -17,7 +17,7 @@ import java.util.Random;
 
 public class CobwebGub extends GadgetListener {
 
-    public CobwebGub(GamePlugin<?> plugin) {
+    public CobwebGub(GamePlugin plugin) {
         super(plugin);
     }
 

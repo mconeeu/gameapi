@@ -20,7 +20,7 @@ import org.bukkit.util.Vector;
 
 public class BombListener extends GadgetListener {
 
-    public BombListener(GamePlugin<?> plugin) {
+    public BombListener(GamePlugin plugin) {
         super(plugin);
     }
 

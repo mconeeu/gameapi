@@ -9,13 +9,13 @@ import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
 import eu.mcone.gameapi.api.backpack.Category;
-import eu.mcone.gameapi.api.player.GameAPIPlayer;
+import eu.mcone.gameapi.player.GameAPIPlayer;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 public class VendorSellInventory extends CoreInventory {
 
-    VendorSellInventory(Player p, GameAPIPlayer<?> gp, Category category, BackpackItem item) {
+    VendorSellInventory(Player p, GameAPIPlayer gp, Category category, BackpackItem item) {
         super("§8» §e§lKäufer §8| §fItem", p, InventorySlot.ROW_3, InventoryOption.FILL_EMPTY_SLOTS);
 
         CorePlayer corePlayer = CoreSystem.getInstance().getCorePlayer(player.getUniqueId());

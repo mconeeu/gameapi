@@ -5,9 +5,9 @@ import org.bukkit.event.Listener;
 
 public abstract class GadgetListener implements Listener {
 
-    protected GamePlugin<?> plugin;
+    protected GamePlugin plugin;
 
-    public GadgetListener(GamePlugin<?> plugin) {
+    public GadgetListener(GamePlugin plugin) {
         this.plugin = plugin;
     }
 

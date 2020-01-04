@@ -2,7 +2,7 @@ package eu.mcone.gameapi.backpack.defaults;
 
 import eu.mcone.gameapi.api.backpack.BackpackInventoryListener;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
-import eu.mcone.gameapi.api.player.GameAPIPlayer;
+import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.listener.backpack.gadget.*;
 import org.bukkit.entity.Player;
 
@@ -23,7 +23,7 @@ public class GadgetListener extends BackpackInventoryListener {
     }
 
     @Override
-    public void onBackpackInventoryClick(BackpackItem item, GameAPIPlayer<?> gamePlayer, Player p) {
+    public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player p) {
         p.getInventory().setItem(3, item.getItem());
     }
 

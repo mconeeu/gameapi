@@ -1,7 +1,7 @@
 package eu.mcone.gameapi.api.achievement;
 
 import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
-import eu.mcone.gameapi.api.player.GameAPIPlayer;
+import eu.mcone.gameapi.api.player.GamePlayer;
 import org.bukkit.entity.Player;
 
 public interface AchievementManager {
@@ -14,7 +14,7 @@ public interface AchievementManager {
 
     Achievement getAchievement(Gamemode gamemode, String name);
 
-    boolean setAchievement(GameAPIPlayer<?> player, Achievement achievement);
+    boolean setAchievement(GamePlayer player, Achievement achievement);
 
     void openAchievementInventory(Player p);
 

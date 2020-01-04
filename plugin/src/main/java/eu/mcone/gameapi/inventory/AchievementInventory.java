@@ -10,9 +10,10 @@ import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.coresystem.api.bukkit.inventory.InventoryOption;
 import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
 import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
+import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.achievement.GameAchievementManager;
 import eu.mcone.gameapi.api.achievement.Achievement;
-import eu.mcone.gameapi.api.player.GameAPIPlayer;
+import eu.mcone.gameapi.player.GameAPIPlayer;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -26,7 +27,7 @@ public class AchievementInventory extends CoreInventory {
 
     public AchievementInventory(Player player, GameAchievementManager achievementManager, Gamemode gamemode) {
         super("§8» §c§lAchievement §8┋ §f§o" + player.getName(), player, InventorySlot.ROW_4, InventoryOption.FILL_EMPTY_SLOTS);
-        GameAPIPlayer<?> gamePlayer = achievementManager.getPlugin().getGamePlayer(player.getUniqueId());
+        GameAPIPlayer gamePlayer = GameAPIPlugin.getSystem().getGamePlayer(player.getUniqueId());
 
         int i = 0;
         for (Map.Entry<Achievement, Long> achievement : gamePlayer.getAchievements(gamemode).entrySet()) {

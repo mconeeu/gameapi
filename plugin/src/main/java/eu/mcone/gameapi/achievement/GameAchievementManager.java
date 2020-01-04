@@ -10,7 +10,7 @@ import eu.mcone.gameapi.api.Option;
 import eu.mcone.gameapi.api.achievement.Achievement;
 import eu.mcone.gameapi.api.achievement.AchievementManager;
 import eu.mcone.gameapi.api.event.achievement.AchievementGetEvent;
-import eu.mcone.gameapi.api.player.GameAPIPlayer;
+import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.inventory.AchievementInventory;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -31,10 +31,10 @@ public class GameAchievementManager implements AchievementManager {
     private final boolean loadAllAchievements;
 
     @Getter
-    private final GamePlugin<?> plugin;
+    private final GamePlugin plugin;
     private final Map<Gamemode, List<Achievement>> achievements;
 
-    public GameAchievementManager(GamePlugin<?> plugin, Option... options) {
+    public GameAchievementManager(GamePlugin plugin, Option... options) {
         this.loadAllAchievements = Arrays.asList(options).contains(Option.ACHIEVEMENT_MANAGER_LOAD_ALL_ACHIEVEMENTS);
         this.plugin = plugin;
         this.achievements = new HashMap<>();
@@ -88,7 +88,7 @@ public class GameAchievementManager implements AchievementManager {
     }
 
     @Override
-    public boolean setAchievement(GameAPIPlayer<?> player, Achievement achievement) {
+    public boolean setAchievement(GamePlayer player, Achievement achievement) {
         AchievementGetEvent event = new AchievementGetEvent(player, achievement);
         Bukkit.getPluginManager().callEvent(event);
 

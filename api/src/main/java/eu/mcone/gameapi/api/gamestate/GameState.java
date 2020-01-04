@@ -1,40 +1,41 @@
 package eu.mcone.gameapi.api.gamestate;
 
 import eu.mcone.coresystem.api.bukkit.CorePlugin;
-import eu.mcone.gameapi.api.event.gamestate.GameStateCountdownEvent;
-import eu.mcone.gameapi.api.event.gamestate.GameStateEndEvent;
-import eu.mcone.gameapi.api.event.gamestate.GameStateStartEvent;
-import eu.mcone.gameapi.api.event.gamestate.GameStateTimeoutEvent;
+import eu.mcone.gameapi.api.event.gamestate.*;
 import lombok.Getter;
 
 @Getter
 public class GameState {
 
     private final String name;
-    private final long timeout;
     private final int countdown;
-
-    public GameState(String name, long nextStateSeconds, int countdownSeconds) {
-        this.name = name;
-        this.timeout = nextStateSeconds;
-        this.countdown = countdownSeconds;
-    }
-
-    public GameState(String name, long nextStateSeconds) {
-        this(name, nextStateSeconds, 0);
-    }
+    private final long timeout;
 
     public GameState(String name) {
         this(name, 0);
     }
 
-    public void onCountdownStart(GameStateCountdownEvent event) {}
+    public GameState(String name, int countdown) {
+        this(name, countdown, 0);
+    }
+
+    public GameState(String name, int countdown, long timeout) {
+        this.name = name;
+        this.countdown = countdown;
+        this.timeout = timeout;
+    }
 
     public void onStart(GameStateStartEvent event) {}
 
-    public void onTimeoutEnd(GameStateTimeoutEvent event) {}
+    public void onTimeoutStart(GameStateTimeoutStartEvent event) {}
 
-    public void onEnd(GameStateEndEvent event) {}
+    public void onTimeoutEnd(GameStateTimeoutEndEvent event) {}
+
+    public void onCountdownStart(GameStateCountdownStartEvent event) {}
+
+    public void onCountdownEnd(GameStateCountdownEndEvent event) {}
+
+    public void onStop(GameStateStopEvent event) {}
 
     public void onCountdownSecond(CorePlugin plugin, int second) {}
 

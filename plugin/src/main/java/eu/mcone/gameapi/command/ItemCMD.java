@@ -2,9 +2,8 @@ package eu.mcone.gameapi.command;
 
 import eu.mcone.coresystem.api.bukkit.command.CoreCommand;
 import eu.mcone.gameapi.GameAPIPlugin;
-import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
-import eu.mcone.gameapi.api.player.GameAPIPlayer;
+import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.backpack.GameBackpackManager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -33,7 +32,7 @@ public class ItemCMD extends CoreCommand {
                     GameAPIPlugin.getInstance().getMessager().send(p, "§4Der Spieler " + args[1] + " ist offline!");
                     return false;
                 } else {
-                    GameAPIPlayer<?> gp = GamePlugin.getPlugin().getGamePlayer(t);
+                    GamePlayer gp = GameAPIPlugin.getSystem().getGamePlayer(t);
                     Set<BackpackItem> items = manager.getCategoryItems(args[2]);
 
                     if (items != null) {
@@ -76,7 +75,7 @@ public class ItemCMD extends CoreCommand {
                     GameAPIPlugin.getInstance().getMessager().send(p, "§4Der Spieler " + args[1] + " ist Offline!");
                     return false;
                 } else {
-                    GameAPIPlayer<?> gp = GamePlugin.getPlugin().getGamePlayer(t);
+                    GamePlayer gp = GameAPIPlugin.getSystem().getGamePlayer(t);
                     Set<BackpackItem> items = manager.getCategoryItems(args[2]);
 
                     if (items != null) {

@@ -8,21 +8,22 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 
 @Getter
-public final class GameStateStartEvent extends GameStateEvent implements Cancellable {
+public final class GameStateTimeoutStartEvent extends GameStateEvent implements Cancellable {
 
-    public GameStateStartEvent(GameStateManager gameStateManager, GameState previous, GameState current) {
+    public GameStateTimeoutStartEvent(GameStateManager gameStateManager, GameState gameState) {
         super(gameStateManager);
-        this.previous = previous;
-        this.current = current;
+        this.timeout = gameState.getTimeout();
+        this.gameState = gameState;
     }
 
     @Getter
     private static final HandlerList handlerList = new HandlerList();
-    private final GameState previous, current;
+    private final GameState gameState;
+
     @Setter
     private boolean cancelled;
     @Setter
-    private boolean skipGameState;
+    private long timeout;
 
     public HandlerList getHandlers() {
         return handlerList;

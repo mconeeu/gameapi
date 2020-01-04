@@ -6,11 +6,20 @@
 package eu.mcone.gameapi.api;
 
 import eu.mcone.coresystem.api.bukkit.CorePlugin;
+import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.gameapi.api.achievement.AchievementManager;
 import eu.mcone.gameapi.api.backpack.BackpackManager;
+import eu.mcone.gameapi.api.damage.DamageLogger;
+import eu.mcone.gameapi.api.gamestate.GameStateManager;
+import eu.mcone.gameapi.api.kit.KitManager;
 import eu.mcone.gameapi.api.map.MapManager;
+import eu.mcone.gameapi.api.player.GamePlayer;
 import lombok.Getter;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+
+import java.util.Collection;
+import java.util.UUID;
 
 public abstract class GameAPI extends CorePlugin {
 
@@ -29,9 +38,26 @@ public abstract class GameAPI extends CorePlugin {
         }
     }
 
+    public abstract GameStateManager constructGameStateManager(GamePlugin gamePlugin);
+
     public abstract MapManager constructMapManager();
 
-    public abstract BackpackManager constructBackpackManager(GamePlugin<?> gamePlugin, Option... options);
+    public abstract BackpackManager constructBackpackManager(GamePlugin gamePlugin, Option... options);
 
-    public abstract AchievementManager constructAchievementManager(GamePlugin<?> gamePlugin, Option... options);
+    public abstract KitManager constructKitManager(GamePlugin plugin, Option... option);
+
+    public abstract AchievementManager constructAchievementManager(GamePlugin gamePlugin, Option... options);
+
+    public abstract DamageLogger constructDamageLogger();
+
+    public abstract GamePlayer getGamePlayer(CorePlayer cp);
+
+    public abstract GamePlayer getGamePlayer(Player p);
+
+    public abstract GamePlayer getGamePlayer(UUID uuid);
+
+    public abstract GamePlayer getGamePlayer(String name);
+
+    public abstract Collection<GamePlayer> getOnlineGamePlayers();
+
 }

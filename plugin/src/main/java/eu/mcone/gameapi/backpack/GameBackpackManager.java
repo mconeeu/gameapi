@@ -21,7 +21,7 @@ import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.api.backpack.handler.OutfitHandler;
 import eu.mcone.gameapi.api.backpack.handler.PetHandler;
 import eu.mcone.gameapi.api.backpack.handler.TrailHandler;
-import eu.mcone.gameapi.api.player.GameAPIPlayer;
+import eu.mcone.gameapi.player.GameAPIPlayer;
 import eu.mcone.gameapi.backpack.defaults.*;
 import eu.mcone.gameapi.command.ItemCMD;
 import eu.mcone.gameapi.inventory.backpack.BackpackInventory;
@@ -57,7 +57,7 @@ public class GameBackpackManager implements BackpackManager {
     @Getter @Setter
     private boolean useRankBoots = false;
 
-    public GameBackpackManager(GameAPIPlugin system, GamePlugin<?> gamePlugin, Option... gameOptions) {
+    public GameBackpackManager(GameAPIPlugin system, GamePlugin gamePlugin, Option... gameOptions) {
         system.registerCommands(new ItemCMD(this));
 
         this.gameOptions = gameOptions;
@@ -273,7 +273,7 @@ public class GameBackpackManager implements BackpackManager {
         }
     }
 
-    public void onCategoryInventoryCreate(Category category, GameAPIPlayer<?> player, CategoryInventory inventory, Player p) {
+    public void onCategoryInventoryCreate(Category category, GameAPIPlayer player, CategoryInventory inventory, Player p) {
         if (clickListeners.containsKey(category.getName())) {
             clickListeners.get(category.getName()).setBackpackItems(inventory, category, getCategoryItems(category.getName()), player, p);
         }

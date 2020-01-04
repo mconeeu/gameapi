@@ -1,10 +1,11 @@
-package eu.mcone.gameapi.api.player;
+package eu.mcone.gameapi.player;
 
 import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import eu.mcone.coresystem.api.bukkit.player.profile.GameProfile;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.achievement.Achievement;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
+import eu.mcone.gameapi.api.kit.ModifiedKit;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,16 +16,16 @@ import java.util.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class GameSystemPlayerProfile extends GameProfile {
+public class GameAPIPlayerProfile extends GameProfile {
 
     private Map<String, List<Integer>> items = new HashMap<>();
     private Map<String, Map<String, Long>> achievements = new HashMap<>();
-    //private Map<String, CustomKit> customKits = new HashMap<>();
+    private List<ModifiedKit> customKits = new ArrayList<>();
 
     private transient Map<String, Set<BackpackItem>> itemMap = new HashMap<>();
     private transient Map<Gamemode, Map<Achievement, Long>> achievementMap = new HashMap<>();
 
-    GameSystemPlayerProfile(final Player p, final Map<String, Set<BackpackItem>> playerItems, Map<Gamemode, Map<Achievement, Long>> achievements/*, final Map<String, CustomKit> customKits*/) {
+    GameAPIPlayerProfile(final Player p, final Map<String, Set<BackpackItem>> playerItems, Map<Gamemode, Map<Achievement, Long>> achievements/*, final Map<String, CustomKit> customKits*/) {
         super(p);
 
         for (Map.Entry<String, Set<BackpackItem>> entry : playerItems.entrySet()) {

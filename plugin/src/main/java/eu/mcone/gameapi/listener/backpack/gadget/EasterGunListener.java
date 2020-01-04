@@ -21,7 +21,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 public class EasterGunListener extends GadgetListener {
 
-    public EasterGunListener(GamePlugin<?> plugin) {
+    public EasterGunListener(GamePlugin plugin) {
         super(plugin);
     }
 

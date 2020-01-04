@@ -1,7 +1,7 @@
 package eu.mcone.gameapi.api.event.achievement;
 
 import eu.mcone.gameapi.api.achievement.Achievement;
-import eu.mcone.gameapi.api.player.GameAPIPlayer;
+import eu.mcone.gameapi.api.player.GamePlayer;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -15,7 +15,7 @@ public final class AchievementGetEvent extends Event implements Cancellable {
 
     @Getter
     private static final HandlerList handlerList = new HandlerList();
-    private final GameAPIPlayer<?> player;
+    private final GamePlayer player;
     private final Achievement achievement;
     @Setter
     private boolean cancelled;

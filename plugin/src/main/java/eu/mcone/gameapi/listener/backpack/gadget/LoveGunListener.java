@@ -18,7 +18,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 public class LoveGunListener extends GadgetListener{
 
-    public LoveGunListener(GamePlugin<?> plugin) {
+    public LoveGunListener(GamePlugin plugin) {
         super(plugin);
     }
 

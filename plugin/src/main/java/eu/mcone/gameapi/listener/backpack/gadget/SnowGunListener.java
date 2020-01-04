@@ -20,7 +20,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 public class SnowGunListener extends GadgetListener {
 
-    public SnowGunListener(GamePlugin<?> plugin) {
+    public SnowGunListener(GamePlugin plugin) {
         super(plugin);
     }
 

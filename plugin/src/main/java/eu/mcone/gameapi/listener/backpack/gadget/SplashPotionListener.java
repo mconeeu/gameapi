@@ -24,7 +24,7 @@ import java.util.Collection;
 
 public class SplashPotionListener extends GadgetListener {
 
-    public SplashPotionListener(GamePlugin<?> plugin) {
+    public SplashPotionListener(GamePlugin plugin) {
         super(plugin);
     }
 

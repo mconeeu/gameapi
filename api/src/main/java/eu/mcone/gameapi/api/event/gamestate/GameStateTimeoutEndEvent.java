@@ -8,24 +8,21 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 
 @Getter
-public final class GameStateEndEvent extends GameStateEvent implements Cancellable {
+public final class GameStateTimeoutEndEvent extends GameStateEvent implements Cancellable {
 
-    public GameStateEndEvent(GameStateManager gameStateManager, GameState current, GameState next) {
+    public GameStateTimeoutEndEvent(GameStateManager gameStateManager, GameState gameState) {
         super(gameStateManager);
-        this.current = current;
-        this.next = next;
+        this.gameState = gameState;
     }
 
     @Getter
     private static final HandlerList handlerList = new HandlerList();
-    private final GameState current, next;
+    private final GameState gameState;
 
     @Setter
     private boolean cancelled;
     @Setter
-    private String cancelReason;
-    @Setter
-    private int newCountdown;
+    private long newTimeout;
 
     public HandlerList getHandlers() {
         return handlerList;

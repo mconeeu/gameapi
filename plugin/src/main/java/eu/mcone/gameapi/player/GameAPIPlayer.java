@@ -3,46 +3,45 @@
  * You are not allowed to decompile the code
  */
 
-package eu.mcone.gameapi.api.player;
+package eu.mcone.gameapi.player;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
-import eu.mcone.coresystem.api.bukkit.player.profile.GameProfile;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.achievement.Achievement;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
+import eu.mcone.gameapi.api.kit.ModifiedKit;
+import eu.mcone.gameapi.api.kit.Kit;
+import eu.mcone.gameapi.api.player.GamePlayer;
+import eu.mcone.gameapi.kit.GameKitManager;
 import lombok.Getter;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
 @Getter
-public abstract class GameAPIPlayer<P extends GameProfile> extends eu.mcone.coresystem.api.bukkit.player.plugin.GamePlayer<P> {
+public abstract class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.GamePlayer<GameAPIPlayerProfile> implements GamePlayer {
 
     private static final GameAPI system = GameAPI.getInstance();
 
-    private final GamePlugin<?> plugin;
-
     @Getter
     private Map<String, Set<BackpackItem>> backpackItems;
-    //private Map<String, CustomKit> customKits;
+    private List<ModifiedKit> customKits;
     private Map<Gamemode, Map<Achievement, Long>> achievements;
 
-    public GameAPIPlayer(GamePlugin<?> plugin, CorePlayer player) {
+    public GameAPIPlayer(CorePlayer player) {
         super(player);
-        this.plugin = plugin;
     }
 
     @Override
-    public P reload() {
-        GameSystemPlayerProfile systemProfile = system.loadGameProfile(corePlayer.bukkit(), GameSystemPlayerProfile.class);
-        systemProfile.doSetData(bukkit());
-
+    public GameAPIPlayerProfile reload() {
+        GameAPIPlayerProfile systemProfile = super.reload();
         this.backpackItems = systemProfile.getItemMap();
-        //this.customKits = systemProfile.getCustomKits();
+        this.customKits = systemProfile.getCustomKits();
         this.achievements = systemProfile.getAchievementMap();
 
         return super.reload();
@@ -50,7 +49,7 @@ public abstract class GameAPIPlayer<P extends GameProfile> extends eu.mcone.core
 
     @Override
     protected void saveData() {
-        system.saveGameProfile(new GameSystemPlayerProfile(corePlayer.bukkit(), backpackItems, achievements/*, customKits*/));
+        system.saveGameProfile(new GameAPIPlayerProfile(corePlayer.bukkit(), backpackItems, achievements/*, customKits*/));
     }
 
 
@@ -58,9 +57,10 @@ public abstract class GameAPIPlayer<P extends GameProfile> extends eu.mcone.core
      * Backpack System
      */
 
+    @Override
     public void addBackpackItem(String category, BackpackItem item) throws IllegalArgumentException {
-        if (plugin.getBackpackManager().categoryExists(category)) {
-            if (plugin.getBackpackManager().itemExists(item)) {
+        if (GamePlugin.getPlugin().getBackpackManager().categoryExists(category)) {
+            if (GamePlugin.getPlugin().getBackpackManager().itemExists(item)) {
                 if (!hasBackpackItem(category, item)) {
                     if (backpackItems.containsKey(category)) {
                         backpackItems.get(category).add(item);
@@ -78,10 +78,12 @@ public abstract class GameAPIPlayer<P extends GameProfile> extends eu.mcone.core
         }
     }
 
+    @Override
     public boolean hasBackpackItem(String category, BackpackItem item) {
         return hasBackpackItem(category, item.getId());
     }
 
+    @Override
     public boolean hasBackpackItem(String category, int id) {
         for (BackpackItem item : backpackItems.getOrDefault(category, Collections.emptySet())) {
             if (item.getId() == id) {
@@ -92,6 +94,7 @@ public abstract class GameAPIPlayer<P extends GameProfile> extends eu.mcone.core
         return false;
     }
 
+    @Override
     public void removeBackpackItem(String category, BackpackItem item) {
         if (hasBackpackItem(category, item)) {
             backpackItems.getOrDefault(category, Collections.emptySet()).remove(item);
@@ -99,6 +102,7 @@ public abstract class GameAPIPlayer<P extends GameProfile> extends eu.mcone.core
         }
     }
 
+    @Override
     public void buyBackpackItem(Player p, String category, BackpackItem item) {
         if (!hasBackpackItem(category, item)) {
             CorePlayer cp = CoreSystem.getInstance().getCorePlayer(p);
@@ -108,16 +112,16 @@ public abstract class GameAPIPlayer<P extends GameProfile> extends eu.mcone.core
                 addBackpackItem(category, item);
 
                 p.closeInventory();
-                plugin.getMessager().send(p, "§2Du hast erfolgreich das Item " + item.getName() + "§2 gekauft!");
+                GamePlugin.getPlugin().getMessager().send(p, "§2Du hast erfolgreich das Item " + item.getName() + "§2 gekauft!");
                 p.playSound(p.getLocation(), Sound.LEVEL_UP, 1, 1);
             } else {
                 p.closeInventory();
-                plugin.getMessager().send(p, "§4Du hast nicht genügend Emeralds!");
+                GamePlugin.getPlugin().getMessager().send(p, "§4Du hast nicht genügend Emeralds!");
                 p.playSound(p.getLocation(), Sound.NOTE_BASS, 1, 1);
             }
         } else {
             p.closeInventory();
-            plugin.getMessager().send(p, "§4Du besitzt dieses Item bereits!");
+            GamePlugin.getPlugin().getMessager().send(p, "§4Du besitzt dieses Item bereits!");
             p.playSound(p.getLocation(), Sound.NOTE_BASS, 1, 1);
         }
     }
@@ -127,16 +131,17 @@ public abstract class GameAPIPlayer<P extends GameProfile> extends eu.mcone.core
      * Achievement System
      */
 
+    @Override
     public void addAchievement(String name) throws IllegalArgumentException {
-        Achievement achievement = plugin.getAchievementManager().getAchievement(name);
+        Achievement achievement = GamePlugin.getPlugin().getAchievementManager().getAchievement(name);
 
         if (achievement != null) {
             if (!hasAchievement(name)) {
-                if (plugin.getAchievementManager().setAchievement(this, achievement)) {
-                    if (achievements.containsKey(plugin.getGamemode())) {
-                        achievements.get(plugin.getGamemode()).put(achievement, System.currentTimeMillis() / 1000);
+                if (GamePlugin.getPlugin().getAchievementManager().setAchievement(this, achievement)) {
+                    if (achievements.containsKey(GamePlugin.getPlugin().getGamemode())) {
+                        achievements.get(GamePlugin.getPlugin().getGamemode()).put(achievement, System.currentTimeMillis() / 1000);
                     } else {
-                        achievements.put(plugin.getGamemode(), new HashMap<Achievement, Long>(){{ put(achievement, System.currentTimeMillis() / 1000); }});
+                        achievements.put(GamePlugin.getPlugin().getGamemode(), new HashMap<Achievement, Long>(){{ put(achievement, System.currentTimeMillis() / 1000); }});
                     }
 
                     saveData();
@@ -147,36 +152,42 @@ public abstract class GameAPIPlayer<P extends GameProfile> extends eu.mcone.core
         }
     }
 
+    @Override
     public Map<Achievement, Long> getAchievements() {
-        return getAchievements(plugin.getGamemode());
+        return getAchievements(GamePlugin.getPlugin().getGamemode());
     }
 
+    @Override
     public Map<Achievement, Long> getAchievements(Gamemode gamemode) {
         return achievements.get(gamemode);
     }
 
+    @Override
     public void addAchievements(String... names) {
         for (String name : names) {
             addAchievement(name);
         }
     }
 
+    @Override
     public void removeAchievement(String name) {
         if (hasAchievement(name)) {
-            Achievement achievement = plugin.getAchievementManager().getAchievement(name);
-            achievements.get(plugin.getGamemode()).remove(achievement);
+            Achievement achievement = GamePlugin.getPlugin().getAchievementManager().getAchievement(name);
+            achievements.get(GamePlugin.getPlugin().getGamemode()).remove(achievement);
             saveData();
         }
     }
 
+    @Override
     public void removeAchievements(final String... names) {
         for (String achievementName : names) {
             removeAchievement(achievementName);
         }
     }
 
+    @Override
     public boolean hasAchievement(String name) {
-        for (Achievement achievement : achievements.get(plugin.getGamemode()).keySet()) {
+        for (Achievement achievement : achievements.get(GamePlugin.getPlugin().getGamemode()).keySet()) {
             if (achievement.getName().equalsIgnoreCase(name)) {
                 return true;
             }
@@ -185,82 +196,76 @@ public abstract class GameAPIPlayer<P extends GameProfile> extends eu.mcone.core
     }
 
 
+
     /*
      * Kit System
-     *//*
+     */
 
-    public void modifyInventory(final Kit kit, final Map<String, Double> sortedItems) {
-        customKits.put(String.valueOf(kit.getKitID()), new CustomKit(System.currentTimeMillis() / 1000, sortedItems));
+    @Override
+    public void modifyKit(final Kit kit, final Map<ItemStack, Integer> items) {
+        ((GameKitManager) GamePlugin.getPlugin().getKitManager()).modifyKit(bukkit(), kit, items);
     }
 
-    public CustomKit getModifiedKit(Kit kit) {
-        return customKits.getOrDefault(String.valueOf(kit.getKitID()), null);
+    @Override
+    public boolean hasKitModified(String name) {
+        return ((GameKitManager) GamePlugin.getPlugin().getKitManager()).hasKitModified(bukkit(), name);
     }
 
-    public boolean isKitModified(Kit kit) {
-        return customKits.containsKey(String.valueOf(kit.getKitID()));
-    }
-
-    public void setKit(Kit kit) {
-        Player player = getCorePlayer().bukkit();
-        CustomKit customKit = getModifiedKit(kit);
-        setCurrentKit(kit);
-
-        if (customKit != null) {
-            for (Map.Entry<String, Double> kitEntry : customKit.getCustomItems().entrySet()) {
-                int slot = Integer.valueOf(kitEntry.getKey());
-                KitItem kitItem = kit.getKitItem(kitEntry.getValue());
-
-                //Set armor
-                for (KitItem defaultKit : kit.getKitItems()) {
-                    if (defaultKit.getKitItemType().equals(KitItemType.HELMET)) {
-                        player.getInventory().setHelmet(defaultKit.getItemStack());
-                    } else if (defaultKit.getKitItemType().equals(KitItemType.CHESTPLATE)) {
-                        player.getInventory().setChestplate(defaultKit.getItemStack());
-                    } else if (defaultKit.getKitItemType().equals(KitItemType.LEGGINGS)) {
-                        player.getInventory().setLeggings(defaultKit.getItemStack());
-                    } else if (defaultKit.getKitItemType().equals(KitItemType.BOOTS)) {
-                        player.getInventory().setBoots(defaultKit.getItemStack());
-                    }
-                }
-                //Set weapons
-                player.getInventory().setItem(slot, kitItem.getItemStack());
-            }
+    @Override
+    public boolean setKit(Kit kit) {
+        if (hasKit(kit)) {
+            ((GameKitManager) GamePlugin.getPlugin().getKitManager()).setKit(kit, bukkit());
+            return true;
         } else {
-            int slot = 0;
-            for (KitItem kitItem : kit.getKitItems()) {
-                if (kitItem.getKitItemType().equals(KitItemType.HELMET)) {
-                    player.getInventory().setHelmet(kitItem.getItemStack());
-                } else if (kitItem.getKitItemType().equals(KitItemType.CHESTPLATE)) {
-                    player.getInventory().setChestplate(kitItem.getItemStack());
-                } else if (kitItem.getKitItemType().equals(KitItemType.LEGGINGS)) {
-                    player.getInventory().setLeggings(kitItem.getItemStack());
-                } else if (kitItem.getKitItemType().equals(KitItemType.BOOTS)) {
-                    player.getInventory().setBoots(kitItem.getItemStack());
-                } else {
-                    player.getInventory().setItem(slot, kitItem.getItemStack());
-                    slot++;
+            return false;
+        }
+    }
+
+    @Override
+    public boolean hasKit(Kit kit) {
+        return ((GameKitManager) GamePlugin.getPlugin().getKitManager()).hasKit(getCorePlayer().getUuid(), kit);
+    }
+
+    @Override
+    public boolean buyKit(Kit kit) {
+        if (!hasKit(kit)) {
+            if (kit.getCoinsPrice() > 0) {
+                if ((getCorePlayer().getCoins() - kit.getCoinsPrice()) < 0) {
+                    GamePlugin.getPlugin().getMessager().send(bukkit(), "§4Du hast nicht genügend Coins!");
+                    return false;
                 }
+
+                getCorePlayer().removeCoins(kit.getCoinsPrice());
             }
+
+            ((GameKitManager) GamePlugin.getPlugin().getKitManager()).addKit(this, kit);
+            return true;
+        } else {
+            return false;
         }
     }
 
-    public void setKit(final String kitName) {
-        Kit kit = GameTemplate.getInstance().getKitManager().getKit(kitName);
-        if (kit != null) {
-            setKit(kit);
+    @Override
+    public boolean removeKit(Kit kit) {
+        if (hasKit(kit)) {
+            ((GameKitManager) GamePlugin.getPlugin().getKitManager()).removeKit(this, kit);
+            return true;
+        } else {
+            return false;
         }
     }
 
-    public void setKit(final int kitID) {
-        Kit kit = GameTemplate.getInstance().getKitManager().getKit(kitID);
-        if (kit != null) {
-            setKit(kit);
-        }
+    @Override
+    public ModifiedKit getModifiedKit(Kit kit) {
+        return getModifiedKit(kit.getName());
     }
 
+    @Override
+    public ModifiedKit getModifiedKit(String name) {
+        return ((GameKitManager) GamePlugin.getPlugin().getKitManager()).getModifiedKit(bukkit(), name);
+    }
     
-    *//*
+    /*
      * Game methods
      *//*
     

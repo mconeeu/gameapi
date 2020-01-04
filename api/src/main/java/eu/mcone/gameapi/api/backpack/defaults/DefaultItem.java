@@ -9,7 +9,7 @@ import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
 import eu.mcone.coresystem.api.bukkit.item.Skull;
 import eu.mcone.gameapi.api.backpack.BackpackManager;
 import eu.mcone.gameapi.api.backpack.Level;
-import eu.mcone.gameapi.api.player.GameAPIPlayer;
+import eu.mcone.gameapi.api.player.GamePlayer;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Material;
@@ -142,18 +142,18 @@ public enum DefaultItem {
         return null;
     }
 
-    public boolean has(GameAPIPlayer<?> gp) {
+    public boolean has(GamePlayer gp) {
         return gp.hasBackpackItem(category.name(), id);
     }
 
-    public void add(GameAPIPlayer<?> gp) {
+    public void add(GamePlayer gp) {
         gp.addBackpackItem(
                 category.name(),
                 manager.getBackpackItem(category.name(), id)
         );
     }
 
-    public void remove(GameAPIPlayer<?> gp) {
+    public void remove(GamePlayer gp) {
         gp.removeBackpackItem(
                 category.name(),
                 manager.getBackpackItem(category.name(), id)
