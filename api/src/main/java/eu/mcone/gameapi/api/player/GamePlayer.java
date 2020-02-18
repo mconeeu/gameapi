@@ -30,6 +30,10 @@ public interface GamePlayer {
 
     void buyBackpackItem(Player p, String category, BackpackItem item);
 
+    boolean isEffectsVisible();
+
+    void setEffectsVisible(boolean visible);
+
     boolean hasDefaultItem(DefaultItem item);
 
     void addDefaultItem(DefaultItem item);

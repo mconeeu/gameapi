@@ -5,8 +5,10 @@
 
 package eu.mcone.gameapi.listener.backpack.gadget;
 
+import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
+import eu.mcone.gameapi.api.player.GamePlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Material;
@@ -40,20 +42,23 @@ public class BombListener extends GadgetListener {
             Vector v = p.getLocation().getDirection().multiply(1);
             item.setVelocity(v);
 
+            //TODO: getWorld().playEffect() umwandeln in player.playEffect()
+
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                item.getWorld().createExplosion(item.getLocation().getX(), item.getLocation().getY(),
-                        item.getLocation().getZ(), 3, false, false);
+                item.getWorld().createExplosion(item.getLocation().getX(), item.getLocation().getY(), item.getLocation().getZ(), 3, false, false);
                 item.getWorld().playEffect(item.getLocation().add(0, 1, 0), Effect.EXPLOSION_LARGE, 1);
                 item.getWorld().playEffect(item.getLocation().add(1, 0, 0), Effect.EXPLOSION_LARGE, 1);
                 item.getWorld().playEffect(item.getLocation().add(0, 0, 1), Effect.EXPLOSION_LARGE, 1);
                 item.getWorld().playEffect(item.getLocation().add(0, 0, 1), Effect.EXPLOSION_LARGE, 1);
                 item.getWorld().playEffect(item.getLocation().add(0, 0, 1), Effect.LAVA_POP, 1);
                 item.getWorld().playEffect(item.getLocation().add(0, 1, 1), Effect.LAVA_POP, 1);
-                for (Player all : Bukkit.getOnlinePlayers()) {
-                    if (all.getLocation().distance(item.getLocation()) <= 6) {
-                        Vector v1 = all.getLocation().getDirection().setY(0.8).multiply(1.1);
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    GamePlayer gp = GameAPI.getInstance().getGamePlayer(player);
 
-                        all.setVelocity(v1);
+                    if (player.getLocation().distance(item.getLocation()) <= 6 && gp.getSettings().isEnableGadgets() && gp.isEffectsVisible()) {
+                        Vector v1 = player.getLocation().getDirection().setY(0.8).multiply(1.1);
+
+                        player.setVelocity(v1);
                     }
                 }
                 item.getWorld().playEffect(item.getLocation(), Effect.FIREWORKS_SPARK, 1);

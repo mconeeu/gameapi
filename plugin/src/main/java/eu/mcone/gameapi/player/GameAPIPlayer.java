@@ -20,6 +20,7 @@ import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.GamePlayerSettings;
 import eu.mcone.gameapi.kit.GameKitManager;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -37,6 +38,9 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
     private Map<Gamemode, Map<Achievement, Long>> achievements;
     @Getter
     private GamePlayerSettings settings;
+
+    @Getter @Setter
+    private boolean effectsVisible = true;
 
     public GameAPIPlayer(CorePlayer player) {
         super(player);
@@ -136,6 +140,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
             p.playSound(p.getLocation(), Sound.NOTE_BASS, 1, 1);
         }
     }
+
 
     @Override
     public boolean hasDefaultItem(DefaultItem item) {

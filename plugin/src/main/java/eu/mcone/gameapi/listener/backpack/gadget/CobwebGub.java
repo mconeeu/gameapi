@@ -1,7 +1,9 @@
 package eu.mcone.gameapi.listener.backpack.gadget;
 
+import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
+import eu.mcone.gameapi.api.player.GamePlayer;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -68,11 +70,15 @@ public class CobwebGub extends GadgetListener {
 
                 for (Location location : locations) {
                     if (item.getLocation().getWorld().getBlockAt(location).getType().equals(Material.AIR)) {
-                        item.getLocation().getWorld().getBlockAt(location)
-                                .setType(Material.WEB);
-                        cobwebLocations.add(location);
+                        for (GamePlayer gp : GameAPI.getInstance().getOnlineGamePlayers()) {
+                            if (gp.getSettings().isEnableGadgets() && gp.isEffectsVisible()) {
+                                gp.bukkit().sendBlockChange(location, Material.WEB, (byte) 0);
+                                cobwebLocations.add(location);
+                            }
+                        }
                     }
                 }
+
 
 //                    Location loc1 = item.getLocation();
 //                    Location loc2 = item.getLocation().add(0, 1, 0);
@@ -88,13 +94,7 @@ public class CobwebGub extends GadgetListener {
 
                 item.getWorld().playEffect(item.getLocation(), Effect.FIREWORKS_SPARK, 1);
                 item.getWorld().playSound(item.getLocation(), Sound.GLASS, 1, 1);
-                Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
-
-                    @Override
-                    public void run() {
-                        item.getWorld().playSound(item.getLocation(), Sound.FIREWORK_TWINKLE, 1, 1);
-                    }
-                }, 3);
+                Bukkit.getScheduler().runTaskLater(plugin, () -> item.getWorld().playSound(item.getLocation(), Sound.FIREWORK_TWINKLE, 1, 1), 3);
             }, 20);
 
             p.playSound(p.getLocation(), Sound.CHICKEN_EGG_POP, 1, 1);
@@ -109,8 +109,11 @@ public class CobwebGub extends GadgetListener {
                         locations.clear();
 
                         for (Location location : cobwebLocations) {
-                            item.getLocation().getWorld().getBlockAt(location)
-                                    .setType(Material.AIR);
+                            for (GamePlayer gp : GameAPI.getInstance().getOnlineGamePlayers()) {
+                                if (gp.getSettings().isEnableGadgets() && gp.isEffectsVisible()) {
+                                    gp.bukkit().sendBlockChange(location, Material.AIR, (byte) 0);
+                                }
+                            }
                         }
                         cobwebLocations.clear();
 
