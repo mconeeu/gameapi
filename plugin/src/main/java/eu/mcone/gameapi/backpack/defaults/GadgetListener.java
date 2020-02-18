@@ -24,6 +24,7 @@ public class GadgetListener extends BackpackInventoryListener {
 
     @Override
     public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player p) {
+
         p.getInventory().setItem(3, item.getItem());
     }
 

@@ -16,6 +16,7 @@ import eu.mcone.gameapi.backpack.GameBackpackManager;
 import eu.mcone.gameapi.damage.GameDamageLogger;
 import eu.mcone.gameapi.gamestate.GameStateManager;
 import eu.mcone.gameapi.kit.GameKitManager;
+import eu.mcone.gameapi.listener.GamePlayerListener;
 import eu.mcone.gameapi.map.GameMapManager;
 import eu.mcone.gameapi.player.GameAPIPlayer;
 import lombok.Getter;
@@ -42,6 +43,10 @@ public class GameAPIPlugin extends GameAPI {
         this.players = new ArrayList<>();
 
         CoreSystem.getInstance().getTranslationManager().loadCategories(this);
+
+        registerEvents(
+                new GamePlayerListener()
+        );
 
         sendConsoleMessage("§aVersion §f" + this.getDescription().getVersion() + "§a enabled...");
     }

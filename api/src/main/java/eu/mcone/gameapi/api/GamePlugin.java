@@ -12,7 +12,7 @@ import org.bukkit.ChatColor;
 public abstract class GamePlugin extends CorePlugin {
 
     @Getter
-    private static GamePlugin plugin;
+    private static GamePlugin gamePlugin;
 
     private final Option[] options;
     private MapManager mapManager;
@@ -22,14 +22,14 @@ public abstract class GamePlugin extends CorePlugin {
 
     protected GamePlugin(String pluginName, ChatColor pluginColor, String prefixTranslation, Option... options) {
         super(pluginName, pluginColor, prefixTranslation);
-        plugin = this;
+        gamePlugin = this;
 
         this.options = options;
     }
 
     protected GamePlugin(Gamemode pluginGamemode, String prefixTranslation, Option... options) {
         super(pluginGamemode, prefixTranslation);
-        plugin = this;
+        gamePlugin = this;
 
         this.options = options;
     }

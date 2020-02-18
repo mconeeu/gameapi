@@ -6,6 +6,7 @@ import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.achievement.Achievement;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
 import eu.mcone.gameapi.api.kit.ModifiedKit;
+import eu.mcone.gameapi.api.player.GamePlayerSettings;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,6 +22,7 @@ public class GameAPIPlayerProfile extends GameProfile {
     private Map<String, List<Integer>> items = new HashMap<>();
     private Map<String, Map<String, Long>> achievements = new HashMap<>();
     private List<ModifiedKit> customKits = new ArrayList<>();
+    private GamePlayerSettings settings = new GamePlayerSettings();
 
     private transient Map<String, Set<BackpackItem>> itemMap = new HashMap<>();
     private transient Map<Gamemode, Map<Achievement, Long>> achievementMap = new HashMap<>();
@@ -57,7 +59,7 @@ public class GameAPIPlayerProfile extends GameProfile {
             Set<BackpackItem> items = new HashSet<>();
 
             for (int itemId : itemEntry.getValue()) {
-                BackpackItem item = GamePlugin.getPlugin().getBackpackManager().getBackpackItem(itemEntry.getKey(), itemId);
+                BackpackItem item = GamePlugin.getGamePlugin().getBackpackManager().getBackpackItem(itemEntry.getKey(), itemId);
 
                 if (item != null) {
                     items.add(item);
@@ -71,7 +73,7 @@ public class GameAPIPlayerProfile extends GameProfile {
             Map<Achievement, Long> achievements = new HashMap<>();
 
             for (Map.Entry<String, Long> solvedAchievement : achievementEntry.getValue().entrySet()) {
-                Achievement achievement = GamePlugin.getPlugin().getAchievementManager().getAchievement(solvedAchievement.getKey());
+                Achievement achievement = GamePlugin.getGamePlugin().getAchievementManager().getAchievement(solvedAchievement.getKey());
 
                 if (achievement != null) {
                     achievements.put(achievement, solvedAchievement.getValue());

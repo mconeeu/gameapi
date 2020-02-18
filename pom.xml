@@ -7,7 +7,7 @@
     <groupId>eu.mcone.gameapi</groupId>
     <artifactId>mcone-gameapi</artifactId>
     <packaging>pom</packaging>
-    <version>3.0.3-SNAPSHOT</version>
+    <version>3.0.4-SNAPSHOT</version>
 
     <modules>
         <module>plugin</module>
@@ -43,6 +43,18 @@
             <roles>
                 <role>adminstrator</role>
                 <role>developer</role>
+            </roles>
+            <timezone>Europe/Berlin</timezone>
+        </developer>
+        <developer>
+            <id>marvinhuelsmann</id>
+            <name>Marvin Huelsmann</name>
+            <url>https://marvhuelsmann.de</url>
+            <organization>MC ONE</organization>
+            <organizationUrl>https://www.mcone.eu</organizationUrl>
+            <roles>
+                <role>developer</role>
+                <role>builder</role>
             </roles>
             <timezone>Europe/Berlin</timezone>
         </developer>

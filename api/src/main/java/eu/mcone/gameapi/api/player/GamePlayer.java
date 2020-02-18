@@ -4,6 +4,7 @@ import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.gameapi.api.achievement.Achievement;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
+import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.api.kit.Kit;
 import eu.mcone.gameapi.api.kit.ModifiedKit;
 import org.bukkit.entity.Player;
@@ -17,6 +18,8 @@ public interface GamePlayer {
 
     CorePlayer getCorePlayer();
 
+    GamePlayerSettings getSettings();
+
     void addBackpackItem(String category, BackpackItem item) throws IllegalArgumentException;
 
     boolean hasBackpackItem(String category, BackpackItem item);
@@ -26,6 +29,12 @@ public interface GamePlayer {
     void removeBackpackItem(String category, BackpackItem item);
 
     void buyBackpackItem(Player p, String category, BackpackItem item);
+
+    boolean hasDefaultItem(DefaultItem item);
+
+    void addDefaultItem(DefaultItem item);
+
+    void removeDefaultItem(DefaultItem item);
 
     void addAchievement(String name) throws IllegalArgumentException;
 
