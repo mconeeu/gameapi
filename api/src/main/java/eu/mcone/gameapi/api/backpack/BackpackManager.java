@@ -28,6 +28,8 @@ public interface BackpackManager {
 
     void openBackpackSellInventory(String name, Player p) throws IllegalArgumentException;
 
+    void makeTraidRequest(Player p, Player t) throws IllegalArgumentException;
+
     Map<Category, Set<BackpackItem>> getBackpackItems(String... categories);
 
     boolean categoryExists(String category);

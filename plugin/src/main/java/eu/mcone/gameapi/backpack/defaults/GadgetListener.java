@@ -26,7 +26,11 @@ public class GadgetListener extends BackpackInventoryListener {
     @Override
     public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player p) {
         if (gamePlayer.getSettings().isEnableGadgets()) {
-            p.getInventory().setItem(3, item.getItem());
+            if (p.hasPermission("lobby.silenthub")) {
+                p.getInventory().setItem(3, item.getItem());
+            } else {
+                p.getInventory().setItem(2, item.getItem());
+            }
         } else {
             p.closeInventory();
             GameAPI.getInstance().getMessager().send(p, "Du kannst keine Gadgets benutzen, da du sie deaktiviert hast. Aktiviere sie wieder in den §fEinstellungen§7!");

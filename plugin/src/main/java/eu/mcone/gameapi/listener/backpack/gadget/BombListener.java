@@ -45,26 +45,32 @@ public class BombListener extends GadgetListener {
             //TODO: getWorld().playEffect() umwandeln in player.playEffect()
 
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                item.getWorld().createExplosion(item.getLocation().getX(), item.getLocation().getY(), item.getLocation().getZ(), 3, false, false);
-                item.getWorld().playEffect(item.getLocation().add(0, 1, 0), Effect.EXPLOSION_LARGE, 1);
-                item.getWorld().playEffect(item.getLocation().add(1, 0, 0), Effect.EXPLOSION_LARGE, 1);
-                item.getWorld().playEffect(item.getLocation().add(0, 0, 1), Effect.EXPLOSION_LARGE, 1);
-                item.getWorld().playEffect(item.getLocation().add(0, 0, 1), Effect.EXPLOSION_LARGE, 1);
-                item.getWorld().playEffect(item.getLocation().add(0, 0, 1), Effect.LAVA_POP, 1);
-                item.getWorld().playEffect(item.getLocation().add(0, 1, 1), Effect.LAVA_POP, 1);
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     GamePlayer gp = GameAPI.getInstance().getGamePlayer(player);
 
-                    if (player.getLocation().distance(item.getLocation()) <= 6 && gp.getSettings().isEnableGadgets() && gp.isEffectsVisible()) {
-                        Vector v1 = player.getLocation().getDirection().setY(0.8).multiply(1.1);
 
+                    if (player.getLocation().distance(item.getLocation()) <= 6 && gp.getSettings().isEnableGadgets() && gp.isEffectsVisible()) {
+                        player.getWorld().createExplosion(item.getLocation().getX(), item.getLocation().getY(), item.getLocation().getZ(), 3, false, false);
+            /*    item.getWorld().playEffect(item.getLocation().add(0, 1, 0), Effect.EXPLOSION_LARGE, 1);
+                item.getWorld().playEffect(item.getLocation().add(1, 0, 0), Effect.EXPLOSION_LARGE, 1);
+                item.getWorld().playEffect(item.getLocation().add(0, 0, 1), Effect.EXPLOSION_LARGE, 1); */
+                        player.playEffect(item.getLocation().add(0, 0, 1), Effect.EXPLOSION_LARGE, 1);
+                        player.playEffect(item.getLocation().add(0, 0, 1), Effect.LAVA_POP, 1);
+                        player.playEffect(item.getLocation().add(0, 1, 1), Effect.LAVA_POP, 1);
+                        player.playEffect(item.getLocation().add(0, 0, 1), Effect.EXPLOSION_HUGE, 10);
+                        player.playEffect(item.getLocation().add(0, 0, 1), Effect.EXPLOSION_LARGE, 10);
+                        player.playEffect(item.getLocation().add(0, 0, 1), Effect.EXPLOSION_LARGE, 10);
+                        player.playEffect(item.getLocation(), Effect.LAVA_POP, 1);
+                        player.playEffect(item.getLocation(), Effect.LAVA_POP, 1);
+
+                        Vector v1 = player.getLocation().getDirection().setY(0.8).multiply(1.1);
+                        Bukkit.getScheduler().runTaskLater(plugin, () -> p.playSound(item.getLocation(), Sound.FIREWORK_TWINKLE, 1, 1), 3);
                         player.setVelocity(v1);
                     }
                 }
                 item.getWorld().playEffect(item.getLocation(), Effect.FIREWORKS_SPARK, 1);
                 item.getWorld().playSound(item.getLocation(), Sound.GLASS, 1, 1);
 
-                Bukkit.getScheduler().runTaskLater(plugin, () -> item.getWorld().playSound(item.getLocation(), Sound.FIREWORK_TWINKLE, 1, 1), 3);
             }, 20);
 
             p.playSound(p.getLocation(), Sound.CHICKEN_EGG_POP, 1, 1);

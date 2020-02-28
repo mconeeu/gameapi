@@ -7,9 +7,10 @@ import lombok.Setter;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter @Setter
+@Getter
+@Setter
 public class GamePlayerSettings {
 
-    private boolean enableGadgets = true;
+    private boolean enableGadgets = true, enableTraiding = true;
 
 }

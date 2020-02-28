@@ -10,6 +10,7 @@ import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import eu.mcone.coresystem.api.bukkit.inventory.category.CategoryInventory;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.gameapi.GameAPIPlugin;
+import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Option;
 import eu.mcone.gameapi.api.backpack.BackpackInventoryListener;
@@ -21,13 +22,19 @@ import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.api.backpack.handler.OutfitHandler;
 import eu.mcone.gameapi.api.backpack.handler.PetHandler;
 import eu.mcone.gameapi.api.backpack.handler.TrailHandler;
-import eu.mcone.gameapi.player.GameAPIPlayer;
 import eu.mcone.gameapi.backpack.defaults.*;
 import eu.mcone.gameapi.command.ItemCMD;
+import eu.mcone.gameapi.command.TradeCMD;
 import eu.mcone.gameapi.inventory.backpack.BackpackInventory;
 import eu.mcone.gameapi.inventory.backpack.BackpackSellInventory;
+import eu.mcone.gameapi.inventory.backpack.trade.TradeChooseInventory;
+import eu.mcone.gameapi.listener.backpack.BackpackListener;
+import eu.mcone.gameapi.player.GameAPIPlayer;
 import lombok.Getter;
 import lombok.Setter;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.conversions.Bson;
 import org.bukkit.Bukkit;
@@ -52,19 +59,32 @@ public class GameBackpackManager implements BackpackManager {
     private final List<BackpackItemCategory> backpackItems;
     private final Map<String, BackpackInventoryListener> clickListeners;
 
+    @Getter
+    private final Map<Player, Player> inTrade;
+    @Getter
+    private final Map<Player, BackpackItem> choosedItems;
+    @Getter
+    private final List<Player> tradeItemAccepted;
+
     private final List<String> additionalCategories;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private boolean useRankBoots = false;
 
     public GameBackpackManager(GameAPIPlugin system, GamePlugin gamePlugin, Option... gameOptions) {
         system.registerCommands(new ItemCMD(this));
+        system.registerCommands(new TradeCMD());
+        system.registerEvents(new BackpackListener(this));
 
         this.gameOptions = gameOptions;
         this.gamePlugin = gamePlugin;
         this.system = system;
         this.backpackItems = new ArrayList<>();
         this.clickListeners = new HashMap<>();
+        this.inTrade = new HashMap<>();
+        this.choosedItems = new HashMap<>();
+        this.tradeItemAccepted = new ArrayList<>();
         this.additionalCategories = new ArrayList<>();
 
         system.sendConsoleMessage("§aLoading BackpackManager...");
@@ -80,6 +100,7 @@ public class GameBackpackManager implements BackpackManager {
 
         BackpackInventory.setPlugin(gamePlugin);
         BackpackSellInventory.setPlugin(gamePlugin);
+        TradeChooseInventory.setPlugin(gamePlugin);
         BackpackInventoryListener.setPlugin(gamePlugin);
         DefaultItem.setManager(this);
 
@@ -98,30 +119,30 @@ public class GameBackpackManager implements BackpackManager {
     public void registerCategory(Category category, Set<BackpackItem> items) throws IllegalArgumentException {
         if (!isDefaultCategory(category.getName())) {
             if (!categoryExists(category.getName()) || getItemCategory(category.getName()).getCategory().getGamemode().equals(gamePlugin.getGamemode())) {
-               if (idsUnique(items)) {
-                   BackpackItemCategory previous = getItemCategory(category.getName());
-                   BackpackItemCategory registered = new BackpackItemCategory(category, items);
+                if (idsUnique(items)) {
+                    BackpackItemCategory previous = getItemCategory(category.getName());
+                    BackpackItemCategory registered = new BackpackItemCategory(category, items);
 
-                   if (previous == null || !previous.equals(registered)) {
-                       BACKPACK_ITEM_GAMEMODE_COLLECTION.replaceOne(
-                               eq("category.name", category.getName()),
-                               registered,
-                               ReplaceOptions.createReplaceOptions(new UpdateOptions().upsert(true))
-                       );
+                    if (previous == null || !previous.equals(registered)) {
+                        BACKPACK_ITEM_GAMEMODE_COLLECTION.replaceOne(
+                                eq("category.name", category.getName()),
+                                registered,
+                                ReplaceOptions.createReplaceOptions(new UpdateOptions().upsert(true))
+                        );
 
-                       if (previous != null) {
-                           backpackItems.remove(previous);
-                       }
-                       backpackItems.add(registered);
-                   }
-               } else {
-                   throw new IllegalArgumentException("Cannot register Category "+category.getName()+". At least one id was registered twice! That would cause an error!");
-               }
+                        if (previous != null) {
+                            backpackItems.remove(previous);
+                        }
+                        backpackItems.add(registered);
+                    }
+                } else {
+                    throw new IllegalArgumentException("Cannot register Category " + category.getName() + ". At least one id was registered twice! That would cause an error!");
+                }
             } else {
-                throw new IllegalArgumentException("Cannot register Category "+category.getName()+". Category with that name already exists in Gamemode "+getItemCategory(category.getName()).getCategory().getGamemode().getName()+"!");
+                throw new IllegalArgumentException("Cannot register Category " + category.getName() + ". Category with that name already exists in Gamemode " + getItemCategory(category.getName()).getCategory().getGamemode().getName() + "!");
             }
         } else {
-            throw new IllegalArgumentException("Cannot register Category "+category.getName()+". Category has the built in GameSystem default categories!");
+            throw new IllegalArgumentException("Cannot register Category " + category.getName() + ". Category has the built in GameSystem default categories!");
         }
     }
 
@@ -153,7 +174,7 @@ public class GameBackpackManager implements BackpackManager {
                 backpackItems.add(new BackpackItemCategory(category, items));
                 clickListeners.put(category.getName(), getDefaultInventoryListener(defaultCategory));
             } else {
-                throw new IllegalArgumentException("Cannot register Category "+category.getName()+". At least one id was registered twice! That would cause an error!");
+                throw new IllegalArgumentException("Cannot register Category " + category.getName() + ". At least one id was registered twice! That would cause an error!");
             }
         }
     }
@@ -208,10 +229,10 @@ public class GameBackpackManager implements BackpackManager {
                     this.additionalCategories.add(category);
                     this.backpackItems.add(entry);
                 } else {
-                    throw new IllegalArgumentException("Could not load additional Category "+category+". Category does not exist in database!");
+                    throw new IllegalArgumentException("Could not load additional Category " + category + ". Category does not exist in database!");
                 }
             } else {
-                throw new IllegalArgumentException("Could not load additional Category "+category+". Category is already registered!");
+                throw new IllegalArgumentException("Could not load additional Category " + category + ". Category is already registered!");
             }
         }
     }
@@ -231,7 +252,7 @@ public class GameBackpackManager implements BackpackManager {
         searchQuery.add(eq("category.gamemode", gamePlugin.getGamemode().toString()));
 
         for (BackpackItemCategory item : BACKPACK_ITEM_GAMEMODE_COLLECTION.find(combine(searchQuery.toArray(new Bson[0])))) {
-            system.sendConsoleMessage("§2Loading Backpack Category "+item.getCategory().getName());
+            system.sendConsoleMessage("§2Loading Backpack Category " + item.getCategory().getName());
             this.backpackItems.add(item);
         }
     }
@@ -245,7 +266,7 @@ public class GameBackpackManager implements BackpackManager {
         }
 
         if (categoryExists(category)) {
-            throw new IllegalArgumentException("Could not get item with id "+id+" from category "+category+". Category exists but item not!");
+            throw new IllegalArgumentException("Could not get item with id " + id + " from category " + category + ". Category exists but item not!");
         } else {
             return null;
         }
@@ -258,7 +279,7 @@ public class GameBackpackManager implements BackpackManager {
         if (category != null) {
             new BackpackInventory(p, category);
         } else {
-            throw new IllegalArgumentException("Could not open BackpackInventory for Category "+name+". Category does not exist!");
+            throw new IllegalArgumentException("Could not open BackpackInventory for Category " + name + ". Category does not exist!");
         }
     }
 
@@ -269,8 +290,76 @@ public class GameBackpackManager implements BackpackManager {
         if (category != null) {
             new BackpackSellInventory(p, category);
         } else {
-            throw new IllegalArgumentException("Could not open BackpackSellInventory for Category "+name+". Category does not exist!");
+            throw new IllegalArgumentException("Could not open BackpackSellInventory for Category " + name + ". Category does not exist!");
         }
+    }
+
+    public Player getTraidingPartner(Player p) {
+        for (Map.Entry<Player, Player> entry : inTrade.entrySet()) {
+            if (entry.getKey().equals(p)) {
+                return entry.getValue();
+            } else if (entry.getValue().equals(p)) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
+    public boolean hasTraidingRequest(Player player, Player target) {
+        return inTrade.containsKey(player) && inTrade.get(player) == target;
+    }
+
+    public void cancelTraid(Player player) {
+        if (inTrade.containsKey(player) || inTrade.containsValue(player)) {
+            Player partner = getTraidingPartner(player);
+
+            if (partner != null) {
+                GameAPIPlugin.getSystem().getMessager().send(partner, "§4Dein Traiding Partner hat das Handeln abgebrochen. Es wurden keine Items verkauft.");
+                inTrade.remove(inTrade.containsKey(player) ? player : partner);
+            } else {
+                inTrade.remove(player);
+            }
+
+            GameAPIPlugin.getSystem().getMessager().send(player, "§4Du hast das Traiding abgebrochen, da du das Inventar geschlossen hast. Es wurden keine Items verkauft.");
+        } else {
+            throw new IllegalStateException("Player is not traiding!");
+        }
+    }
+
+    public void makeTraidRequest(Player p, Player target) throws IllegalArgumentException {
+        if (!hasTraidingRequest(p, target)) {
+            if (!inTrade.containsKey(p)) {
+                if (!inTrade.containsValue(target) && !inTrade.containsKey(target)) {
+                    target.spigot().sendMessage(new ComponentBuilder("§cDer Spieler §f" + p.getName())
+                            .append("§c hat dich zum Trade eingeladen ")
+                            .append("§f[Klicke hier!]")
+                            .bold(true)
+                            .event(new HoverEvent(
+                                    HoverEvent.Action.SHOW_TEXT,
+                                    new ComponentBuilder("§7§oKlicke hier, um die Tausch Einladung anzunehemen!").create()
+                            ))
+                            .event(new ClickEvent(
+                                    ClickEvent.Action.RUN_COMMAND,
+                                    "/trade accept " + p.getName()
+                            ))
+                            .append("\n§c»")
+                            .create());
+
+                    inTrade.put(p, target);
+                    openBackpackTraidInventory(p);
+                } else {
+                    GameAPI.getInstance().getMessager().send(p, "§cDer Spieler ist bereits in einem Tausch!");
+                }
+            } else {
+                GameAPI.getInstance().getMessager().send(p, "§cDu bist bereits in einem §4Tausch!");
+            }
+        } else {
+            GameAPI.getInstance().getMessager().send(p, "§4Du hast §c"+target.getName()+"§4 schon eine Anfrage geschickt");
+        }
+    }
+
+    public void openBackpackTraidInventory(Player player) {
+        new TradeChooseInventory(player, getItemCategory(DefaultCategory.GADGET.name()).getCategory());
     }
 
     public void onCategoryInventoryCreate(Category category, GameAPIPlayer player, CategoryInventory inventory, Player p) {
@@ -399,13 +488,20 @@ public class GameBackpackManager implements BackpackManager {
 
     private BackpackInventoryListener getDefaultInventoryListener(DefaultCategory category) {
         switch (category) {
-            case HAT: return new HatListener();
-            case PET: return new PetListener();
-            case TRAIL: return new TrailListener();
-            case GADGET: return new GadgetListener();
-            case OUTFIT: return new OutfitListener();
-            case EXCLUSIVE: return new ExclusiveListener();
-            default: return null;
+            case HAT:
+                return new HatListener();
+            case PET:
+                return new PetListener();
+            case TRAIL:
+                return new TrailListener();
+            case GADGET:
+                return new GadgetListener();
+            case OUTFIT:
+                return new OutfitListener();
+            case EXCLUSIVE:
+                return new ExclusiveListener();
+            default:
+                return null;
         }
     }
 
