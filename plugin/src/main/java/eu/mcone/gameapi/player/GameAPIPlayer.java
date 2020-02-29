@@ -19,6 +19,9 @@ import eu.mcone.gameapi.api.kit.Kit;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.GamePlayerSettings;
 import eu.mcone.gameapi.kit.GameKitManager;
+import eu.mcone.gameapi.api.event.stats.PlayerRoundStatsChangeEvent;
+import eu.mcone.gameapi.api.team.Team;
+import eu.mcone.gameapi.api.team.TeamEnum;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Sound;
@@ -42,8 +45,20 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
     @Getter @Setter
     private boolean effectsVisible = true;
 
+    @Getter
+    private int roundKills;
+    @Getter
+    private int roundDeaths;
+    @Getter
+    private int roundGoals;
+
+    private Player player;
+    @Getter
+    private TeamEnum team;
+
     public GameAPIPlayer(CorePlayer player) {
         super(player);
+        this.player = player.bukkit();
     }
 
     @Override
@@ -64,9 +79,8 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
 
     @Override
     protected void saveData() {
-        system.saveGameProfile(new GameAPIPlayerProfile(corePlayer.bukkit(), backpackItems, achievements/*, customKits*/));
+        system.saveGameProfile(new GameAPIPlayerProfile(corePlayer.bukkit(), backpackItems, achievements));
     }
-
 
     /*
      * Backpack System
@@ -89,7 +103,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
                 throw new IllegalArgumentException("Backpack item " + item + " could not be added. Item is not registered in any Category!");
             }
         } else {
-            throw new IllegalArgumentException("Backpack item " + item + " could not be added. Category "+category+" does not exist!");
+            throw new IllegalArgumentException("Backpack item " + item + " could not be added. Category " + category + " does not exist!");
         }
     }
 
@@ -178,14 +192,16 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
                     if (achievements.containsKey(GamePlugin.getGamePlugin().getGamemode())) {
                         achievements.get(GamePlugin.getGamePlugin().getGamemode()).put(achievement, System.currentTimeMillis() / 1000);
                     } else {
+                        achievements.put(GamePlugin.getPlugin().getGamemode(), new HashMap<Achievement, Long>() {{
+                            put(achievement, System.currentTimeMillis() / 1000);
+                        }});
                         achievements.put(GamePlugin.getGamePlugin().getGamemode(), new HashMap<Achievement, Long>(){{ put(achievement, System.currentTimeMillis() / 1000); }});
                     }
-
                     saveData();
                 }
             }
         } else {
-            throw new IllegalArgumentException("Cannot add Achievement "+name+" to player "+getCorePlayer().getName()+". Achievement does not exist!");
+            throw new IllegalArgumentException("Cannot add Achievement " + name + " to player " + getCorePlayer().getName() + ". Achievement does not exist!");
         }
     }
 
@@ -232,7 +248,83 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
         return false;
     }
 
+    /*
+     *
+     * Team management
+     */
 
+    public void setTeam(Team team) {
+        if (this.team != null) {
+            GamePlugin.getPlugin().getTeamManager().getTeam(this.team).removePlayer(player);
+            team.addPlayer(player);
+        } else {
+            team.addPlayer(player);
+        }
+    }
+
+    public void setTeam(TeamEnum team) {
+        if (this.team != null) {
+            GamePlugin.getPlugin().getTeamManager().getTeam(this.team).removePlayer(player);
+        } else {
+            GamePlugin.getPlugin().getTeamManager().getTeam(team).addPlayer(player);
+        }
+    }
+
+    public void removeTeam() {
+        if (this.team != null) {
+            GamePlugin.getPlugin().getTeamManager().getTeam(this.team).removePlayer(player);
+        }
+    }
+
+    public void removeFromGame() {
+        //TODO: Add team stage integration
+        GamePlugin.getPlugin().getPlayerManager().setPlaying(player, false);
+        this.team = TeamEnum.ERROR;
+    }
+
+    public void addKill() {
+        this.roundKills = this.roundKills + 1;
+        callStatsEvent();
+    }
+
+    public void addKill(final int var) {
+        this.roundKills = this.roundKills + var;
+        callStatsEvent();
+    }
+
+    public void addDeath() {
+        this.roundDeaths = this.roundDeaths + 1;
+        callStatsEvent();
+    }
+
+    public void addDeath(final int var) {
+        this.roundDeaths = this.roundDeaths + var;
+        callStatsEvent();
+    }
+
+    public void addGoal() {
+        this.roundGoals = this.roundGoals + 1;
+        callStatsEvent();
+    }
+
+    public void addGoals(final int var) {
+        this.roundGoals = this.roundGoals + var;
+        callStatsEvent();
+    }
+
+    private void callStatsEvent() {
+        GamePlugin.getPlugin().getServer().getPluginManager().callEvent(new PlayerRoundStatsChangeEvent(player, roundKills, roundDeaths, roundGoals));
+    }
+
+    public double getRoundKD() {
+        double KD = (double) roundDeaths / roundKills;
+
+        if (KD <= 0.0) {
+            return 0;
+        } else {
+            return KD;
+        }
+    }
 
     /*
      * Kit System
@@ -301,7 +393,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
     public ModifiedKit getModifiedKit(String name) {
         return ((GameKitManager) GamePlugin.getGamePlugin().getKitManager()).getModifiedKit(bukkit(), name);
     }
-    
+
     /*
      * Game methods
      *//*

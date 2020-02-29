@@ -1,4 +1,4 @@
-package eu.mcone.gamesystem.api.game.stats;
+package eu.mcone.gameapi.api.stats;
 
 import com.mongodb.client.MongoCollection;
 import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;

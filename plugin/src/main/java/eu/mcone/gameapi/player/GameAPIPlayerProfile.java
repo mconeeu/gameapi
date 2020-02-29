@@ -27,7 +27,7 @@ public class GameAPIPlayerProfile extends GameProfile {
     private transient Map<String, Set<BackpackItem>> itemMap = new HashMap<>();
     private transient Map<Gamemode, Map<Achievement, Long>> achievementMap = new HashMap<>();
 
-    GameAPIPlayerProfile(final Player p, final Map<String, Set<BackpackItem>> playerItems, Map<Gamemode, Map<Achievement, Long>> achievements/*, final Map<String, CustomKit> customKits*/) {
+    GameAPIPlayerProfile(final Player p, final Map<String, Set<BackpackItem>> playerItems, Map<Gamemode, Map<Achievement, Long>> achievements) {
         super(p);
 
         for (Map.Entry<String, Set<BackpackItem>> entry : playerItems.entrySet()) {
@@ -49,8 +49,6 @@ public class GameAPIPlayerProfile extends GameProfile {
 
             this.achievements.put(entry.getKey().toString(), achievementMap);
         }
-
-        //this.customKits = customKits;
     }
 
     @Override

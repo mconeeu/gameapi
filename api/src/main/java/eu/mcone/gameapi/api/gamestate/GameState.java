@@ -3,9 +3,11 @@ package eu.mcone.gameapi.api.gamestate;
 import eu.mcone.coresystem.api.bukkit.CorePlugin;
 import eu.mcone.gameapi.api.event.gamestate.*;
 import lombok.Getter;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 
 @Getter
-public class GameState {
+public class GameState implements Listener {
 
     private final String name;
     private final int countdown;
@@ -25,6 +27,7 @@ public class GameState {
         this.timeout = timeout;
     }
 
+    @EventHandler
     public void onStart(GameStateStartEvent event) {}
 
     public void onTimeoutStart(GameStateTimeoutStartEvent event) {}

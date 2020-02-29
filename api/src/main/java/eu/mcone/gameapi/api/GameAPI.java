@@ -14,6 +14,10 @@ import eu.mcone.gameapi.api.gamestate.GameStateManager;
 import eu.mcone.gameapi.api.kit.KitManager;
 import eu.mcone.gameapi.api.map.MapManager;
 import eu.mcone.gameapi.api.player.GamePlayer;
+import eu.mcone.gameapi.api.player.PlayerManager;
+import eu.mcone.gameapi.api.replay.session.ReplaySession;
+import eu.mcone.gameapi.api.replay.session.ReplaySessionManager;
+import eu.mcone.gameapi.api.team.TeamManager;
 import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -38,9 +42,19 @@ public abstract class GameAPI extends CorePlugin {
         }
     }
 
+    public abstract ReplaySession createReplaySession(ReplaySessionManager manager);
+
     public abstract GameStateManager constructGameStateManager(GamePlugin gamePlugin);
 
     public abstract MapManager constructMapManager();
+
+    public abstract ReplaySessionManager constructReplaySessionManager(GamePlugin gamePlugin, Option... options);
+
+    public abstract GameStateManager constructGameStatsManager(GamePlugin gamePlugin);
+
+    public abstract TeamManager constructTeamManager(GamePlugin gamePlugin);
+
+    public abstract PlayerManager constructPlayerManager(GamePlugin gamePlugin);
 
     public abstract BackpackManager constructBackpackManager(GamePlugin gamePlugin, Option... options);
 

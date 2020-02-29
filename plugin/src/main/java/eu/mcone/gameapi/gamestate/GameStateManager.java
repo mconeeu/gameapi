@@ -4,6 +4,7 @@ import eu.mcone.coresystem.api.bukkit.CorePlugin;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.event.gamestate.*;
 import eu.mcone.gameapi.api.gamestate.GameState;
+import eu.mcone.gameapi.listener.GameStateListener;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
@@ -25,6 +26,8 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
     private int countdownCounter;
 
     public GameStateManager(GameAPIPlugin system, CorePlugin gamePlugin) {
+        system.registerEvents(new GameStateListener());
+
         this.system = system;
         this.gamePlugin = gamePlugin;
         this.pipeline = new LinkedList<>();
@@ -47,7 +50,7 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
         if (running == null) {
             startGameState(pipeline.getFirst());
         } else {
-            throw new IllegalStateException("GameStateManager already started the game! Pipeline running currently with GameState "+running.getName());
+            throw new IllegalStateException("GameStateManager already started the game! Pipeline running currently with GameState " + running.getName());
         }
     }
 
@@ -57,7 +60,7 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
             int i = 0;
             for (GameState gameState : pipeline) {
                 if (gameState.equals(running)) {
-                    if (++i <= pipeline.size()-1) {
+                    if (++i <= pipeline.size() - 1) {
                         return pipeline.get(i);
                     } else {
                         return null;
@@ -86,16 +89,24 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
                     timeoutTask.cancel();
                     timeoutTask = null;
                 }
+
+                stopAndStartNextGameState(running, "Manual set new GameState: " + gameState.getName());
+            } else {
+                //Start GameState (start Timeout if present)
+                startGameState(gameState);
             }
 
-            //Start GameState (start Timeout if present)
-            startGameState(gameState);
             return true;
         } else {
             return false;
         }
     }
 
+
+    @Override
+    public boolean isTimeoutRunning() {
+        return timeoutTask != null;
+    }
 
     @Override
     public boolean cancelTimeout() {
@@ -132,10 +143,15 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
                 return false;
             }
         } else {
-            throw new IllegalStateException("Cannot start TimeoutTask of GameState "+running+"! Timeout already running.");
+            throw new IllegalStateException("Cannot start TimeoutTask of GameState " + running + "! Timeout already running.");
         }
     }
 
+
+    @Override
+    public boolean isCountdownRunning() {
+        return countdownTask != null;
+    }
 
     @Override
     public boolean cancelCountdown() {
@@ -172,12 +188,9 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
                 return false;
             }
         } else {
-            throw new IllegalStateException("Cannot start CountdownTask of GameState "+running+"! Countdown already running.");
+            throw new IllegalStateException("Cannot start CountdownTask of GameState " + running + "! Countdown already running.");
         }
     }
-
-
-
 
     private void startGameState(GameState gameState) {
         GameStateStartEvent startEvent = new GameStateStartEvent(this, running, gameState);
@@ -201,7 +214,7 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
                 GameState next = getNextGameState();
 
                 if (next != null) {
-                    system.sendConsoleMessage("§fSkipped Gamestate " + gameState.getName() + "! Starting new GameState "+next.getName());
+                    system.sendConsoleMessage("§fSkipped Gamestate " + gameState.getName() + "! Starting new GameState " + next.getName());
                     startGameState(next);
                 } else {
                     system.sendConsoleMessage("§fSkipped Gamestate " + gameState.getName() + "! No new GameState in pipeline: The Game has ended...");
@@ -221,7 +234,7 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
         if (!timeoutStartEvent.isCancelled()) {
             long timeout = timeoutStartEvent.getTimeout() > 0 ? timeoutStartEvent.getTimeout() : gameState.getTimeout();
 
-            system.sendConsoleMessage("§fStarting Gamestate " + gameState.getName()+" with timout of "+timeout+" seconds!");
+            system.sendConsoleMessage("§fStarting Gamestate " + gameState.getName() + " with timout of " + timeout + " seconds!");
             timeoutGameState(gameState, timeout);
         } else {
             system.sendConsoleMessage("§fStarted Gamestate " + gameState.getName() + " without timeout! Idling...");
@@ -316,10 +329,10 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
 
         //If next GameState exists, start it, otherwise do idle
         if (next != null) {
-            system.sendConsoleMessage("§fStopping Gamestate " + gameState.getName()+" ("+stopReason+"). Starting new Gamemode "+next.getName());
+            system.sendConsoleMessage("§fStopping Gamestate " + gameState.getName() + " (" + stopReason + "). Starting new Gamemode " + next.getName());
             startGameState(next);
         } else {
-            system.sendConsoleMessage("§fStopping Gamestate " + gameState.getName()+" ("+stopReason+"). No new GameState in pipeline: The Game has ended...");
+            system.sendConsoleMessage("§fStopping Gamestate " + gameState.getName() + " (" + stopReason + "). No new GameState in pipeline: The Game has ended...");
         }
     }
 

@@ -7,6 +7,8 @@ import eu.mcone.gameapi.api.backpack.BackpackItem;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.api.kit.Kit;
 import eu.mcone.gameapi.api.kit.ModifiedKit;
+import eu.mcone.gameapi.api.team.Team;
+import eu.mcone.gameapi.api.team.TeamEnum;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -15,6 +17,14 @@ import java.util.Map;
 public interface GamePlayer {
 
     Player bukkit();
+
+    int getRoundKills();
+
+    int getRoundDeaths();
+
+    int getRoundGoals();
+
+    TeamEnum getTeam();
 
     CorePlayer getCorePlayer();
 
@@ -54,6 +64,30 @@ public interface GamePlayer {
 
     boolean hasAchievement(String name);
 
+    //Team
+    void setTeam(Team team);
+
+    void setTeam(TeamEnum team);
+
+    void removeTeam();
+
+    void removeFromGame();
+
+    void addKill();
+
+    void addKill(final int var);
+
+    void addDeath();
+
+    void addDeath(final int var);
+
+    void addGoal();
+
+    void addGoals(final int var);
+
+    double getRoundKD();
+
+    //Kit
     void modifyKit(Kit kit, Map<ItemStack, Integer> items);
 
     boolean hasKitModified(String name);

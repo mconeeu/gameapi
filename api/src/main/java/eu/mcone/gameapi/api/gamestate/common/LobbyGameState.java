@@ -3,14 +3,19 @@ package eu.mcone.gameapi.api.gamestate.common;
 import eu.mcone.coresystem.api.bukkit.CorePlugin;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.gameapi.api.gamestate.GameState;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 public class LobbyGameState extends GameState {
 
+    @Setter @Getter
+    private static int lobbyCountdown = 60;
+
     public LobbyGameState() {
-        super("Lobby");
+        super("Lobby", lobbyCountdown);
     }
 
     @Override

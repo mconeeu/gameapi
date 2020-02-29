@@ -6,13 +6,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @NoArgsConstructor
 public class MapsConfig {
 
-    private List<GameAPIMap> maps;
+    private List<GameAPIMap> maps = new ArrayList<>();
 
     public MapsConfig addWorld(CoreWorld world, ItemStack item) {
         maps.add(new GameAPIMap(world.getName(), item));

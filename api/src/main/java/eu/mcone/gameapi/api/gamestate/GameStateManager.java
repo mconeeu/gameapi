@@ -7,17 +7,23 @@ public interface GameStateManager {
 
     void startGame();
 
+    GameState getRunning();
+
     GameState getNextGameState();
 
     boolean setGameState(GameState gameState, boolean force);
 
     boolean cancelTimeout();
 
+    boolean isTimeoutRunning();
+
     boolean startTimeout();
 
     boolean startTimeout(boolean force);
 
     boolean startTimeout(boolean force, long countdown);
+
+    boolean isCountdownRunning();
 
     boolean cancelCountdown();
 
