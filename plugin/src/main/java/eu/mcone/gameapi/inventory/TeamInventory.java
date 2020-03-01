@@ -24,7 +24,7 @@ public class TeamInventory extends CoreInventory {
     //TODO: Add team stage integration
     public TeamInventory(Player player, TeamManager teamManager) {
         super("§8» §c§oTeamauswahl", player, InventorySlot.ROW_4, InventoryOption.FILL_EMPTY_SLOTS);
-        gamePlugin = GamePlugin.getPlugin();
+        gamePlugin = GamePlugin.getGamePlugin();
         this.teamManager = teamManager;
 
         if (gamePlugin.getModules().contains(Modules.TEAM_MANAGER)) {

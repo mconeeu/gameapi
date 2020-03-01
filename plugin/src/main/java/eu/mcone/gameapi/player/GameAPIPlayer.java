@@ -8,20 +8,19 @@ package eu.mcone.gameapi.player;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
-import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.achievement.Achievement;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
-import eu.mcone.gameapi.api.kit.ModifiedKit;
+import eu.mcone.gameapi.api.event.stats.PlayerRoundStatsChangeEvent;
 import eu.mcone.gameapi.api.kit.Kit;
+import eu.mcone.gameapi.api.kit.ModifiedKit;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.GamePlayerSettings;
-import eu.mcone.gameapi.kit.GameKitManager;
-import eu.mcone.gameapi.api.event.stats.PlayerRoundStatsChangeEvent;
 import eu.mcone.gameapi.api.team.Team;
 import eu.mcone.gameapi.api.team.TeamEnum;
+import eu.mcone.gameapi.kit.GameKitManager;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Sound;
@@ -192,7 +191,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
                     if (achievements.containsKey(GamePlugin.getGamePlugin().getGamemode())) {
                         achievements.get(GamePlugin.getGamePlugin().getGamemode()).put(achievement, System.currentTimeMillis() / 1000);
                     } else {
-                        achievements.put(GamePlugin.getPlugin().getGamemode(), new HashMap<Achievement, Long>() {{
+                        achievements.put(GamePlugin.getGamePlugin().getGamemode(), new HashMap<Achievement, Long>() {{
                             put(achievement, System.currentTimeMillis() / 1000);
                         }});
                         achievements.put(GamePlugin.getGamePlugin().getGamemode(), new HashMap<Achievement, Long>(){{ put(achievement, System.currentTimeMillis() / 1000); }});
@@ -255,7 +254,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
 
     public void setTeam(Team team) {
         if (this.team != null) {
-            GamePlugin.getPlugin().getTeamManager().getTeam(this.team).removePlayer(player);
+            GamePlugin.getGamePlugin().getTeamManager().getTeam(this.team).removePlayer(player);
             team.addPlayer(player);
         } else {
             team.addPlayer(player);
@@ -264,21 +263,21 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
 
     public void setTeam(TeamEnum team) {
         if (this.team != null) {
-            GamePlugin.getPlugin().getTeamManager().getTeam(this.team).removePlayer(player);
+            GamePlugin.getGamePlugin().getTeamManager().getTeam(this.team).removePlayer(player);
         } else {
-            GamePlugin.getPlugin().getTeamManager().getTeam(team).addPlayer(player);
+            GamePlugin.getGamePlugin().getTeamManager().getTeam(team).addPlayer(player);
         }
     }
 
     public void removeTeam() {
         if (this.team != null) {
-            GamePlugin.getPlugin().getTeamManager().getTeam(this.team).removePlayer(player);
+            GamePlugin.getGamePlugin().getTeamManager().getTeam(this.team).removePlayer(player);
         }
     }
 
     public void removeFromGame() {
         //TODO: Add team stage integration
-        GamePlugin.getPlugin().getPlayerManager().setPlaying(player, false);
+        GamePlugin.getGamePlugin().getPlayerManager().setPlaying(player, false);
         this.team = TeamEnum.ERROR;
     }
 
@@ -313,7 +312,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
     }
 
     private void callStatsEvent() {
-        GamePlugin.getPlugin().getServer().getPluginManager().callEvent(new PlayerRoundStatsChangeEvent(player, roundKills, roundDeaths, roundGoals));
+        GamePlugin.getGamePlugin().getServer().getPluginManager().callEvent(new PlayerRoundStatsChangeEvent(player, roundKills, roundDeaths, roundGoals));
     }
 
     public double getRoundKD() {

@@ -70,7 +70,7 @@ public class GameAPIPlugin extends GameAPI {
 
     @Override
     public eu.mcone.gameapi.api.replay.session.ReplaySession createReplaySession(eu.mcone.gameapi.api.replay.session.ReplaySessionManager manager) {
-        if (GamePlugin.getPlugin().getModules().contains(Modules.REPLAY_SESSION_MANAGER)) {
+        if (GamePlugin.getGamePlugin().getModules().contains(Modules.REPLAY_SESSION_MANAGER)) {
             ReplaySession session = new ReplaySession(manager);
             session.getInfo().setStarted(System.currentTimeMillis() / 1000);
             return session;
@@ -81,13 +81,13 @@ public class GameAPIPlugin extends GameAPI {
 
     @Override
     public MapManager constructMapManager() {
-        GamePlugin.getPlugin().getModules().add(Modules.MAP_MANAGER);
+        GamePlugin.getGamePlugin().getModules().add(Modules.MAP_MANAGER);
         return new GameMapManager(this);
     }
 
     @Override
     public BackpackManager constructBackpackManager(GamePlugin gamePlugin, Option... options) {
-        GamePlugin.getPlugin().getModules().add(Modules.BACKPACK_MANAGER);
+        GamePlugin.getGamePlugin().getModules().add(Modules.BACKPACK_MANAGER);
         return new GameBackpackManager(this, gamePlugin, options);
     }
 
@@ -98,31 +98,31 @@ public class GameAPIPlugin extends GameAPI {
 
     @Override
     public AchievementManager constructAchievementManager(GamePlugin gamePlugin, Option... options) {
-        GamePlugin.getPlugin().getModules().add(Modules.ACHIEVEMENT_MANAGER);
+        GamePlugin.getGamePlugin().getModules().add(Modules.ACHIEVEMENT_MANAGER);
         return new GameAchievementManager(gamePlugin, options);
     }
 
     @Override
     public ReplaySessionManager constructReplaySessionManager(GamePlugin gamePlugin, Option... options) {
-        GamePlugin.getPlugin().getModules().add(Modules.REPLAY_SESSION_MANAGER);
+        GamePlugin.getGamePlugin().getModules().add(Modules.REPLAY_SESSION_MANAGER);
         return new eu.mcone.gameapi.replay.session.ReplaySessionManager(gamePlugin, options);
     }
 
     @Override
     public GameStateManager constructGameStatsManager(GamePlugin gamePlugin) {
-        GamePlugin.getPlugin().getModules().add(Modules.GAME_STATE_MANAGER);
+        GamePlugin.getGamePlugin().getModules().add(Modules.GAME_STATE_MANAGER);
         return new GameStateManager(this, gamePlugin);
     }
 
     @Override
     public TeamManager constructTeamManager(GamePlugin gamePlugin) {
-        GamePlugin.getPlugin().getModules().add(Modules.TEAM_MANAGER);
+        GamePlugin.getGamePlugin().getModules().add(Modules.TEAM_MANAGER);
         return new TeamManager(gamePlugin);
     }
 
     @Override
     public GamePlayerManager constructPlayerManager(GamePlugin gamePlugin) {
-        GamePlugin.getPlugin().getModules().add(Modules.PLAYER_MANAGER);
+        GamePlugin.getGamePlugin().getModules().add(Modules.PLAYER_MANAGER);
         return new GamePlayerManager(gamePlugin);
     }
 

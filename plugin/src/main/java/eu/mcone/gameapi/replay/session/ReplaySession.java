@@ -68,7 +68,7 @@ public class ReplaySession implements eu.mcone.gameapi.api.replay.session.Replay
     }
 
     public void recordSession() {
-        info.setWorld(GamePlugin.getPlugin().getGameConfig().parseConfig().getGameWorld());
+        info.setWorld(GamePlugin.getGamePlugin().getGameConfig().parseConfig().getGameWorld());
         replayRecorder.record();
 
         //Adds the world entity spawn packet
@@ -80,7 +80,7 @@ public class ReplaySession implements eu.mcone.gameapi.api.replay.session.Replay
 
     public void saveSession() {
         replayRecorder.stop();
-        GamePlugin.getPlugin().getSessionManager().saveSession(this);
+        GamePlugin.getGamePlugin().getSessionManager().saveSession(this);
     }
 
     public void addPlayer(final Player player) {

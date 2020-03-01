@@ -18,16 +18,16 @@ public class InGameState extends GameState {
 
     @Override
     public void onStart(GameStateStartEvent event) {
-        if (GamePlugin.getPlugin().getModules().contains(Modules.REPLAY)) {
-            GamePlugin.getPlugin().getReplaySession().recordSession();
+        if (GamePlugin.getGamePlugin().getModules().contains(Modules.REPLAY)) {
+            GamePlugin.getGamePlugin().getReplaySession().recordSession();
             System.out.println("replay on");
         }
     }
 
     @Override
     public void onStop(GameStateStopEvent event) {
-        if (GamePlugin.getPlugin().getModules().contains(Modules.REPLAY)) {
-            GamePlugin.getPlugin().getReplaySession().saveSession();
+        if (GamePlugin.getGamePlugin().getModules().contains(Modules.REPLAY)) {
+            GamePlugin.getGamePlugin().getReplaySession().saveSession();
             System.out.println("replay off");
         }
     }

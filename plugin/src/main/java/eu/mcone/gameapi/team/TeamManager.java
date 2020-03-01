@@ -37,8 +37,8 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
             teamSize = config.getMaxPlayers() / config.getPlayersPerTeam();
         }
 
-        if (GamePlugin.getPlugin().getModules().contains(Modules.REPLAY_SESSION_MANAGER)) {
-            GamePlugin.getPlugin().getReplaySession().getInfo().setTeams(teamSize);
+        if (GamePlugin.getGamePlugin().getModules().contains(Modules.REPLAY_SESSION_MANAGER)) {
+            GamePlugin.getGamePlugin().getReplaySession().getInfo().setTeams(teamSize);
         }
 
         int i = 0;

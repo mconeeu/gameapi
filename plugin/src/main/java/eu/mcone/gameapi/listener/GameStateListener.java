@@ -14,9 +14,9 @@ public class GameStateListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
-        if (GamePlugin.getPlugin().getModules().contains(Modules.PLAYER_MANAGER) && GamePlugin.getPlugin().getModules().contains(Modules.GAME_STATE_MANAGER)) {
-            PlayerManager playerManager = GamePlugin.getPlugin().getPlayerManager();
-            GameStateManager gameStateManager = GamePlugin.getPlugin().getGameStateManager();
+        if (GamePlugin.getGamePlugin().getModules().contains(Modules.PLAYER_MANAGER) && GamePlugin.getGamePlugin().getModules().contains(Modules.GAME_STATE_MANAGER)) {
+            PlayerManager playerManager = GamePlugin.getGamePlugin().getPlayerManager();
+            GameStateManager gameStateManager = GamePlugin.getGamePlugin().getGameStateManager();
 
             if (gameStateManager.getRunning() instanceof LobbyGameState) {
                 if (!gameStateManager.isCountdownRunning() && playerManager.getPlaying().size() >= playerManager.getMinPlayers()) {
@@ -28,9 +28,9 @@ public class GameStateListener implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
-        if (GamePlugin.getPlugin().getModules().contains(Modules.PLAYER_MANAGER) && GamePlugin.getPlugin().getModules().contains(Modules.GAME_STATE_MANAGER)) {
-            PlayerManager playerManager = GamePlugin.getPlugin().getPlayerManager();
-            GameStateManager gameStateManager = GamePlugin.getPlugin().getGameStateManager();
+        if (GamePlugin.getGamePlugin().getModules().contains(Modules.PLAYER_MANAGER) && GamePlugin.getGamePlugin().getModules().contains(Modules.GAME_STATE_MANAGER)) {
+            PlayerManager playerManager = GamePlugin.getGamePlugin().getPlayerManager();
+            GameStateManager gameStateManager = GamePlugin.getGamePlugin().getGameStateManager();
 
             if (gameStateManager.getRunning() instanceof LobbyGameState) {
                 if (gameStateManager.isCountdownRunning() && playerManager.getPlaying().size() < playerManager.getMinPlayers()) {

@@ -69,7 +69,7 @@ public class GamePlayerManager implements eu.mcone.gameapi.api.player.PlayerMana
             }
         }
 
-        player.teleport(CoreSystem.getInstance().getWorldManager().getWorld(GamePlugin.getPlugin().getGameConfig().parseConfig().getLobby()).getLocation("spawn"));
+        player.teleport(CoreSystem.getInstance().getWorldManager().getWorld(GamePlugin.getGamePlugin().getGameConfig().parseConfig().getLobby()).getLocation("spawn"));
     }
 
     public void setPlaying(final Player player, final boolean var) {

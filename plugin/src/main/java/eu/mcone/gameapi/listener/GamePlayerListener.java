@@ -35,15 +35,15 @@ public class GamePlayerListener implements Listener {
     public void on(GamePlayerLoadedEvent e) {
         GamePlayer gamePlayer = e.getPlayer();
         Player player = e.getPlayer().getCorePlayer().bukkit();
-        PlayerManager playerManager = GamePlugin.getPlugin().getPlayerManager();
+        PlayerManager playerManager = GamePlugin.getGamePlugin().getPlayerManager();
 
         if (e.getReason().equals(GamePlayerLoadedEvent.Reason.JOINED)
                 || e.getReason().equals(GamePlayerLoadedEvent.Reason.RELOADED)) {
 
-            if (GamePlugin.getPlugin().getGameStateManager().getRunning() instanceof LobbyGameState) {
-                if (GamePlugin.getPlugin().getModules().contains(Modules.REPLAY)) {
-                    GamePlugin.getPlugin().getReplaySession().addPlayer(player);
-                    GamePlugin.getPlugin().getReplaySession().getReplayPlayer(player).getData().setJoined(System.currentTimeMillis() / 1000);
+            if (GamePlugin.getGamePlugin().getGameStateManager().getRunning() instanceof LobbyGameState) {
+                if (GamePlugin.getGamePlugin().getModules().contains(Modules.REPLAY)) {
+                    GamePlugin.getGamePlugin().getReplaySession().addPlayer(player);
+                    GamePlugin.getGamePlugin().getReplaySession().getReplayPlayer(player).getData().setJoined(System.currentTimeMillis() / 1000);
                 }
 
                 player.setGameMode(GameMode.SURVIVAL);
@@ -61,7 +61,7 @@ public class GamePlayerListener implements Listener {
                 player.getActivePotionEffects().clear();
 
                 for (CorePlayer cps : CoreSystem.getInstance().getOnlineCorePlayers()) {
-                    GamePlugin.getPlugin().getMessager().send(cps.bukkit(), CoreSystem.getInstance().getTranslationManager().get("game.join", cps)
+                    GamePlugin.getGamePlugin().getMessager().send(cps.bukkit(), CoreSystem.getInstance().getTranslationManager().get("game.join", cps)
                             .replace("%player%", player.getName())
                             .replace("%playing%", Integer.toString(playerManager.getPlaying().size()))
                             .replace("%max%", String.valueOf(playerManager.getMaxPlayers())));
@@ -76,9 +76,9 @@ public class GamePlayerListener implements Listener {
                                     .replace("%playing%", Integer.toString(playerManager.getPlaying().size()))
                                     .replace("%max%", String.valueOf(playerManager.getMaxPlayers()))).send(cps.bukkit());
                 }
-            } else if (GamePlugin.getPlugin().getGameStateManager().getRunning() instanceof InGameState) {
+            } else if (GamePlugin.getGamePlugin().getGameStateManager().getRunning() instanceof InGameState) {
                 playerManager.setSpectating(player, true);
-                GamePlugin.getPlugin().getMessager().sendTransl(player, "game.spectators.join");
+                GamePlugin.getGamePlugin().getMessager().sendTransl(player, "game.spectators.join");
 
                 CoreSystem.getInstance().createTitle()
                         .fadeIn(1)

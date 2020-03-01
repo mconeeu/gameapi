@@ -18,7 +18,7 @@ public class ReplaySpectatorInventory extends CoreInventory {
         for (ReplayPlayer rPlayer : session.getPlayers()) {
             setItem(slot, new Skull(rPlayer.getData().getName()).setDisplayName(rPlayer.getData().getDisplayName()).getItemStack(), e -> {
                 p.teleport(rPlayer.getReplay().getLocation());
-                GamePlugin.getPlugin().getMessager().send(p, "§aDu wurdest zu dem Spieler §f" + rPlayer.getData().getName() + " §ateleportiert!");
+                GamePlugin.getGamePlugin().getMessager().send(p, "§aDu wurdest zu dem Spieler §f" + rPlayer.getData().getName() + " §ateleportiert!");
             });
             slot++;
         }
