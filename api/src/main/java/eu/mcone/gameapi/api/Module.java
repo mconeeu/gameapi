@@ -9,6 +9,7 @@ public enum Module {
     REPLAY,
     BACKPACK_MANAGER,
     ACHIEVEMENT_MANAGER,
-    PLAYER_MANAGER
+    PLAYER_MANAGER,
+    KIT_MANAGER
 
 }

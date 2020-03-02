@@ -57,6 +57,7 @@ public abstract class GamePlugin extends CorePlugin {
         super(pluginGamemode, prefixTranslation);
         gamePlugin = this;
 
+        this.modules = new ArrayList<>();
         this.options = options;
     }
 
@@ -94,10 +95,12 @@ public abstract class GamePlugin extends CorePlugin {
     }
 
     public KitManager getKitManager() {
+        modules.add(Module.KIT_MANAGER);
         return kitManager != null ? kitManager : (kitManager = GameAPI.getInstance().constructKitManager(this, options));
     }
 
     public AchievementManager getAchievementManager() {
+        modules.add(Module.ACHIEVEMENT_MANAGER);
         return achievementManager != null ? achievementManager : (achievementManager = GameAPI.getInstance().constructAchievementManager(this, options));
     }
 
@@ -107,6 +110,7 @@ public abstract class GamePlugin extends CorePlugin {
     }
 
     public GameStateManager getGameStateManager() {
+        modules.add(Module.GAME_STATE_MANAGER);
         return gameStateManager != null ? gameStateManager : (gameStateManager = GameAPI.getInstance().constructGameStatsManager(this));
     }
 

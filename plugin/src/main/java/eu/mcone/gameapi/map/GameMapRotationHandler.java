@@ -36,8 +36,6 @@ public class GameMapRotationHandler implements MapRotationHandler {
             throw new IllegalArgumentException("Cannot initialize MapRotationHandler: more than one Map must be loaded!");
         }
 
-        System.out.println("loading RotationHandler with "+mapManager.getMaps());
-
         this.mapManager = mapManager;
         this.currentMap = mapManager.getMaps().get(new Random().nextInt(mapManager.getMaps().size() - 1));
     }

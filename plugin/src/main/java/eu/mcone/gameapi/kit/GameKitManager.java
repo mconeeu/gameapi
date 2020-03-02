@@ -163,10 +163,12 @@ public class GameKitManager implements KitManager {
         if (clearInvOnKitSet && currentKits.containsKey(p.getUniqueId())) {
             Kit oldKit = currentKits.get(p.getUniqueId());
 
-            for (ItemStack item : oldKit.getKitItems().values()) {
-                p.getInventory().remove(item);
+            if (oldKit != null) {
+                for (ItemStack item : oldKit.getKitItems().values()) {
+                    p.getInventory().remove(item);
+                }
+                p.getInventory().setArmorContents(null);
             }
-            p.getInventory().setArmorContents(null);
         }
 
         currentKits.put(p.getUniqueId(), kit);

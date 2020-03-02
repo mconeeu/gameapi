@@ -81,13 +81,11 @@ public class GameAPIPlugin extends GameAPI {
 
     @Override
     public MapManager constructMapManager() {
-        GamePlugin.getGamePlugin().getModules().add(Modules.MAP_MANAGER);
         return new GameMapManager(this);
     }
 
     @Override
     public BackpackManager constructBackpackManager(GamePlugin gamePlugin, Option... options) {
-        GamePlugin.getGamePlugin().getModules().add(Modules.BACKPACK_MANAGER);
         return new GameBackpackManager(this, gamePlugin, options);
     }
 
@@ -98,31 +96,26 @@ public class GameAPIPlugin extends GameAPI {
 
     @Override
     public AchievementManager constructAchievementManager(GamePlugin gamePlugin, Option... options) {
-        GamePlugin.getGamePlugin().getModules().add(Modules.ACHIEVEMENT_MANAGER);
         return new GameAchievementManager(gamePlugin, this, options);
     }
 
     @Override
     public ReplaySessionManager constructReplaySessionManager(GamePlugin gamePlugin, Option... options) {
-        GamePlugin.getGamePlugin().getModules().add(Modules.REPLAY_SESSION_MANAGER);
         return new eu.mcone.gameapi.replay.session.ReplaySessionManager(gamePlugin, options);
     }
 
     @Override
     public GameStateManager constructGameStatsManager(GamePlugin gamePlugin) {
-        GamePlugin.getGamePlugin().getModules().add(Modules.GAME_STATE_MANAGER);
         return new GameStateManager(this, gamePlugin);
     }
 
     @Override
     public TeamManager constructTeamManager(GamePlugin gamePlugin) {
-        GamePlugin.getGamePlugin().getModules().add(Modules.TEAM_MANAGER);
         return new TeamManager(gamePlugin, this);
     }
 
     @Override
     public GamePlayerManager constructPlayerManager(GamePlugin gamePlugin) {
-        GamePlugin.getGamePlugin().getModules().add(Modules.PLAYER_MANAGER);
         return new GamePlayerManager(gamePlugin, this);
     }
 
