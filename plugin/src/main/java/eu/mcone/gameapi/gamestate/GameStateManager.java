@@ -4,7 +4,7 @@ import eu.mcone.coresystem.api.bukkit.CorePlugin;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.event.gamestate.*;
 import eu.mcone.gameapi.api.gamestate.GameState;
-import eu.mcone.gameapi.listener.GameStateListener;
+import eu.mcone.gameapi.listener.gamestate.GameStateListener;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
@@ -25,12 +25,13 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
     @Getter
     private int countdownCounter;
 
-    public GameStateManager(GameAPIPlugin system, CorePlugin gamePlugin) {
-        system.registerEvents(new GameStateListener());
-
+    public GameStateManager(GameAPIPlugin system, CorePlugin plugin) {
         this.system = system;
-        this.gamePlugin = gamePlugin;
+        this.gamePlugin = plugin;
         this.pipeline = new LinkedList<>();
+
+        system.sendConsoleMessage("§aLoading GameStateManager...");
+        system.registerEvents(new GameStateListener());
     }
 
     @Override

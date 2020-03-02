@@ -3,6 +3,7 @@ package eu.mcone.gameapi.replay.session;
 import com.mongodb.client.MongoCollection;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.config.typeadapter.bson.LocationCodecProvider;
+import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Option;
 import eu.mcone.gameapi.api.replay.exception.ReplaySessionAlreadyExistsException;
@@ -44,6 +45,7 @@ public class ReplaySessionManager implements eu.mcone.gameapi.api.replay.session
         sessionID = generateSessionID();
         npcManager = new ReplayNpcManager();
 
+        GameAPIPlugin.getSystem().sendConsoleMessage("§aLoading Replay SessionManager...");
         if (Arrays.asList(options).contains(Option.SESSION_MANAGER_LOAD_ALL_REPLAYS)) {
             load();
         }

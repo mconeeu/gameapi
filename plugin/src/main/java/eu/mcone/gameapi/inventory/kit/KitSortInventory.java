@@ -23,7 +23,7 @@ import java.util.TimeZone;
 
 public class KitSortInventory extends CoreInventory {
 
-    KitSortInventory(Player p, GamePlayer gp, GameKitManager manager, Kit kit) {
+    KitSortInventory(Player p, GamePlayer gp, GameKitManager manager, Kit kit, Runnable onBackClick) {
         super("§8» " + kit.getName()+" §8| §7Kit sortieren", p, InventorySlot.ROW_3);
 
         Map<Integer, ItemStack> items = manager.calculateItems(kit, p);
@@ -33,7 +33,7 @@ public class KitSortInventory extends CoreInventory {
             }
         }
 
-        for (int i = InventorySlot.ROW_2_SLOT_1; i <= InventorySlot.ROW_2_SLOT_9; i++) {
+        for (int i = InventorySlot.ROW_2_SLOT_1; i <= InventorySlot.ROW_3_SLOT_9; i++) {
             setItem(i, PLACEHOLDER_ITEM);
         }
 
@@ -44,23 +44,23 @@ public class KitSortInventory extends CoreInventory {
             }
 
             gp.modifyKit(kit, changedItems);
-            new KitsInventory(p, manager);
+            new KitsInventory(p, manager, onBackClick);
         });
 
         ModifiedKit modifiedKit = gp.getModifiedKit(kit.getName());
         if (modifiedKit != null) {
-            setItem(InventorySlot.ROW_3_SLOT_5, new ItemBuilder(Material.WATCH).displayName("§7Zuletzt bearbeitet:").lore("§f§l" + getUpdateDate(modifiedKit.getLastUpdated())).create());
+            setItem(InventorySlot.ROW_3_SLOT_5, new ItemBuilder(Material.WATCH).displayName("§7Zuletzt bearbeitet:").lore("§7vor §f§l" + getUpdateDate(modifiedKit.getLastUpdated())).create());
         } else {
             setItem(InventorySlot.ROW_3_SLOT_5, new ItemBuilder(Material.WATCH).displayName("§7Noch nie bearbeitet").create());
         }
 
-        setItem(InventorySlot.ROW_3_SLOT_9, new ItemBuilder(Material.IRON_DOOR).displayName("§c§lAbbrechen").create(), e -> new KitsInventory(p, manager));
+        setItem(InventorySlot.ROW_3_SLOT_9, new ItemBuilder(Material.BARRIER).displayName("§c§lAbbrechen").create(), e -> new KitsInventory(p, manager, onBackClick));
 
         openInventory();
     }
 
     private String getUpdateDate(long lastModified) {
-        String date = "ERROR";
+        String date = "NAN";
         Calendar current = Calendar.getInstance(TimeZone.getTimeZone("CEST"));
 
         long difference = current.getTimeInMillis() - (lastModified * 1000);
@@ -68,11 +68,11 @@ public class KitSortInventory extends CoreInventory {
         differenceDate.setTimeInMillis(difference);
 
         if (differenceDate.get(Calendar.HOUR) >= 1) {
-            date = "§f§l" + differenceDate.get(Calendar.HOUR) + " §7Stunden";
+            date = "§f§l" + differenceDate.get(Calendar.HOUR) + " Stunden";
         } else if (differenceDate.get(Calendar.MINUTE) >= 1) {
-            date = "§f§l" + differenceDate.get(Calendar.MINUTE) + " §7Minuten";
+            date = "§f§l" + differenceDate.get(Calendar.MINUTE) + " Minuten";
         } else if (differenceDate.get(Calendar.SECOND) >= 1) {
-            date = "§f§l" + differenceDate.get(Calendar.SECOND) + " §7Sekunden";
+            date = "§f§l" + differenceDate.get(Calendar.SECOND) + " Sekunden";
         }
 
         return date;

@@ -2,6 +2,7 @@ package eu.mcone.gameapi.player;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
+import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.inventory.SpectatorInventory;
 import lombok.Getter;
@@ -24,11 +25,13 @@ public class GamePlayerManager implements eu.mcone.gameapi.api.player.PlayerMana
     @Getter
     private int maxPlayers;
 
-    public GamePlayerManager(GamePlugin gamePlugin) {
+    public GamePlayerManager(GamePlugin plugin, GameAPIPlugin system) {
         playing = new ArrayList<>();
         spectating = new ArrayList<>();
-        minPlayers = gamePlugin.getGameConfig().parseConfig().getMinPlayers();
-        maxPlayers = gamePlugin.getGameConfig().parseConfig().getMaxPlayers();
+        minPlayers = plugin.getGameConfig().parseConfig().getMinPlayers();
+        maxPlayers = plugin.getGameConfig().parseConfig().getMaxPlayers();
+
+        system.sendConsoleMessage("§aLoading PlayerManager...");
     }
 
     public void addSpectator(final Player player) {
@@ -69,7 +72,7 @@ public class GamePlayerManager implements eu.mcone.gameapi.api.player.PlayerMana
             }
         }
 
-        player.teleport(CoreSystem.getInstance().getWorldManager().getWorld(GamePlugin.getPlugin().getGameConfig().parseConfig().getLobby()).getLocation("spawn"));
+        player.teleport(CoreSystem.getInstance().getWorldManager().getWorld(GamePlugin.getGamePlugin().getGameConfig().parseConfig().getLobby()).getLocation("spawn"));
     }
 
     public void setPlaying(final Player player, final boolean var) {

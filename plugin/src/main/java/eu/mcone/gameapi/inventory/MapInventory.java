@@ -28,16 +28,18 @@ public class MapInventory extends CoreInventory {
 
         int i = 0;
         for (Map.Entry<GameAPIMap, List<Player>> entry : mapVotingHandler.getPopularityMap().entrySet()) {
-            ItemMeta meta = entry.getKey().getItem().getItemMeta();
-            meta.getLore().add("§7§o" + entry.getValue().size() + " Votes");
-            entry.getKey().getItem().setItemMeta(meta);
+            setItem(
+                    i,
+                    new ItemBuilder(entry.getKey().getItem())
+                            .displayName("§f§o" + entry.getKey().getWorld().getName())
+                            .lore("§7§o" + entry.getValue().size() + " Votes")
+                            .create(),
+                    e -> {
+                        mapVotingHandler.vote(p, entry.getKey());
 
-            setItem(i, entry.getKey().getItem(), e -> {
-                mapVotingHandler.vote(p, entry.getKey());
-
-                p.playSound(p.getLocation(), Sound.NOTE_BASS, 1, 1);
-                mapVotingHandler.getMapManager().getSystem().getMessager().send(p, "§2Du hast für die Map §a" + entry.getKey().getName() + " §2 gevotet.");
-            });
+                        p.playSound(p.getLocation(), Sound.NOTE_BASS, 1, 1);
+                        mapVotingHandler.getMapManager().getSystem().getMessager().send(p, "§2Du hast für die Map §a" + entry.getKey().getName() + " §2 gevotet.");
+                    });
             i++;
         }
 

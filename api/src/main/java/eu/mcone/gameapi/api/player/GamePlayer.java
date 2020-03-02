@@ -96,9 +96,15 @@ public interface GamePlayer {
 
     boolean hasKit(Kit kit);
 
+    Kit getCurrentKit();
+
     boolean buyKit(Kit kit);
 
+    boolean addKit(Kit kit);
+
     boolean removeKit(Kit kit);
+
+    void openKitInventory(Runnable onBackClick);
 
     ModifiedKit getModifiedKit(Kit kit);
 

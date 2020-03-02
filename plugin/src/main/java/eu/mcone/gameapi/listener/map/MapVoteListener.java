@@ -1,4 +1,4 @@
-package eu.mcone.gameapi.listener;
+package eu.mcone.gameapi.listener.map;
 
 import eu.mcone.gameapi.inventory.MapInventory;
 import eu.mcone.gameapi.map.GameMapVotingHandler;

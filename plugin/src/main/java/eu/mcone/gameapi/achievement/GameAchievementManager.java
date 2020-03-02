@@ -5,6 +5,7 @@ import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.UpdateOptions;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
+import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Option;
 import eu.mcone.gameapi.api.achievement.Achievement;
@@ -34,11 +35,12 @@ public class GameAchievementManager implements AchievementManager {
     private final GamePlugin plugin;
     private final Map<Gamemode, List<Achievement>> achievements;
 
-    public GameAchievementManager(GamePlugin plugin, Option... options) {
+    public GameAchievementManager(GamePlugin plugin, GameAPIPlugin system, Option... options) {
         this.loadAllAchievements = Arrays.asList(options).contains(Option.ACHIEVEMENT_MANAGER_LOAD_ALL_ACHIEVEMENTS);
         this.plugin = plugin;
         this.achievements = new HashMap<>();
 
+        system.sendConsoleMessage("§aLoading AchievementManager...");
         reload();
     }
 

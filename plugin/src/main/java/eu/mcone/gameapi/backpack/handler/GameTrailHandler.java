@@ -9,7 +9,7 @@ package eu.mcone.gameapi.backpack.handler;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
 import eu.mcone.gameapi.api.backpack.handler.TrailHandler;
-import eu.mcone.gameapi.listener.TrailListener;
+import eu.mcone.gameapi.listener.backpack.TrailListener;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultCategory;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import org.bukkit.Bukkit;

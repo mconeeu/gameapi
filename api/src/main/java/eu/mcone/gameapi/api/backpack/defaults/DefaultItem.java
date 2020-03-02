@@ -30,8 +30,6 @@ public enum DefaultItem {
     SPLASH_POTION(8, "Hexen Wurf Trank", DefaultCategory.GADGET, Level.UNUSUAL, 70, 45, new ItemBuilder(Material.POTION, 1, 16430).displayName("§3§lGeister Trank").lore("§7Kategorie: §bGadget", "§7Seltenheit: §3Ungewöhnlich", "", "", "§7Mache dich unsichtbar und erschrecke\nAhnungslose Spieler!").create()),
     MYSTERY_FURNACHE(9, "Mystery Ofen", DefaultCategory.GADGET, Level.LEGENDARY, 135, 95, new ItemBuilder(Material.FURNACE, 1, 0).displayName("§6§lKomischer Ofen").lore("§7Kategorie: §bGadget", "§7Seltenheit: §6Legendär", "", "", "§7Werfe deinen komischen Ofen auf andere und\nkoche seltsame Dinge!").create()),
 
-
-
     //Heads
     HEAD_PALUTEN(0, "Palutens Kopf", DefaultCategory.HAT, Level.EPIC, 120,70, Skull.fromUrl("http://textures.minecraft.net/texture/33121196cf12ee65354016861da064948d4ce0912f662bca2e2a6b2a932038", 1).toItemBuilder().displayName("§5§lPalutens Kopf").lore("§7Kategorie: §bKopf", "§7Seltenheit: §5Episch", "§7Rang:§5 Youtuber", "", "§7Edgar bist du da ??").create()),
     HEAD_DNER(1, "Dners Kopf", DefaultCategory.HAT, Level.EPIC, 120,70, Skull.fromUrl("http://textures.minecraft.net/texture/6092d4ea3448f3b2fbf355fcdfa2d36e51b2587a09e41e58eaa51e3daad4de5", 1).toItemBuilder().displayName("§5§lDners Kopf").lore("§7Kategorie: §bKopf", "§7Seltenheit: §5Episch", "§7Rang:§5 Youtuber", "", "§7Spielkind Zeit").create()),

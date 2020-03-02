@@ -15,7 +15,7 @@ public class ReplayObjective extends CoreSidebarObjective {
         setDisplayName("§e§lReplay Server");
         setScore(5, "");
         setScore(4, "§8» §7Replays:");
-        setScore(3, "§f§l" + GamePlugin.getPlugin().getSessionManager().getReplaySessions().size());
+        setScore(3, "§f§l" + GamePlugin.getGamePlugin().getSessionManager().getReplaySessions().size());
         setScore(2, "");
         setScore(1, "§f§lMCONE.EU ");
     }

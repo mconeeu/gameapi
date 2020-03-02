@@ -3,6 +3,7 @@ package eu.mcone.gameapi.player;
 import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import eu.mcone.coresystem.api.bukkit.player.profile.GameProfile;
 import eu.mcone.gameapi.api.GamePlugin;
+import eu.mcone.gameapi.api.Module;
 import eu.mcone.gameapi.api.achievement.Achievement;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
 import eu.mcone.gameapi.api.kit.ModifiedKit;
@@ -53,6 +54,7 @@ public class GameAPIPlayerProfile extends GameProfile {
 
     @Override
     public void doSetData(Player p) {
+        if (GamePlugin.getGamePlugin().hasModule(Module.BACKPACK_MANAGER))
         for (Map.Entry<String, List<Integer>> itemEntry : items.entrySet()) {
             Set<BackpackItem> items = new HashSet<>();
 

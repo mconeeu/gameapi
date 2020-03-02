@@ -67,7 +67,7 @@ public class Replay extends SimplePlayer implements Listener, eu.mcone.gameapi.a
                                     if (packet instanceof EntitySpawnPacketWrapper) {
                                         EntitySpawnPacketWrapper spawnPacketWrapper = (EntitySpawnPacketWrapper) packet;
                                         System.out.println(spawnPacketWrapper.getLocation().toString());
-                                        npc = GamePlugin.getPlugin().getSessionManager().getNpcManager().createNpc(player, new CoreLocation(spawnPacketWrapper.getLocation()));
+                                        npc = GamePlugin.getGamePlugin().getSessionManager().getNpcManager().createNpc(player, new CoreLocation(spawnPacketWrapper.getLocation()));
                                         Bukkit.getPluginManager().callEvent(new NpcAnimationStateChangeEvent(npc, NpcAnimationStateChangeEvent.NpcAnimationState.START));
                                     }
 

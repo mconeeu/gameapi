@@ -3,7 +3,7 @@ package eu.mcone.gameapi.map;
 import eu.mcone.gameapi.api.event.map.MapVotedEvent;
 import eu.mcone.gameapi.api.map.GameAPIMap;
 import eu.mcone.gameapi.api.map.MapVotingHandler;
-import eu.mcone.gameapi.listener.MapVoteListener;
+import eu.mcone.gameapi.listener.map.MapVoteListener;
 import eu.mcone.gameapi.inventory.MapInventory;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -22,6 +22,8 @@ public class GameMapVotingHandler implements MapVotingHandler {
 
     GameMapVotingHandler(GameMapManager mapManager) throws IllegalStateException {
         this.mapManager = mapManager;
+
+        mapManager.getSystem().sendConsoleMessage("§aLoading Map VotingHandler...");
         mapManager.getSystem().registerEvents(new MapVoteListener(this));
 
         if (mapManager.getMaps().size() <= 0) {

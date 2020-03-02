@@ -5,6 +5,7 @@ import eu.mcone.coresystem.api.bukkit.world.CoreWorld;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 
@@ -13,7 +14,7 @@ import org.bukkit.inventory.ItemStack;
 public class GameAPIMap {
 
     private String name;
-    private ItemStack item;
+    private Material item;
 
     public CoreWorld getWorld() {
         return CoreSystem.getInstance().getWorldManager().getWorld(name);

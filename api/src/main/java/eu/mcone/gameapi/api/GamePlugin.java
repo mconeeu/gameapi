@@ -29,8 +29,7 @@ public abstract class GamePlugin extends CorePlugin {
     @Getter
     private static GamePlugin gamePlugin;
 
-    @Getter
-    private List<Modules> modules;
+    private List<Module> modules;
     private final Option[] options;
 
     private MapManager mapManager;
@@ -69,9 +68,9 @@ public abstract class GamePlugin extends CorePlugin {
 
     @Override
     public void onDisable() {
-        if (modules.contains(Modules.REPLAY_SESSION_MANAGER)
-                && modules.contains(Modules.TEAM_MANAGER)
-                && modules.contains(Modules.PLAYER_MANAGER)) {
+        if (modules.contains(Module.REPLAY_SESSION_MANAGER)
+                && modules.contains(Module.TEAM_MANAGER)
+                && modules.contains(Module.PLAYER_MANAGER)) {
             //Stop date
             getReplaySession().getInfo().setStopped(System.currentTimeMillis() / 1000);
 //            getSessionManager().getChannelHandler().createUnregisterRequest();
@@ -85,10 +84,12 @@ public abstract class GamePlugin extends CorePlugin {
     public abstract void onGameDisable();
 
     public MapManager getMapManager() {
+        modules.add(Module.MAP_MANAGER);
         return mapManager != null ? mapManager : (mapManager = GameAPI.getInstance().constructMapManager());
     }
 
     public BackpackManager getBackpackManager() {
+        modules.add(Module.BACKPACK_MANAGER);
         return backpackManager != null ? backpackManager : (backpackManager = GameAPI.getInstance().constructBackpackManager(this, options));
     }
 
@@ -101,7 +102,7 @@ public abstract class GamePlugin extends CorePlugin {
     }
 
     public ReplaySessionManager getSessionManager() {
-        modules.add(Modules.REPLAY_SESSION_MANAGER);
+        modules.add(Module.REPLAY_SESSION_MANAGER);
         return sessionManager != null ? sessionManager : (sessionManager = GameAPI.getInstance().constructReplaySessionManager(this, options));
     }
 
@@ -111,10 +112,10 @@ public abstract class GamePlugin extends CorePlugin {
 
     public ReplaySession getReplaySession() {
         try {
-            if (modules.contains(Modules.REPLAY_SESSION_MANAGER)
-                    && modules.contains(Modules.TEAM_MANAGER)
-                    && modules.contains(Modules.PLAYER_MANAGER)) {
-                modules.add(Modules.REPLAY);
+            if (modules.contains(Module.REPLAY_SESSION_MANAGER)
+                    && modules.contains(Module.TEAM_MANAGER)
+                    && modules.contains(Module.PLAYER_MANAGER)) {
+                modules.add(Module.REPLAY);
                 return replaySession != null ? replaySession : (replaySession = GameAPI.getInstance().createReplaySession(getSessionManager()));
             } else {
                 throw new GameModuleNotActiveException("The game module ReplaysessionManager isn`t active!");
@@ -127,11 +128,17 @@ public abstract class GamePlugin extends CorePlugin {
     }
 
     public TeamManager getTeamManager() {
+        modules.add(Module.TEAM_MANAGER);
         return teamManager != null ? teamManager : (teamManager = GameAPI.getInstance().constructTeamManager(this));
     }
 
     public PlayerManager getPlayerManager() {
+        modules.add(Module.PLAYER_MANAGER);
         return playerManager != null ? playerManager : (playerManager = GameAPI.getInstance().constructPlayerManager(this));
+    }
+
+    public boolean hasModule(Module module) {
+        return modules.contains(module);
     }
 
     public GamePlayer getGamePlayer(final UUID uuid) {

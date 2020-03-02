@@ -1,6 +1,6 @@
 package eu.mcone.gameapi.api;
 
-public enum Modules {
+public enum Module {
 
     GAME_STATE_MANAGER,
     MAP_MANAGER,
@@ -10,4 +10,5 @@ public enum Modules {
     BACKPACK_MANAGER,
     ACHIEVEMENT_MANAGER,
     PLAYER_MANAGER
+
 }

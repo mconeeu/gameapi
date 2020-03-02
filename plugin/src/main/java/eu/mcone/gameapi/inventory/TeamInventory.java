@@ -6,7 +6,7 @@ import eu.mcone.coresystem.api.bukkit.inventory.InventoryOption;
 import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
 import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
 import eu.mcone.gameapi.api.GamePlugin;
-import eu.mcone.gameapi.api.Modules;
+import eu.mcone.gameapi.api.Module;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.team.Team;
 import eu.mcone.gameapi.api.team.TeamEnum;
@@ -24,10 +24,10 @@ public class TeamInventory extends CoreInventory {
     //TODO: Add team stage integration
     public TeamInventory(Player player, TeamManager teamManager) {
         super("§8» §c§oTeamauswahl", player, InventorySlot.ROW_4, InventoryOption.FILL_EMPTY_SLOTS);
-        gamePlugin = GamePlugin.getPlugin();
+        gamePlugin = GamePlugin.getGamePlugin();
         this.teamManager = teamManager;
 
-        if (gamePlugin.getModules().contains(Modules.TEAM_MANAGER)) {
+        if (gamePlugin.hasModule(Module.TEAM_MANAGER)) {
             int i = 1;
             for (Team team : teamManager.getTeams()) {
                 setItem(getPlace(team), new ItemBuilder(Material.BED, team.getSize()).displayName(team.getTeamEnum().getPrefix()).lore(new String[]{

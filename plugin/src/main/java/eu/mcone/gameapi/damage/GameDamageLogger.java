@@ -19,11 +19,12 @@ public class GameDamageLogger implements DamageLogger {
     private final GameAPIPlugin plugin;
     private final Map<UUID, Map<UUID, Long>> damageLog;
 
-    public GameDamageLogger(GameAPIPlugin plugin) {
-        this.plugin = plugin;
+    public GameDamageLogger(GameAPIPlugin system) {
+        this.plugin = system;
         this.damageLog = new HashMap<>();
 
-        plugin.registerEvents(new DamageLogListener(this));
+        system.sendConsoleMessage("§aLoading DamageLogger...");
+        system.registerEvents(new DamageLogListener(this));
     }
 
     public void logDamage(Player player, Player damager) {
@@ -36,7 +37,7 @@ public class GameDamageLogger implements DamageLogger {
 
     @Override
     public Player getKiller(Player p) {
-        if (damageLog.get(p.getUniqueId()).size() > 0) {
+        if (damageLog.containsKey(p.getUniqueId()) && damageLog.get(p.getUniqueId()).size() > 0) {
             HashMap.Entry<UUID, Long> entry = null;
             for (HashMap.Entry<UUID, Long> e : damageLog.get(p.getUniqueId()).entrySet()) {
                 entry = e;

@@ -1,4 +1,4 @@
-package eu.mcone.gameapi.listener;
+package eu.mcone.gameapi.listener.backpack;
 
 import eu.mcone.gameapi.backpack.handler.GameTrailHandler;
 import lombok.RequiredArgsConstructor;

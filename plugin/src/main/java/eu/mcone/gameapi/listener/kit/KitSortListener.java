@@ -1,4 +1,4 @@
-package eu.mcone.gameapi.listener;
+package eu.mcone.gameapi.listener.kit;
 
 import eu.mcone.gameapi.kit.GameKitManager;
 import lombok.RequiredArgsConstructor;

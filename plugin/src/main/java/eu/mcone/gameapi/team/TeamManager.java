@@ -2,7 +2,7 @@ package eu.mcone.gameapi.team;
 
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GamePlugin;
-import eu.mcone.gameapi.api.Modules;
+import eu.mcone.gameapi.api.Module;
 import eu.mcone.gameapi.api.event.team.TeamWonEvent;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.team.Team;
@@ -26,19 +26,21 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
     private HashMap<TeamEnum, Team> teams;
     private final GamePlugin gamePlugin;
 
-    public TeamManager(GamePlugin gamePlugin) {
-        this.gamePlugin = gamePlugin;
-        GameConfig config = gamePlugin.getGameConfig().parseConfig();
+    public TeamManager(GamePlugin plugin, GameAPIPlugin system) {
+        this.gamePlugin = plugin;
+        GameConfig config = plugin.getGameConfig().parseConfig();
         playersPerTeam = config.getPlayersPerTeam();
         teams = new HashMap<>();
+
+        system.sendConsoleMessage("§aLoading Map RotationHandler...");
 
         int teamSize = 0;
         if (config.getMaxPlayers() != 0 && config.getPlayersPerTeam() != 0) {
             teamSize = config.getMaxPlayers() / config.getPlayersPerTeam();
         }
 
-        if (GamePlugin.getPlugin().getModules().contains(Modules.REPLAY_SESSION_MANAGER)) {
-            GamePlugin.getPlugin().getReplaySession().getInfo().setTeams(teamSize);
+        if (GamePlugin.getGamePlugin().hasModule(Module.REPLAY_SESSION_MANAGER)) {
+            GamePlugin.getGamePlugin().getReplaySession().getInfo().setTeams(teamSize);
         }
 
         int i = 0;

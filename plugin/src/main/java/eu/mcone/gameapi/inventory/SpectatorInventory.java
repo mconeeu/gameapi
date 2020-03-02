@@ -22,7 +22,7 @@ public class SpectatorInventory extends CoreInventory {
 
         int slot = 0;
         for (Player playing : playerManager.getPlaying()) {
-            GamePlayer gamePlayer = GamePlugin.getPlugin().getGamePlayer(playing.getUniqueId());
+            GamePlayer gamePlayer = GamePlugin.getGamePlugin().getGamePlayer(playing.getUniqueId());
 
             setItem(slot, new Skull(playing.getName()).setDisplayName("§7" + playing.getName()).lore(
                     "§8» §7§oRanking Platz: §f§l" + gamePlayer.getCorePlayer().getStats().getUserRanking(),
@@ -34,7 +34,7 @@ public class SpectatorInventory extends CoreInventory {
             ).getItemStack(), e -> {
                 player.teleport(gamePlayer.getCorePlayer().bukkit().getLocation());
                 player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 1);
-                GamePlugin.getPlugin().getMessager().send(player, "§7Du wurdest zu dem Spieler " + GamePlugin.getPlugin().getPluginColor() + gamePlayer.getCorePlayer().getName() + " §7teleportiert");
+                GamePlugin.getGamePlugin().getMessager().send(player, "§7Du wurdest zu dem Spieler " + GamePlugin.getGamePlugin().getPluginColor() + gamePlayer.getCorePlayer().getName() + " §7teleportiert");
             });
 
             slot++;
