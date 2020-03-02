@@ -8,14 +8,14 @@ package eu.mcone.gameapi.player;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
-import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.achievement.Achievement;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
-import eu.mcone.gameapi.api.kit.ModifiedKit;
+import eu.mcone.gameapi.api.event.stats.PlayerRoundStatsChangeEvent;
 import eu.mcone.gameapi.api.kit.Kit;
+import eu.mcone.gameapi.api.kit.ModifiedKit;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.GamePlayerSettings;
 import eu.mcone.gameapi.backpack.GameBackpackManager;
@@ -23,6 +23,7 @@ import eu.mcone.gameapi.kit.GameKitManager;
 import eu.mcone.gameapi.api.event.stats.PlayerRoundStatsChangeEvent;
 import eu.mcone.gameapi.api.team.Team;
 import eu.mcone.gameapi.api.team.TeamEnum;
+import eu.mcone.gameapi.kit.GameKitManager;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Sound;
@@ -43,8 +44,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
     @Getter
     private GamePlayerSettings settings;
 
-    @Getter
-    @Setter
+    @Getter @Setter
     private boolean effectsVisible = true;
 
     @Getter
@@ -194,9 +194,6 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
                     if (achievements.containsKey(GamePlugin.getGamePlugin().getGamemode())) {
                         achievements.get(GamePlugin.getGamePlugin().getGamemode()).put(achievement, System.currentTimeMillis() / 1000);
                     } else {
-                        achievements.put(GamePlugin.getGamePlugin().getGamemode(), new HashMap<Achievement, Long>() {{
-                            put(achievement, System.currentTimeMillis() / 1000);
-                        }});
                         achievements.put(GamePlugin.getGamePlugin().getGamemode(), new HashMap<Achievement, Long>() {{
                             put(achievement, System.currentTimeMillis() / 1000);
                         }});
