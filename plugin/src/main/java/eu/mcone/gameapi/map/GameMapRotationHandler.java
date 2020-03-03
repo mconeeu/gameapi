@@ -18,6 +18,7 @@ import java.util.Random;
 
 public class GameMapRotationHandler implements MapRotationHandler {
 
+    private static final Random MAP_RANDOM = new Random();
     private final GameMapManager mapManager;
 
     private BukkitTask currentTask, countdownTask;
@@ -37,7 +38,6 @@ public class GameMapRotationHandler implements MapRotationHandler {
         }
 
         this.mapManager = mapManager;
-        this.currentMap = mapManager.getMaps().get(new Random().nextInt(mapManager.getMaps().size() - 1));
     }
 
     @Override
@@ -64,20 +64,23 @@ public class GameMapRotationHandler implements MapRotationHandler {
             throw new IllegalStateException("Cannot start rotation. The Rotation is already initialized and will happen in " + (rotationInterval - (System.currentTimeMillis() / 1000) - lastRotation) + " seconds!");
         }
 
-        long configLastRotation = mapManager.getConfig().parseConfig().getLastRotation();
-        if (configLastRotation > 0) {
-            lastRotation = configLastRotation;
+        MapsConfig config = mapManager.getConfig().parseConfig();
+        if (config.getLastRotation() > 0) {
+            lastRotation = config.getLastRotation();
         }
 
-        //delaying rotation start as coresystem did not load all players on reload (needed for Messager messages in resumeRotation())
-        Bukkit.getScheduler().runTaskLater(mapManager.getSystem(), () -> {
-            long newConfigRation = configLastRotation + rotationInterval;
-            if (newConfigRation <= ((System.currentTimeMillis() / 1000) + 15)) {
-                rotate();
-            } else {
+        long newConfigRation = config.getLastRotation() + rotationInterval;
+        if (newConfigRation <= ((System.currentTimeMillis() / 1000) + 15) || config.getCurrentMap() == null || mapManager.getMap(config.getCurrentMap()) == null) {
+            rotate();
+        } else {
+            currentMap = mapManager.getMap(config.getCurrentMap());
+
+            //delaying rotation start as coresystem did not load all players on reload (needed for Messager messages in resumeRotation())
+            Bukkit.getScheduler().runTaskLater(mapManager.getSystem(), () -> {
+                mapManager.getSystem().sendConsoleMessage("§7Starting RotationHandler with old Map " + currentMap.getName());
                 resumeRotation(newConfigRation - (System.currentTimeMillis() / 1000));
-            }
-        }, 5 * 20);
+            }, 5 * 20);
+        }
     }
 
     private void resumeRotation(long doRotationIn) {
@@ -113,6 +116,9 @@ public class GameMapRotationHandler implements MapRotationHandler {
         if (currentTask != null) {
             currentTask.cancel();
         }
+        if (currentMap == null) {
+            this.currentMap = mapManager.getMaps().get(MAP_RANDOM.nextInt(mapManager.getMaps().size() - 1));
+        }
 
         int lastIndex = -1, newIndex = 0;
         for (int i = 0; i < mapManager.getMaps().size(); i++) {
@@ -146,12 +152,15 @@ public class GameMapRotationHandler implements MapRotationHandler {
 
         MapsConfig config = mapManager.getConfig().parseConfig();
         config.setLastRotation(lastRotation);
+        config.setCurrentMap(currentMap.getName());
         mapManager.getConfig().updateConfig(config);
 
         if (newInterval > -1) {
             rotationInterval = newInterval;
             newInterval = -1;
         }
+
+        mapManager.getSystem().sendConsoleMessage("§7Changing Map to " + currentMap.getName());
         resumeRotation(rotationInterval);
     }
 

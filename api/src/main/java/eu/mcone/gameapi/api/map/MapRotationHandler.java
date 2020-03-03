@@ -6,6 +6,8 @@ public interface MapRotationHandler {
 
     void startRotation() throws IllegalStateException;
 
+    GameAPIMap getCurrentMap();
+
     long getLastRotation();
 
     long getRotationInterval();

@@ -32,7 +32,7 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
         playersPerTeam = config.getPlayersPerTeam();
         teams = new HashMap<>();
 
-        system.sendConsoleMessage("§aLoading Map RotationHandler...");
+        system.sendConsoleMessage("§aLoading TeamManager...");
 
         int teamSize = 0;
         if (config.getMaxPlayers() != 0 && config.getPlayersPerTeam() != 0) {

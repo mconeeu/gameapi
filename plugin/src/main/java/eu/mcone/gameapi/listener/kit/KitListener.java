@@ -1,7 +1,9 @@
 package eu.mcone.gameapi.listener.kit;
 
+import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.kit.GameKitManager;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,7 +27,7 @@ public class KitListener implements Listener {
     @EventHandler
     public void on(PlayerRespawnEvent e) {
         if (manager.getDefaultKit() != null) {
-            manager.setKit(manager.getDefaultKit(), e.getPlayer());
+            Bukkit.getScheduler().runTask(GameAPIPlugin.getSystem(), () -> manager.setKit(manager.getDefaultKit(), e.getPlayer()));
         }
     }
 

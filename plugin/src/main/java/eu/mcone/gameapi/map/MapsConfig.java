@@ -18,6 +18,8 @@ public class MapsConfig {
     private List<GameAPIMap> maps = new ArrayList<>();
     @Setter
     private long lastRotation = 0;
+    @Setter
+    private String currentMap = null;
 
     public MapsConfig addWorld(CoreWorld world, Material item) {
         if (!containsMap(world.getName())) {
