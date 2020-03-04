@@ -43,10 +43,10 @@ public class TradeChooseInventory extends CategoryInventory {
         for (BackpackItem item : ((GameBackpackManager) plugin.getBackpackManager()).getCategoryItems(category.getName())) {
             if (hasItem(category.getName(), item) && item.isSellable()) {
                 addItem(item.getItem(), e -> {
-                    ((GameBackpackManager) GamePlugin.getGamePlugin().getBackpackManager()).getChoosedItems().put(p, item);
+                    ((GameBackpackManager) GamePlugin.getGamePlugin().getBackpackManager()).getTradeManager().getChoosedItems().put(p, item);
 
-                    Player partner = ((GameBackpackManager) plugin.getBackpackManager()).getTraidingPartner(p);
-                    new TradingFinishInventory(gamePlayer, item, ((GameBackpackManager) GamePlugin.getGamePlugin().getBackpackManager()).getChoosedItems().getOrDefault(partner, null), false);
+                    Player partner = ((GameBackpackManager) plugin.getBackpackManager()).getTradeManager().getTraidingPartner(p);
+                    new TradingFinishInventory(gamePlayer, item, ((GameBackpackManager) GamePlugin.getGamePlugin().getBackpackManager()).getTradeManager().getChoosedItems().getOrDefault(partner, null), false);
                 });
             }
         }

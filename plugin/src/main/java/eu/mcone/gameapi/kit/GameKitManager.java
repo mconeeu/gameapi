@@ -6,9 +6,9 @@ import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Option;
-import eu.mcone.gameapi.api.kit.ModifiedKit;
 import eu.mcone.gameapi.api.kit.Kit;
 import eu.mcone.gameapi.api.kit.KitManager;
+import eu.mcone.gameapi.api.kit.ModifiedKit;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.inventory.kit.KitsInventory;
 import eu.mcone.gameapi.listener.kit.KitListener;
@@ -16,10 +16,8 @@ import eu.mcone.gameapi.listener.kit.KitSortListener;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.Document;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
@@ -40,7 +38,7 @@ public class GameKitManager implements KitManager {
 
     @Getter
     private final List<Kit> kits;
-    private final Map<UUID, Kit> currentKits;
+    private final Map<UUID, String> currentKits;
     private final Map<UUID, List<String>> playerKits;
     private final Map<UUID, List<ModifiedKit>> customKits;
 
@@ -93,7 +91,7 @@ public class GameKitManager implements KitManager {
             if (playerEntry.get(plugin.getGamemode().toString()) != null) {
                 String currentKit = playerEntry.get(plugin.getGamemode().toString(), Document.class).getString("currentKit");
                 if (currentKit != null) {
-                    currentKits.put(uuid, getKit(currentKit));
+                    currentKits.put(uuid, currentKit);
                 }
 
                 if (!applyKitsOnce) {
@@ -161,17 +159,18 @@ public class GameKitManager implements KitManager {
 
     public void setKit(Kit kit, Player p) {
         if (clearInvOnKitSet && currentKits.containsKey(p.getUniqueId())) {
-            Kit oldKit = currentKits.get(p.getUniqueId());
+            Kit oldKit = getKit(currentKits.get(p.getUniqueId()));
 
             if (oldKit != null) {
                 for (ItemStack item : oldKit.getKitItems().values()) {
                     p.getInventory().remove(item);
                 }
+
                 p.getInventory().setArmorContents(null);
             }
         }
 
-        currentKits.put(p.getUniqueId(), kit);
+        currentKits.put(p.getUniqueId(), kit.getName());
         system.getServer().getScheduler().runTaskAsynchronously(
                 system,
                 () -> PLAYER_KITS_COLLECTION.updateOne(
@@ -196,7 +195,7 @@ public class GameKitManager implements KitManager {
     }
 
     public Kit getCurrentKit(Player p) {
-        return currentKits.getOrDefault(p.getUniqueId(), null);
+        return getKit(currentKits.getOrDefault(p.getUniqueId(), null));
     }
 
     @Override

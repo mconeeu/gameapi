@@ -19,8 +19,8 @@ public class TradingFinishInventory extends CoreInventory {
         super("§8» §e§lTrade", gp.bukkit(), InventorySlot.ROW_3, InventoryOption.FILL_EMPTY_SLOTS);
         GameBackpackManager backpackManager = ((GameBackpackManager) GamePlugin.getGamePlugin().getBackpackManager());
         Player p = gp.bukkit();
-        Player partner = backpackManager.getTraidingPartner(p);
-        boolean partnerAccepted = partner != null && backpackManager.getTradeItemAccepted().contains(partner);
+        Player partner = backpackManager.getTradeManager().getTraidingPartner(p);
+        boolean partnerAccepted = partner != null && backpackManager.getTradeManager().getTradeItemAccepted().contains(partner);
 
         setItem(InventorySlot.ROW_2_SLOT_2, selfChoosedItem.getItem());
 
@@ -64,7 +64,7 @@ public class TradingFinishInventory extends CoreInventory {
                     GameAPIPlugin.getSystem().getMessager().send(p, "§2Du hast das Item §a" + selfChoosedItem.getName() + " §2für §f" + partnerChoosedItem.getName() + " §2erfolgreich ausgetauscht!");
                     GameAPIPlugin.getSystem().getMessager().send(partner, "§2Du hast das Item §a" + partnerChoosedItem.getName() + " §2für §f" + selfChoosedItem.getName() + " §2erfolgreich ausgetauscht!");
                 } : null) : e -> {
-                    backpackManager.getTradeItemAccepted().add(p);
+                    backpackManager.getTradeManager().getTradeItemAccepted().add(p);
                     new TradingFinishInventory(gp, selfChoosedItem, partnerChoosedItem, true);
                     
                     if (partnerChoosedItem != null) {
@@ -88,7 +88,7 @@ public class TradingFinishInventory extends CoreInventory {
                 new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 14)
                         .displayName("§cAbbrechen")
                         .create(),
-                e -> backpackManager.openBackpackTraidInventory(player)
+                e -> backpackManager.getTradeManager().openBackpackTraidInventory(player)
         );
 
         setItem(

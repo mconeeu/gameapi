@@ -22,9 +22,7 @@ public class GameMapManager implements MapManager {
     @Getter
     private final CoreJsonConfig<MapsConfig> config;
 
-    @Getter
     private GameMapVotingHandler votingHandler;
-    @Getter
     private GameMapRotationHandler rotationHandler;
 
     public GameMapManager(GameAPIPlugin system) throws IllegalStateException {

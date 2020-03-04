@@ -20,14 +20,19 @@ public class KitListener implements Listener {
         Player p = e.getPlayer();
 
         if (manager.getCurrentKit(p) == null && manager.getDefaultKit() != null) {
-            manager.setKit(manager.getDefaultKit(), p);
+            Bukkit.getScheduler().runTaskLater(GameAPIPlugin.getSystem(), () -> {
+                p.getInventory().clear();
+                p.getInventory().setArmorContents(null);
+
+                manager.setKit(manager.getDefaultKit(), p);
+            }, 20);
         }
     }
 
     @EventHandler
     public void on(PlayerRespawnEvent e) {
         if (manager.getDefaultKit() != null) {
-            Bukkit.getScheduler().runTask(GameAPIPlugin.getSystem(), () -> manager.setKit(manager.getDefaultKit(), e.getPlayer()));
+            Bukkit.getScheduler().runTaskLater(GameAPIPlugin.getSystem(), () -> manager.setKit(manager.getDefaultKit(), e.getPlayer()), 5);
         }
     }
 

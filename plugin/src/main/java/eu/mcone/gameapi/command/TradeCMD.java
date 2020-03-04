@@ -19,7 +19,6 @@ public class TradeCMD extends CoreCommand {
     public boolean onCommand(CommandSender sender, String[] args) {
         Player player = (Player) sender;
 
-
         if (args.length == 1) {
             Player target = Bukkit.getPlayer(args[0]);
             GamePlayer gt = GameAPI.getInstance().getGamePlayer(target);
@@ -31,10 +30,10 @@ public class TradeCMD extends CoreCommand {
 
                     if (target != null) {
                         if (player != target) {
-                            if (!((GameBackpackManager) GamePlugin.getGamePlugin().getBackpackManager()).hasTraidingRequest(target, player)) {
-                                GamePlugin.getGamePlugin().getBackpackManager().makeTraidRequest(player, target);
+                            if (!((GameBackpackManager) GamePlugin.getGamePlugin().getBackpackManager()).getTradeManager().hasTraidingRequest(target, player)) {
+                                GamePlugin.getGamePlugin().getBackpackManager().getTradeManager().makeTraidRequest(player, target);
                             } else {
-                                ((GameBackpackManager) GamePlugin.getGamePlugin().getBackpackManager()).openBackpackTraidInventory(player);
+                                ((GameBackpackManager) GamePlugin.getGamePlugin().getBackpackManager()).getTradeManager().openBackpackTraidInventory(player);
                             }
                         } else {
                             GameAPI.getInstance().getMessager().send(player, "§4Du kannst nicht mit dir selber handeln!");
@@ -57,8 +56,8 @@ public class TradeCMD extends CoreCommand {
                 if (gp.getSettings().isEnableTraiding()) {
                     if (gt.getSettings().isEnableTraiding()) {
 
-                        if (((GameBackpackManager) GamePlugin.getGamePlugin().getBackpackManager()).hasTraidingRequest(target, player)) {
-                            ((GameBackpackManager) GamePlugin.getGamePlugin().getBackpackManager()).openBackpackTraidInventory(player);
+                        if (((GameBackpackManager) GamePlugin.getGamePlugin().getBackpackManager()).getTradeManager().hasTraidingRequest(target, player)) {
+                            ((GameBackpackManager) GamePlugin.getGamePlugin().getBackpackManager()).getTradeManager().openBackpackTraidInventory(player);
                         } else {
                             GameAPI.getInstance().getMessager().send(player, "§4Der §cSpieler §4hat dich nicht angefragt!");
                         }
