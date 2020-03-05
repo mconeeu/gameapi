@@ -51,4 +51,8 @@ public class GameDamageLogger implements DamageLogger {
         return null;
     }
 
+    public void playerDied(Player p) {
+        damageLog.remove(p.getUniqueId());
+    }
+
 }
