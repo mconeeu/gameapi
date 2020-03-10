@@ -17,7 +17,8 @@ public class GadgetListener extends BackpackInventoryListener {
                 //new EnderGunListener(plugin),
                 new LoveGunListener(plugin),
                 new SnowGunListener(plugin),
-                new CobwebGub(plugin),
+                new CobwebGunListener(plugin),
+                new FurnaceListener(plugin),
                 new EnderPearlListener(plugin),
                 new SplashPotionListener(plugin)
         );

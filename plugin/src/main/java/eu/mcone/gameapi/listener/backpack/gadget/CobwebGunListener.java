@@ -17,9 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class CobwebGub extends GadgetListener {
+public class CobwebGunListener extends GadgetListener {
 
-    public CobwebGub(GamePlugin plugin) {
+    public CobwebGunListener(GamePlugin plugin) {
         super(plugin);
     }
 
@@ -30,7 +30,7 @@ public class CobwebGub extends GadgetListener {
     @EventHandler
     public void on(PlayerInteractEvent e) {
         if (e.hasItem() && e.getItem().equals(DefaultItem.COBWEBGUN.getItemStack()) && (e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_AIR))) {
-            Player p = e.getPlayer();
+           Player p = e.getPlayer();
 
             org.bukkit.entity.Item item = p.getLocation().getWorld().dropItem(p.getEyeLocation(),
                     new ItemStack(Material.FIREWORK_CHARGE));
