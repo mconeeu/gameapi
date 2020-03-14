@@ -33,42 +33,51 @@ public class TradingFinishInventory extends CoreInventory {
         setItem(
                 InventorySlot.ROW_2_SLOT_4,
                 new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 13)
-                        .displayName(accpeted ? (partnerChoosedItem != null && partnerAccepted ? "§aJetzt Traden" : "§7§oWarte auf Partner" ) : "§aEigenes Item Akzeptieren")
+                        .displayName(accpeted ? (partnerChoosedItem != null && partnerAccepted ? "§aJetzt Traden" : "§7§oWarte auf Partner") : "§aEigenes Item Akzeptieren")
                         .lore("§7Tausche das Item §f" + selfChoosedItem.getName() + (partnerChoosedItem != null ? "§7 mit " + partnerChoosedItem.getName() : ""))
                         .create(),
-                accpeted ? ((partnerChoosedItem != null && partnerAccepted) ? e -> {
-                    GamePlayer gpPartner = GameAPIPlugin.getSystem().getGamePlayer(partner);
-                    String selfChoosedItemCategory = backpackManager
-                            .getCategoryByItemDisplayName(selfChoosedItem.getItem().getItemMeta().getDisplayName()).getName();
-                    String partnerChoosedItemCatergory = backpackManager
-                            .getCategoryByItemDisplayName(partnerChoosedItem.getItem().getItemMeta().getDisplayName()).getName();
+                e -> {
+                    if (partnerChoosedItem != null && partnerAccepted) {
+                        GamePlayer gpPartner = GameAPIPlugin.getSystem().getGamePlayer(partner);
 
-                    gp.removeBackpackItem(
-                            selfChoosedItemCategory,
-                            selfChoosedItem
-                    );
-                    gpPartner.removeBackpackItem(
-                            partnerChoosedItemCatergory,
-                            partnerChoosedItem
-                    );
+                        System.out.println("selfChoosed displayname: " + selfChoosedItem.getItem().getItemMeta().getDisplayName());
+                        System.out.println("selfChoosed category: " + backpackManager
+                                .getCategoryByItemDisplayName(selfChoosedItem.getItem().getItemMeta().getDisplayName()));
+                        System.out.println("partnerChoosed displayname: " + partnerChoosedItem.getItem().getItemMeta().getDisplayName());
+                        System.out.println("partnerChoosed category: " + backpackManager
+                                .getCategoryByItemDisplayName(partnerChoosedItem.getItem().getItemMeta().getDisplayName()));
+                        String selfChoosedItemCategory = backpackManager
+                                .getCategoryByItemDisplayName(selfChoosedItem.getItem().getItemMeta().getDisplayName()).getName();
+                        String partnerChoosedItemCatergory = backpackManager
+                                .getCategoryByItemDisplayName(partnerChoosedItem.getItem().getItemMeta().getDisplayName()).getName();
 
-                    gp.addBackpackItem(
-                            partnerChoosedItemCatergory,
-                            partnerChoosedItem
-                    );
-                    gpPartner.removeBackpackItem(
-                            selfChoosedItemCategory,
-                            selfChoosedItem
-                    );
+                        gp.removeBackpackItem(
+                                selfChoosedItemCategory,
+                                selfChoosedItem
+                        );
+                        gpPartner.removeBackpackItem(
+                                partnerChoosedItemCatergory,
+                                partnerChoosedItem
+                        );
 
-                    GameAPIPlugin.getSystem().getMessager().send(p, "§2Du hast das Item §a" + selfChoosedItem.getName() + " §2für §f" + partnerChoosedItem.getName() + " §2erfolgreich ausgetauscht!");
-                    GameAPIPlugin.getSystem().getMessager().send(partner, "§2Du hast das Item §a" + partnerChoosedItem.getName() + " §2für §f" + selfChoosedItem.getName() + " §2erfolgreich ausgetauscht!");
-                } : null) : e -> {
-                    backpackManager.getTradeManager().getTradeItemAccepted().add(p);
-                    new TradingFinishInventory(gp, selfChoosedItem, partnerChoosedItem, true);
-                    
-                    if (partnerChoosedItem != null) {
-                        new TradingFinishInventory(GameAPIPlugin.getSystem().getGamePlayer(partner), partnerChoosedItem, selfChoosedItem, partnerAccepted);
+                        gp.addBackpackItem(
+                                partnerChoosedItemCatergory,
+                                partnerChoosedItem
+                        );
+                        gpPartner.removeBackpackItem(
+                                selfChoosedItemCategory,
+                                selfChoosedItem
+                        );
+
+                        GameAPIPlugin.getSystem().getMessager().send(p, "§2Du hast das Item §a" + selfChoosedItem.getName() + " §2für §f" + partnerChoosedItem.getName() + " §2erfolgreich ausgetauscht!");
+                        GameAPIPlugin.getSystem().getMessager().send(partner, "§2Du hast das Item §a" + partnerChoosedItem.getName() + " §2für §f" + selfChoosedItem.getName() + " §2erfolgreich ausgetauscht!");
+                    } else if (!accpeted) {
+                        backpackManager.getTradeManager().getTradeItemAccepted().add(p);
+                        new TradingFinishInventory(gp, selfChoosedItem, partnerChoosedItem, true);
+
+                        if (partnerChoosedItem != null) {
+                            new TradingFinishInventory(GameAPIPlugin.getSystem().getGamePlayer(partner), partnerChoosedItem, selfChoosedItem, partnerAccepted);
+                        }
                     }
                 });
 
