@@ -51,10 +51,6 @@ public class GameAPIPlugin extends GameAPI {
 
         registerEvents(new GamePlayerListener());
 
-        registerEvents(
-                new GamePlayerListener()
-        );
-
         sendConsoleMessage("§aVersion §f" + this.getDescription().getVersion() + "§a enabled...");
     }
 
