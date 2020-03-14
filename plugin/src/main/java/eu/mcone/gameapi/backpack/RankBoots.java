@@ -20,7 +20,8 @@ public enum RankBoots {
     SR_MODERATOR_BOOTS(Group.SRMODERATOR, ItemBuilder.createLeatherArmorItem(Material.LEATHER_BOOTS, Color.OLIVE).displayName("§c§lSenior Moderator Schuhe").lore("§7Kategorie: §bExklusives Item", "§7Seltenheit: §cMythisch", "", "§7Senior Moderator Boots").unbreakable(true).itemFlags(ItemFlag.HIDE_UNBREAKABLE).create()),
     BUILDER_BOOTS(Group.BUILDER, ItemBuilder.createLeatherArmorItem(Material.LEATHER_BOOTS, Color.YELLOW).displayName("§c§lBuilder Schuhe").lore("§7Kategorie: §bExklusives Item", "§7Seltenheit: §cMythisch", "", "§7Builder Boots").unbreakable(true).itemFlags(ItemFlag.HIDE_UNBREAKABLE).create()),
     DEVELOPER_BOOTS(Group.DEVELOPER, ItemBuilder.createLeatherArmorItem(Material.LEATHER_BOOTS, Color.AQUA).displayName("§c§lDeveloper Schuhe").lore("§7Kategorie: §bExklusives Item", "§7Seltenheit: §cMythisch", "", "§7Nike Developer Ultra Boost").unbreakable(true).itemFlags(ItemFlag.HIDE_UNBREAKABLE).create()),
-    ADMIN_BOOTS(Group.ADMIN, ItemBuilder.createLeatherArmorItem(Material.LEATHER_BOOTS, Color.RED).displayName("§c§lAdminstrator Schuhe").lore("§7Kategorie: §bExklusives Item", "§7Seltenheit: §cMythisch", "", "§7ADMIN SCHUHE ICH BIN DER BOSS").unbreakable(true).itemFlags(ItemFlag.HIDE_UNBREAKABLE).create());
+    CONTENT_BOOTS(Group.CONTENT, ItemBuilder.createLeatherArmorItem(Material.LEATHER_BOOTS, Color.BLUE).displayName("§c§lContent Schuhe").lore("§7Kategorie: §bExklusives Item", "§7Seltenheit: §cMythisch", "", "§7Gucci x Supreme MH100").unbreakable(true).itemFlags(ItemFlag.HIDE_UNBREAKABLE).create()),
+    ADMIN_BOOTS(Group.ADMIN, ItemBuilder.createLeatherArmorItem(Material.LEATHER_BOOTS, Color.RED).displayName("§c§lAdminstrator Schuhe").lore("§7Kategorie: §bExklusives Item", "§7Seltenheit: §cMythisch", "", "§7BAN BAN BAN. ICH BIN DER BOSS!!").unbreakable(true).itemFlags(ItemFlag.HIDE_UNBREAKABLE).create());
 
     private Group group;
     private ItemStack item;
