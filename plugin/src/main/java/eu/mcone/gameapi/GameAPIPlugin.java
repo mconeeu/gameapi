@@ -49,8 +49,6 @@ public class GameAPIPlugin extends GameAPI {
 
         CoreSystem.getInstance().getTranslationManager().loadCategories(this);
 
-        registerEvents(new GamePlayerListener());
-
         registerEvents(
                 new GamePlayerListener()
         );
