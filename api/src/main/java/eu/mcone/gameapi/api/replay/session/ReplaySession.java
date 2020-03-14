@@ -1,12 +1,15 @@
 package eu.mcone.gameapi.api.replay.session;
 
 import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketWrapper;
+import eu.mcone.gameapi.api.replay.chunk.ReplayChunkHandler;
 import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
+import eu.mcone.gameapi.api.replay.runner.ReplayRunnerManager;
+import eu.mcone.gameapi.api.utils.ReplayRecorder;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public interface ReplaySession {
@@ -15,9 +18,13 @@ public interface ReplaySession {
 
     ServerInfo getInfo();
 
-    HashMap<String, List<PacketWrapper>> getServerPackets();
+    ReplayRunnerManager getRunnerManager();
 
-    HashMap<String, List<PacketWrapper>> getWorldPackets();
+    ReplayChunkHandler getChunkHandler();
+
+    ReplayRecorder getReplayRecorder();
+
+    Map<String, List<PacketWrapper>> getMessages();
 
     void recordSession();
 
@@ -38,8 +45,6 @@ public interface ReplaySession {
     boolean existsReplayPlayer(final Player player);
 
     void openInformationInventory(Player player);
-
-    void openSpectatorInventory(Player player);
 
     interface ServerInfo {
 
@@ -63,8 +68,8 @@ public interface ReplaySession {
 
         void setWorld(String world);
 
-        double getLength();
+        int getLastTick();
 
-        void setLength(double length);
+        void setLastTick(int length);
     }
 }

@@ -6,6 +6,7 @@ import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
 import eu.mcone.coresystem.api.bukkit.item.Skull;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
+import eu.mcone.gameapi.replay.runner.PlayerRunner;
 import eu.mcone.gameapi.replay.session.ReplaySession;
 import org.bukkit.entity.Player;
 
@@ -17,8 +18,11 @@ public class ReplaySpectatorInventory extends CoreInventory {
         int slot = 0;
         for (ReplayPlayer rPlayer : session.getPlayers()) {
             setItem(slot, new Skull(rPlayer.getData().getName()).setDisplayName(rPlayer.getData().getDisplayName()).getItemStack(), e -> {
-                p.teleport(rPlayer.getReplay().getLocation());
-                GamePlugin.getGamePlugin().getMessager().send(p, "§aDu wurdest zu dem Spieler §f" + rPlayer.getData().getName() + " §ateleportiert!");
+                if (session.getRunnerManager().getReplays().containsKey(rPlayer.getUuid())) {
+                    //TODO: Check if this works
+                    p.teleport(((PlayerRunner)(session.getRunnerManager().getReplays().containsKey(rPlayer.getUuid()) ? session.getRunnerManager().getReplays().get(rPlayer.getUuid()) : session.getRunnerManager().getSingleReplays().get(player.getUniqueId()))).getLocation());
+                    GamePlugin.getGamePlugin().getMessager().send(p, "§aDu wurdest zu dem Spieler §f" + rPlayer.getData().getName() + " §ateleportiert!");
+                }
             });
             slot++;
         }

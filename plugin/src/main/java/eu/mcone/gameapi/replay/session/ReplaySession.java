@@ -6,9 +6,10 @@ import eu.mcone.gameapi.api.replay.event.PlayerJoinReplaySessionEvent;
 import eu.mcone.gameapi.api.replay.event.PlayerQuitReplaySessionEvent;
 import eu.mcone.gameapi.api.replay.exception.ReplayPlayerAlreadyExistsException;
 import eu.mcone.gameapi.api.replay.session.ReplaySessionManager;
+import eu.mcone.gameapi.replay.chunk.ReplayChunkHandler;
 import eu.mcone.gameapi.replay.inventory.ReplayInformationInventory;
-import eu.mcone.gameapi.replay.inventory.ReplaySpectatorInventory;
 import eu.mcone.gameapi.replay.player.ReplayPlayer;
+import eu.mcone.gameapi.replay.runner.ReplayRunnerManager;
 import eu.mcone.gameapi.replay.utils.ReplayRecorder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,36 +36,35 @@ public class ReplaySession implements eu.mcone.gameapi.api.replay.session.Replay
 
     //Contains Broadcast messages !
     @Getter
-    private HashMap<String, List<PacketWrapper>> serverPackets;
-    @Getter
-    private HashMap<String, List<PacketWrapper>> worldPackets;
+    private HashMap<String, List<PacketWrapper>> messages;
     @Getter
     private HashMap<String, ReplayPlayer> replayPlayers;
 
-    @Getter
+    private transient ReplayChunkHandler chunkHandler;
+    private transient ReplayRunnerManager runnerManager;
     private transient ReplayRecorder replayRecorder;
 
     public ReplaySession(final ReplaySessionManager replaySessionManager) {
         this.ID = replaySessionManager.getSessionID();
 
         info = new ServerInfo();
-
-        serverPackets = new HashMap<>();
-        worldPackets = new HashMap<>();
+        messages = new HashMap<>();
         replayPlayers = new HashMap<>();
 
         replayRecorder = new ReplayRecorder(this);
+        chunkHandler = new ReplayChunkHandler(this);
+        runnerManager = new ReplayRunnerManager(this);
     }
 
     @BsonCreator
-    public ReplaySession(@BsonProperty("sessionID") String sessionID, @BsonProperty("info") ServerInfo info, @BsonProperty("serverPackets") HashMap<String, List<PacketWrapper>> serverPackets,
-                         @BsonProperty("worldPackets") HashMap<String, List<PacketWrapper>> worldPackets,
-                         @BsonProperty("replayPlayers") HashMap<String, ReplayPlayer> replayPlayers) {
-        this.ID = sessionID;
+    public ReplaySession(@BsonProperty("ID") String ID, @BsonProperty("info") ServerInfo info, @BsonProperty("messages") HashMap<String, List<PacketWrapper>> messages, @BsonProperty("replayPlayers") HashMap<String, ReplayPlayer> replayPlayers) {
+        this.ID = ID;
         this.info = info;
-        this.serverPackets = serverPackets;
-        this.worldPackets = worldPackets;
+        this.messages = messages;
         this.replayPlayers = replayPlayers;
+
+        chunkHandler = new ReplayChunkHandler(this);
+        runnerManager = new ReplayRunnerManager(this);
     }
 
     public void recordSession() {
@@ -73,7 +73,6 @@ public class ReplaySession implements eu.mcone.gameapi.api.replay.session.Replay
 
         //Adds the world entity spawn packet
         for (ReplayPlayer player : replayPlayers.values()) {
-            System.out.println("SPAWN");
             Bukkit.getServer().getPluginManager().callEvent(new PlayerJoinReplaySessionEvent(Bukkit.getPlayer(player.getUuid())));
         }
     }
@@ -131,37 +130,17 @@ public class ReplaySession implements eu.mcone.gameapi.api.replay.session.Replay
 
     @Getter
     @Setter
-    @NoArgsConstructor
-    @BsonDiscriminator
     public static class ServerInfo implements eu.mcone.gameapi.api.replay.session.ReplaySession.ServerInfo {
         private String uuid;
         private long started;
         private long stopped;
         private int teams;
-        private String winnerTeam;
+        private String winnerTeam = "LEER";
         private String world;
-
-        //In minutes
-        private double length;
-
-        @BsonCreator
-        public ServerInfo(@BsonProperty("uuid") final String uuid, @BsonProperty("started") final long started, @BsonProperty("stopped") final long stopped,
-                          @BsonProperty("teams") final int teams, @BsonProperty("winnerTeam") final String winnerTeam, @BsonProperty("length") final double length, @BsonProperty("world") final String world) {
-            this.uuid = uuid;
-            this.started = started;
-            this.stopped = stopped;
-            this.teams = teams;
-            this.winnerTeam = winnerTeam;
-            this.length = length;
-            this.world = world;
-        }
+        private int lastTick;
     }
 
     public void openInformationInventory(Player player) {
         new ReplayInformationInventory(player, this);
-    }
-
-    public void openSpectatorInventory(Player player) {
-        new ReplaySpectatorInventory(this, player);
     }
 }

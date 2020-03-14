@@ -106,7 +106,7 @@ public abstract class GamePlugin extends CorePlugin {
 
     public ReplaySessionManager getSessionManager() {
         modules.add(Module.REPLAY_SESSION_MANAGER);
-        return sessionManager != null ? sessionManager : (sessionManager = GameAPI.getInstance().constructReplaySessionManager(this, options));
+        return sessionManager != null ? sessionManager : (sessionManager = GameAPI.getInstance().constructReplaySessionManager(options));
     }
 
     public GameStateManager getGameStateManager() {

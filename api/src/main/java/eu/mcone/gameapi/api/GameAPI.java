@@ -48,7 +48,7 @@ public abstract class GameAPI extends CorePlugin {
 
     public abstract MapManager constructMapManager();
 
-    public abstract ReplaySessionManager constructReplaySessionManager(GamePlugin gamePlugin, Option... options);
+    public abstract ReplaySessionManager constructReplaySessionManager(Option... options);
 
     public abstract GameStateManager constructGameStatsManager(GamePlugin gamePlugin);
 

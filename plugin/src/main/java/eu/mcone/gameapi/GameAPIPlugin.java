@@ -51,6 +51,10 @@ public class GameAPIPlugin extends GameAPI {
 
         registerEvents(new GamePlayerListener());
 
+        registerEvents(
+                new GamePlayerListener()
+        );
+
         sendConsoleMessage("§aVersion §f" + this.getDescription().getVersion() + "§a enabled...");
     }
 
@@ -96,8 +100,8 @@ public class GameAPIPlugin extends GameAPI {
     }
 
     @Override
-    public ReplaySessionManager constructReplaySessionManager(GamePlugin gamePlugin, Option... options) {
-        return new eu.mcone.gameapi.replay.session.ReplaySessionManager(gamePlugin, options);
+    public ReplaySessionManager constructReplaySessionManager(Option... options) {
+        return new eu.mcone.gameapi.replay.session.ReplaySessionManager(options);
     }
 
     @Override

@@ -1,50 +1,61 @@
 package eu.mcone.gameapi.api.replay.record.packets.player;
 
+import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
 import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
 import eu.mcone.coresystem.api.bukkit.npc.capture.packets.EntityAction;
-import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketType;
-import eu.mcone.gameapi.api.replay.record.packets.player.template.ItemStackArrayPacketTemplate;
+import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketWrapper;
 import eu.mcone.gameapi.api.replay.record.packets.util.SerializableItemStack;
 import lombok.Getter;
-import org.bson.codecs.pojo.annotations.BsonCreator;
-import org.bson.codecs.pojo.annotations.BsonDiscriminator;
-import org.bson.codecs.pojo.annotations.BsonIgnore;
-import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Getter
-@BsonDiscriminator
-public class EntityChangeInventoryPacketWrapper extends ItemStackArrayPacketTemplate {
+public class EntityChangeInventoryPacketWrapper extends PacketWrapper {
 
-    public EntityChangeInventoryPacketWrapper(ItemStack[] itemStacks) {
-        super(EntityAction.CHANGE_INVENTORY, itemStacks);
+    private Map<Integer, SerializableItemStack> items;
+
+    public EntityChangeInventoryPacketWrapper(Map<Integer, SerializableItemStack> items) {
+        super(EntityAction.CHANGE_INVENTORY);
+        this.items = items;
     }
 
-    @BsonCreator
-    public EntityChangeInventoryPacketWrapper(@BsonProperty("packetType") PacketType packetType, @BsonProperty("entityAction") EntityAction entityAction, @BsonProperty("itemStacks") List<SerializableItemStack> itemStacks) {
-        super(packetType, entityAction, itemStacks);
+    public ItemStack[] getContent() {
+        List<ItemStack> array = new ArrayList<>();
+
+        for (SerializableItemStack items : items.values()) {
+            array.add(items.constructItemStack());
+        }
+
+        return array.toArray(new ItemStack[0]);
     }
 
-    @BsonIgnore
-    public Inventory constructInventory() {
-        Inventory inventory = Bukkit.createInventory(null, InventorySlot.ROW_6, "§7Inventar");
-        ItemStack[] items = constructItemStackArray();
+    public Inventory constructInventory(final String invName) {
+        Inventory inventory = Bukkit.createInventory(null, InventorySlot.ROW_5, invName);
 
-        if (items.length > 0) {
-            int slot = 0;
-            for (ItemStack itemStack : constructItemStackArray()) {
-                inventory.setItem(slot, itemStack);
-                slot++;
+        if (!this.items.isEmpty()) {
+            for (Map.Entry<Integer, SerializableItemStack> entry : this.items.entrySet()) {
+                inventory.setItem(entry.getKey(), entry.getValue().constructItemStack());
             }
         } else {
             inventory.setItem(InventorySlot.ROW_3_SLOT_5, new ItemBuilder(Material.BARRIER).displayName("§cKeine Items vorhanden!").create());
         }
+
+        inventory.setItem(InventorySlot.ROW_5_SLOT_1, CoreInventory.PLACEHOLDER_ITEM);
+        inventory.setItem(InventorySlot.ROW_5_SLOT_2, CoreInventory.PLACEHOLDER_ITEM);
+        inventory.setItem(InventorySlot.ROW_5_SLOT_3, CoreInventory.PLACEHOLDER_ITEM);
+        inventory.setItem(InventorySlot.ROW_5_SLOT_4, CoreInventory.PLACEHOLDER_ITEM);
+        inventory.setItem(InventorySlot.ROW_5_SLOT_5, CoreInventory.PLACEHOLDER_ITEM);
+        inventory.setItem(InventorySlot.ROW_5_SLOT_6, CoreInventory.PLACEHOLDER_ITEM);
+        inventory.setItem(InventorySlot.ROW_5_SLOT_7, CoreInventory.PLACEHOLDER_ITEM);
+        inventory.setItem(InventorySlot.ROW_5_SLOT_8, CoreInventory.PLACEHOLDER_ITEM);
+        inventory.setItem(InventorySlot.ROW_5_SLOT_9, CoreInventory.BACK_ITEM);
 
         return inventory;
     }

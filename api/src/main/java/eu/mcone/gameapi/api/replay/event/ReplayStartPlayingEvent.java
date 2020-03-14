@@ -8,12 +8,11 @@ import org.bukkit.event.HandlerList;
 
 @RequiredArgsConstructor
 @Getter
-public class ReplayEndEvent extends Event {
+public class ReplayStartPlayingEvent extends Event {
 
-    @Getter
     private static final HandlerList handlerList = new HandlerList();
     private final ReplaySession session;
-    private final int lastTick;
+    private final int tick;
 
     public HandlerList getHandlers() {
         return handlerList;

@@ -4,8 +4,6 @@ import eu.mcone.coresystem.api.bukkit.npc.capture.packets.EntityAction;
 import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketType;
 import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketWrapper;
 import lombok.Getter;
-import org.bson.codecs.pojo.annotations.BsonCreator;
-import org.bson.codecs.pojo.annotations.BsonProperty;
 
 @Getter
 public class EntityStatsChangePacketWrapper extends PacketWrapper {
@@ -14,8 +12,7 @@ public class EntityStatsChangePacketWrapper extends PacketWrapper {
     private final int deaths;
     private final int goals;
 
-    @BsonCreator
-    public EntityStatsChangePacketWrapper(@BsonProperty("kills") final int kills, @BsonProperty("deaths") final int deaths, @BsonProperty("goals") final int goals) {
+    public EntityStatsChangePacketWrapper(final int kills, final int deaths, final int goals) {
         super(PacketType.ENTITY, EntityAction.STATS);
 
         this.kills = kills;

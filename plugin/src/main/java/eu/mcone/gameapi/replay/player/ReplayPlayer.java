@@ -1,171 +1,106 @@
 package eu.mcone.gameapi.replay.player;
 
-import eu.mcone.coresystem.api.bukkit.event.npc.NpcInteractEvent;
-import eu.mcone.coresystem.api.bukkit.npc.NPC;
-import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketWrapper;
+import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.coresystem.api.bukkit.npc.entity.PlayerNpc;
-import eu.mcone.coresystem.api.core.player.SkinInfo;
-import eu.mcone.gameapi.replay.inventory.ReplayPlayerInteractInventory;
-import eu.mcone.gameapi.replay.utils.Replay;
+import eu.mcone.gameapi.api.replay.record.packets.util.SerializableItemStack;
+import eu.mcone.gameapi.replay.inventory.ReplayPlayerInventory;
+import eu.mcone.gameapi.replay.npc.NpcUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
-import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @NoArgsConstructor
 @BsonDiscriminator
-public class ReplayPlayer implements eu.mcone.gameapi.api.replay.player.ReplayPlayer, Listener {
+public class ReplayPlayer implements eu.mcone.gameapi.api.replay.player.ReplayPlayer, Listener, Serializable {
 
     @Getter
     private UUID uuid;
     @Getter
     private Data data;
+    @Setter
+    private transient Map<Integer, SerializableItemStack> inventoryItems;
     @Getter
     @Setter
-    @BsonIgnore
-    private transient ItemStack[] inventoryContent;
+    private transient eu.mcone.gameapi.api.replay.player.ReplayPlayer.Stats stats;
     @Getter
     @Setter
-    @BsonIgnore
-    private transient ReplayPlayer.Stats stats;
-    @Getter
-    @Setter
-    @BsonIgnore
     private transient double health;
-
     @Getter
-    private HashMap<String, List<PacketWrapper>> packets;
-
-    @BsonIgnore
+    private transient Map<Player, CoreInventory> inventoryViewers;
     @Getter
-    private transient List<Player> viewInventory;
-
-    @Getter
-    @BsonIgnore
-    private transient Replay replay;
+    private transient PlayerNpc npc;
 
     public ReplayPlayer(final Player player) {
         uuid = player.getUniqueId();
         data = new Data(player);
-        packets = new HashMap<>();
-        replay = new Replay(this);
-        viewInventory = new ArrayList<>();
+        inventoryItems = new HashMap<>();
+        stats = new Stats(0, 0, 0);
+        health = 10.0;
+        inventoryViewers = new HashMap<>();
     }
 
     @BsonCreator
-    public ReplayPlayer(@BsonProperty("uuid") final UUID uuid, @BsonProperty("data") final Data data, @BsonProperty("packets") final HashMap<String, List<PacketWrapper>> packets) {
+    public ReplayPlayer(@BsonProperty("uuid") final UUID uuid, @BsonProperty("data") final Data data) {
         this.uuid = uuid;
         this.data = data;
-        this.packets = packets;
-        replay = new Replay(this);
-        viewInventory = new ArrayList<>();
+        inventoryItems = new HashMap<>();
+        stats = new Stats(0, 0, 0);
+        health = 10.0;
+        inventoryViewers = new HashMap<>();
+        npc = NpcUtils.constructNpcForPlayer(this);
     }
 
-    public void addPacket(final int tick, final PacketWrapper packet) {
-        String sTick = String.valueOf(tick);
-        System.out.println("Add packet " + sTick);
-        if (packets.containsKey(sTick)) {
-            packets.get(sTick).add(packet);
-        } else {
-            packets.put(sTick, new ArrayList<PacketWrapper>() {{
-                add(packet);
-            }});
-        }
-    }
-
-    @EventHandler
-    public void on(InventoryClickEvent e) {
-        Inventory inv = e.getClickedInventory();
-        Player player = (Player) e.getWhoClicked();
-        if (inv != null && !e.getSlotType().equals(InventoryType.SlotType.OUTSIDE)) {
-            if (inv.getName().equalsIgnoreCase(replay.getPlayer().getData().getDisplayName())) {
-                if (viewInventory.contains(player)) {
-                    e.setCancelled(true);
-                }
-            }
-        }
-    }
-
-    @EventHandler
-    public void on(InventoryCloseEvent e) {
-        Inventory inv = e.getInventory();
-        Player player = (Player) e.getPlayer();
-        if (inv.getName().equalsIgnoreCase(replay.getPlayer().getData().getDisplayName())) {
-            if (viewInventory.contains(player)) {
-                new ReplayPlayerInteractInventory(replay, player);
-                viewInventory.remove(player);
-            }
-        }
-    }
-
-    @EventHandler
-    public void on(NpcInteractEvent e) {
-        NPC npc = e.getNpc();
-
-        if (npc instanceof PlayerNpc) {
-            if (npc.getData().getName().equalsIgnoreCase(replay.getPlayer().getUuid().toString())) {
-                new ReplayPlayerInteractInventory(replay, e.getPlayer());
-            }
-        }
+    public void openInventory(Player player) {
+        inventoryViewers.put(player, new ReplayPlayerInventory(player, this, inventoryItems));
     }
 
     @Getter
-    @NoArgsConstructor
     @BsonDiscriminator
-    public static class Data implements eu.mcone.gameapi.api.replay.player.ReplayPlayer.Data {
+    public static class Data implements Serializable, eu.mcone.gameapi.api.replay.player.ReplayPlayer.Data {
         private String displayName;
         private String name;
+        @Setter
         private boolean reported;
-        private SkinInfo skinInfo;
         @Setter
         private long joined;
+        @Setter
+        private String world;
 
         public Data(final Player player) {
             this.displayName = player.getDisplayName();
             this.name = player.getName();
             this.reported = false;
-
-//            Property textures = ((CraftPlayer) player).getHandle().getProfile().getProperties().get("textures").iterator().next();
-//            this.skinInfo = new SkinInfo(name, textures.getValue(), textures.getSignature(), SkinInfo.SkinType.PLAYER);
         }
 
         @BsonCreator
-        public Data(@BsonProperty("displayName") String displayName, @BsonProperty("name") String name,
-                    @BsonProperty("reported") boolean reported, @BsonProperty("skinInfo") SkinInfo skinInfo, @BsonProperty("joined") long joined) {
+        public Data(@BsonProperty("displayName") final String displayName, @BsonProperty("name") final String name,
+                    @BsonProperty("reported") final boolean reported, @BsonProperty("joined") final long joined, @BsonProperty("world") final String world) {
             this.displayName = displayName;
             this.name = name;
             this.reported = reported;
-            this.skinInfo = skinInfo;
             this.joined = joined;
+            this.world = world;
         }
     }
 
     @Setter
     @Getter
     @AllArgsConstructor
-    public static class Stats implements eu.mcone.gameapi.api.replay.player.ReplayPlayer.Stats {
-        @BsonIgnore
-        private int kills;
-        @BsonIgnore
-        private int deaths;
-        @BsonIgnore
-        private int goals;
+    @NoArgsConstructor
+    public static class Stats implements Serializable, eu.mcone.gameapi.api.replay.player.ReplayPlayer.Stats {
+        private transient int kills = 0;
+        private transient int deaths = 0;
+        private transient int goals = 0;
     }
 }

@@ -6,7 +6,7 @@ import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
 import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
 import eu.mcone.coresystem.api.bukkit.npc.data.PlayerNpcData;
 import eu.mcone.coresystem.api.bukkit.npc.enums.EquipmentPosition;
-import eu.mcone.gameapi.replay.utils.Replay;
+import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -15,14 +15,21 @@ import java.util.Map;
 
 public class ReplayPlayerArmorInventory extends CoreInventory {
 
-    public ReplayPlayerArmorInventory(Replay replay, Player player) {
-        super(replay.getPlayer().getData().getDisplayName(), player, InventorySlot.ROW_2, InventoryOption.FILL_EMPTY_SLOTS);
+    public ReplayPlayerArmorInventory(ReplayPlayer replayPlayer, Player player) {
+        super(replayPlayer.getData().getDisplayName(), player, InventorySlot.ROW_1, InventoryOption.FILL_EMPTY_SLOTS);
 
-        for (Map.Entry<EquipmentPosition, ItemStack> entry : ((PlayerNpcData) replay.getNpc().getEntityData()).getEquipment().entrySet()) {
-            setItem(entry.getKey().getId(), entry.getValue());
+        PlayerNpcData data = replayPlayer.getNpc().getEntityData();
+        if (data.getEquipment().size() > 0) {
+            int slot = 2;
+            for (Map.Entry<EquipmentPosition, ItemStack> entry : ((PlayerNpcData) replayPlayer.getNpc().getEntityData()).getEquipment().entrySet()) {
+                setItem(slot, entry.getValue());
+                slot++;
+            }
+        } else {
+            setItem(InventorySlot.ROW_1_SLOT_4, new ItemBuilder(Material.BARRIER, 1).displayName("§cDer Spieler hat monentan keine Rüstung an!").create());
         }
 
-        setItem(InventorySlot.ROW_2_SLOT_9, new ItemBuilder(Material.IRON_DOOR, 1).displayName("§7Zurück").create(), e -> new ReplayPlayerInteractInventory(replay, player));
+        setItem(InventorySlot.ROW_1_SLOT_9, new ItemBuilder(Material.IRON_DOOR, 1).displayName("§7Zurück").create(), e -> new ReplayPlayerInteractInventory(replayPlayer, player));
         openInventory();
     }
 }

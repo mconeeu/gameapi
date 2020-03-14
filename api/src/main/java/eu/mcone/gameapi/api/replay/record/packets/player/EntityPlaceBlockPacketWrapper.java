@@ -1,43 +1,25 @@
 package eu.mcone.gameapi.api.replay.record.packets.player;
 
 import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
+import eu.mcone.coresystem.api.bukkit.npc.capture.packets.EntityAction;
 import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketType;
-import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketWrapper;
-import eu.mcone.coresystem.api.bukkit.npc.capture.packets.WorldAction;
+import eu.mcone.coresystem.api.bukkit.npc.capture.packets.templates.EntityLocationWrapperTemplate;
 import lombok.Getter;
-import org.bson.codecs.pojo.annotations.BsonCreator;
-import org.bson.codecs.pojo.annotations.BsonDiscriminator;
-import org.bson.codecs.pojo.annotations.BsonIgnore;
-import org.bson.codecs.pojo.annotations.BsonProperty;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
 @Getter
-@BsonDiscriminator
-public class EntityPlaceBlockPacketWrapper extends PacketWrapper {
+public class EntityPlaceBlockPacketWrapper extends EntityLocationWrapperTemplate {
 
-    private Material material;
-    private Location location;
+    private String material;
 
     public EntityPlaceBlockPacketWrapper(final Block block) {
-        super(PacketType.ENTITY, WorldAction.SET_BLOCK);
-
-        this.material = block.getType();
-        this.location = block.getLocation();
+        super(PacketType.ENTITY, EntityAction.PLACE_BLOCK, block.getLocation());
+        this.material = block.getType().toString();
     }
 
-    @BsonCreator
-    public EntityPlaceBlockPacketWrapper(@BsonProperty("worldAction") final WorldAction worldAction, @BsonProperty("material") final Material material, @BsonProperty("location") final Location location) {
-        super(PacketType.ENTITY, worldAction);
-
-        this.material = material;
-        this.location = location;
-    }
-
-    @BsonIgnore
     public ItemStack constructItemStack() {
-        return new ItemBuilder(material, 1).create();
+        return new ItemBuilder(Material.valueOf(material), 1).create();
     }
 }
