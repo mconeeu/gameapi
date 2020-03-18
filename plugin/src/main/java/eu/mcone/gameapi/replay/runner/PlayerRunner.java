@@ -7,13 +7,14 @@ import eu.mcone.coresystem.api.bukkit.npc.capture.SimplePlayer;
 import eu.mcone.coresystem.api.bukkit.npc.capture.packets.*;
 import eu.mcone.coresystem.api.bukkit.npc.enums.EquipmentPosition;
 import eu.mcone.coresystem.api.bukkit.npc.enums.NpcAnimation;
-import eu.mcone.coresystem.api.bukkit.spawnable.ListMode;
 import eu.mcone.coresystem.api.bukkit.world.CoreLocation;
 import eu.mcone.gameapi.GameAPIPlugin;
+import eu.mcone.gameapi.api.GamePlugin;
+import eu.mcone.gameapi.api.replay.chunk.ReplayChunk;
 import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
 import eu.mcone.gameapi.api.replay.record.packets.player.*;
 import eu.mcone.gameapi.api.replay.record.packets.util.SerializableItemStack;
-import eu.mcone.gameapi.api.replay.chunk.ReplayChunk;
+import eu.mcone.gameapi.api.replay.session.ReplaySession;
 import lombok.Getter;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Bukkit;
@@ -39,9 +40,12 @@ public class PlayerRunner extends SimplePlayer implements eu.mcone.gameapi.api.r
     @Getter
     private Location location;
 
+    private ReplaySession session;
+
     public PlayerRunner(final ReplayPlayer player, final ReplayRunnerManager manager) {
         this.player = player;
         this.manager = manager;
+        this.session = GamePlugin.getGamePlugin().getSessionManager().getSession(player.getData().getSessionID());
     }
 
     @Override
@@ -55,7 +59,7 @@ public class PlayerRunner extends SimplePlayer implements eu.mcone.gameapi.api.r
                 ReplayChunk chunk = manager.getSession().getChunkHandler().getChunk(tick);
                 Map<Integer, List<PacketWrapper>> packets = chunk.getPackets(player.getUuid());
 
-                if (packetsCount.get() < packets.size() - 1) {
+                if (tick != session.getInfo().getLastTick()) {
                     if (packets.containsKey(tick)) {
                         for (PacketWrapper packet : packets.get(tick)) {
                             Player[] watchers = watcher.toArray(new Player[0]);
@@ -63,8 +67,9 @@ public class PlayerRunner extends SimplePlayer implements eu.mcone.gameapi.api.r
                             if (packet instanceof EntitySpawnPacketWrapper) {
                                 System.out.println("SPAWN");
                                 EntitySpawnPacketWrapper spawnPacketWrapper = (EntitySpawnPacketWrapper) packet;
-                                player.getNpc().teleport(new CoreLocation(spawnPacketWrapper.calculateLocation()));
-                                player.getNpc().togglePlayerVisibility(ListMode.BLACKLIST);
+                                CoreLocation location = new CoreLocation(spawnPacketWrapper.calculateLocation());
+                                player.getNpc().teleport(location);
+                                //player.getNpc().togglePlayerVisibility(ListMode.BLACKLIST);
                                 Bukkit.getPluginManager().callEvent(new NpcAnimationStateChangeEvent(player.getNpc(), NpcAnimationStateChangeEvent.NpcAnimationState.START));
                             }
 
@@ -76,7 +81,6 @@ public class PlayerRunner extends SimplePlayer implements eu.mcone.gameapi.api.r
                             if (packet instanceof EntityMovePacketWrapper) {
                                 EntityMovePacketWrapper move = (EntityMovePacketWrapper) packet;
                                 location = move.calculateLocation();
-                                player.getNpc().getData().setLocation(new CoreLocation(location));
                                 player.getNpc().teleport(location);
                             }
 
@@ -211,12 +215,16 @@ public class PlayerRunner extends SimplePlayer implements eu.mcone.gameapi.api.r
 
                             if (packet instanceof EntityPlaceBlockPacketWrapper) {
                                 EntityPlaceBlockPacketWrapper place = (EntityPlaceBlockPacketWrapper) packet;
+                                System.out.println("BREAK");
                                 for (Player player : watchers) {
+                                    System.out.println("SEND BLOCK BREAK CHANGE");
                                     player.sendBlockChange(place.calculateLocation(), org.bukkit.Material.valueOf(place.getMaterial()), (byte) CraftMagicNumbers.getBlock(org.bukkit.Material.valueOf(place.getMaterial())).k());
                                 }
                             } else if (packet instanceof EntityBreakBlockPacketWrapper) {
                                 EntityBreakBlockPacketWrapper brake = (EntityBreakBlockPacketWrapper) packet;
+                                System.out.println("PLACE");
                                 for (Player player : watchers) {
+                                    System.out.println("SEND BLOCK PLACE CHANGE");
                                     player.sendBlockChange(brake.calculateLocation(), org.bukkit.Material.AIR, (byte) CraftMagicNumbers.getBlock(org.bukkit.Material.AIR).k());
 
                                 }
@@ -238,6 +246,7 @@ public class PlayerRunner extends SimplePlayer implements eu.mcone.gameapi.api.r
                         }
                     }
                 } else {
+                    System.out.println("STOP PLAYING");
                     playing = false;
                     playingTask.cancel();
                     Bukkit.getPluginManager().callEvent(new NpcAnimationStateChangeEvent(player.getNpc(), NpcAnimationStateChangeEvent.NpcAnimationState.END));
@@ -249,6 +258,7 @@ public class PlayerRunner extends SimplePlayer implements eu.mcone.gameapi.api.r
     @Override
     public void stop() {
         super.stop();
+        CoreSystem.getInstance().getNpcManager().removeNPC(player.getNpc());
         manager.getNpcListener().setUnregister(true);
     }
 }

@@ -1,5 +1,6 @@
 package eu.mcone.gameapi.replay.chunk;
 
+import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketWrapper;
 import eu.mcone.coresystem.api.core.util.GenericUtils;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.replay.session.ReplaySession;
@@ -11,9 +12,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 import java.util.zip.ZipEntry;
@@ -27,6 +26,7 @@ public class ReplayChunkHandler implements eu.mcone.gameapi.api.replay.chunk.Rep
     private File replayFile;
     @Getter
     private int currentChunkID;
+    private int lastChunkID;
     private BukkitTask unloadChunkTask;
 
     public ReplayChunkHandler(ReplaySession session) {
@@ -36,8 +36,8 @@ public class ReplayChunkHandler implements eu.mcone.gameapi.api.replay.chunk.Rep
 
     private void unloadChunk() {
         if (unloadChunkTask == null) {
-            unloadChunkTask = Bukkit.getScheduler().runTaskTimerAsynchronously(GameAPIPlugin.getInstance(), () -> {
-                if (chunks.size() > 0 && chunks.size() > 3) {
+            unloadChunkTask = Bukkit.getScheduler().runTaskTimer(GameAPIPlugin.getInstance(), () -> {
+                if (currentChunkID > 2) {
                     List<Integer> whitelist = new ArrayList<>();
                     whitelist.add(currentChunkID - 1);
                     whitelist.add(currentChunkID);
@@ -45,7 +45,6 @@ public class ReplayChunkHandler implements eu.mcone.gameapi.api.replay.chunk.Rep
 
                     for (int i = 0; i < chunks.size(); i++) {
                         if (chunks.containsKey(i) && !whitelist.contains(i)) {
-                            System.out.println("Remove chunk " + i);
                             chunks.remove(i);
                         }
                     }
@@ -55,7 +54,7 @@ public class ReplayChunkHandler implements eu.mcone.gameapi.api.replay.chunk.Rep
     }
 
     public void preLoad() {
-        setPath();
+        set();
 
         if (currentChunkID < 2) {
             for (int i = 0; i <= 2; i++) {
@@ -65,11 +64,15 @@ public class ReplayChunkHandler implements eu.mcone.gameapi.api.replay.chunk.Rep
     }
 
     public eu.mcone.gameapi.api.replay.chunk.ReplayChunk getChunk(int tick) {
-        currentChunkID = tick / 600;
+        currentChunkID = tick / 1200;
 
-        System.out.println("Return chunk");
-        if (!chunks.containsKey(currentChunkID + 1)) {
-            loadChunk(currentChunkID);
+        int nextChunk = currentChunkID + 1;
+        if (tick != session.getInfo().getLastTick()) {
+            if (!chunks.containsKey(nextChunk) && lastChunkID != nextChunk) {
+                loadChunk(nextChunk);
+            }
+        } else {
+            Bukkit.getScheduler().cancelTask(unloadChunkTask.getTaskId());
         }
 
         return chunks.get(currentChunkID);
@@ -77,14 +80,16 @@ public class ReplayChunkHandler implements eu.mcone.gameapi.api.replay.chunk.Rep
 
     private void loadChunk(int chunkID) {
         if (!chunks.containsKey(chunkID)) {
-            setPath();
+            set();
 
-            Bukkit.getScheduler().runTaskAsynchronously(GameAPIPlugin.getInstance(), () -> {
-                try {
-                    if (replayFile.exists()) {
-                        System.out.println("Loading chunk...");
-                        FileInputStream fileInputStream = new FileInputStream(replayFile);
-                        ZipInputStream zipInputStream = new ZipInputStream(fileInputStream);
+            Bukkit.getScheduler().runTask(GameAPIPlugin.getInstance(), () -> {
+                if (replayFile.exists()) {
+                    FileInputStream fileInputStream = null;
+                    ZipInputStream zipInputStream = null;
+
+                    try {
+                        fileInputStream = new FileInputStream(replayFile);
+                        zipInputStream = new ZipInputStream(fileInputStream);
 
                         for (ZipEntry zipEntry; (zipEntry = zipInputStream.getNextEntry()) != null; ) {
                             if (zipEntry.getName().equalsIgnoreCase("CHUNK:" + chunkID)) {
@@ -107,14 +112,15 @@ public class ReplayChunkHandler implements eu.mcone.gameapi.api.replay.chunk.Rep
                                         byteArrayOutputStream.write(buf, 0, count);
                                     }
 
-                                    ReplayChunk chunk = (ReplayChunk) GenericUtils.deserialize(byteArrayOutputStream.toByteArray());
+                                    ReplayChunk chunk = new ReplayChunk((Map<UUID, Map<Integer, List<PacketWrapper>>>) GenericUtils.deserialize(byteArrayOutputStream.toByteArray()));
+                                    System.out.println(chunk.getPlayers().size());
                                     chunks.put(chunkID, chunk);
-                                    System.out.println("Chunk loaded!");
 
                                     unloadChunk();
-                                    byteArrayOutputStream.close();
                                 } catch (IOException | DataFormatException ex) {
                                     ex.printStackTrace();
+                                } finally {
+                                    byteArrayOutputStream.close();
                                 }
                             }
                         }
@@ -122,15 +128,30 @@ public class ReplayChunkHandler implements eu.mcone.gameapi.api.replay.chunk.Rep
                         zipInputStream.close();
                         fileInputStream.close();
                         System.gc();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            if (zipInputStream != null) {
+                                zipInputStream.close();
+                            }
+
+                            if (fileInputStream != null) {
+                                fileInputStream.close();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
             });
         }
     }
 
-    private void setPath() {
-        replayFile = new File("./plugins/" + GameAPIPlugin.getInstance().getPluginName() + "/", session.getID() + ".replay");
+    private void set() {
+        if (replayFile == null) {
+            replayFile = new File("./plugins/" + GameAPIPlugin.getInstance().getPluginName() + "/", session.getID() + ".replay");
+            lastChunkID = session.getInfo().getLastTick() / 1200;
+        }
     }
 }

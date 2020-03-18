@@ -9,8 +9,6 @@ import java.util.UUID;
 
 public interface ReplayChunk {
 
-    int getChunkID();
-
     void addPacket(UUID uuid, int tick, PacketWrapper wrapper);
 
     byte[] compressData();

@@ -22,7 +22,7 @@ import java.util.UUID;
 
 @NoArgsConstructor
 @BsonDiscriminator
-public class ReplayPlayer implements eu.mcone.gameapi.api.replay.player.ReplayPlayer, Listener, Serializable {
+public class ReplayPlayer implements eu.mcone.gameapi.api.replay.player.ReplayPlayer, Listener {
 
     @Getter
     private UUID uuid;
@@ -58,7 +58,7 @@ public class ReplayPlayer implements eu.mcone.gameapi.api.replay.player.ReplayPl
         stats = new Stats(0, 0, 0);
         health = 10.0;
         inventoryViewers = new HashMap<>();
-        npc = NpcUtils.constructNpcForPlayer(this);
+        npc = NpcUtils.constructNpcForPlayer(data.getSessionID(), this);
     }
 
     public void openInventory(Player player) {
@@ -70,6 +70,8 @@ public class ReplayPlayer implements eu.mcone.gameapi.api.replay.player.ReplayPl
     public static class Data implements Serializable, eu.mcone.gameapi.api.replay.player.ReplayPlayer.Data {
         private String displayName;
         private String name;
+        @Setter
+        private String sessionID;
         @Setter
         private boolean reported;
         @Setter
@@ -84,10 +86,11 @@ public class ReplayPlayer implements eu.mcone.gameapi.api.replay.player.ReplayPl
         }
 
         @BsonCreator
-        public Data(@BsonProperty("displayName") final String displayName, @BsonProperty("name") final String name,
+        public Data(@BsonProperty("displayName") final String displayName, @BsonProperty("name") final String name, @BsonProperty("sessionID") String sessionID,
                     @BsonProperty("reported") final boolean reported, @BsonProperty("joined") final long joined, @BsonProperty("world") final String world) {
             this.displayName = displayName;
             this.name = name;
+            this.sessionID = sessionID;
             this.reported = reported;
             this.joined = joined;
             this.world = world;

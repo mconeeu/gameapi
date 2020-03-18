@@ -53,6 +53,11 @@ public class ReplayRunnerManager implements eu.mcone.gameapi.api.replay.runner.R
 
         for (Player player : players) {
             watchers.add(player);
+
+            for (PlayerRunner runner : replays.values()) {
+                runner.addWatcher(player);
+            }
+
             Bukkit.getPluginManager().callEvent(new WatcherJoinReplayEvent(player, session));
         }
     }
@@ -62,6 +67,11 @@ public class ReplayRunnerManager implements eu.mcone.gameapi.api.replay.runner.R
 
         for (Player player : players) {
             watchers.remove(player);
+
+            for (PlayerRunner runner : replays.values()) {
+                runner.removeWatcher(player);
+            }
+
             Bukkit.getPluginManager().callEvent(new WatcherQuitReplayEvent(player, session));
 
             if (playing && watchers.isEmpty()) {
@@ -71,7 +81,7 @@ public class ReplayRunnerManager implements eu.mcone.gameapi.api.replay.runner.R
     }
 
     private void progress() {
-        progressTask = Bukkit.getScheduler().runTaskTimerAsynchronously(GameAPI.getInstance(), () -> {
+        progressTask = Bukkit.getScheduler().runTaskTimer(GameAPI.getInstance(), () -> {
             for (Player watcher : watchers) {
                 if (playing && showProgress) {
                     if (currentTick.get() == session.getInfo().getLastTick()) {
@@ -112,6 +122,7 @@ public class ReplayRunnerManager implements eu.mcone.gameapi.api.replay.runner.R
             for (ReplayPlayer player : session.getPlayers()) {
                 if (!(replays.containsKey(player.getUuid()) || singleReplays.containsKey(player.getUuid()))) {
                     PlayerRunner runner = new PlayerRunner(player, this);
+                    runner.addWatcher(watchers.toArray(new Player[0]));
                     runner.play();
                     replays.put(player.getUuid(), runner);
                 }

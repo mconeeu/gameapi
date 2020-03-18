@@ -134,8 +134,8 @@ public class ReplaySession implements eu.mcone.gameapi.api.replay.session.Replay
         private String uuid;
         private long started;
         private long stopped;
-        private int teams;
-        private String winnerTeam = "LEER";
+        private int teams = 0;
+        private String winnerTeam = "";
         private String world;
         private int lastTick;
     }

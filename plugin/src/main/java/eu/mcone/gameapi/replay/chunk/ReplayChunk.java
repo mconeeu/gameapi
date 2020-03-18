@@ -2,7 +2,6 @@ package eu.mcone.gameapi.replay.chunk;
 
 import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketWrapper;
 import eu.mcone.coresystem.api.core.util.GenericUtils;
-import lombok.Getter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -13,12 +12,13 @@ import java.util.zip.Deflater;
 public class ReplayChunk implements Serializable, eu.mcone.gameapi.api.replay.chunk.ReplayChunk {
 
     private Map<UUID, Map<Integer, List<PacketWrapper>>> player;
-    @Getter
-    private int chunkID;
 
-    public ReplayChunk(int chunkID) {
+    public ReplayChunk() {
         player = new HashMap<>();
-        this.chunkID = chunkID;
+    }
+
+    public ReplayChunk(Map<UUID, Map<Integer, List<PacketWrapper>>> players) {
+        this.player = players;
     }
 
     public void addPacket(UUID uuid, int tick, PacketWrapper wrapper) {
@@ -41,7 +41,7 @@ public class ReplayChunk implements Serializable, eu.mcone.gameapi.api.replay.ch
 
     public byte[] compressData() {
         try {
-            byte[] unCompressedData = GenericUtils.serialize(this);
+            byte[] unCompressedData = GenericUtils.serialize(player);
             Deflater deflater = new Deflater();
             deflater.setInput(unCompressedData);
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream(unCompressedData.length);

@@ -36,6 +36,10 @@ public interface ReplayPlayer {
 
         String getName();
 
+        String getSessionID();
+
+        void setSessionID(String sessionID);
+
         boolean isReported();
 
         void setReported(boolean reported);

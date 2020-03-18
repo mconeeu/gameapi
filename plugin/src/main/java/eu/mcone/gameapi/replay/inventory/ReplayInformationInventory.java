@@ -29,11 +29,11 @@ public class ReplayInformationInventory extends CoreInventory {
     }
 
     private String getLength(int lastTick) {
-        double seconds = lastTick / 30;
+        double seconds = lastTick / 20;
         if (seconds < 60) {
             return seconds + " §7Sekunden";
         } else {
-            return Double.parseDouble(String.format(Locale.GERMAN, "%1.2f", seconds / 20)) + " §7Minuten";
+            return Double.parseDouble(String.format(Locale.ENGLISH, "%1.2f", seconds / 60)) + " §7Minuten";
         }
     }
 }

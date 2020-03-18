@@ -79,8 +79,11 @@ public class ReplaySessionManager implements eu.mcone.gameapi.api.replay.session
                 //Save date
                 session.getInfo().setStopped(System.currentTimeMillis() / 1000);
 
-                boolean succeed = true;
+                for (ReplayPlayer player : session.getPlayers()) {
+                    player.getData().setSessionID(sessionID);
+                }
 
+                boolean succeed = true;
                 if (!CoreSystem.getInstance().getWorldManager().existsWorldInDatabase(session.getInfo().getWorld())) {
                     succeed = CoreSystem.getInstance().getWorldManager().upload(CoreSystem.getInstance().getWorldManager().getWorld(session.getInfo().getWorld()));
                 }
@@ -142,7 +145,7 @@ public class ReplaySessionManager implements eu.mcone.gameapi.api.replay.session
     public boolean deleteSession(final String sessionID) {
         if (replaySessions.containsKey(sessionID)) {
             replaySessions.remove(sessionID);
-            replayCollection.deleteOne(eq("sessionID", sessionID));
+            replayCollection.deleteOne(eq("ID", sessionID));
             return true;
         } else {
             return false;
@@ -160,7 +163,7 @@ public class ReplaySessionManager implements eu.mcone.gameapi.api.replay.session
             if (replaySessions.containsKey(sessionID)) {
                 return replaySessions.get(sessionID);
             } else {
-                ReplaySession session = replayCollection.find(eq("sessionID", sessionID)).first();
+                ReplaySession session = replayCollection.find(eq("ID", sessionID)).first();
 
                 if (session != null) {
                     replaySessions.put(sessionID, session);

@@ -29,16 +29,15 @@ public class ReplaySessionObjective extends CoreSidebarObjective {
         setScore(8, "§8» §7Gestopt:");
         setScore(7, "§f   " + convertDate(replaySession.getInfo().getStopped()));
         setScore(6, "§8» §7Teams:");
-        setScore(5, "§f   " + replaySession.getInfo().getTeams());
+        setScore(5, "§f   " + (replaySession.getInfo().getTeams() != 0 ? replaySession.getInfo().getTeams() : "§c✘"));
         setScore(4, "§8» §7Gewinner:");
-        setScore(3, "§f   " + replaySession.getInfo().getWinnerTeam());
+        setScore(3, "§f   " + (!replaySession.getInfo().getWinnerTeam().isEmpty() ? replaySession.getInfo().getWinnerTeam() : "§c✘"));
         setScore(2, "");
         setScore(1, "§f§lMCONE.EU ");
     }
 
     @Override
-    protected void onReload(CorePlayer corePlayer) {
-    }
+    protected void onReload(CorePlayer corePlayer) {}
 
     private String convertDate(final long timestamp) {
         return new SimpleDateFormat("HH:mm").format(new Date(timestamp * 1000));
