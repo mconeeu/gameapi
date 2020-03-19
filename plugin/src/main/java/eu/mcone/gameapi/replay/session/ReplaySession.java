@@ -15,7 +15,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bson.codecs.pojo.annotations.BsonCreator;
-import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bukkit.Bukkit;
@@ -23,10 +22,9 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 
-@NoArgsConstructor
 @Getter
 @Setter
-@BsonDiscriminator
+@NoArgsConstructor
 public class ReplaySession implements eu.mcone.gameapi.api.replay.session.ReplaySession {
 
     @Getter
@@ -120,6 +118,11 @@ public class ReplaySession implements eu.mcone.gameapi.api.replay.session.Replay
         return new ArrayList<>(replayPlayers.values());
     }
 
+    @BsonIgnore
+    public Collection<ReplayPlayer> getPlayersAsObject() {
+        return new ArrayList<>(replayPlayers.values());
+    }
+
     public boolean existsReplayPlayer(final UUID uuid) {
         return replayPlayers.containsKey(uuid.toString());
     }
@@ -130,12 +133,13 @@ public class ReplaySession implements eu.mcone.gameapi.api.replay.session.Replay
 
     @Getter
     @Setter
+    @NoArgsConstructor
     public static class ServerInfo implements eu.mcone.gameapi.api.replay.session.ReplaySession.ServerInfo {
         private String uuid;
         private long started;
         private long stopped;
-        private int teams = 0;
-        private String winnerTeam = "";
+        private int teams;
+        private String winnerTeam = "Nicht verfügbar";
         private String world;
         private int lastTick;
     }

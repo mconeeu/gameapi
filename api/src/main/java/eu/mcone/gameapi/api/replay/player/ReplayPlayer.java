@@ -2,6 +2,7 @@ package eu.mcone.gameapi.api.replay.player;
 
 import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.coresystem.api.bukkit.npc.entity.PlayerNpc;
+import eu.mcone.coresystem.api.bukkit.world.CoreLocation;
 import eu.mcone.gameapi.api.replay.record.packets.util.SerializableItemStack;
 import org.bukkit.entity.Player;
 
@@ -38,17 +39,17 @@ public interface ReplayPlayer {
 
         String getSessionID();
 
-        void setSessionID(String sessionID);
-
         boolean isReported();
+
+        CoreLocation getSpawnLocation();
+
+        void setSessionID(String sessionID);
 
         void setReported(boolean reported);
 
         void setJoined(long joined);
 
-        void setWorld(String world);
-
-        String getWorld();
+        void setSpawnLocation(CoreLocation location);
     }
 
     interface Stats {

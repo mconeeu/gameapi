@@ -5,6 +5,7 @@ import eu.mcone.coresystem.api.bukkit.event.BroadcastMessageEvent;
 import eu.mcone.coresystem.api.bukkit.event.armor.ArmorEquipEvent;
 import eu.mcone.coresystem.api.bukkit.npc.capture.SimpleRecorder;
 import eu.mcone.coresystem.api.bukkit.npc.capture.packets.*;
+import eu.mcone.coresystem.api.bukkit.world.CoreLocation;
 import eu.mcone.gameapi.api.event.stats.PlayerRoundStatsChangeEvent;
 import eu.mcone.gameapi.api.event.team.TeamWonEvent;
 import eu.mcone.gameapi.api.replay.event.PlayerJoinReplaySessionEvent;
@@ -84,7 +85,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                     Player player = e.getPlayer();
                     if (session.existsReplayPlayer(player)) {
                         ReplayPlayer replayPlayer = session.getReplayPlayer(player.getUniqueId());
-                        replayPlayer.getData().setWorld(player.getLocation().getWorld().getName());
+                        replayPlayer.getData().setSpawnLocation(new CoreLocation(player.getLocation()));
                         addPacket(session.getReplayPlayer(player), ticks, new EntitySpawnPacketWrapper(player.getLocation()));
                     }
                 }

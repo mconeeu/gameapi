@@ -19,10 +19,16 @@ public class ReplayInformationInventory extends CoreInventory {
         super("§eReplay", player, InventorySlot.ROW_3, InventoryOption.FILL_EMPTY_SLOTS);
 
         setItem(InventorySlot.ROW_1_SLOT_5, new ItemBuilder(Material.COMMAND, 1).displayName("§eReplay ID: §f§l" + session.getID()).create());
-        setItem(InventorySlot.ROW_3_SLOT_3, new ItemBuilder(Material.GRASS, 1).displayName("§eMaps").lore("§7" + session.getInfo().getWorld()).create());
-        setItem(InventorySlot.ROW_3_SLOT_4, new ItemBuilder(Material.WOOL, 1).displayName("§eWinner Team").lore("§f§l" + session.getInfo().getWinnerTeam()).create());
+        setItem(InventorySlot.ROW_3_SLOT_3, new ItemBuilder(Material.GRASS, 1).displayName("§eMap").lore("§7§l" + session.getInfo().getWorld()).create());
+
+        if (session.getInfo().getWinnerTeam().isEmpty()) {
+            setItem(InventorySlot.ROW_3_SLOT_4, new ItemBuilder(Material.BARRIER, 1).displayName("§cGewinner").create());
+        } else {
+            setItem(InventorySlot.ROW_3_SLOT_4, new ItemBuilder(Material.BED, 1).displayName("§eGewinner").lore("§f§l" + session.getInfo().getWinnerTeam()).create());
+        }
+
         setItem(InventorySlot.ROW_3_SLOT_5, ItemBuilder.wrap(CategoryInventory.UP_ITEM).displayName("§eServer gestartet").lore("§f§l" + new SimpleDateFormat("HH:mm").format(new Date(session.getInfo().getStarted() * 1000))).create());
-        setItem(InventorySlot.ROW_3_SLOT_6, ItemBuilder.wrap(CategoryInventory.UP_ITEM).displayName("§eServer gestoppt").lore("§f§l" + new SimpleDateFormat("HH:mm").format(new Date(session.getInfo().getStopped() * 1000))).create());
+        setItem(InventorySlot.ROW_3_SLOT_6, ItemBuilder.wrap(CategoryInventory.DOWN_ITEM).displayName("§eServer gestoppt").lore("§f§l" + new SimpleDateFormat("HH:mm").format(new Date(session.getInfo().getStopped() * 1000))).create());
         setItem(InventorySlot.ROW_3_SLOT_7, new ItemBuilder(Material.WATCH).displayName("§eLänge").lore("§f§l" + getLength(session.getInfo().getLastTick())).create());
 
         openInventory();

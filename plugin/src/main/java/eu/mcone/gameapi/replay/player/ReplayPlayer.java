@@ -2,20 +2,20 @@ package eu.mcone.gameapi.replay.player;
 
 import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.coresystem.api.bukkit.npc.entity.PlayerNpc;
+import eu.mcone.coresystem.api.bukkit.world.CoreLocation;
 import eu.mcone.gameapi.api.replay.record.packets.util.SerializableItemStack;
 import eu.mcone.gameapi.replay.inventory.ReplayPlayerInventory;
-import eu.mcone.gameapi.replay.npc.NpcUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
+import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -29,17 +29,23 @@ public class ReplayPlayer implements eu.mcone.gameapi.api.replay.player.ReplayPl
     @Getter
     private Data data;
     @Setter
-    private transient Map<Integer, SerializableItemStack> inventoryItems;
+    @BsonIgnore
+    private Map<Integer, SerializableItemStack> inventoryItems;
     @Getter
     @Setter
-    private transient eu.mcone.gameapi.api.replay.player.ReplayPlayer.Stats stats;
+    @BsonIgnore
+    private eu.mcone.gameapi.api.replay.player.ReplayPlayer.Stats stats;
     @Getter
     @Setter
-    private transient double health;
+    @BsonIgnore
+    private double health;
     @Getter
-    private transient Map<Player, CoreInventory> inventoryViewers;
+    @BsonIgnore
+    private Map<Player, CoreInventory> inventoryViewers;
     @Getter
-    private transient PlayerNpc npc;
+    @Setter
+    @BsonIgnore
+    private PlayerNpc npc;
 
     public ReplayPlayer(final Player player) {
         uuid = player.getUniqueId();
@@ -58,7 +64,10 @@ public class ReplayPlayer implements eu.mcone.gameapi.api.replay.player.ReplayPl
         stats = new Stats(0, 0, 0);
         health = 10.0;
         inventoryViewers = new HashMap<>();
-        npc = NpcUtils.constructNpcForPlayer(data.getSessionID(), this);
+    }
+
+    public void setNpc(PlayerNpc npc) {
+        this.npc = npc;
     }
 
     public void openInventory(Player player) {
@@ -67,7 +76,7 @@ public class ReplayPlayer implements eu.mcone.gameapi.api.replay.player.ReplayPl
 
     @Getter
     @BsonDiscriminator
-    public static class Data implements Serializable, eu.mcone.gameapi.api.replay.player.ReplayPlayer.Data {
+    public static class Data implements eu.mcone.gameapi.api.replay.player.ReplayPlayer.Data {
         private String displayName;
         private String name;
         @Setter
@@ -77,7 +86,7 @@ public class ReplayPlayer implements eu.mcone.gameapi.api.replay.player.ReplayPl
         @Setter
         private long joined;
         @Setter
-        private String world;
+        private CoreLocation spawnLocation;
 
         public Data(final Player player) {
             this.displayName = player.getDisplayName();
@@ -86,14 +95,14 @@ public class ReplayPlayer implements eu.mcone.gameapi.api.replay.player.ReplayPl
         }
 
         @BsonCreator
-        public Data(@BsonProperty("displayName") final String displayName, @BsonProperty("name") final String name, @BsonProperty("sessionID") String sessionID,
-                    @BsonProperty("reported") final boolean reported, @BsonProperty("joined") final long joined, @BsonProperty("world") final String world) {
+        public Data(@BsonProperty("displayName") final String displayName, @BsonProperty("name") final String name, @BsonProperty("sessionID") final String sessionID,
+                    @BsonProperty("reported") final boolean reported, @BsonProperty("joined") final long joined, @BsonProperty("spawnLocation") CoreLocation spawnLocation) {
             this.displayName = displayName;
             this.name = name;
             this.sessionID = sessionID;
             this.reported = reported;
             this.joined = joined;
-            this.world = world;
+            this.spawnLocation = spawnLocation;
         }
     }
 
@@ -101,9 +110,9 @@ public class ReplayPlayer implements eu.mcone.gameapi.api.replay.player.ReplayPl
     @Getter
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class Stats implements Serializable, eu.mcone.gameapi.api.replay.player.ReplayPlayer.Stats {
-        private transient int kills = 0;
-        private transient int deaths = 0;
-        private transient int goals = 0;
+    public static class Stats implements eu.mcone.gameapi.api.replay.player.ReplayPlayer.Stats {
+        private int kills = 0;
+        private int deaths = 0;
+        private int goals = 0;
     }
 }

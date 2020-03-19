@@ -53,10 +53,15 @@ public class NPCInteractListener implements Listener {
     public void on(NpcInteractEvent e) {
         NPC npc = e.getNpc();
 
+        System.out.println("Interact with npc");
         if (npc instanceof PlayerNpc) {
+            System.out.println("PLAYER NPC");
             for (ReplayPlayer replayPlayer : session.getPlayers()) {
+                System.out.println(replayPlayer.getData().getName());
                 if (replayPlayer.getNpc().equals(npc)) {
+                    System.out.println("OPEN");
                     new ReplayPlayerInteractInventory(replayPlayer, e.getPlayer());
+
                     break;
                 }
             }

@@ -6,6 +6,7 @@ import eu.mcone.gameapi.api.replay.event.*;
 import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
 import eu.mcone.gameapi.replay.inventory.ReplaySpectatorInventory;
 import eu.mcone.gameapi.replay.listener.NPCInteractListener;
+import eu.mcone.gameapi.replay.npc.NpcUtils;
 import eu.mcone.gameapi.replay.session.ReplaySession;
 import lombok.Getter;
 import lombok.Setter;
@@ -119,8 +120,9 @@ public class ReplayRunnerManager implements eu.mcone.gameapi.api.replay.runner.R
         if (!playing && replays.size() == 0 && watchers.size() > 0) {
             playing = true;
 
-            for (ReplayPlayer player : session.getPlayers()) {
+            for (eu.mcone.gameapi.replay.player.ReplayPlayer player : session.getPlayersAsObject()) {
                 if (!(replays.containsKey(player.getUuid()) || singleReplays.containsKey(player.getUuid()))) {
+                    player.setNpc(NpcUtils.constructNpcForPlayer(player));
                     PlayerRunner runner = new PlayerRunner(player, this);
                     runner.addWatcher(watchers.toArray(new Player[0]));
                     runner.play();
@@ -234,7 +236,7 @@ public class ReplayRunnerManager implements eu.mcone.gameapi.api.replay.runner.R
     }
 
     public void openSpectatorInventory(Player player) {
-        if (singleReplays.containsKey(player.getUniqueId()) || replays.containsKey(player.getUniqueId()))
+        if (watchers.contains(player))
             new ReplaySpectatorInventory(session, player);
     }
 }
