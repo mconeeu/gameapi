@@ -3,6 +3,7 @@ package eu.mcone.gameapi.replay.session;
 import com.mongodb.client.MongoCollection;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.config.typeadapter.bson.LocationCodecProvider;
+import eu.mcone.coresystem.api.bukkit.world.CoreWorld;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.Option;
 import eu.mcone.gameapi.api.replay.chunk.ReplayChunk;
@@ -10,6 +11,7 @@ import eu.mcone.gameapi.api.replay.exception.ReplaySessionAlreadyExistsException
 import eu.mcone.gameapi.api.replay.exception.ReplaySessionNotFoundException;
 import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
 import eu.mcone.gameapi.api.replay.session.ReplaySession;
+import eu.mcone.gameapi.replay.utils.IDUtils;
 import lombok.Getter;
 import org.bson.Document;
 import org.bson.UuidRepresentation;
@@ -46,7 +48,7 @@ public class ReplaySessionManager implements eu.mcone.gameapi.api.replay.session
 
     public ReplaySessionManager(final Option... options) {
         replaySessions = new HashMap<>();
-        sessionID = generateSessionID();
+        sessionID = IDUtils.generateID();
 
         GameAPIPlugin.getSystem().sendConsoleMessage("§aLoading Replay SessionManager...");
         if (Arrays.asList(options).contains(Option.SESSION_MANAGER_LOAD_ALL_REPLAYS)) {
@@ -54,20 +56,21 @@ public class ReplaySessionManager implements eu.mcone.gameapi.api.replay.session
         }
     }
 
-    /**
+    /** *
      * Loads all ReplaySessions form the DB
      */
     private void load() {
         for (Document entry : CoreSystem.getInstance().getMongoDB().getCollection("replay_sessions", Document.class).find().projection(include("info.world"))) {
             String world = entry.get("info", Document.class).getString("world");
-
-            if (CoreSystem.getInstance().getWorldManager().getWorld(world) == null) {
+            if (!CoreSystem.getInstance().getWorldManager().existWorld(world)) {
                 CoreSystem.getInstance().getWorldManager().download(world);
+                CoreWorld downloadedWorld = CoreSystem.getInstance().getWorldManager().getWorld(world);
+                downloadedWorld.setLoadOnStartup(false);
+                downloadedWorld.save();
             }
         }
 
         for (ReplaySession session : replayCollection.find()) {
-            System.out.println("Add replaysession");
             replaySessions.put(session.getID(), session);
         }
     }
@@ -93,12 +96,10 @@ public class ReplaySessionManager implements eu.mcone.gameapi.api.replay.session
                     replayCollection.insertOne((eu.mcone.gameapi.replay.session.ReplaySession) session);
 
                     Bukkit.getScheduler().runTaskAsynchronously(GameAPIPlugin.getInstance(), () -> {
-                        System.out.println("Save replay data");
                         List<File> zipFiles = new ArrayList<>();
 
                         for (Map.Entry<Integer, ReplayChunk> entry : session.getReplayRecorder().getChunks().entrySet()) {
                             File file = new File("CHUNK:" + entry.getKey());
-                            System.out.println("Create file for CHUNK:" + entry.getKey());
                             try {
                                 FileOutputStream fos = new FileOutputStream(file);
                                 fos.write(entry.getValue().compressData());
@@ -131,8 +132,6 @@ public class ReplaySessionManager implements eu.mcone.gameapi.api.replay.session
                             e.printStackTrace();
                         }
                     });
-                } else {
-                    System.out.println("Error by uploading world...");
                 }
             } else {
                 throw new ReplaySessionAlreadyExistsException("The replay with the sessionID " + sessionID + " already exists!");
@@ -166,7 +165,7 @@ public class ReplaySessionManager implements eu.mcone.gameapi.api.replay.session
                 ReplaySession session = replayCollection.find(eq("ID", sessionID)).first();
 
                 if (session != null) {
-                    replaySessions.put(sessionID, session);
+                    download(session.getInfo().getWorld());
                     return session;
                 } else {
                     throw new ReplaySessionNotFoundException();
@@ -222,21 +221,12 @@ public class ReplaySessionManager implements eu.mcone.gameapi.api.replay.session
         return replaySessions.values();
     }
 
-    /**
-     * Generates a unique SessionID for the current replay
-     *
-     * @return Unique SessionID as String
-     */
-    private String generateSessionID() {
-        StringBuilder uuid = new StringBuilder();
-        String[] uuidArray = UUID.randomUUID().toString().split("-");
-
-        Random random = new Random(0);
-
-        for (int i = 0; i < uuidArray.length / 2; i++) {
-            uuid.append(uuidArray[random.nextInt(uuidArray.length)]);
+    private void download(String world) {
+        if (!CoreSystem.getInstance().getWorldManager().existWorld(world)) {
+            CoreSystem.getInstance().getWorldManager().download(world);
+            CoreWorld downloadedWorld = CoreSystem.getInstance().getWorldManager().getWorld(world);
+            downloadedWorld.setLoadOnStartup(false);
+            downloadedWorld.save();
         }
-
-        return uuid.toString();
     }
 }

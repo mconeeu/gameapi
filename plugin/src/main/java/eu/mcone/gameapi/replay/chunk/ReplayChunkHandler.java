@@ -64,7 +64,7 @@ public class ReplayChunkHandler implements eu.mcone.gameapi.api.replay.chunk.Rep
     }
 
     public eu.mcone.gameapi.api.replay.chunk.ReplayChunk getChunk(int tick) {
-        currentChunkID = tick / 1200;
+        currentChunkID = tick / 600;
 
         int nextChunk = currentChunkID + 1;
         if (tick != session.getInfo().getLastTick()) {

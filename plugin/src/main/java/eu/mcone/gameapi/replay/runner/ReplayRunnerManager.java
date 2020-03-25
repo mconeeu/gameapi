@@ -8,17 +8,24 @@ import eu.mcone.gameapi.replay.inventory.ReplaySpectatorInventory;
 import eu.mcone.gameapi.replay.listener.NPCInteractListener;
 import eu.mcone.gameapi.replay.npc.NpcUtils;
 import eu.mcone.gameapi.replay.session.ReplaySession;
+import eu.mcone.gameapi.replay.utils.IDUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Getter
 public class ReplayRunnerManager implements eu.mcone.gameapi.api.replay.runner.ReplayRunnerManager {
+
+    @Getter
+    private final String replayID;
 
     private boolean playing = false;
     private AtomicInteger currentTick = new AtomicInteger();
@@ -40,6 +47,7 @@ public class ReplayRunnerManager implements eu.mcone.gameapi.api.replay.runner.R
 
     public ReplayRunnerManager(ReplaySession session) {
         this.session = session;
+        replayID = IDUtils.generateID();
         watchers = new HashSet<>();
         singleReplays = new HashMap<>();
         serverRunner = new ServerRunner(session);
@@ -53,13 +61,13 @@ public class ReplayRunnerManager implements eu.mcone.gameapi.api.replay.runner.R
         replays.forEach((key, value) -> value.addWatcher(players));
 
         for (Player player : players) {
+            Bukkit.getPluginManager().callEvent(new WatcherJoinReplayEvent(player, watchers.toArray(new Player[0]), session));
+
             watchers.add(player);
 
             for (PlayerRunner runner : replays.values()) {
                 runner.addWatcher(player);
             }
-
-            Bukkit.getPluginManager().callEvent(new WatcherJoinReplayEvent(player, session));
         }
     }
 
@@ -73,7 +81,7 @@ public class ReplayRunnerManager implements eu.mcone.gameapi.api.replay.runner.R
                 runner.removeWatcher(player);
             }
 
-            Bukkit.getPluginManager().callEvent(new WatcherQuitReplayEvent(player, session));
+            Bukkit.getPluginManager().callEvent(new WatcherQuitReplayEvent(player, watchers.toArray(new Player[0]), session));
 
             if (playing && watchers.isEmpty()) {
                 stop();
@@ -96,7 +104,13 @@ public class ReplayRunnerManager implements eu.mcone.gameapi.api.replay.runner.R
                             tick = currentTick.getAndDecrement();
                         }
 
-                        CoreSystem.getInstance().createActionBar().message("§7" + tick / 30 + " Sekunden").send(watcher);
+                        int seconds = tick / 30;
+
+                        if (seconds < 60) {
+                            CoreSystem.getInstance().createActionBar().message("§7" + seconds + " Sekunden").send(watcher);
+                        } else {
+                            CoreSystem.getInstance().createActionBar().message("§7" + seconds / 60 + " Minuten").send(watcher);
+                        }
                     }
                 } else {
                     CoreSystem.getInstance().createActionBar().message("§7Paussiert");
@@ -122,7 +136,7 @@ public class ReplayRunnerManager implements eu.mcone.gameapi.api.replay.runner.R
 
             for (eu.mcone.gameapi.replay.player.ReplayPlayer player : session.getPlayersAsObject()) {
                 if (!(replays.containsKey(player.getUuid()) || singleReplays.containsKey(player.getUuid()))) {
-                    player.setNpc(NpcUtils.constructNpcForPlayer(player));
+                    player.setNpc(NpcUtils.constructNpcForPlayer(player, replayID));
                     PlayerRunner runner = new PlayerRunner(player, this);
                     runner.addWatcher(watchers.toArray(new Player[0]));
                     runner.play();
@@ -132,7 +146,7 @@ public class ReplayRunnerManager implements eu.mcone.gameapi.api.replay.runner.R
 
             serverRunner.play();
             progress();
-            npcListener = new NPCInteractListener(session);
+            npcListener = new NPCInteractListener(this);
             Bukkit.getPluginManager().callEvent(new ReplayStartEvent(session));
         }
     }

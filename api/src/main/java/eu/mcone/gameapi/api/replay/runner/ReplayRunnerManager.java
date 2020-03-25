@@ -9,6 +9,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public interface ReplayRunnerManager {
 
+    String getReplayID();
+
     boolean isForward();
 
     boolean isBackward();

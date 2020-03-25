@@ -5,6 +5,7 @@ import eu.mcone.coresystem.api.bukkit.event.BroadcastMessageEvent;
 import eu.mcone.coresystem.api.bukkit.event.armor.ArmorEquipEvent;
 import eu.mcone.coresystem.api.bukkit.npc.capture.SimpleRecorder;
 import eu.mcone.coresystem.api.bukkit.npc.capture.packets.*;
+import eu.mcone.coresystem.api.bukkit.npc.entity.EntityProjectile;
 import eu.mcone.coresystem.api.bukkit.world.CoreLocation;
 import eu.mcone.gameapi.api.event.stats.PlayerRoundStatsChangeEvent;
 import eu.mcone.gameapi.api.event.team.TeamWonEvent;
@@ -20,18 +21,15 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityRegainHealthEvent;
-import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
@@ -70,8 +68,8 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                 } else {
                     Player player = e.getPlayer();
                     if (session.existsReplayPlayer(player)) {
-                        if (ticks % 3 == 0) {
-                            addPacket(session.getReplayPlayer(player), ticks, new EntityMovePacketWrapper(player.getLocation()));
+                        if (ticks % 2 == 0) {
+                            addPacket(player, new EntityMovePacketWrapper(player.getLocation()));
                         }
                     }
                 }
@@ -86,7 +84,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                     if (session.existsReplayPlayer(player)) {
                         ReplayPlayer replayPlayer = session.getReplayPlayer(player.getUniqueId());
                         replayPlayer.getData().setSpawnLocation(new CoreLocation(player.getLocation()));
-                        addPacket(session.getReplayPlayer(player), ticks, new EntitySpawnPacketWrapper(player.getLocation()));
+                        addPacket(player, new EntitySpawnPacketWrapper(player.getLocation()));
                     }
                 }
             }
@@ -98,7 +96,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                 } else {
                     Player player = e.getPlayer();
                     if (session.existsReplayPlayer(player)) {
-                        addPacket(session.getReplayPlayer(player), ticks, new EntityDestroyPacketWrapper(e.getPlayer().getUniqueId().toString()));
+                        addPacket(player, new EntityDestroyPacketWrapper(e.getPlayer().getUniqueId().toString()));
                     }
                 }
             }
@@ -110,7 +108,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                 } else {
                     Player player = e.getPlayer();
                     if (session.existsReplayPlayer(player)) {
-                        addPacket(session.getReplayPlayer(player), ticks, new EntitySwitchItemPacketWrapper(player.getItemInHand()));
+                        addPacket(player, new EntitySwitchItemPacketWrapper(player.getItemInHand()));
                     }
                 }
             }
@@ -122,20 +120,18 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                 } else {
                     Player player = e.getPlayer();
                     if (session.existsReplayPlayer(player)) {
-                        ReplayPlayer replayPlayer = session.getReplayPlayer(player);
-
                         if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
                             if (e.getClickedBlock().getType().equals(Material.STONE_BUTTON) || e.getClickedBlock().getType().equals(Material.STONE_BUTTON)) {
                                 BlockState blockState = e.getClickedBlock().getState();
-                                addPacket(replayPlayer, ticks, new EntityButtonInteractPacketWrapper(e.getClickedBlock().getLocation(), ((Button) blockState.getData()).isPowered()));
-                                addPacket(replayPlayer, ticks, new EntityClickPacketWrapper());
+                                addPacket(player, new EntityButtonInteractPacketWrapper(e.getClickedBlock().getLocation(), ((Button) blockState.getData()).isPowered()));
+                                addPacket(player, new EntityClickPacketWrapper());
                             } else if (e.getClickedBlock().getType().toString().contains("DOOR")) {
                                 BlockState blockState = e.getClickedBlock().getState();
-                                addPacket(replayPlayer, ticks, new EntityOpenDoorPacketWrapper(e.getClickedBlock().getLocation(), ((Door) blockState.getData()).isOpen()));
-                                addPacket(replayPlayer, ticks, new EntityClickPacketWrapper());
+                                addPacket(player, new EntityOpenDoorPacketWrapper(e.getClickedBlock().getLocation(), ((Door) blockState.getData()).isOpen()));
+                                addPacket(player, new EntityClickPacketWrapper());
                             }
                         } else if (e.getAction().equals(Action.LEFT_CLICK_AIR) || e.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
-                            addPacket(replayPlayer, ticks, new EntityClickPacketWrapper());
+                            addPacket(player, new EntityClickPacketWrapper());
                         }
                     }
                 }
@@ -149,10 +145,86 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                     if (e.getEntity() instanceof Player) {
                         Player player = (Player) e.getEntity();
                         if (session.existsReplayPlayer(player)) {
-                            ReplayPlayer replayPlayer = session.getReplayPlayer(player);
-                            addPacket(replayPlayer, ticks, new EntityDamagePacketWrapper());
-                            addPacket(replayPlayer, ticks, new EntityChangeHealthPacketWrapper(player.getHealth()));
+                            addPacket(player, new EntityDamagePacketWrapper());
+                            addPacket(player, new EntityChangeHealthPacketWrapper(player.getHealth()));
                         }
+                    }
+                }
+            }
+
+            @EventHandler
+            public void on(PlayerDeathEvent e) {
+                if (isStopped()) {
+                    e.getHandlers().unregister(this);
+                } else {
+                    Player player = e.getEntity();
+                    if (session.existsReplayPlayer(player)) {
+//                        addPacket(player, new EntityDeathEventPacketWrapper());
+                    }
+                }
+            }
+
+            @EventHandler
+            public void on(EntityDamageByEntityEvent e) {
+                if (isStopped()) {
+                    e.getHandlers().unregister(this);
+                } else {
+                    Entity entity = e.getEntity();
+                    Entity projectile = e.getDamager();
+
+                    if (projectile != null && entity != null) {
+                        if (entity instanceof Player) {
+                            Player damaged = (Player) entity;
+                            if ((projectile instanceof Arrow)) {
+                                Arrow arrow = (Arrow) projectile;
+
+                                if (arrow.getShooter() instanceof Player) {
+                                    Player shooter = (Player) arrow.getShooter();
+                                    if (session.existsReplayPlayer(shooter)) {
+                                        addPacket(shooter, new EntityShootArrowPacketWrapper(damaged.getLocation()));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            @EventHandler
+            public void on(ProjectileLaunchEvent e) {
+                if (isStopped) {
+                    e.getHandlers().unregister(this);
+                } else {
+                    Projectile projectile = e.getEntity();
+                    if (projectile instanceof Snowball) {
+                        Snowball snowball = (Snowball) projectile;
+
+                        if (snowball.getShooter() instanceof Player) {
+                            Player shooter = (Player) snowball.getShooter();
+                            if (session.existsReplayPlayer(shooter)) {
+                                addPacket(shooter, new EntityLaunchProjectilePacketWrapper(EntityProjectile.SNOWBALL));
+                            }
+                        }
+                    } else if (projectile instanceof Egg) {
+                        Egg egg = (Egg) projectile;
+                        if (egg.getShooter() instanceof Player) {
+                            Player shooter = (Player) egg.getShooter();
+                            if (session.existsReplayPlayer(shooter)) {
+                                addPacket(shooter, new EntityLaunchProjectilePacketWrapper(EntityProjectile.EGG));
+                            }
+                        }
+                    }
+                }
+            }
+
+            @EventHandler
+            public void on(PlayerRespawnEvent e) {
+                if (isStopped()) {
+                    e.getHandlers().unregister(this);
+                } else {
+                    Player player = e.getPlayer();
+                    if (session.existsReplayPlayer(player)) {
+                        addPacket(player, new EntityRespawnPacketWrapper(e.getRespawnLocation()));
                     }
                 }
             }
@@ -166,7 +238,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                         Player player = (Player) e.getEntity();
                         if (session.existsReplayPlayer(player)) {
                             double health = ((Player) e.getEntity()).getHealth();
-                            addPacket(session.getReplayPlayer(player), ticks, new EntityChangeHealthPacketWrapper(health));
+                            addPacket(player, new EntityChangeHealthPacketWrapper(health));
                         }
                     }
                 }
@@ -179,12 +251,11 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                 } else {
                     Player player = e.getPlayer();
                     if (session.existsReplayPlayer(player)) {
-                        ReplayPlayer replayPlayer = session.getReplayPlayer(player);
 
                         if (e.isSneaking()) {
-                            addPacket(replayPlayer, ticks, new EntitySneakPacketWrapper(EntityAction.START_SNEAKING));
+                            addPacket(player, new EntitySneakPacketWrapper(EntityAction.START_SNEAKING));
                         } else {
-                            addPacket(replayPlayer, ticks, new EntitySneakPacketWrapper(EntityAction.STOP_SNEAKING));
+                            addPacket(player, new EntitySneakPacketWrapper(EntityAction.STOP_SNEAKING));
                         }
                     }
                 }
@@ -197,32 +268,9 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                 } else {
                     Player player = e.getPlayer();
                     if (session.existsReplayPlayer(player)) {
-                        System.out.println(e.getType());
-                        System.out.println(e.getNewArmorPiece());
-                        System.out.println(e.getOldArmorPiece());
-                        addPacket(session.getReplayPlayer(player), ticks, new EntityArmorChangePacketWrapper(e.getType(), e.getNewArmorPiece()));
+                        addPacket(player, new EntityArmorChangePacketWrapper(e.getType(), e.getNewArmorPiece()));
                         if (isStopped()) {
                             e.getHandlers().unregister(this);
-                        }
-                    }
-                }
-            }
-
-            @EventHandler
-            public void on(InventoryCloseEvent e) {
-                if (isStopped()) {
-                    e.getHandlers().unregister(this);
-                } else {
-                    Inventory inv = e.getInventory();
-                    Player player = (Player) e.getPlayer();
-
-                    if (session.existsReplayPlayer(player)) {
-                        ReplayPlayer replayPlayer = session.getReplayPlayer(player);
-                        System.out.println(e.getInventory().getType());
-                        if (inv != null && (e.getInventory().getType().equals(InventoryType.CRAFTING) || e.getInventory().getType().equals(InventoryType.PLAYER))) {
-                            System.out.println("ADD PACKET");
-
-//                        replayPlayer.getPackets().addPacket(ticks, new EntityChangeInventoryPacketWrapper(e.getInventory().getContents()));
                         }
                     }
                 }
@@ -249,7 +297,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                                 slot++;
                             }
 
-                            addPacket(session.getReplayPlayer(player), ticks, new EntityChangeInventoryPacketWrapper(items));
+                            addPacket(player, new EntityChangeInventoryPacketWrapper(items));
                         }
                     }
                 }
@@ -262,7 +310,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                 } else {
                     Player player = e.getPlayer();
                     if (session.existsReplayPlayer(player)) {
-                        addPacket(session.getReplayPlayer(player), ticks, new EntityPickItemUpPacketWrapper(e.getItem()));
+                        addPacket(player, new EntityPickItemUpPacketWrapper(e.getItem()));
                     }
                 }
             }
@@ -274,7 +322,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                 } else {
                     Player player = e.getPlayer();
                     if (session.existsReplayPlayer(player)) {
-                        addPacket(session.getReplayPlayer(player), ticks, new EntityDropItemPacketWrapper(e.getItemDrop().getItemStack()));
+                        addPacket(player, new EntityDropItemPacketWrapper(e.getItemDrop().getItemStack()));
                     }
                 }
             }
@@ -288,12 +336,9 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                     if (e.getItem().getType().equals(Material.POTION)) {
                         Potion potion = Potion.fromItemStack(e.getItem());
                         Player player = e.getPlayer();
-                        ReplayPlayer replayPlayer = session.getReplayPlayer(player);
 
-                        if (replayPlayer != null) {
-                            if (potion != null) {
-                                addPacket(replayPlayer, ticks, new EntityPotionEffectPacketWrapper(potion));
-                            }
+                        if (potion != null) {
+                            addPacket(player, new EntityPotionEffectPacketWrapper(potion));
                         }
                     }
                 }
@@ -306,9 +351,10 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                     e.getHandlers().unregister(this);
                 } else {
                     for (ReplayPlayer replayPlayer : session.getPlayers()) {
-                        if (e.getAffectedEntities().contains(Bukkit.getPlayer(replayPlayer.getUuid()))) {
+                        Player player = Bukkit.getPlayer(replayPlayer.getUuid());
+                        if (e.getAffectedEntities().contains(player)) {
                             if (Potion.fromItemStack(e.getPotion().getItem()) != null) {
-                                addPacket(replayPlayer, ticks, new EntityPotionEffectPacketWrapper(Potion.fromItemStack(e.getPotion().getItem())));
+                                addPacket(player, new EntityPotionEffectPacketWrapper(Potion.fromItemStack(e.getPotion().getItem())));
                             }
                         }
                     }
@@ -322,7 +368,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                 } else {
                     Player player = e.getPlayer();
                     if (session.existsReplayPlayer(player)) {
-                        addPacket(session.getReplayPlayer(player), ticks, new EntityStatsChangePacketWrapper(e.getKills(), e.getDeaths(), e.getGoals()));
+                        addPacket(player, new EntityStatsChangePacketWrapper(e.getKills(), e.getDeaths(), e.getGoals()));
                     }
                 }
             }
@@ -361,7 +407,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                     e.getHandlers().unregister(this);
                 } else {
                     if (session.existsReplayPlayer(player)) {
-                        addPacket(session.getReplayPlayer(player), ticks, new EntityBreakBlockPacketWrapper(e.getBlock()));
+                        addPacket(player, new EntityBreakBlockPacketWrapper(e.getBlock()));
                     }
                 }
             }
@@ -374,22 +420,22 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                     e.getHandlers().unregister(this);
                 } else {
                     if (session.existsReplayPlayer(player)) {
-                        addPacket(session.getReplayPlayer(player), ticks, new EntityPlaceBlockPacketWrapper(e.getBlock()));
+                        addPacket(player, new EntityPlaceBlockPacketWrapper(e.getBlock()));
                     }
                 }
             }
         });
     }
 
-    private void addPacket(ReplayPlayer player, int tick, PacketWrapper wrapper) {
-        int chunkID = tick / 600;
-        lastTick = tick;
+    private void addPacket(Player player, PacketWrapper wrapper) {
+        int chunkID = ticks / 600;
+        lastTick = ticks;
 
         if (chunks.containsKey(chunkID)) {
-            chunks.get(chunkID).addPacket(player.getUuid(), tick, wrapper);
+            chunks.get(chunkID).addPacket(player.getUniqueId(), ticks, wrapper);
         } else {
             ReplayChunk chunk = new ReplayChunk();
-            chunk.addPacket(player.getUuid(), tick, wrapper);
+            chunk.addPacket(player.getUniqueId(), ticks, wrapper);
             chunks.put(chunkID, chunk);
         }
     }

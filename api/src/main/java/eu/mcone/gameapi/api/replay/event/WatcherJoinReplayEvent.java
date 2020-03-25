@@ -14,6 +14,7 @@ public class WatcherJoinReplayEvent extends Event {
     @Getter
     private static final HandlerList handlerList = new HandlerList();
     private final Player player;
+    private final Player[] watchers;
     private final ReplaySession session;
 
     public HandlerList getHandlers() {
