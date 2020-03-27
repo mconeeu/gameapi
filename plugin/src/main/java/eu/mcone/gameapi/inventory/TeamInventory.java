@@ -9,7 +9,7 @@ import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Module;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.team.Team;
-import eu.mcone.gameapi.api.team.TeamEnum;
+import eu.mcone.gameapi.api.team.Teams;
 import eu.mcone.gameapi.team.TeamManager;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -55,7 +55,7 @@ public class TeamInventory extends CoreInventory {
                     break;
                 } else {
                     if (team.getSize() <= teamManager.getPlayersPerTeam()) {
-                        if (gp.getTeam() == TeamEnum.ERROR || gp.getTeam() == null) {
+                        if (gp.getTeam() == Teams.ERROR || gp.getTeam() == null) {
                             gp.setTeam(team);
 
                             //GameTemplate.getInstance().getTeamManager().getTeamStageHandler().getTeamStage(team).addPlayerToStage(gp);
@@ -96,37 +96,37 @@ public class TeamInventory extends CoreInventory {
 
     private int getPlace(final Team team) {
         if (teamManager.getTeams().size() == 2) {
-            if (team.getTeamEnum().equals(TeamEnum.RED)) {
+            if (team.getTeamEnum().equals(Teams.RED)) {
                 return InventorySlot.ROW_2_SLOT_3;
-            } else if (team.getTeamEnum().equals(TeamEnum.BLUE)) {
+            } else if (team.getTeamEnum().equals(Teams.BLUE)) {
                 return InventorySlot.ROW_2_SLOT_7;
             }
         } else if (teamManager.getTeams().size() == 4) {
-            if (team.getTeamEnum().equals(TeamEnum.RED)) {
+            if (team.getTeamEnum().equals(Teams.RED)) {
                 return InventorySlot.ROW_2_SLOT_2;
-            } else if (team.getTeamEnum().equals(TeamEnum.BLUE)) {
+            } else if (team.getTeamEnum().equals(Teams.BLUE)) {
                 return InventorySlot.ROW_2_SLOT_4;
-            } else if (team.getTeamEnum().equals(TeamEnum.YELLOW)) {
+            } else if (team.getTeamEnum().equals(Teams.YELLOW)) {
                 return InventorySlot.ROW_2_SLOT_6;
-            } else if (team.getTeamEnum().equals(TeamEnum.GREEN)) {
+            } else if (team.getTeamEnum().equals(Teams.GREEN)) {
                 return InventorySlot.ROW_2_SLOT_8;
             }
         } else if (teamManager.getTeams().size() == 8) {
-            if (team.getTeamEnum().equals(TeamEnum.RED)) {
+            if (team.getTeamEnum().equals(Teams.RED)) {
                 return InventorySlot.ROW_2_SLOT_1;
-            } else if (team.getTeamEnum().equals(TeamEnum.BLUE)) {
+            } else if (team.getTeamEnum().equals(Teams.BLUE)) {
                 return InventorySlot.ROW_2_SLOT_2;
-            } else if (team.getTeamEnum().equals(TeamEnum.YELLOW)) {
+            } else if (team.getTeamEnum().equals(Teams.YELLOW)) {
                 return InventorySlot.ROW_2_SLOT_3;
-            } else if (team.getTeamEnum().equals(TeamEnum.GREEN)) {
+            } else if (team.getTeamEnum().equals(Teams.GREEN)) {
                 return InventorySlot.ROW_2_SLOT_4;
-            } else if (team.getTeamEnum().equals(TeamEnum.ORANGE)) {
+            } else if (team.getTeamEnum().equals(Teams.ORANGE)) {
                 return InventorySlot.ROW_1_SLOT_5;
-            } else if (team.getTeamEnum().equals(TeamEnum.AQUA)) {
+            } else if (team.getTeamEnum().equals(Teams.AQUA)) {
                 return InventorySlot.ROW_3_SLOT_6;
-            } else if (team.getTeamEnum().equals(TeamEnum.WHITE)) {
+            } else if (team.getTeamEnum().equals(Teams.WHITE)) {
                 return InventorySlot.ROW_1_SLOT_7;
-            } else if (team.getTeamEnum().equals(TeamEnum.PURPLE)) {
+            } else if (team.getTeamEnum().equals(Teams.PURPLE)) {
                 return InventorySlot.ROW_3_SLOT_8;
             }
         }

@@ -18,12 +18,9 @@ import eu.mcone.gameapi.api.kit.Kit;
 import eu.mcone.gameapi.api.kit.ModifiedKit;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.GamePlayerSettings;
-import eu.mcone.gameapi.backpack.GameBackpackManager;
 import eu.mcone.gameapi.kit.GameKitManager;
-import eu.mcone.gameapi.api.event.stats.PlayerRoundStatsChangeEvent;
 import eu.mcone.gameapi.api.team.Team;
-import eu.mcone.gameapi.api.team.TeamEnum;
-import eu.mcone.gameapi.kit.GameKitManager;
+import eu.mcone.gameapi.api.team.Teams;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Sound;
@@ -56,7 +53,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
 
     private Player player;
     @Getter
-    private TeamEnum team;
+    private Teams team;
 
     public GameAPIPlayer(CorePlayer player) {
         super(player);
@@ -263,7 +260,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
         }
     }
 
-    public void setTeam(TeamEnum team) {
+    public void setTeam(Teams team) {
         if (this.team != null) {
             GamePlugin.getGamePlugin().getTeamManager().getTeam(this.team).removePlayer(player);
         } else {
@@ -280,7 +277,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
     public void removeFromGame() {
         //TODO: Add team stage integration
         GamePlugin.getGamePlugin().getPlayerManager().setPlaying(player, false);
-        this.team = TeamEnum.ERROR;
+        this.team = Teams.ERROR;
     }
 
     public void addKill() {

@@ -11,9 +11,9 @@ import eu.mcone.gameapi.api.replay.exception.ReplaySessionAlreadyExistsException
 import eu.mcone.gameapi.api.replay.exception.ReplaySessionNotFoundException;
 import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
 import eu.mcone.gameapi.api.replay.session.ReplaySession;
-import eu.mcone.gameapi.replay.utils.IDUtils;
+import eu.mcone.gameapi.api.utils.IDUtils;
+import eu.mcone.gameapi.replay.world.WorldDownloader;
 import lombok.Getter;
-import org.bson.Document;
 import org.bson.UuidRepresentation;
 import org.bson.codecs.UuidCodecProvider;
 import org.bson.codecs.pojo.Conventions;
@@ -30,7 +30,6 @@ import java.util.zip.ZipOutputStream;
 
 import static com.mongodb.MongoClientSettings.getDefaultCodecRegistry;
 import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Projections.include;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
@@ -41,7 +40,11 @@ public class ReplaySessionManager implements eu.mcone.gameapi.api.replay.session
             fromRegistries(getDefaultCodecRegistry(), fromProviders(new UuidCodecProvider(UuidRepresentation.JAVA_LEGACY), new LocationCodecProvider(), PojoCodecProvider.builder().conventions(Conventions.DEFAULT_CONVENTIONS).automatic(true).build()))
     ).getCollection("replay_sessions", eu.mcone.gameapi.replay.session.ReplaySession.class);
 
+    @Getter
+    private boolean cache = true;
+
     private HashMap<String, ReplaySession> replaySessions;
+    private WorldDownloader worldDownloader;
 
     @Getter
     private String sessionID;
@@ -50,31 +53,36 @@ public class ReplaySessionManager implements eu.mcone.gameapi.api.replay.session
         replaySessions = new HashMap<>();
         sessionID = IDUtils.generateID();
 
+        List<Option> optionsList = Arrays.asList(options);
+
         GameAPIPlugin.getSystem().sendConsoleMessage("§aLoading Replay SessionManager...");
-        if (Arrays.asList(options).contains(Option.SESSION_MANAGER_LOAD_ALL_REPLAYS)) {
+        if (optionsList.contains(Option.SESSION_MANAGER_LOAD_ALL_REPLAYS)) {
             load();
+        } else {
+            cache = false;
+        }
+
+        if (optionsList.contains(Option.USE_WORLD_DOWNLOADER)) {
+            GameAPIPlugin.getSystem().sendConsoleMessage("§aStarting world downloader...");
+            worldDownloader = new WorldDownloader();
+            worldDownloader.runDownloader();
         }
     }
 
-    /** *
+    public eu.mcone.gameapi.api.replay.world.WorldDownloader getWorldDownloader() {
+        return worldDownloader;
+    }
+
+    /**
      * Loads all ReplaySessions form the DB
      */
     private void load() {
-        for (Document entry : CoreSystem.getInstance().getMongoDB().getCollection("replay_sessions", Document.class).find().projection(include("info.world"))) {
-            String world = entry.get("info", Document.class).getString("world");
-            if (!CoreSystem.getInstance().getWorldManager().existWorld(world)) {
-                CoreSystem.getInstance().getWorldManager().download(world);
-                CoreWorld downloadedWorld = CoreSystem.getInstance().getWorldManager().getWorld(world);
-                downloadedWorld.setLoadOnStartup(false);
-                downloadedWorld.save();
-            }
-        }
-
         for (ReplaySession session : replayCollection.find()) {
             replaySessions.put(session.getID(), session);
         }
     }
 
+    @Override
     public void saveSession(final ReplaySession session) {
         try {
             String sessionID = session.getID();
@@ -141,10 +149,11 @@ public class ReplaySessionManager implements eu.mcone.gameapi.api.replay.session
         }
     }
 
+    @Override
     public boolean deleteSession(final String sessionID) {
         if (replaySessions.containsKey(sessionID)) {
             replaySessions.remove(sessionID);
-            replayCollection.deleteOne(eq("ID", sessionID));
+            replayCollection.deleteOne(eq("iD", sessionID));
             return true;
         } else {
             return false;
@@ -152,24 +161,21 @@ public class ReplaySessionManager implements eu.mcone.gameapi.api.replay.session
     }
 
     /**
-     * Returns a ReplaySession object for the sessionID
+     * Gets the live version of the replay session from the database
      *
      * @param sessionID Unique ID
-     * @return ReplaySession
+     * @return ReplaySession interface
      */
-    public ReplaySession getSession(final String sessionID) {
+    @Override
+    public ReplaySession getLiveSession(final String sessionID) {
         try {
-            if (replaySessions.containsKey(sessionID)) {
-                return replaySessions.get(sessionID);
-            } else {
-                ReplaySession session = replayCollection.find(eq("ID", sessionID)).first();
+            ReplaySession session = replayCollection.find(eq("iD", sessionID)).first();
 
-                if (session != null) {
-                    download(session.getInfo().getWorld());
-                    return session;
-                } else {
-                    throw new ReplaySessionNotFoundException();
-                }
+            if (session != null) {
+                download(session.getInfo().getWorld());
+                return session;
+            } else {
+                throw new ReplaySessionNotFoundException();
             }
         } catch (ReplaySessionNotFoundException e) {
             e.printStackTrace();
@@ -179,11 +185,27 @@ public class ReplaySessionManager implements eu.mcone.gameapi.api.replay.session
     }
 
     /**
+     * Returns a ReplaySession object for the sessionID
+     *
+     * @param sessionID Unique ID
+     * @return ReplaySession
+     */
+    @Override
+    public ReplaySession getSession(final String sessionID) {
+        if (replaySessions.containsKey(sessionID)) {
+            return replaySessions.get(sessionID);
+        } else {
+            return getLiveSession(sessionID);
+        }
+    }
+
+    /**
      * Returns a List of ReplaySessions for the specified UUID (Player)
      *
      * @param uuid Unique UUID
      * @return List of ReplaySessions
      */
+    @Override
     public List<ReplaySession> getSessionsForPlayer(final UUID uuid) {
         List<ReplaySession> sessions = new ArrayList<>();
         for (ReplaySession session : replaySessions.values()) {
@@ -203,6 +225,7 @@ public class ReplaySessionManager implements eu.mcone.gameapi.api.replay.session
      * @param sessionID Unique ID
      * @return boolean
      */
+    @Override
     public boolean existsSession(final String sessionID) {
         if (replaySessions.containsKey(sessionID)) {
             return true;
@@ -212,17 +235,36 @@ public class ReplaySessionManager implements eu.mcone.gameapi.api.replay.session
         }
     }
 
+    @Override
+    public Collection<ReplaySession> getLiveSessions() {
+        List<ReplaySession> sessions = new ArrayList<>();
+        replayCollection.find().iterator().forEachRemaining(sessions::add);
+        return sessions;
+    }
+
+    @Override
+    public Collection<ReplaySession> getLiveSessions(int startIndex, int values) {
+        List<ReplaySession> sessions = new ArrayList<>();
+        replayCollection.find().skip(startIndex).limit(values).iterator().forEachRemaining(sessions::add);
+        return sessions;
+    }
+
     /**
      * Returns a list of all replay sessions in the database
      *
      * @return ReplaySession
      */
-    public Collection<ReplaySession> getReplaySessions() {
+    @Override
+    public Collection<ReplaySession> getSessions() {
         return replaySessions.values();
     }
 
     private void download(String world) {
         if (!CoreSystem.getInstance().getWorldManager().existWorld(world)) {
+            if (worldDownloader != null) {
+                worldDownloader.getDownloaded().add(world);
+            }
+
             CoreSystem.getInstance().getWorldManager().download(world);
             CoreWorld downloadedWorld = CoreSystem.getInstance().getWorldManager().getWorld(world);
             downloadedWorld.setLoadOnStartup(false);

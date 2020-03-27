@@ -10,7 +10,7 @@ import java.util.List;
 public class Team {
 
     @Getter
-    private final TeamEnum teamEnum;
+    private final Teams teamEnum;
     @Getter
     private int size;
     @Getter
@@ -24,7 +24,7 @@ public class Team {
 
     private List<Player> players;
 
-    public Team(final TeamEnum teamEnum, final String spawnLocation, final String npcLocation, final String respawnBlockLocation) {
+    public Team(final Teams teamEnum, final String spawnLocation, final String npcLocation, final String respawnBlockLocation) {
         this.teamEnum = teamEnum;
         this.spawnLocation = spawnLocation;
         this.npcLocation = npcLocation;

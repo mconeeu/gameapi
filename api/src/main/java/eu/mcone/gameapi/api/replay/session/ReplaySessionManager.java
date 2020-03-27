@@ -6,11 +6,17 @@ import java.util.UUID;
 
 public interface ReplaySessionManager {
 
+    boolean isCache();
+
     String getSessionID();
+
+    eu.mcone.gameapi.api.replay.world.WorldDownloader getWorldDownloader();
 
     void saveSession(final ReplaySession replaySession);
 
     boolean deleteSession(final String sessionID);
+
+    ReplaySession getLiveSession(final String sessionID);
 
     ReplaySession getSession(final String replaySessionID);
 
@@ -18,5 +24,9 @@ public interface ReplaySessionManager {
 
     boolean existsSession(final String sessionID);
 
-    Collection<ReplaySession> getReplaySessions();
+    Collection<ReplaySession> getLiveSessions();
+
+    Collection<ReplaySession> getLiveSessions(int startIndex, int values);
+
+    Collection<ReplaySession> getSessions();
 }

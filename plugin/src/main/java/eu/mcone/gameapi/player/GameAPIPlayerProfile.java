@@ -54,19 +54,20 @@ public class GameAPIPlayerProfile extends GameProfile {
 
     @Override
     public void doSetData(Player p) {
-        if (GamePlugin.getGamePlugin().hasModule(Module.BACKPACK_MANAGER))
-        for (Map.Entry<String, List<Integer>> itemEntry : items.entrySet()) {
-            Set<BackpackItem> items = new HashSet<>();
+        if (GamePlugin.getGamePlugin().hasModule(Module.BACKPACK_MANAGER)) {
+            for (Map.Entry<String, List<Integer>> itemEntry : items.entrySet()) {
+                Set<BackpackItem> items = new HashSet<>();
 
-            for (int itemId : itemEntry.getValue()) {
-                BackpackItem item = GamePlugin.getGamePlugin().getBackpackManager().getBackpackItem(itemEntry.getKey(), itemId);
+                for (int itemId : itemEntry.getValue()) {
+                    BackpackItem item = GamePlugin.getGamePlugin().getBackpackManager().getBackpackItem(itemEntry.getKey(), itemId);
 
-                if (item != null) {
-                    items.add(item);
+                    if (item != null) {
+                        items.add(item);
+                    }
                 }
-            }
 
-            itemMap.put(itemEntry.getKey(), items);
+                itemMap.put(itemEntry.getKey(), items);
+            }
         }
 
         for (Map.Entry<String, Map<String, Long>> achievementEntry : achievements.entrySet()) {

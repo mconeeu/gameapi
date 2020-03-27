@@ -6,7 +6,7 @@ import eu.mcone.gameapi.api.Module;
 import eu.mcone.gameapi.api.event.team.TeamWonEvent;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.team.Team;
-import eu.mcone.gameapi.api.team.TeamEnum;
+import eu.mcone.gameapi.api.team.Teams;
 import eu.mcone.gameapi.api.utils.GameConfig;
 import eu.mcone.gameapi.inventory.TeamInventory;
 import eu.mcone.gameapi.player.GameAPIPlayer;
@@ -23,7 +23,7 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
     @Getter
     private final int playersPerTeam;
 
-    private HashMap<TeamEnum, Team> teams;
+    private HashMap<Teams, Team> teams;
     private final GamePlugin gamePlugin;
 
     public TeamManager(GamePlugin plugin, GameAPIPlugin system) {
@@ -44,7 +44,7 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
         }
 
         int i = 0;
-        for (TeamEnum team : TeamEnum.values()) {
+        for (Teams team : Teams.values()) {
             if (i < teamSize) {
                 this.teams.put(team, new Team(team, team.getTeam() + ".spawn", team.getTeam() + ".npc", team.getTeam() + ".respawn"));
                 i++;
@@ -52,7 +52,7 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
         }
     }
 
-    public Team getTeam(final TeamEnum teamEnum) {
+    public Team getTeam(final Teams teamEnum) {
         return teams.getOrDefault(teamEnum, null);
     }
 
@@ -69,9 +69,9 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
     public void setupTeam() {
         for (Player p : gamePlugin.getPlayerManager().getPlaying()) {
             GameAPIPlayer gp = GameAPIPlugin.getSystem().getGamePlayer(p.getUniqueId());
-            if (gp.getTeam() == TeamEnum.ERROR) {
+            if (gp.getTeam() == Teams.ERROR) {
                 int i = 1;
-                for (TeamEnum teamEnum : TeamEnum.values()) {
+                for (Teams teamEnum : Teams.values()) {
                     if (i < teams.size()) {
                         Team team = teams.get(teamEnum);
                         if (playersPerTeam >= 2) {

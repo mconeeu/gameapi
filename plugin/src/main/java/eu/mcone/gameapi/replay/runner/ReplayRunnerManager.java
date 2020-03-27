@@ -8,7 +8,7 @@ import eu.mcone.gameapi.replay.inventory.ReplaySpectatorInventory;
 import eu.mcone.gameapi.replay.listener.NPCInteractListener;
 import eu.mcone.gameapi.replay.npc.NpcUtils;
 import eu.mcone.gameapi.replay.session.ReplaySession;
-import eu.mcone.gameapi.replay.utils.IDUtils;
+import eu.mcone.gameapi.api.utils.IDUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -24,8 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Getter
 public class ReplayRunnerManager implements eu.mcone.gameapi.api.replay.runner.ReplayRunnerManager {
 
-    @Getter
-    private final String replayID;
+    private final String runnerID;
 
     private boolean playing = false;
     private AtomicInteger currentTick = new AtomicInteger();
@@ -47,7 +46,7 @@ public class ReplayRunnerManager implements eu.mcone.gameapi.api.replay.runner.R
 
     public ReplayRunnerManager(ReplaySession session) {
         this.session = session;
-        replayID = IDUtils.generateID();
+        runnerID = IDUtils.generateID();
         watchers = new HashSet<>();
         singleReplays = new HashMap<>();
         serverRunner = new ServerRunner(session);
@@ -67,6 +66,7 @@ public class ReplayRunnerManager implements eu.mcone.gameapi.api.replay.runner.R
 
             for (PlayerRunner runner : replays.values()) {
                 runner.addWatcher(player);
+                runner.getPlayer().getNpc().toggleVisibility(player, false);
             }
         }
     }
@@ -79,6 +79,7 @@ public class ReplayRunnerManager implements eu.mcone.gameapi.api.replay.runner.R
 
             for (PlayerRunner runner : replays.values()) {
                 runner.removeWatcher(player);
+                runner.getPlayer().getNpc().toggleVisibility(player, true);
             }
 
             Bukkit.getPluginManager().callEvent(new WatcherQuitReplayEvent(player, watchers.toArray(new Player[0]), session));
@@ -136,7 +137,7 @@ public class ReplayRunnerManager implements eu.mcone.gameapi.api.replay.runner.R
 
             for (eu.mcone.gameapi.replay.player.ReplayPlayer player : session.getPlayersAsObject()) {
                 if (!(replays.containsKey(player.getUuid()) || singleReplays.containsKey(player.getUuid()))) {
-                    player.setNpc(NpcUtils.constructNpcForPlayer(player, replayID));
+                    player.setNpc(NpcUtils.constructNpcForPlayer(player, runnerID));
                     PlayerRunner runner = new PlayerRunner(player, this);
                     runner.addWatcher(watchers.toArray(new Player[0]));
                     runner.play();

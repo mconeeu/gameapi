@@ -1,5 +1,6 @@
 package eu.mcone.gameapi.replay.session;
 
+import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketWrapper;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.replay.event.PlayerJoinReplaySessionEvent;
@@ -67,11 +68,21 @@ public class ReplaySession implements eu.mcone.gameapi.api.replay.session.Replay
 
     public void recordSession() {
         info.setWorld(GamePlugin.getGamePlugin().getGameConfig().parseConfig().getGameWorld());
-        replayRecorder.record();
 
-        //Adds the world entity spawn packet
-        for (ReplayPlayer player : replayPlayers.values()) {
-            Bukkit.getServer().getPluginManager().callEvent(new PlayerJoinReplaySessionEvent(Bukkit.getPlayer(player.getUuid())));
+        boolean succeed = true;
+        if (!CoreSystem.getInstance().getWorldManager().existsWorldInDatabase(getInfo().getWorld())) {
+            succeed = CoreSystem.getInstance().getWorldManager().upload(CoreSystem.getInstance().getWorldManager().getWorld(getInfo().getWorld()));
+        }
+
+        if (succeed) {
+            replayRecorder.record();
+
+            //Adds the world entity spawn packet
+            for (ReplayPlayer player : replayPlayers.values()) {
+                Bukkit.getServer().getPluginManager().callEvent(new PlayerJoinReplaySessionEvent(Bukkit.getPlayer(player.getUuid())));
+            }
+        } else {
+            throw new IllegalStateException("[REPLAY] Could not upload World " + info.getWorld() + " to database!");
         }
     }
 

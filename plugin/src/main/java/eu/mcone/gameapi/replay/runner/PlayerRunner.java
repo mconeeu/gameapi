@@ -10,6 +10,7 @@ import eu.mcone.coresystem.api.bukkit.npc.enums.EquipmentPosition;
 import eu.mcone.coresystem.api.bukkit.npc.enums.NpcAnimation;
 import eu.mcone.coresystem.api.bukkit.spawnable.ListMode;
 import eu.mcone.coresystem.api.bukkit.util.BlockSound;
+import eu.mcone.coresystem.api.bukkit.util.EntitySoundKeys;
 import eu.mcone.coresystem.api.bukkit.world.CoreLocation;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GamePlugin;
@@ -72,6 +73,7 @@ public class PlayerRunner extends SimplePlayer implements eu.mcone.gameapi.api.r
                                 EntitySpawnPacketWrapper spawnPacketWrapper = (EntitySpawnPacketWrapper) packet;
                                 CoreLocation location = new CoreLocation(spawnPacketWrapper.calculateLocation());
                                 player.getNpc().teleport(location);
+                                player.getNpc().togglePlayerVisibility(ListMode.WHITELIST, watchers);
                                 //player.getNpc().togglePlayerVisibility(ListMode.BLACKLIST);
                                 Bukkit.getPluginManager().callEvent(new NpcAnimationStateChangeEvent(player.getNpc(), NpcAnimationStateChangeEvent.NpcAnimationState.START));
                             } else if (packet instanceof EntityDestroyPacketWrapper) {
@@ -83,9 +85,7 @@ public class PlayerRunner extends SimplePlayer implements eu.mcone.gameapi.api.r
                                 EntityMovePacketWrapper move = (EntityMovePacketWrapper) packet;
                                 location = move.calculateLocation();
                                 player.getNpc().teleport(location);
-
-                                if (tick % 6 == 0)
-                                    SoundUtils.playStepSound(location, watchers);
+                                SoundUtils.playStepSound(location, watchers);
                             }
 
                             if (packet instanceof EntitySneakPacketWrapper) {
@@ -128,26 +128,29 @@ public class PlayerRunner extends SimplePlayer implements eu.mcone.gameapi.api.r
 
                             if (packet instanceof EntityDamagePacketWrapper) {
                                 player.getNpc().sendAnimation(NpcAnimation.TAKE_DAMAGE, watchers);
+                                eu.mcone.coresystem.api.bukkit.util.SoundUtils.playSound(EntitySoundKeys.PLAYER_HURT.getNmsSound(), location, watchers);
                             }
 
                             if (packet instanceof EntityShootArrowPacketWrapper) {
                                 EntityShootArrowPacketWrapper arrowPacket = (EntityShootArrowPacketWrapper) packet;
                                 location.getWorld().spawnArrow(location, arrowPacket.getVector().subtract(player.getNpc().getVector()), (float) 3, (float) 0);
+                                location.getWorld().playSound(location, Sound.ARROW_HIT, 1, 1);
                             }
 
                             if (packet instanceof EntityLaunchProjectilePacketWrapper) {
                                 EntityLaunchProjectilePacketWrapper projectilePacket = (EntityLaunchProjectilePacketWrapper) packet;
                                 player.getNpc().throwProjectile(EntityProjectile.valueOf(projectilePacket.getProjectile()));
+                                location.getWorld().playSound(location, Sound.SHOOT_ARROW, 1, 1);
                             }
 
                             if (packet instanceof EntityDeathEventPacketWrapper) {
-                                player.getNpc().togglePlayerVisibility(ListMode.BLACKLIST);
+                                player.getNpc().togglePlayerVisibility(ListMode.BLACKLIST, watchers);
                             }
 
                             if (packet instanceof EntityRespawnPacketWrapper) {
                                 EntityRespawnPacketWrapper respawn = (EntityRespawnPacketWrapper) packet;
                                 player.getNpc().setItemInHand(null);
-                                player.getNpc().togglePlayerVisibility(ListMode.WHITELIST);
+                                player.getNpc().togglePlayerVisibility(ListMode.WHITELIST, watchers);
                                 player.getNpc().teleport(respawn.calculateLocation());
                             }
 
@@ -165,6 +168,7 @@ public class PlayerRunner extends SimplePlayer implements eu.mcone.gameapi.api.r
 
                             if (packet instanceof EntityPickItemUpPacketWrapper) {
                                 EntityPickItemUpPacketWrapper pickup = (EntityPickItemUpPacketWrapper) packet;
+                                eu.mcone.coresystem.api.bukkit.util.SoundUtils.playSound(EntitySoundKeys.ENTITY_ITEM_PICKUP.getNmsSound(), location, watchers);
 
                                 for (Entity entity : location.getWorld().getEntities()) {
                                     System.out.println(entity.getName());

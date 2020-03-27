@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public interface ReplayRunnerManager {
 
-    String getReplayID();
+    String getRunnerID();
 
     boolean isForward();
 

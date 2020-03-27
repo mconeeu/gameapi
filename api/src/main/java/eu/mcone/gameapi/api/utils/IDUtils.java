@@ -1,4 +1,4 @@
-package eu.mcone.gameapi.replay.utils;
+package eu.mcone.gameapi.api.utils;
 
 import java.util.Random;
 import java.util.UUID;

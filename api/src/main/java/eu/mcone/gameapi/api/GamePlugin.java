@@ -77,6 +77,12 @@ public abstract class GamePlugin extends CorePlugin {
 //            getSessionManager().getChannelHandler().createUnregisterRequest();
         }
 
+        if (modules.contains(Module.REPLAY_SESSION_MANAGER)) {
+            if (getSessionManager().getWorldDownloader() != null) {
+                getSessionManager().getWorldDownloader().stop();
+            }
+        }
+
         onGameDisable();
     }
 
