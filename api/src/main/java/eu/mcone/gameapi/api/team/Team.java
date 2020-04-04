@@ -1,6 +1,8 @@
 package eu.mcone.gameapi.api.team;
 
+import eu.mcone.gameapi.api.event.team.TeamDestroyEvent;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -48,6 +50,7 @@ public class Team {
 
     public void setAlive(boolean var) {
         alive = var;
+        Bukkit.getPluginManager().callEvent(new TeamDestroyEvent(this));
     }
 
     public boolean containsPlayer(final Player player) {

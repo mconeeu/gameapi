@@ -18,6 +18,9 @@ import eu.mcone.gameapi.damage.GameDamageLogger;
 import eu.mcone.gameapi.gamestate.GameStateManager;
 import eu.mcone.gameapi.kit.GameKitManager;
 import eu.mcone.gameapi.listener.GamePlayerListener;
+import eu.mcone.gameapi.listener.GeneralDamageListener;
+import eu.mcone.gameapi.listener.GeneralDeathListener;
+import eu.mcone.gameapi.listener.GeneralInteractListener;
 import eu.mcone.gameapi.map.GameMapManager;
 import eu.mcone.gameapi.player.GameAPIPlayer;
 import eu.mcone.gameapi.player.GamePlayerManager;
@@ -50,7 +53,10 @@ public class GameAPIPlugin extends GameAPI {
         CoreSystem.getInstance().getTranslationManager().loadCategories(this);
 
         registerEvents(
-                new GamePlayerListener()
+                new GamePlayerListener(),
+                new GeneralDamageListener(),
+                new GeneralDeathListener(),
+                new GeneralInteractListener()
         );
 
         sendConsoleMessage("§aVersion §f" + this.getDescription().getVersion() + "§a enabled...");

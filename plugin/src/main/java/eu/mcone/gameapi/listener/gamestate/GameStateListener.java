@@ -22,7 +22,6 @@ public class GameStateListener implements Listener {
         GamePlayer gamePlayer = e.getPlayer();
         Player player = e.getPlayer().getCorePlayer().bukkit();
 
-        System.out.println("GAMESYSTEM");
         if (GamePlugin.getGamePlugin().hasModule(Module.REPLAY)) {
             GamePlugin.getGamePlugin().getReplaySession().addPlayer(player);
             GamePlugin.getGamePlugin().getReplaySession().getReplayPlayer(player).getData().setJoined(System.currentTimeMillis() / 1000);
@@ -63,6 +62,8 @@ public class GameStateListener implements Listener {
         if (GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER) && GamePlugin.getGamePlugin().hasModule(Module.GAME_STATE_MANAGER)) {
             PlayerManager playerManager = GamePlugin.getGamePlugin().getPlayerManager();
             GameStateManager gameStateManager = GamePlugin.getGamePlugin().getGameStateManager();
+            GamePlayer gamePlayer = GamePlugin.getGamePlugin().getGamePlayer(e.getPlayer());
+            gamePlayer.removeFromGame();
 
             if (gameStateManager.getRunning() instanceof LobbyGameState) {
                 if (gameStateManager.isCountdownRunning() && playerManager.getPlaying().size() < playerManager.getMinPlayers()) {

@@ -196,6 +196,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
                             put(achievement, System.currentTimeMillis() / 1000);
                         }});
                     }
+
                     saveData();
                 }
             }
@@ -271,6 +272,11 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
     public void removeTeam() {
         if (this.team != null) {
             this.team.removePlayer(player);
+
+            if (team.getPlayers().size() == 0) {
+                team.setAlive(false);
+            }
+
             this.team = null;
         }
     }

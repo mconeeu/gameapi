@@ -5,14 +5,14 @@ import lombok.Getter;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class TeamWonEvent extends Event {
+public class TeamDestroyEvent extends Event {
 
     private static final HandlerList handlerlist = new HandlerList();
 
     @Getter
     private final Team team;
 
-    public TeamWonEvent(final Team team) {
+    public TeamDestroyEvent(final Team team) {
         this.team = team;
     }
 

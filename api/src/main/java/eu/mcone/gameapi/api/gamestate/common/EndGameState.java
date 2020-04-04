@@ -16,7 +16,6 @@ public class EndGameState extends GameState {
     @Override
     public void onCountdownSecond(CorePlugin plugin, int second) {
         switch (second) {
-            case 60:
             case 30:
             case 15:
             case 10:

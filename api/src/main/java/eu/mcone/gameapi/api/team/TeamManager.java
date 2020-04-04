@@ -11,6 +11,8 @@ public interface TeamManager {
 
     ItemStack TEAM = new ItemBuilder(Material.BED, 1, 0).displayName("§c§lTeam §8» §7§owähle dein Team aus.").create();
 
+    void useTeamChat(boolean use);
+
     Team getTeam(final TeamDefinition team);
 
     Team getWonTeam();
@@ -19,11 +21,11 @@ public interface TeamManager {
 
     void setupTeam();
 
-    boolean checkChanceToWin();
+    Team checkChanceToWin();
 
     void sendKillMessage(Player receiver, final Player victim, final Player killer);
 
     Collection<Team> getTeams();
 
-    void createTeamInventory(Player p);
+    void openTeamInventory(Player p);
 }

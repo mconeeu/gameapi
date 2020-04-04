@@ -5,7 +5,6 @@ import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Module;
-import eu.mcone.gameapi.api.event.team.TeamWonEvent;
 import eu.mcone.gameapi.api.team.Team;
 import eu.mcone.gameapi.api.team.TeamDefinition;
 import eu.mcone.gameapi.api.utils.GameConfig;
@@ -28,10 +27,13 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
     private final GamePlugin gamePlugin;
 
     @Getter
+    private TeamChatManager teamChatManager;
+    @Getter
     private Team wonTeam;
 
     public TeamManager(GamePlugin plugin, GameAPIPlugin system) {
         this.gamePlugin = plugin;
+        teamChatManager = new TeamChatManager();
         GameConfig config = plugin.getGameConfig().parseConfig();
         playersPerTeam = config.getPlayersPerTeam();
         teams = new HashMap<>();
@@ -56,6 +58,11 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
         }
     }
 
+    public void useTeamChat(boolean use) {
+        teamChatManager.setDisable(!use);
+        CoreSystem.getInstance().setPlayerChatEnabled(!use);
+    }
+
     public Team getTeam(final TeamDefinition teamEnum) {
         return teams.getOrDefault(teamEnum, null);
     }
@@ -73,7 +80,6 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
     public void setupTeam() {
         for (Player p : gamePlugin.getPlayerManager().getPlaying()) {
             GameAPIPlayer gp = GameAPIPlugin.getSystem().getGamePlayer(p.getUniqueId());
-            System.out.println("TEAM: " + gp.getTeam());
             if (gp.getTeam() == null || gp.getTeam().getTeam() == TeamDefinition.ERROR) {
                 System.out.println("NO TEAM");
                 int i = 1;
@@ -112,7 +118,7 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
         }
     }
 
-    public boolean checkChanceToWin() {
+    public Team checkChanceToWin() {
         int playingSize = gamePlugin.getPlayerManager().getPlaying().size();
         Team team = null;
 
@@ -140,10 +146,9 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
 
         if (team != null) {
             wonTeam = team;
-            gamePlugin.getServer().getPluginManager().callEvent(new TeamWonEvent(team, team.getPlayers()));
-            return true;
+            return wonTeam;
         } else {
-            return false;
+            return null;
         }
     }
 
@@ -170,7 +175,7 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
         return teams.values();
     }
 
-    public void createTeamInventory(Player p) {
+    public void openTeamInventory(Player p) {
         new TeamInventory(p, this);
     }
 }
