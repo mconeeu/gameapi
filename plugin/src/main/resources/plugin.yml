@@ -1,6 +1,6 @@
 name: MCONE-GameAPI
 version: ${project.version}
-authors: [Rufus Maiwald, Domink Lippl]
+authors: [Rufus Maiwald, Dominik Lippl]
 main: eu.mcone.gameapi.GameAPIPlugin
 depend: [MCONE-BukkitCoreSystem]
 

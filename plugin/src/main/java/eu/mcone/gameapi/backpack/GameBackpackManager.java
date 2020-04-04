@@ -33,7 +33,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.conversions.Bson;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -79,10 +78,9 @@ public class GameBackpackManager implements BackpackManager {
 
         if (Arrays.asList(gameOptions).contains(Option.BACKPACK_MANAGER_USE_RANK_BOOTS)) {
             useRankBoots = true;
-            system.registerEvents();
 
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                setRankBoots(p);
+            for (CorePlayer cp : CoreSystem.getInstance().getOnlineCorePlayers()) {
+                setRankBoots(cp.bukkit());
             }
         }
 
@@ -404,7 +402,6 @@ public class GameBackpackManager implements BackpackManager {
     @Override
     public void setRankBoots(Player p) {
         CorePlayer cp = CoreSystem.getInstance().getCorePlayer(p);
-
         RankBoots boots = RankBoots.getBootsByGroup(cp.getMainGroup());
         if (boots != null) {
             p.getInventory().setBoots(boots.getItem());

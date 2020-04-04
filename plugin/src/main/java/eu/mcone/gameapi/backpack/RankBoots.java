@@ -37,7 +37,7 @@ public enum RankBoots {
                 return boots;
             }
         }
+
         return null;
     }
-
 }
