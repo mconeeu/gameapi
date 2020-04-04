@@ -2,6 +2,7 @@ package eu.mcone.gameapi.gamestate;
 
 import eu.mcone.coresystem.api.bukkit.CorePlugin;
 import eu.mcone.gameapi.GameAPIPlugin;
+import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.event.gamestate.*;
 import eu.mcone.gameapi.api.gamestate.GameState;
 import eu.mcone.gameapi.listener.gamestate.GameStateListener;
@@ -158,6 +159,7 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
     public boolean cancelCountdown() {
         if (countdownTask != null) {
             countdownTask.cancel();
+            countdownTask = null;
             return true;
         } else {
             return false;
@@ -183,7 +185,7 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
         if (countdownTask == null) {
             if (timeoutTask == null || force) {
                 system.sendConsoleMessage("§fManually starting Countdown in Gamestate " + running.getName() + " with " + countdown + " seconds!");
-                countdownGameState(running, countdown);
+                initializeCountdown(running, countdown);
                 return true;
             } else {
                 return false;
@@ -245,7 +247,7 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
     private void timeoutGameState(GameState gameState, long timeout) {
         this.timeoutCounter = timeout;
 
-        this.timeoutTask = Bukkit.getScheduler().runTaskTimerAsynchronously(system, () -> {
+        this.timeoutTask = Bukkit.getScheduler().runTaskTimer(system, () -> {
             //If timeoutTask reached the end call timeout event
             if (this.timeoutCounter < 1) {
                 this.timeoutTask.cancel();
@@ -277,13 +279,17 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
     }
 
     private void initializeCountdown(GameState gameState) {
-        GameStateCountdownStartEvent countdownStartEvent = new GameStateCountdownStartEvent(this, gameState);
+        initializeCountdown(gameState, -1);
+    }
+
+    private void initializeCountdown(GameState gameState, int countdown) {
+        GameStateCountdownStartEvent countdownStartEvent = new GameStateCountdownStartEvent(this, gameState, countdown);
         gameState.onCountdownStart(countdownStartEvent);
         gamePlugin.getServer().getPluginManager().callEvent(countdownStartEvent);
 
         //If countdown was not cancelled, start countdown, otherwise stop current and start new gamestate
         if (!countdownStartEvent.isCancelled()) {
-            int countdown = countdownStartEvent.getCountdown() > 0 ? countdownStartEvent.getCountdown() : gameState.getCountdown();
+            countdown = countdownStartEvent.getCountdown() > 0 ? countdownStartEvent.getCountdown() : gameState.getCountdown();
 
             system.sendConsoleMessage("§fStarting Countdown in Gamestate " + gameState.getName() + " with " + countdown + " seconds!");
             countdownGameState(gameState, countdown);
@@ -295,7 +301,7 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
     private void countdownGameState(GameState gameState, int countdown) {
         this.countdownCounter = countdown;
 
-        this.countdownTask = gamePlugin.getServer().getScheduler().runTaskTimerAsynchronously(system, () -> {
+        this.countdownTask = gamePlugin.getServer().getScheduler().runTaskTimer(system, () -> {
             //If countdownTask reached the end call timeout event
             if (this.countdownCounter < 1) {
                 this.countdownTask.cancel();
@@ -317,6 +323,7 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
                 }
             }
 
+            gameState.onCountdownSecond(GamePlugin.getGamePlugin(), countdownCounter);
             this.countdownCounter--;
         }, 0, 20);
     }

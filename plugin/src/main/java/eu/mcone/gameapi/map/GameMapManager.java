@@ -2,21 +2,22 @@ package eu.mcone.gameapi.map;
 
 import eu.mcone.coresystem.api.bukkit.config.CoreJsonConfig;
 import eu.mcone.coresystem.api.bukkit.world.CoreWorld;
-import eu.mcone.gameapi.GameAPIPlugin;
+import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.map.GameAPIMap;
 import eu.mcone.gameapi.api.map.MapManager;
 import eu.mcone.gameapi.api.map.MapRotationHandler;
 import eu.mcone.gameapi.api.map.MapVotingHandler;
 import lombok.Getter;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 public class GameMapManager implements MapManager {
 
     @Getter
-    private final GameAPIPlugin system;
+    private final GamePlugin system;
     @Getter
     private final LinkedList<GameAPIMap> maps;
     @Getter
@@ -25,7 +26,7 @@ public class GameMapManager implements MapManager {
     private GameMapVotingHandler votingHandler;
     private GameMapRotationHandler rotationHandler;
 
-    public GameMapManager(GameAPIPlugin system) throws IllegalStateException {
+    public GameMapManager(GamePlugin system) throws IllegalStateException {
         this.system = system;
         this.maps = new LinkedList<>();
         this.config = new CoreJsonConfig<>(system, MapsConfig.class, "maps.json");
@@ -33,18 +34,27 @@ public class GameMapManager implements MapManager {
         system.sendConsoleMessage("§aLoading MapManager...");
         for (GameAPIMap map : config.parseConfig().getMaps()) {
             if (map.getWorld() != null) {
-                system.sendConsoleMessage("§2Loading Map "+map.getName()+"...");
+                system.sendConsoleMessage("§2Loading Map " + map.getName() + "...");
                 this.maps.add(map);
             } else {
-                throw new IllegalStateException("Map "+map.getName()+" could not be loaded in Mapmanager. World was not loaded by the CoreSystem!");
+                throw new IllegalStateException("Map " + map.getName() + " could not be loaded in Mapmanager. World was not loaded by the CoreSystem!");
             }
         }
     }
 
     @Override
+    public GameMapManager addMap(CoreWorld world, List<String> lore, Material item) {
+        MapsConfig config = this.config.parseConfig();
+        config.addWorld(world, lore, item);
+
+        this.config.updateConfig(config);
+        return this;
+    }
+
+    @Override
     public GameMapManager addMap(CoreWorld world, Material item) {
         MapsConfig config = this.config.parseConfig();
-        config.addWorld(world, item);
+        config.addWorld(world, new ArrayList<>(), item);
 
         this.config.updateConfig(config);
         return this;

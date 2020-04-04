@@ -4,6 +4,8 @@ import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.replay.event.*;
 import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
+import eu.mcone.gameapi.api.replay.runner.ReplaySpeed;
+import eu.mcone.gameapi.replay.inventory.ReplayInformationInventory;
 import eu.mcone.gameapi.replay.inventory.ReplaySpectatorInventory;
 import eu.mcone.gameapi.replay.listener.NPCInteractListener;
 import eu.mcone.gameapi.replay.npc.NpcUtils;
@@ -32,7 +34,8 @@ public class ReplayRunnerManager implements eu.mcone.gameapi.api.replay.runner.R
     private boolean backward = false;
     @Setter
     private boolean showProgress = true;
-    private double speed = 1.0D;
+    private ReplaySpeed replaySpeed = null;
+    private int skipped;
 
     private ReplaySession session;
     private HashSet<Player> watchers;
@@ -49,7 +52,7 @@ public class ReplayRunnerManager implements eu.mcone.gameapi.api.replay.runner.R
         runnerID = IDUtils.generateID();
         watchers = new HashSet<>();
         singleReplays = new HashMap<>();
-        serverRunner = new ServerRunner(session);
+        serverRunner = new ServerRunner(this);
         replays = new HashMap<>();
     }
 
@@ -63,6 +66,7 @@ public class ReplayRunnerManager implements eu.mcone.gameapi.api.replay.runner.R
             Bukkit.getPluginManager().callEvent(new WatcherJoinReplayEvent(player, watchers.toArray(new Player[0]), session));
 
             watchers.add(player);
+            serverRunner.addWatcher(player);
 
             for (PlayerRunner runner : replays.values()) {
                 runner.addWatcher(player);
@@ -76,6 +80,7 @@ public class ReplayRunnerManager implements eu.mcone.gameapi.api.replay.runner.R
 
         for (Player player : players) {
             watchers.remove(player);
+            serverRunner.removeWatcher(player);
 
             for (PlayerRunner runner : replays.values()) {
                 runner.removeWatcher(player);
@@ -95,34 +100,39 @@ public class ReplayRunnerManager implements eu.mcone.gameapi.api.replay.runner.R
             for (Player watcher : watchers) {
                 if (playing && showProgress) {
                     if (currentTick.get() == session.getInfo().getLastTick()) {
+                        System.out.println("STOP");
                         stop();
                         Bukkit.getPluginManager().callEvent(new ReplayStopEvent(session, session.getInfo().getLastTick()));
                     } else {
-                        int tick;
-                        if (forward) {
-                            tick = currentTick.getAndIncrement();
+                        int repeat;
+                        if (replaySpeed != null && skipped == replaySpeed.getWait()) {
+                            repeat = (replaySpeed.isAdd() ? 2 : 0);
+                            skipped = 0;
                         } else {
-                            tick = currentTick.getAndDecrement();
+                            repeat = 1;
                         }
 
-                        int seconds = tick / 30;
+                        for (int i = 0; i < repeat; i++) {
+                            int tick;
+                            if (forward) {
+                                tick = currentTick.getAndIncrement();
+                            } else {
+                                tick = currentTick.getAndDecrement();
+                            }
 
-                        if (seconds < 60) {
-                            CoreSystem.getInstance().createActionBar().message("§7" + seconds + " Sekunden").send(watcher);
-                        } else {
-                            CoreSystem.getInstance().createActionBar().message("§7" + seconds / 60 + " Minuten").send(watcher);
+                            CoreSystem.getInstance().createActionBar().message(ReplayInformationInventory.getLength(tick)).send(watcher);
                         }
                     }
                 } else {
                     CoreSystem.getInstance().createActionBar().message("§7Paussiert");
                 }
             }
-        }, (long) (1L * speed), (long) (1L * speed));
+        }, 1L, 1L);
     }
 
     public void restart() {
         if (this.playing) {
-            this.speed = 1;
+            this.replaySpeed = null;
             this.currentTick = new AtomicInteger(0);
         } else {
             this.forward = true;
@@ -156,13 +166,14 @@ public class ReplayRunnerManager implements eu.mcone.gameapi.api.replay.runner.R
         if (playing && replays.size() > 0) {
             for (PlayerRunner runner : replays.values()) {
                 runner.stop();
+                runner.setReplaySpeed(null);
             }
 
             serverRunner.stop();
-            serverRunner.setSpeed(1);
+            serverRunner.setReplaySpeed(null);
 
             forward = true;
-            speed = 1;
+            replaySpeed = null;
             backward = false;
             playing = false;
 
@@ -226,15 +237,32 @@ public class ReplayRunnerManager implements eu.mcone.gameapi.api.replay.runner.R
         }
     }
 
-    public void setSpeed(double speed) {
+    public void setSpeed(ReplaySpeed speed) {
         if (playing) {
-            this.speed = speed;
+            this.replaySpeed = speed;
 
             for (PlayerRunner runner : replays.values()) {
-                runner.setSpeed(speed);
+                runner.setReplaySpeed(speed);
             }
 
-            serverRunner.setSpeed(speed);
+            serverRunner.setReplaySpeed(speed);
+        }
+    }
+
+    public void skip(int ticks) {
+        if (playing) {
+            for (PlayerRunner runner : replays.values()) {
+                runner.skip(ticks);
+            }
+
+            int newTick = currentTick.get() + ticks;
+            if (newTick > 0) {
+                currentTick.set(newTick);
+            } else {
+                currentTick.set(0);
+            }
+
+            serverRunner.skip(ticks);
         }
     }
 

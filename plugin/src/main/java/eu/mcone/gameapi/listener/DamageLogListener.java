@@ -15,7 +15,7 @@ public class DamageLogListener implements Listener {
 
     private final GameDamageLogger damageLogger;
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
         if (e.getEntity() instanceof Player) {
             Player t = (Player) e.getEntity();

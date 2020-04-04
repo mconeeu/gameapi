@@ -14,7 +14,6 @@ import eu.mcone.gameapi.map.GameMapVotingHandler;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.List;
 import java.util.Map;
@@ -23,7 +22,7 @@ public class MapInventory extends CoreInventory {
 
     public static final String TITLE = "§8» §c§lVoting §8┋ §f§oMapvoting";
 
-    public MapInventory(Player p, GameMapVotingHandler mapVotingHandler) {
+    public MapInventory(Player p, GameMapVotingHandler mapVotingHandler, CoreInventory coreInventory) {
         super(TITLE, p, InventorySlot.ROW_2, InventoryOption.FILL_EMPTY_SLOTS);
 
         int i = 0;
@@ -35,15 +34,15 @@ public class MapInventory extends CoreInventory {
                             .lore("§7§o" + entry.getValue().size() + " Votes")
                             .create(),
                     e -> {
-                        mapVotingHandler.vote(p, entry.getKey());
+                        mapVotingHandler.vote(p, entry.getKey(), coreInventory);
 
                         p.playSound(p.getLocation(), Sound.NOTE_BASS, 1, 1);
-                        mapVotingHandler.getMapManager().getSystem().getMessager().send(p, "§2Du hast für die Map §a" + entry.getKey().getName() + " §2 gevotet.");
+                        mapVotingHandler.getMapManager().getSystem().getMessager().send(p, "§7Du hast für die Map §f§l" + entry.getKey().getName() + " §7 gevotet.");
                     });
             i++;
         }
 
-        setItem(InventorySlot.ROW_2_SLOT_9, new ItemBuilder(Material.IRON_DOOR, 1).displayName("§c§l↩ Zurück").create());
+        setItem(InventorySlot.ROW_2_SLOT_9, new ItemBuilder(Material.IRON_DOOR, 1).displayName("§c§l↩ Zurück").create(), e -> coreInventory.openInventory());
 
         player.playSound(player.getLocation(), Sound.LEVEL_UP, 1, 1);
         openInventory();

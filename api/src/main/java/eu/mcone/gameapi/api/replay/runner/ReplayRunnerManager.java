@@ -19,7 +19,7 @@ public interface ReplayRunnerManager {
 
     void setShowProgress(boolean progress);
 
-    double getSpeed();
+    ReplaySpeed getReplaySpeed();
 
     void play();
 
@@ -43,7 +43,9 @@ public interface ReplayRunnerManager {
 
     void removeWatcher(Player... players);
 
-    void setSpeed(double speed);
+    void setSpeed(ReplaySpeed speed);
+
+    void skip(int ticks);
 
     HashSet<Player> getWatchers();
 

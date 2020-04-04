@@ -26,17 +26,21 @@ public class AchievementInventory extends CoreInventory {
     }
 
     public AchievementInventory(Player player, GameAchievementManager achievementManager, Gamemode gamemode) {
-        super("§8» §c§lAchievement §8┋ §f§o" + player.getName(), player, InventorySlot.ROW_4, InventoryOption.FILL_EMPTY_SLOTS);
+        super("§8» §c§lAchievement", player, InventorySlot.ROW_4, InventoryOption.FILL_EMPTY_SLOTS);
         GameAPIPlayer gamePlayer = GameAPIPlugin.getSystem().getGamePlayer(player.getUniqueId());
 
-        int i = 0;
-        for (Map.Entry<Achievement, Long> achievement : gamePlayer.getAchievements(gamemode).entrySet()) {
-            if (gamePlayer.hasAchievement(achievement.getKey().getName())) {
-                setItem(i, new ItemBuilder(Material.INK_SACK, 1, 10).displayName("§7§o" + achievement.getKey().getName()).lore("§7§o" + achievement.getKey().getDescription()).create());
-            } else {
-                setItem(i, new ItemBuilder(Material.INK_SACK, 0, 1).displayName("§7§o" + achievement.getKey().getName()).lore("§7§o???").create());
+        if (!gamePlayer.getAchievements(gamemode).isEmpty()) {
+            int i = 0;
+            for (Map.Entry<Achievement, Long> achievement : gamePlayer.getAchievements(gamemode).entrySet()) {
+                if (gamePlayer.hasAchievement(achievement.getKey().getName())) {
+                    setItem(i, new ItemBuilder(Material.INK_SACK, 1, 10).displayName("§7§o" + achievement.getKey().getName()).lore("§7§o" + achievement.getKey().getDescription()).create());
+                } else {
+                    setItem(i, new ItemBuilder(Material.INK_SACK, 0, 1).displayName("§7§o" + achievement.getKey().getName()).lore("§7§o???").create());
+                }
+                i++;
             }
-            i++;
+        } else {
+            setItem(InventorySlot.ROW_2_SLOT_5, new ItemBuilder(Material.BARRIER, 1, 0).displayName("§cKeine Achievements vorhanden!").create());
         }
 
         openInventory();

@@ -21,15 +21,21 @@ public interface ReplayPlayer {
 
     PlayerNpc getNpc();
 
+    void setInventoryItem(int slot, SerializableItemStack itemStack);
+
     void openInventory(Player player);
 
     ReplayPlayer.Stats getStats();
 
     void setStats(ReplayPlayer.Stats stats);
 
-    double getHealth();
+    int getHealth();
 
-    void setHealth(double health);
+    void setHealth(int health);
+
+    int getFood();
+
+    void setFood(int food);
 
     interface Data {
 

@@ -18,9 +18,9 @@ import eu.mcone.gameapi.api.kit.Kit;
 import eu.mcone.gameapi.api.kit.ModifiedKit;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.GamePlayerSettings;
-import eu.mcone.gameapi.kit.GameKitManager;
 import eu.mcone.gameapi.api.team.Team;
-import eu.mcone.gameapi.api.team.Teams;
+import eu.mcone.gameapi.api.team.TeamDefinition;
+import eu.mcone.gameapi.kit.GameKitManager;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Sound;
@@ -41,7 +41,8 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
     @Getter
     private GamePlayerSettings settings;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private boolean effectsVisible = true;
 
     @Getter
@@ -53,7 +54,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
 
     private Player player;
     @Getter
-    private Teams team;
+    private Team team;
 
     public GameAPIPlayer(CorePlayer player) {
         super(player);
@@ -210,7 +211,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
 
     @Override
     public Map<Achievement, Long> getAchievements(Gamemode gamemode) {
-        return achievements.get(gamemode);
+        return achievements.getOrDefault(gamemode, new HashMap<>());
     }
 
     @Override
@@ -238,11 +239,12 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
 
     @Override
     public boolean hasAchievement(String name) {
-        for (Achievement achievement : achievements.get(GamePlugin.getGamePlugin().getGamemode()).keySet()) {
+        for (Achievement achievement : getAchievements(GamePlugin.getGamePlugin().getGamemode()).keySet()) {
             if (achievement.getName().equalsIgnoreCase(name)) {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -250,63 +252,55 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
      *
      * Team management
      */
-
     public void setTeam(Team team) {
-        if (this.team != null) {
-            GamePlugin.getGamePlugin().getTeamManager().getTeam(this.team).removePlayer(player);
-            team.addPlayer(player);
-        } else {
-            team.addPlayer(player);
-        }
+        if (this.team != null)
+            this.team.removePlayer(player);
+
+        this.team = team;
+        this.team.addPlayer(player);
     }
 
-    public void setTeam(Teams team) {
-        if (this.team != null) {
-            GamePlugin.getGamePlugin().getTeamManager().getTeam(this.team).removePlayer(player);
-        } else {
-            GamePlugin.getGamePlugin().getTeamManager().getTeam(team).addPlayer(player);
-        }
+    public void setTeam(TeamDefinition team) {
+        if (this.team != null)
+            this.team.removePlayer(player);
+
+        this.team = GamePlugin.getGamePlugin().getTeamManager().getTeam(team);
+        this.team.addPlayer(player);
     }
 
     public void removeTeam() {
         if (this.team != null) {
-            GamePlugin.getGamePlugin().getTeamManager().getTeam(this.team).removePlayer(player);
+            this.team.removePlayer(player);
+            this.team = null;
         }
     }
 
     public void removeFromGame() {
         //TODO: Add team stage integration
+        removeTeam();
         GamePlugin.getGamePlugin().getPlayerManager().setPlaying(player, false);
-        this.team = Teams.ERROR;
     }
 
-    public void addKill() {
-        this.roundKills = this.roundKills + 1;
-        callStatsEvent();
-    }
-
-    public void addKill(final int var) {
+    public void addKills(final int var) {
         this.roundKills = this.roundKills + var;
+        corePlayer.getStats(GamePlugin.getGamePlugin().getGamemode()).addKills(var);
         callStatsEvent();
     }
 
-    public void addDeath() {
-        this.roundDeaths = this.roundDeaths + 1;
-        callStatsEvent();
-    }
-
-    public void addDeath(final int var) {
+    public void addDeaths(final int var) {
         this.roundDeaths = this.roundDeaths + var;
-        callStatsEvent();
-    }
-
-    public void addGoal() {
-        this.roundGoals = this.roundGoals + 1;
+        corePlayer.getStats(GamePlugin.getGamePlugin().getGamemode()).addDeaths(var);
         callStatsEvent();
     }
 
     public void addGoals(final int var) {
         this.roundGoals = this.roundGoals + var;
+        corePlayer.getStats(GamePlugin.getGamePlugin().getGamemode()).addGoal(var);
+        callStatsEvent();
+    }
+
+    public void addLose(final int var) {
+        corePlayer.getStats(GamePlugin.getGamePlugin().getGamemode()).addLoses(var);
         callStatsEvent();
     }
 

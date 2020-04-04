@@ -8,7 +8,7 @@ import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.api.kit.Kit;
 import eu.mcone.gameapi.api.kit.ModifiedKit;
 import eu.mcone.gameapi.api.team.Team;
-import eu.mcone.gameapi.api.team.Teams;
+import eu.mcone.gameapi.api.team.TeamDefinition;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -24,7 +24,7 @@ public interface GamePlayer {
 
     int getRoundGoals();
 
-    Teams getTeam();
+    Team getTeam();
 
     CorePlayer getCorePlayer();
 
@@ -67,23 +67,19 @@ public interface GamePlayer {
     //Team
     void setTeam(Team team);
 
-    void setTeam(Teams team);
+    void setTeam(TeamDefinition team);
 
     void removeTeam();
 
     void removeFromGame();
 
-    void addKill();
+    void addKills(final int var);
 
-    void addKill(final int var);
-
-    void addDeath();
-
-    void addDeath(final int var);
-
-    void addGoal();
+    void addDeaths(final int var);
 
     void addGoals(final int var);
+
+    void addLose(final int var);
 
     double getRoundKD();
 

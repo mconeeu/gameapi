@@ -9,8 +9,8 @@ import eu.mcone.gameapi.api.gamestate.GameState;
 
 public class InGameState extends GameState {
 
-    public InGameState(String name) {
-        super(name);
+    public InGameState() {
+        super("InGame");
     }
 
     @Override

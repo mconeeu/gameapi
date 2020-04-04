@@ -14,12 +14,14 @@ import java.util.Map;
 public class SerializableItemStack implements Serializable {
 
     private String material;
+    private int subID;
     private int amount;
     private String enchantments;
 
     public SerializableItemStack(ItemStack itemStack) {
         if (itemStack.getType() != null) {
             material = itemStack.getType().toString();
+            subID = itemStack.getTypeId();
             amount = itemStack.getAmount();
             enchantments = ItemStackTypeAdapterUtils.serializeEnchantments(itemStack.getEnchantments());
         }

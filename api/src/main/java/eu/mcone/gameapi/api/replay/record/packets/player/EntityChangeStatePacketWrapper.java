@@ -6,12 +6,14 @@ import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketWrapper;
 import lombok.Getter;
 
 @Getter
-public class EntityChangeHealthPacketWrapper extends PacketWrapper {
+public class EntityChangeStatePacketWrapper extends PacketWrapper {
 
-    private double health;
+    private int foodLevel;
+    private int health;
 
-    public EntityChangeHealthPacketWrapper(double health) {
-        super(PacketType.ENTITY, EntityAction.CHANGE_HEART);
+    public EntityChangeStatePacketWrapper(int foodLevel, int health) {
+        super(PacketType.ENTITY, EntityAction.CHANGE_FOOD);
+        this.foodLevel = foodLevel;
         this.health = health;
     }
 }

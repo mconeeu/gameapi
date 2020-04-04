@@ -10,11 +10,11 @@ import java.util.List;
 public class Team {
 
     @Getter
-    private final Teams teamEnum;
+    private final TeamDefinition team;
     @Getter
     private int size;
     @Getter
-    private boolean alive;
+    private boolean alive = true;
     @Getter
     private String spawnLocation;
     @Getter
@@ -24,12 +24,11 @@ public class Team {
 
     private List<Player> players;
 
-    public Team(final Teams teamEnum, final String spawnLocation, final String npcLocation, final String respawnBlockLocation) {
-        this.teamEnum = teamEnum;
-        this.spawnLocation = spawnLocation;
-        this.npcLocation = npcLocation;
-        this.respawnBlockLocation = respawnBlockLocation;
-
+    public Team(final TeamDefinition teamDefinition) {
+        this.team = teamDefinition;
+        this.spawnLocation = team.getTeam() + ".spawn";
+        this.npcLocation = team.getTeam() + ".npc";
+        this.respawnBlockLocation = team.getTeam() + ".respawn";
         this.players = new ArrayList<>();
     }
 

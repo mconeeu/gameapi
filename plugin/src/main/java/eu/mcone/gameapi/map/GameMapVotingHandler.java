@@ -1,5 +1,6 @@
 package eu.mcone.gameapi.map;
 
+import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.gameapi.api.event.map.MapVotedEvent;
 import eu.mcone.gameapi.api.map.GameAPIMap;
 import eu.mcone.gameapi.api.map.MapVotingHandler;
@@ -36,9 +37,9 @@ public class GameMapVotingHandler implements MapVotingHandler {
     }
 
     @Override
-    public void openVotingInventory(Player p) {
+    public void openVotingInventory(Player p, CoreInventory coreInventory) {
         openedInventories.add(p);
-        new MapInventory(p, this);
+        new MapInventory(p, this, coreInventory);
     }
 
     public void closedInventory(Player p) {
@@ -64,7 +65,7 @@ public class GameMapVotingHandler implements MapVotingHandler {
     }
 
     @Override
-    public void vote(Player player, GameAPIMap map) {
+    public void vote(Player player, GameAPIMap map, CoreInventory coreInventory) {
         if (votes.containsKey(player)) {
             popularity.put(votes.get(player), popularity.get(votes.get(player))-1);
         }
@@ -73,7 +74,7 @@ public class GameMapVotingHandler implements MapVotingHandler {
         popularity.put(map.getName(), popularity.containsKey(map.getName()) ? popularity.get(map.getName())+1 : 1);
 
         for (Player p : openedInventories) {
-            openVotingInventory(p);
+            openVotingInventory(p, coreInventory);
         }
     }
 

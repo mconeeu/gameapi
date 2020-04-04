@@ -10,9 +10,9 @@ import org.bukkit.event.HandlerList;
 @Getter
 public final class GameStateCountdownStartEvent extends GameStateEvent implements Cancellable {
 
-    public GameStateCountdownStartEvent(GameStateManager gameStateManager, GameState gameState) {
+    public GameStateCountdownStartEvent(GameStateManager gameStateManager, GameState gameState, int countdown) {
         super(gameStateManager);
-        this.countdown = gameState.getCountdown();
+        this.countdown = countdown > -1 ? countdown : gameState.getCountdown();
         this.gameState = gameState;
     }
 

@@ -8,7 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 @Getter
-public enum Teams {
+public enum TeamDefinition {
 
     RED(1, "red", "§cRot", ChatColor.RED, Color.RED, new ItemBuilder(Material.WOOL, 14).create()),
     BLUE(2, "blue", "§9Blau", ChatColor.BLUE, Color.BLUE, new ItemBuilder(Material.WOOL, 11).create()),
@@ -27,12 +27,12 @@ public enum Teams {
     private final Color color;
     private final ItemStack itemStack;
 
-    Teams(int position,
-          final String team,
-          final String prefix,
-          final ChatColor chatColor,
-          final Color color,
-          final ItemStack itemStack) {
+    TeamDefinition(int position,
+                   final String team,
+                   final String prefix,
+                   final ChatColor chatColor,
+                   final Color color,
+                   final ItemStack itemStack) {
 
         this.position = position;
         this.team = team;

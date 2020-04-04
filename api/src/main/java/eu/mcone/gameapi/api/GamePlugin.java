@@ -5,6 +5,7 @@ import eu.mcone.coresystem.api.bukkit.config.CoreJsonConfig;
 import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import eu.mcone.gameapi.api.achievement.AchievementManager;
 import eu.mcone.gameapi.api.backpack.BackpackManager;
+import eu.mcone.gameapi.api.damage.DamageLogger;
 import eu.mcone.gameapi.api.gamestate.GameStateManager;
 import eu.mcone.gameapi.api.kit.KitManager;
 import eu.mcone.gameapi.api.map.MapManager;
@@ -41,6 +42,7 @@ public abstract class GamePlugin extends CorePlugin {
     private TeamManager teamManager;
     private PlayerManager playerManager;
     private ReplaySession replaySession;
+    private DamageLogger damageLogger;
 
     @Getter
     private CoreJsonConfig<GameConfig> gameConfig;
@@ -145,6 +147,10 @@ public abstract class GamePlugin extends CorePlugin {
     public PlayerManager getPlayerManager() {
         modules.add(Module.PLAYER_MANAGER);
         return playerManager != null ? playerManager : (playerManager = GameAPI.getInstance().constructPlayerManager(this));
+    }
+
+    public DamageLogger getDamageLogger() {
+        return damageLogger != null ? damageLogger : (damageLogger = GameAPI.getInstance().constructDamageLogger());
     }
 
     public boolean hasModule(Module module) {

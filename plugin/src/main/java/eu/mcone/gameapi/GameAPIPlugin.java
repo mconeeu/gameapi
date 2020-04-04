@@ -79,7 +79,7 @@ public class GameAPIPlugin extends GameAPI {
 
     @Override
     public MapManager constructMapManager() {
-        return new GameMapManager(this);
+        return new GameMapManager(GamePlugin.getGamePlugin());
     }
 
     @Override

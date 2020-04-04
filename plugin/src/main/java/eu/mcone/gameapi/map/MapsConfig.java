@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,9 +20,9 @@ public class MapsConfig {
     @Setter
     private String currentMap = null;
 
-    public MapsConfig addWorld(CoreWorld world, Material item) {
+    public MapsConfig addWorld(CoreWorld world, List<String> lore, Material item) {
         if (!containsMap(world.getName())) {
-            maps.add(new GameAPIMap(world.getName(), item));
+            maps.add(new GameAPIMap(world.getName(), lore, item));
         }
         return this;
     }

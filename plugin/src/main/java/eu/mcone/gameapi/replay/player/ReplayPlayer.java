@@ -1,8 +1,11 @@
 package eu.mcone.gameapi.replay.player;
 
+import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.coresystem.api.bukkit.npc.entity.PlayerNpc;
+import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.coresystem.api.bukkit.world.CoreLocation;
+import eu.mcone.coresystem.api.core.player.Group;
 import eu.mcone.gameapi.api.replay.record.packets.util.SerializableItemStack;
 import eu.mcone.gameapi.replay.inventory.ReplayPlayerInventory;
 import lombok.AllArgsConstructor;
@@ -38,7 +41,11 @@ public class ReplayPlayer implements eu.mcone.gameapi.api.replay.player.ReplayPl
     @Getter
     @Setter
     @BsonIgnore
-    private double health;
+    private int health;
+    @Getter
+    @Setter
+    @BsonIgnore
+    private int food;
     @Getter
     @BsonIgnore
     private Map<Player, CoreInventory> inventoryViewers;
@@ -52,7 +59,8 @@ public class ReplayPlayer implements eu.mcone.gameapi.api.replay.player.ReplayPl
         data = new Data(player);
         inventoryItems = new HashMap<>();
         stats = new Stats(0, 0, 0);
-        health = 10.0;
+        health = 10;
+        food = 20;
         inventoryViewers = new HashMap<>();
     }
 
@@ -62,12 +70,16 @@ public class ReplayPlayer implements eu.mcone.gameapi.api.replay.player.ReplayPl
         this.data = data;
         inventoryItems = new HashMap<>();
         stats = new Stats(0, 0, 0);
-        health = 10.0;
+        health = 10;
         inventoryViewers = new HashMap<>();
     }
 
     public void setNpc(PlayerNpc npc) {
         this.npc = npc;
+    }
+
+    public void setInventoryItem(int slot, SerializableItemStack itemStack) {
+        inventoryItems.put(slot, itemStack);
     }
 
     public void openInventory(Player player) {
@@ -89,7 +101,8 @@ public class ReplayPlayer implements eu.mcone.gameapi.api.replay.player.ReplayPl
         private CoreLocation spawnLocation;
 
         public Data(final Player player) {
-            this.displayName = player.getDisplayName();
+            CorePlayer cp = CoreSystem.getInstance().getCorePlayer(player.getUniqueId());
+            this.displayName = (cp.isNicked() ? Group.SPIELER.getPrefix() : cp.getMainGroup().getPrefix()) + player.getName();
             this.name = player.getName();
             this.reported = false;
         }

@@ -34,7 +34,7 @@ public class ReplayInformationInventory extends CoreInventory {
         openInventory();
     }
 
-    private String getLength(int lastTick) {
+    public static String getLength(int lastTick) {
         double seconds = lastTick / 20;
         if (seconds < 60) {
             return seconds + " §7Sekunden";

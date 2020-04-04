@@ -112,6 +112,8 @@ public class ReplaySessionManager implements eu.mcone.gameapi.api.replay.session
                                 FileOutputStream fos = new FileOutputStream(file);
                                 fos.write(entry.getValue().compressData());
                                 zipFiles.add(file);
+                                fos.close();
+                                file.delete();
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }

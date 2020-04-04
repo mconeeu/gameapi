@@ -16,7 +16,8 @@ public class NpcUtils {
         return (PlayerNpc) CoreSystem.getInstance().getNpcManager().addNPC(new NpcData(
                         EntityType.PLAYER,
                         runnerID + "_" + player.getData().getName(),
-                        (player.getData().isReported() ? "§8[§cR§8] " + player.getData().getName() : player.getData().getDisplayName()),
+//                        (player.getData().isReported() ? "§8[§cR§8] " + player.getData().getName() : player.getData().getDisplayName()),
+                        (player.getData().isReported() ? "§8[§cR§8] " + player.getData().getName() : player.getData().getName()),
                         player.getData().getSpawnLocation(),
                         new PlayerNpcData
                                 (

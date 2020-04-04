@@ -9,8 +9,8 @@ import org.bukkit.entity.Player;
 
 public class EndGameState extends GameState {
 
-    public EndGameState(String name) {
-        super(name, 30);
+    public EndGameState() {
+        super("End", 30);
     }
 
     @Override
