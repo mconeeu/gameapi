@@ -7,6 +7,7 @@ import eu.mcone.gameapi.api.backpack.handler.PetHandler;
 import eu.mcone.gameapi.api.backpack.handler.TrailHandler;
 import org.bukkit.entity.Player;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,7 +16,7 @@ public interface BackpackManager {
 
     List<Option> getGameOptions();
 
-    List<String> getDisabledItems();
+    HashSet<String> getDisabledItems();
 
     boolean isUseRankBoots();
 
