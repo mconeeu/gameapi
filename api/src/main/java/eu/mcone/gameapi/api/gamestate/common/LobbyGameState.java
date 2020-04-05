@@ -3,6 +3,9 @@ package eu.mcone.gameapi.api.gamestate.common;
 import eu.mcone.coresystem.api.bukkit.CorePlugin;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.gameapi.api.GamePlugin;
+import eu.mcone.gameapi.api.Module;
+import eu.mcone.gameapi.api.Option;
+import eu.mcone.gameapi.api.event.gamestate.GameStateCountdownEndEvent;
 import eu.mcone.gameapi.api.gamestate.GameState;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,9 +15,11 @@ import org.bukkit.entity.Player;
 
 public class LobbyGameState extends GameState {
 
-    @Setter @Getter
+    @Setter
+    @Getter
     private static int lobbyCountdown = 60;
-    @Setter @Getter
+    @Setter
+    @Getter
     private static int forceStartTime = 10;
 
     public LobbyGameState() {
@@ -43,6 +48,23 @@ public class LobbyGameState extends GameState {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.setLevel(second);
                 }
+        }
+    }
+
+    @Override
+    public void onCountdownEnd(GameStateCountdownEndEvent event) {
+        super.onCountdownEnd(event);
+
+        if (GamePlugin.getGamePlugin().hasModule(Module.BACKPACK_MANAGER)) {
+            if (GamePlugin.getGamePlugin().getBackpackManager().getGameOptions().contains(Option.BACKPACK_MANAGER_REGISTER_TRAIL_CATEGORY)) {
+                GamePlugin.getGamePlugin().getBackpackManager().getTrailHandler().stop();
+            }
+
+            if (GamePlugin.getGamePlugin().getBackpackManager().getGameOptions().contains(Option.BACKPACK_MANAGER_REGISTER_PET_CATEGORY)) {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    GamePlugin.getGamePlugin().getBackpackManager().getPetHandler().despawnPet(player);
+                }
+            }
         }
     }
 

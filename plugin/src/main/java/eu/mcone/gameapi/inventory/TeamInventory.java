@@ -47,7 +47,7 @@ public class TeamInventory extends CoreInventory {
                     gamePlugin.getMessager().send(p, CoreSystem.getInstance().getTranslationManager().get("game.team.already"));
                     p.playSound(p.getLocation(), Sound.ANVIL_BREAK, 1, 1);
                 } else {
-                    if (team.getSize() <= teamManager.getPlayersPerTeam()) {
+                    if (team.getSize() < teamManager.getPlayersPerTeam()) {
                         gp.setTeam(team);
                         gamePlugin.getMessager().send(p, CoreSystem.getInstance().getTranslationManager().get("game.team.join", CoreSystem.getInstance().getGlobalCorePlayer(p.getUniqueId())).replace("%team%", team.getTeam().getPrefix()));
                         update();

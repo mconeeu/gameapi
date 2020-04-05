@@ -36,9 +36,9 @@ public class SnowGunListener extends GadgetListener {
             p.getWorld().playEffect(snowball.getLocation(), Effect.LARGE_SMOKE, 10);
 
             if (p.hasPermission("lobby.silenthub")) {
-                p.getInventory().setItem(3, null);
+                p.getInventory().setItem(plugin.getBackpackManager().getItemSlot(), null);
             } else {
-                p.getInventory().setItem(2, null);
+                p.getInventory().setItem(plugin.getBackpackManager().getFallbackSlot(), null);
             }
 
             p.playSound(p.getLocation(), Sound.CHICKEN_EGG_POP, 1, 1);

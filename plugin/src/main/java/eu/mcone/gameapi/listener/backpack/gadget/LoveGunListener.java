@@ -29,9 +29,9 @@ public class LoveGunListener extends GadgetListener{
 
 
             if (p.hasPermission("lobby.silenthub")) {
-                p.getInventory().setItem(3, null);
+                p.getInventory().setItem(plugin.getBackpackManager().getItemSlot(), null);
             } else {
-                p.getInventory().setItem(2, null);
+                p.getInventory().setItem(plugin.getBackpackManager().getFallbackSlot(), null);
             }
 
             for (Player all : Bukkit.getOnlinePlayers()) {
@@ -56,9 +56,9 @@ public class LoveGunListener extends GadgetListener{
                         p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
 
                         if (p.hasPermission("lobby.silenthub")) {
-                            p.getInventory().setItem(3, DefaultItem.LOVEGUN.getItemStack());
+                            p.getInventory().setItem(plugin.getBackpackManager().getItemSlot(), DefaultItem.LOVEGUN.getItemStack());
                         } else {
-                            p.getInventory().setItem(2, DefaultItem.LOVEGUN.getItemStack());
+                            p.getInventory().setItem(plugin.getBackpackManager().getFallbackSlot(), DefaultItem.LOVEGUN.getItemStack());
                         }
                     }, 9);
                 }, 10);

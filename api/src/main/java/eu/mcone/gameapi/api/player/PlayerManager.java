@@ -13,6 +13,8 @@ public interface PlayerManager {
 
     List<Player> getPlaying();
 
+    List<Player> getSpectating();
+
     int getMinPlayers();
 
     int getMaxPlayers();

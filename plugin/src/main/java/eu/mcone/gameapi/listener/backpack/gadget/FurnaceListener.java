@@ -35,9 +35,9 @@ public class FurnaceListener extends GadgetListener {
             org.bukkit.entity.Item item = p.getLocation().getWorld().dropItem(p.getEyeLocation(),
                     new ItemStack(Material.FURNACE));
             if (p.hasPermission("lobby.silenthub")) {
-                p.getInventory().setItem(3, null);
+                p.getInventory().setItem(plugin.getBackpackManager().getItemSlot(), null);
             } else {
-                p.getInventory().setItem(2, null);
+                p.getInventory().setItem(plugin.getBackpackManager().getFallbackSlot(), null);
             }
 
             Vector v = p.getLocation().getDirection().multiply(1);

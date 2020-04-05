@@ -4,6 +4,8 @@ import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import org.bukkit.entity.Player;
 
+import java.util.List;
+
 public interface AchievementManager {
 
     void registerAchievements(Achievement... achievements);
@@ -13,6 +15,8 @@ public interface AchievementManager {
     Achievement getAchievement(String name);
 
     Achievement getAchievement(Gamemode gamemode, String name);
+
+    List<Achievement> getAchievements(Gamemode gamemode);
 
     boolean setAchievement(GamePlayer player, Achievement achievement);
 

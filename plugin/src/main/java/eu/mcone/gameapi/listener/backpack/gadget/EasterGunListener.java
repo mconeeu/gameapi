@@ -34,9 +34,9 @@ public class EasterGunListener extends GadgetListener {
             egg.setVelocity(p.getPlayer().getLocation().getDirection().multiply(1.2));
             egg.setShooter(p);
             if (p.hasPermission("lobby.silenthub")) {
-                p.getInventory().setItem(3, null);
+                p.getInventory().setItem(plugin.getBackpackManager().getItemSlot(), null);
             } else {
-                p.getInventory().setItem(2, null);
+                p.getInventory().setItem(plugin.getBackpackManager().getFallbackSlot(), null);
             }
 
             p.getWorld().playEffect(egg.getLocation(), Effect.LARGE_SMOKE, 10);

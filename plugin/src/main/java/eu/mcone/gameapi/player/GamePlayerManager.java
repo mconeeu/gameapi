@@ -19,6 +19,7 @@ public class GamePlayerManager implements eu.mcone.gameapi.api.player.PlayerMana
 
     @Getter
     private List<Player> playing;
+    @Getter
     private List<Player> spectating;
     @Getter
     private int minPlayers;
@@ -49,6 +50,8 @@ public class GamePlayerManager implements eu.mcone.gameapi.api.player.PlayerMana
     }
 
     public void setSpectating(final Player player, final boolean var) {
+        playing.remove(player);
+
         if (var) {
             if (!spectating.contains(player)) {
                 spectating.add(player);
@@ -76,6 +79,8 @@ public class GamePlayerManager implements eu.mcone.gameapi.api.player.PlayerMana
     }
 
     public void setPlaying(final Player player, final boolean var) {
+        spectating.remove(player);
+
         if (var) {
             if (!playing.contains(player)) {
                 playing.add(player);

@@ -14,19 +14,22 @@ public abstract class BackpackInventoryListener {
     @Setter
     protected static GamePlugin plugin;
 
-    public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player player) {}
+    public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player player) {
+    }
 
     public void setBackpackItems(CategoryInventory inv, Category category, Set<BackpackItem> categoryItems, GamePlayer gamePlayer, Player player) {
         for (BackpackItem item : categoryItems) {
             if (gamePlayer.hasBackpackItem(category.getName(), item) || (!category.getName().equals("STORY_ITEMS") && player.hasPermission("system.game.items"))) {
-                inv.addItem(item.getItem(), e -> {
-                    if (gamePlayer.isEffectsVisible()) {
-                        onBackpackInventoryClick(item, gamePlayer, player);
-                    } else {
-                        player.closeInventory();
-                        GameAPI.getInstance().getMessager().send(player, "§4Du kannst keine Effekte benutzen, da Effekte von anderen für dich unsichtbar sind");
-                    }
-                });
+                if (!plugin.getBackpackManager().getDisabledItems().contains(item.getName())) {
+                    inv.addItem(item.getItem(), e -> {
+                        if (gamePlayer.isEffectsVisible()) {
+                            onBackpackInventoryClick(item, gamePlayer, player);
+                        } else {
+                            player.closeInventory();
+                            GameAPI.getInstance().getMessager().send(player, "§4Du kannst keine Effekte benutzen, da Effekte von anderen für dich unsichtbar sind");
+                        }
+                    });
+                }
             }
         }
     }

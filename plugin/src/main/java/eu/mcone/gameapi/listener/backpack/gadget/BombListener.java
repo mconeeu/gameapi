@@ -85,9 +85,9 @@ public class BombListener extends GadgetListener {
                         p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
 
                         if (p.hasPermission("lobby.silenthub")) {
-                            p.getInventory().setItem(3, DefaultItem.BOMB.getItemStack());
+                            p.getInventory().setItem(plugin.getBackpackManager().getItemSlot(), DefaultItem.BOMB.getItemStack());
                         } else {
-                            p.getInventory().setItem(2, DefaultItem.BOMB.getItemStack());
+                            p.getInventory().setItem(plugin.getBackpackManager().getFallbackSlot(), DefaultItem.BOMB.getItemStack());
                         }
                     }, 30);
                 }, 10);

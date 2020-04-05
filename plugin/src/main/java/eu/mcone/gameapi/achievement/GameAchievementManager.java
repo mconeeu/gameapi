@@ -89,6 +89,19 @@ public class GameAchievementManager implements AchievementManager {
         }
     }
 
+    public List<Achievement> getAchievements(Gamemode gamemode) {
+        if (achievements.containsKey(gamemode)) {
+            return achievements.get(gamemode);
+        } else {
+            GamemodeAchievement achievements = ACHIEVEMENT_COLLECTION.find(eq("gamemode", gamemode)).first();
+            if (achievements != null) {
+                return achievements.getAchievements();
+            } else {
+                return new ArrayList<>();
+            }
+        }
+    }
+
     @Override
     public boolean setAchievement(GamePlayer player, Achievement achievement) {
         AchievementGetEvent event = new AchievementGetEvent(player, achievement);
@@ -98,15 +111,7 @@ public class GameAchievementManager implements AchievementManager {
             ChatColor gamemodeColor = plugin.getPluginColor();
 
             player.getCorePlayer().addCoins(achievement.getRewardCoins());
-            plugin.getMessager().sendSimple(player.bukkit(),
-                    "§8§kasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfsadfsadfsadfasdfasdf\n" +
-                            "§aDu hast das folgendes Achievement freigeschaltet!\n" +
-                            "\n" +
-                            "§7Achievement: " + gamemodeColor + "§o" + achievement.getName() + "\n" +
-                            "§7Beschreibung: " + gamemodeColor + "§o" + achievement.getDescription() + "\n" +
-                            "§7Coins:" + gamemodeColor + "§o" + achievement.getRewardCoins() + "\n" +
-                            "§8§kasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfsadfsadfsadfasdfasdf"
-            );
+            plugin.getMessager().send(player.bukkit(), "§aDu hast das folgendes Achievement " + gamemodeColor.toString() + achievement.getName() + " §afreigeschaltet!");
             return true;
         } else {
             return false;

@@ -49,9 +49,12 @@ public class GameBackpackManager implements BackpackManager {
             fromRegistries(getDefaultCodecRegistry(), fromProviders(new ItemStackCodecProvider(), PojoCodecProvider.builder().automatic(true).build()))
     ).getCollection("gamesystem_backpack_items", BackpackItemCategory.class);
 
-    private final Option[] gameOptions;
+    @Getter
+    private final List<Option> gameOptions;
     private final CorePlugin gamePlugin, system;
     private final List<BackpackItemCategory> backpackItems;
+    @Getter
+    private final HashSet<String> disabledItems;
     private final Map<String, BackpackInventoryListener> clickListeners;
 
     private final List<String> additionalCategories;
@@ -62,15 +65,23 @@ public class GameBackpackManager implements BackpackManager {
     @Setter
     private boolean useRankBoots = false;
 
+    @Getter
+    @Setter
+    private int itemSlot = 3;
+    @Getter
+    @Setter
+    private int fallbackSlot = 2;
+
     public GameBackpackManager(GameAPIPlugin system, GamePlugin gamePlugin, Option... gameOptions) {
         system.registerCommands(new ItemCMD(this));
         system.registerCommands(new TradeCMD());
         system.registerEvents(new BackpackListener(this));
 
-        this.gameOptions = gameOptions;
+        this.gameOptions = Arrays.asList(gameOptions);
         this.gamePlugin = gamePlugin;
         this.system = system;
         this.backpackItems = new ArrayList<>();
+        this.disabledItems = new HashSet<>();
         this.clickListeners = new HashMap<>();
         this.additionalCategories = new ArrayList<>();
 
@@ -79,9 +90,10 @@ public class GameBackpackManager implements BackpackManager {
         if (Arrays.asList(gameOptions).contains(Option.BACKPACK_MANAGER_USE_RANK_BOOTS)) {
             useRankBoots = true;
 
-            for (CorePlayer cp : CoreSystem.getInstance().getOnlineCorePlayers()) {
-                setRankBoots(cp.bukkit());
-            }
+            //Not needed because the boots are set in the CorePlayerLoaded Event
+//            for (CorePlayer cp : CoreSystem.getInstance().getOnlineCorePlayers()) {
+//                setRankBoots(cp.bukkit());
+//            }
         }
 
         BackpackInventory.setPlugin(gamePlugin);
@@ -91,6 +103,14 @@ public class GameBackpackManager implements BackpackManager {
         DefaultItem.setManager(this);
 
         reload();
+    }
+
+    public void disableItem(DefaultItem item) {
+        disabledItems.add(item.getName());
+    }
+
+    public void disableItem(String item) {
+        disabledItems.add(item);
     }
 
     @Override
@@ -165,36 +185,34 @@ public class GameBackpackManager implements BackpackManager {
         }
     }
 
-    private void registerDefaultCategories(Option... gameOptions) {
-        List<Option> optionList = Arrays.asList(gameOptions);
-
-        if (optionList.contains(Option.BACKPACK_MANAGER_REGISTER_ALL_DEFAULT_CATEGORIES)) {
+    private void registerDefaultCategories(List<Option> gameOptions) {
+        if (gameOptions.contains(Option.BACKPACK_MANAGER_REGISTER_ALL_DEFAULT_CATEGORIES)) {
             system.sendConsoleMessage("§2Loading all DefaultCategories");
             registerDefaultCategories(DefaultCategory.values());
         } else {
             List<DefaultCategory> categories = new ArrayList<>();
 
-            if (optionList.contains(Option.BACKPACK_MANAGER_REGISTER_PET_CATEGORY)) {
+            if (gameOptions.contains(Option.BACKPACK_MANAGER_REGISTER_PET_CATEGORY)) {
                 system.sendConsoleMessage("§2Loading DefaultCategory ANIMAL");
                 categories.add(DefaultCategory.PET);
             }
-            if (optionList.contains(Option.BACKPACK_MANAGER_REGISTER_GADGET_CATEGORY)) {
+            if (gameOptions.contains(Option.BACKPACK_MANAGER_REGISTER_GADGET_CATEGORY)) {
                 system.sendConsoleMessage("§2Loading DefaultCategory GADGET");
                 categories.add(DefaultCategory.GADGET);
             }
-            if (optionList.contains(Option.BACKPACK_MANAGER_REGISTER_HAT_CATEGORY)) {
+            if (gameOptions.contains(Option.BACKPACK_MANAGER_REGISTER_HAT_CATEGORY)) {
                 system.sendConsoleMessage("§2Loading DefaultCategory HAT");
                 categories.add(DefaultCategory.HAT);
             }
-            if (optionList.contains(Option.BACKPACK_MANAGER_REGISTER_OUTFIT_CATEGORY)) {
+            if (gameOptions.contains(Option.BACKPACK_MANAGER_REGISTER_OUTFIT_CATEGORY)) {
                 system.sendConsoleMessage("§2Loading DefaultCategory OUTFIT");
                 categories.add(DefaultCategory.OUTFIT);
             }
-            if (optionList.contains(Option.BACKPACK_MANAGER_REGISTER_TRAIL_CATEGORY)) {
+            if (gameOptions.contains(Option.BACKPACK_MANAGER_REGISTER_TRAIL_CATEGORY)) {
                 system.sendConsoleMessage("§2Loading DefaultCategory TRAIL");
                 categories.add(DefaultCategory.TRAIL);
             }
-            if (optionList.contains(Option.BACKPACK_MANAGER_REGISTER_EXCLUSIVE_CATEGORY)) {
+            if (gameOptions.contains(Option.BACKPACK_MANAGER_REGISTER_EXCLUSIVE_CATEGORY)) {
                 system.sendConsoleMessage("§2Loading DefaultCategory ARMOR");
                 categories.add(DefaultCategory.EXCLUSIVE);
             }
