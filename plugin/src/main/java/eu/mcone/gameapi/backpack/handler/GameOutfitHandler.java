@@ -19,9 +19,8 @@ public class GameOutfitHandler implements OutfitHandler {
 
     @Override
     public void setOutfit(Player p, BackpackItem item) {
-        DefaultItem choosed = DefaultItem.getItemByID(DefaultCategory.TRAIL, item.getId());
+        DefaultItem choosed = DefaultItem.getItemByID(DefaultCategory.OUTFIT, item.getId());
 
-        System.out.println("DEBUG");
         if (choosed != null) {
             switch (choosed) {
                 case OUTFIT_RABBIT: {
@@ -44,11 +43,16 @@ public class GameOutfitHandler implements OutfitHandler {
                 }
 
                 case OUTFIT_SANTA: {
+                    p.getInventory().setBoots(ItemBuilder.createLeatherArmorItem(Material.LEATHER_BOOTS, Color.RED).create());
+                    p.getInventory().setChestplate(ItemBuilder.createLeatherArmorItem(Material.LEATHER_CHESTPLATE, Color.GRAY).create());
+                    p.getInventory().setLeggings(ItemBuilder.createLeatherArmorItem(Material.LEATHER_LEGGINGS, Color.RED).create());
+
+                    p.getInventory().setHelmet(Skull.fromUrl("http://textures.minecraft.net/texture/df783877fc2581ead734847a6cea5bfd6e23939616b1e004459332b5b3933bcd", 1).getItemStack());
 
                 }
             }
         } else {
-            throw new IllegalStateException("Could not set Outfit from item "+item.getName()+". Item is not a outfit!");
+            throw new IllegalStateException("Could not set Outfit from item " + item.getName() + ". Item is not a outfit!");
         }
     }
 
