@@ -21,6 +21,7 @@ public class GameOutfitHandler implements OutfitHandler {
     public void setOutfit(Player p, BackpackItem item) {
         DefaultItem choosed = DefaultItem.getItemByID(DefaultCategory.TRAIL, item.getId());
 
+        System.out.println("DEBUG");
         if (choosed != null) {
             switch (choosed) {
                 case OUTFIT_RABBIT: {
@@ -29,6 +30,7 @@ public class GameOutfitHandler implements OutfitHandler {
                     p.getInventory().setLeggings(ItemBuilder.createLeatherArmorItem(Material.LEATHER_LEGGINGS, Color.GRAY).create());
 
                     p.getInventory().setHelmet(Skull.fromUrl("http://textures.minecraft.net/texture/dc7a317ec5c1ed7788f89e7f1a6af3d2eeb92d1e9879c05343c57f9d863de130", 1).getItemStack());
+                    System.out.println("DEBUG-1");
                     break;
                 }
                 case OUTFIT_DINOSAUR: {
