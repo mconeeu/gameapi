@@ -32,4 +32,10 @@ public interface GameStateManager {
     boolean startCountdown(boolean force);
 
     boolean startCountdown(boolean force, int countdown);
+
+    int getCountdownCounter();
+
+    long getTimeoutCounter();
+
+    boolean updateCountdownCounter(int second);
 }
