@@ -12,3 +12,5 @@ permissions:
         description: MapManager manage permission
       system.game.item:
         description: Manage BackpackItems of online users
+      system.game.start:
+        description: Skip LobbyGameState Countdown

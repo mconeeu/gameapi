@@ -5,6 +5,7 @@ import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.event.gamestate.*;
 import eu.mcone.gameapi.api.gamestate.GameState;
+import eu.mcone.gameapi.command.ForceStartCMD;
 import eu.mcone.gameapi.listener.gamestate.GameStateListener;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -33,6 +34,7 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
 
         system.sendConsoleMessage("§aLoading GameStateManager...");
         system.registerEvents(new GameStateListener());
+        system.registerCommands(new ForceStartCMD());
     }
 
     @Override
@@ -195,6 +197,17 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
         }
     }
 
+    @Override
+    public boolean updateCountdownCounter(int second) {
+        if (countdownTask != null) {
+            countdownGameState(running, second);
+            system.sendConsoleMessage("§fUpdated GameState Countdown manually to "+second);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     private void startGameState(GameState gameState) {
         GameStateStartEvent startEvent = new GameStateStartEvent(this, running, gameState);
         gameState.onStart(startEvent);
@@ -301,6 +314,9 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
     private void countdownGameState(GameState gameState, int countdown) {
         this.countdownCounter = countdown;
 
+        if (this.countdownTask != null) {
+            this.countdownTask.cancel();
+        }
         this.countdownTask = gamePlugin.getServer().getScheduler().runTaskTimer(system, () -> {
             //If countdownTask reached the end call timeout event
             if (this.countdownCounter < 1) {

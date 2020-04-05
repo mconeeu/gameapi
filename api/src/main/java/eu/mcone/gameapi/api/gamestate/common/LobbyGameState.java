@@ -2,6 +2,7 @@ package eu.mcone.gameapi.api.gamestate.common;
 
 import eu.mcone.coresystem.api.bukkit.CorePlugin;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
+import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.gamestate.GameState;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,6 +14,8 @@ public class LobbyGameState extends GameState {
 
     @Setter @Getter
     private static int lobbyCountdown = 60;
+    @Setter @Getter
+    private static int forceStartTime = 10;
 
     public LobbyGameState() {
         super("Lobby", lobbyCountdown);
@@ -40,6 +43,14 @@ public class LobbyGameState extends GameState {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.setLevel(second);
                 }
+        }
+    }
+
+    public static boolean forceStart() {
+        if (GamePlugin.getGamePlugin().getGameStateManager().getCountdownCounter() > forceStartTime) {
+            return GamePlugin.getGamePlugin().getGameStateManager().updateCountdownCounter(forceStartTime);
+        } else {
+            return false;
         }
     }
 
