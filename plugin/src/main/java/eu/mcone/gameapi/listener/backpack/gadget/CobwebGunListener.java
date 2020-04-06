@@ -120,9 +120,9 @@ public class CobwebGunListener extends GadgetListener {
                         Bukkit.getScheduler().runTaskLater(plugin, () -> {
                             p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
                             if (p.hasPermission("lobby.silenthub")) {
-                                p.getInventory().setItem(3, DefaultItem.COBWEBGUN.getItemStack());
+                                p.getInventory().setItem(plugin.getBackpackManager().getItemSlot(), DefaultItem.COBWEBGUN.getItemStack());
                             } else {
-                                p.getInventory().setItem(2, DefaultItem.COBWEBGUN.getItemStack());
+                                p.getInventory().setItem(plugin.getBackpackManager().getFallbackSlot(), DefaultItem.COBWEBGUN.getItemStack());
                             }
 
                         }, 33);
