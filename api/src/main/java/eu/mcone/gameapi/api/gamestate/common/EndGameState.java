@@ -25,7 +25,7 @@ public class EndGameState extends GameState {
             case 1:
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     plugin.getMessager().send(p, CoreSystem.getInstance().getTranslationManager().get(
-                            "game.countdown.lobby.idling",
+                            "game.countdown.restart",
                             CoreSystem.getInstance().getCorePlayer(p)
                     ).replace("%seconds%", Long.toString(second)));
                     p.playSound(p.getLocation(), Sound.LEVEL_UP, 1, 1);
