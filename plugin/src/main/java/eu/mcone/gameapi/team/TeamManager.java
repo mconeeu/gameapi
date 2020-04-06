@@ -5,6 +5,7 @@ import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Module;
+import eu.mcone.gameapi.api.Option;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.team.Team;
 import eu.mcone.gameapi.api.team.TeamDefinition;
@@ -14,10 +15,7 @@ import eu.mcone.gameapi.player.GameAPIPlayer;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
 
@@ -31,13 +29,19 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
     private TeamChatManager teamChatManager;
     @Getter
     private Team wonTeam;
+    @Getter
+    private boolean exitBySingleDeath;
 
-    public TeamManager(GamePlugin plugin, GameAPIPlugin system) {
+    public TeamManager(GamePlugin plugin, GameAPIPlugin system, Option[] options) {
         this.gamePlugin = plugin;
         teamChatManager = new TeamChatManager();
         GameConfig config = plugin.getGameConfig().parseConfig();
         playersPerTeam = config.getPlayersPerTeam();
         teams = new HashMap<>();
+
+        if (Arrays.asList(options).contains(Option.TEAM_MANAGER_EXIT_BY_SINGLE_DEATH)) {
+            exitBySingleDeath = true;
+        }
 
         system.sendConsoleMessage("§aLoading TeamManager...");
 
@@ -120,17 +124,7 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
     }
 
     public Team checkChanceToWin() {
-        int playingSize = gamePlugin.getPlayerManager().getPlaying().size();
         Team team = null;
-
-//        if (playingSize == playersPerTeam) {
-//            for (Team lastTeam : teams.values()) {
-//                if (lastTeam.getPlayers().size() == playersPerTeam) {
-//                    team = lastTeam;
-//                    break;
-//                }
-//            }
-//        } else {
         List<Team> lastTeams = new ArrayList<>();
         for (Team lastTeam : teams.values()) {
             if (lastTeam.getPlayers().size() > 0) {
@@ -141,7 +135,6 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
         if (lastTeams.size() == 1) {
             team = lastTeams.get(0);
         }
-//        }
 
         if (team != null) {
             wonTeam = team;

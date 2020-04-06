@@ -141,7 +141,7 @@ public abstract class GamePlugin extends CorePlugin {
 
     public TeamManager getTeamManager() {
         modules.add(Module.TEAM_MANAGER);
-        return teamManager != null ? teamManager : (teamManager = GameAPI.getInstance().constructTeamManager(this));
+        return teamManager != null ? teamManager : (teamManager = GameAPI.getInstance().constructTeamManager(this, options));
     }
 
     public PlayerManager getPlayerManager() {

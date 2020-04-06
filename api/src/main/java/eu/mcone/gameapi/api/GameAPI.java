@@ -52,7 +52,7 @@ public abstract class GameAPI extends CorePlugin {
 
     public abstract GameStateManager constructGameStatsManager(GamePlugin gamePlugin);
 
-    public abstract TeamManager constructTeamManager(GamePlugin gamePlugin);
+    public abstract TeamManager constructTeamManager(GamePlugin gamePlugin, Option[] options);
 
     public abstract PlayerManager constructPlayerManager(GamePlugin gamePlugin);
 
