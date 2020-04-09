@@ -349,6 +349,21 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
     }
 
     @Override
+    public void setChoosedKit(Kit defaultKit) {
+        if (((GameKitManager) GamePlugin.getGamePlugin().getKitManager()).isChooseKitsForServerLifetime()) {
+            Kit currentKit = getCurrentKit();
+
+            if (currentKit != null) {
+                setKit(currentKit);
+            } else {
+                setKit(defaultKit);
+            }
+        } else {
+            throw new IllegalStateException("Can not set a choosed kit. You must enable GameAPI Option CHOOSE_KITS_FOR_SERVER_LIFETIME for this");
+        }
+    }
+
+    @Override
     public boolean hasKit(Kit kit) {
         return ((GameKitManager) GamePlugin.getGamePlugin().getKitManager()).hasKit(getCorePlayer().getUuid(), kit);
     }
@@ -371,7 +386,9 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
             }
 
             ((GameKitManager) GamePlugin.getGamePlugin().getKitManager()).addKit(this, kit);
-            setKit(kit);
+            if (!((GameKitManager) GamePlugin.getGamePlugin().getKitManager()).isChooseKitsForServerLifetime()) {
+                setKit(kit);
+            }
             return true;
         } else {
             return false;

@@ -32,14 +32,14 @@ public class GameKitManager implements KitManager {
     private static final MongoCollection<Document> KIT_COLLECTION = CoreSystem.getInstance().getMongoDB().getCollection("custom_kits");
 
     @Getter
-    private final boolean clearInvOnKitSet, applyKitsOnce;
+    private final boolean clearInvOnKitSet, applyKitsOnce, chooseKitsForServerLifetime;
     private final GameAPIPlugin system;
     private final GamePlugin plugin;
 
     @Getter
     private final List<Kit> kits;
     private final Map<UUID, String> currentKits;
-    private final Map<UUID, List<String>> playerKits;
+    private Map<UUID, List<String>> playerKits;
     private final Map<UUID, List<ModifiedKit>> customKits;
 
     @Setter @Getter
@@ -50,12 +50,16 @@ public class GameKitManager implements KitManager {
 
         this.clearInvOnKitSet = optionList.contains(Option.KIT_MANAGER_CLEAR_INVENTORY_ON_KIT_SET);
         this.applyKitsOnce = optionList.contains(Option.KIT_MANAGER_APPLY_KITS_ONCE);
+        this.chooseKitsForServerLifetime = optionList.contains(Option.KIT_MANAGER_CHOOSE_KITS_FOR_SERVER_LIFETIME);
+
         this.system = system;
         this.plugin = plugin;
 
         this.kits = new ArrayList<>();
         this.currentKits = new HashMap<>();
-        this.playerKits = new HashMap<>();
+        if (!applyKitsOnce && !chooseKitsForServerLifetime) {
+            this.playerKits = new HashMap<>();
+        }
         this.customKits = new HashMap<>();
 
         system.sendConsoleMessage("§aLoading KitManager...");
@@ -65,7 +69,9 @@ public class GameKitManager implements KitManager {
 
     @Override
     public void reload() {
-        playerKits.clear();
+        if (playerKits != null) {
+            playerKits.clear();
+        }
         customKits.clear();
 
         for (Document kit : KIT_COLLECTION.find()) {
@@ -94,7 +100,7 @@ public class GameKitManager implements KitManager {
                     currentKits.put(uuid, currentKit);
                 }
 
-                if (!applyKitsOnce) {
+                if (!applyKitsOnce && !chooseKitsForServerLifetime) {
                     List<String> kits = playerEntry.get(plugin.getGamemode().toString(), Document.class).getList("kits", String.class);
 
                     playerKits.put(
@@ -135,7 +141,7 @@ public class GameKitManager implements KitManager {
     }
 
     public void addKit(GamePlayer gp, Kit kit) {
-        if (!applyKitsOnce) {
+        if (!applyKitsOnce && !chooseKitsForServerLifetime) {
             Player p = gp.bukkit();
 
             if (playerKits.containsKey(p.getUniqueId())) {
@@ -146,10 +152,14 @@ public class GameKitManager implements KitManager {
 
             savePlayerKits(p);
         }
+
+        if (chooseKitsForServerLifetime) {
+            currentKits.put(gp.getCorePlayer().getUuid(), kit.getName());
+        }
     }
 
     public void removeKit(GamePlayer player, Kit kit) {
-        if (!applyKitsOnce) {
+        if (!applyKitsOnce && !chooseKitsForServerLifetime) {
             Player p = player.bukkit();
 
             playerKits.getOrDefault(p.getUniqueId(), Collections.emptyList()).remove(kit.getName());
