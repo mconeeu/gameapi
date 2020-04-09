@@ -209,6 +209,7 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
     }
 
     private void startGameState(GameState gameState) {
+        System.out.println("calling start event");
         GameStateStartEvent startEvent = new GameStateStartEvent(this, running, gameState);
         gameState.onStart(startEvent);
         gamePlugin.getServer().getPluginManager().callEvent(startEvent);

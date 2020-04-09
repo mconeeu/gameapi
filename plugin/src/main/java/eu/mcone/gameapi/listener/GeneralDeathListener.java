@@ -18,6 +18,12 @@ public class GeneralDeathListener implements Listener {
         if (GamePlugin.getGamePlugin().hasModule(Module.TEAM_MANAGER)
                 && GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)
                 && GamePlugin.getGamePlugin().hasModule(Module.GAME_STATE_MANAGER)) {
+            GamePlayer gamePlayer = GamePlugin.getGamePlugin().getGamePlayer(e.getEntity());
+            if (GamePlugin.getGamePlugin().getTeamManager().isExitBySingleDeath()
+                    || !gamePlayer.getTeam().isAlive()) {
+                gamePlayer.removeFromGame();
+            }
+
             Team team = GamePlugin.getGamePlugin().getTeamManager().checkChanceToWin();
             if (team != null) {
                 Bukkit.getPluginManager().callEvent(new TeamWonEvent(team));

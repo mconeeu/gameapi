@@ -38,6 +38,12 @@ public class GamePlayerListener implements Listener {
             }
         }
 
+        if (GamePlugin.getGamePlugin().hasModule(Module.BACKPACK_MANAGER)) {
+            if (GamePlugin.getGamePlugin().getBackpackManager().isUseRankBoots()) {
+                GamePlugin.getGamePlugin().getBackpackManager().setRankBoots(e.getPlayer().bukkit());
+            }
+        }
+
         Bukkit.getPluginManager().callEvent(new GamePlayerLoadedEvent(e, e.getBukkitPlayer(), p, gp));
     }
 
@@ -56,7 +62,7 @@ public class GamePlayerListener implements Listener {
                 if (team != null) {
                     Bukkit.getPluginManager().callEvent(new TeamWonEvent(team));
 
-                    for (Player player : GamePlugin.getGamePlugin().getPlayerManager().getPlaying()) {
+                    for (Player player : Bukkit.getOnlinePlayers()) {
                         GamePlugin.getGamePlugin().getPlayerManager().setPlaying(player, false);
                         GamePlugin.getGamePlugin().getPlayerManager().setSpectating(player, false);
                     }

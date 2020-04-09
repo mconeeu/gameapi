@@ -29,9 +29,9 @@ public class EnderPearlListener extends GadgetListener {
             Player p = e.getPlayer();
 
             if (p.hasPermission("lobby.silenthub")) {
-                p.getInventory().setItem(3, null);
+                p.getInventory().setItem(plugin.getBackpackManager().getItemSlot(), null);
             } else {
-                p.getInventory().setItem(2, null);
+                p.getInventory().setItem(plugin.getBackpackManager().getFallbackSlot(), null);
             }
 
             p.getWorld().playEffect(p.getLocation(), Effect.LARGE_SMOKE, 10);

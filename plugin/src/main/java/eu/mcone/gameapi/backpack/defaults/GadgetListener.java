@@ -5,8 +5,12 @@ import eu.mcone.gameapi.api.backpack.BackpackInventoryListener;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.listener.backpack.gadget.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.entity.Player;
 
+@Getter
+@Setter
 public class GadgetListener extends BackpackInventoryListener {
 
     static {
@@ -28,9 +32,9 @@ public class GadgetListener extends BackpackInventoryListener {
     public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player p) {
         if (gamePlayer.getSettings().isEnableGadgets()) {
             if (p.hasPermission("lobby.silenthub")) {
-                p.getInventory().setItem(3, item.getItem());
+                p.getInventory().setItem(plugin.getBackpackManager().getItemSlot(), item.getItem());
             } else {
-                p.getInventory().setItem(2, item.getItem());
+                p.getInventory().setItem(plugin.getBackpackManager().getFallbackSlot(), item.getItem());
             }
         } else {
             p.closeInventory();

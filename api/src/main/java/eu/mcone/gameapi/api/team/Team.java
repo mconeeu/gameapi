@@ -16,7 +16,7 @@ public class Team {
     @Getter
     private int size;
     @Getter
-    private boolean alive = true;
+    private boolean alive = false;
     @Getter
     private String spawnLocation;
     @Getter
@@ -38,6 +38,7 @@ public class Team {
         if (!players.contains(player)) {
             players.add(player);
             size += 1;
+            alive = true;
         }
     }
 
@@ -50,7 +51,9 @@ public class Team {
 
     public void setAlive(boolean var) {
         alive = var;
-        Bukkit.getPluginManager().callEvent(new TeamDestroyEvent(this));
+
+        if (!var)
+            Bukkit.getPluginManager().callEvent(new TeamDestroyEvent(this));
     }
 
     public boolean containsPlayer(final Player player) {

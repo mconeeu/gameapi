@@ -7,4 +7,6 @@ public interface TrailHandler {
     void setTrail(Player p, BackpackItem trail);
 
     void removeTrail(Player p);
+
+    void stop();
 }

@@ -35,9 +35,9 @@ public class CobwebGunListener extends GadgetListener {
             org.bukkit.entity.Item item = p.getLocation().getWorld().dropItem(p.getEyeLocation(),
                     new ItemStack(Material.FIREWORK_CHARGE));
             if (p.hasPermission("lobby.silenthub")) {
-                p.getInventory().setItem(3, null);
+                p.getInventory().setItem(plugin.getBackpackManager().getItemSlot(), null);
             } else {
-                p.getInventory().setItem(2, null);
+                p.getInventory().setItem(plugin.getBackpackManager().getFallbackSlot(), null);
             }
 
             Vector v = p.getLocation().getDirection().multiply(1);
@@ -120,9 +120,9 @@ public class CobwebGunListener extends GadgetListener {
                         Bukkit.getScheduler().runTaskLater(plugin, () -> {
                             p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
                             if (p.hasPermission("lobby.silenthub")) {
-                                p.getInventory().setItem(3, DefaultItem.COBWEBGUN.getItemStack());
+                                p.getInventory().setItem(plugin.getBackpackManager().getItemSlot(), DefaultItem.COBWEBGUN.getItemStack());
                             } else {
-                                p.getInventory().setItem(2, DefaultItem.COBWEBGUN.getItemStack());
+                                p.getInventory().setItem(plugin.getBackpackManager().getFallbackSlot(), DefaultItem.COBWEBGUN.getItemStack());
                             }
 
                         }, 33);

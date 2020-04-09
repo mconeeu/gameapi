@@ -22,5 +22,8 @@ public enum Option {
 
     //ReplaySessionManager
     SESSION_MANAGER_LOAD_ALL_REPLAYS,
-    USE_WORLD_DOWNLOADER
+    USE_WORLD_DOWNLOADER,
+
+    //TeamManager
+    TEAM_MANAGER_EXIT_BY_SINGLE_DEATH
 }

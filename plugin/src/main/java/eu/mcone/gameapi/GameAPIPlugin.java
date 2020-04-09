@@ -47,7 +47,6 @@ public class GameAPIPlugin extends GameAPI {
     public void onEnable() {
         system = this;
         setInstance(this);
-
         this.players = new ArrayList<>();
 
         CoreSystem.getInstance().getTranslationManager().loadCategories(this);
@@ -114,8 +113,8 @@ public class GameAPIPlugin extends GameAPI {
     }
 
     @Override
-    public TeamManager constructTeamManager(GamePlugin gamePlugin) {
-        return new TeamManager(gamePlugin, this);
+    public TeamManager constructTeamManager(GamePlugin gamePlugin, Option[] options) {
+        return new TeamManager(gamePlugin, this, options);
     }
 
     @Override

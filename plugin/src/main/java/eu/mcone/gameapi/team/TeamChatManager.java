@@ -37,13 +37,19 @@ public class TeamChatManager implements Listener {
             if (GamePlugin.getGamePlugin().getGameStateManager().getRunning() instanceof InGameState) {
                 GamePlayer gamePlayer = GamePlugin.getGamePlugin().getGamePlayer(p.getUniqueId());
 
-                if (playerMessage.startsWith("@all")) {
-                    for (Player all : Bukkit.getOnlinePlayers()) {
-                        GamePlugin.getGamePlugin().getMessager().sendSimple(all, "§8[§b@all§8] " + gamePlayer.getTeam().getTeam().getChatColor().toString() + p.getName() + " §8»§7" + playerMessage.replace("@all", ""));
+                if (GamePlugin.getGamePlugin().getPlayerManager().isSpectator(p)) {
+                    for (Player player : GamePlugin.getGamePlugin().getPlayerManager().getSpectating()) {
+                        player.sendMessage("§8[§7Spectator§8] " + CoreSystem.getInstance().getTranslationManager().get("system.bukkit.chat").replaceAll("%Player%", p.getName()) + playerMessage);
                     }
                 } else {
-                    for (Player team : gamePlayer.getTeam().getPlayers()) {
-                        GamePlugin.getGamePlugin().getMessager().sendSimple(team, gamePlayer.getTeam().getTeam().getChatColor().toString() + p.getName() + " §8»§7" + playerMessage);
+                    if (playerMessage.startsWith("@all")) {
+                        for (Player all : Bukkit.getOnlinePlayers()) {
+                            GamePlugin.getGamePlugin().getMessager().sendSimple(all, "§8[§b@all§8] " + gamePlayer.getTeam().getTeam().getChatColor().toString() + p.getName() + " §8»§7 " + playerMessage.replace("@all", ""));
+                        }
+                    } else {
+                        for (Player team : gamePlayer.getTeam().getPlayers()) {
+                            GamePlugin.getGamePlugin().getMessager().sendSimple(team, gamePlayer.getTeam().getTeam().getChatColor().toString() + p.getName() + " §8»§7 " + playerMessage);
+                        }
                     }
                 }
 

@@ -1,18 +1,38 @@
 package eu.mcone.gameapi.api.backpack;
 
+import eu.mcone.gameapi.api.Option;
+import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.api.backpack.handler.OutfitHandler;
 import eu.mcone.gameapi.api.backpack.handler.PetHandler;
 import eu.mcone.gameapi.api.backpack.handler.TrailHandler;
 import org.bukkit.entity.Player;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public interface BackpackManager {
 
+    List<Option> getGameOptions();
+
+    HashSet<String> getDisabledItems();
+
     boolean isUseRankBoots();
 
+    int getItemSlot();
+
+    void setItemSlot(int slot);
+
+    int getFallbackSlot();
+
+    void setFallbackSlot(int slot);
+
     void setUseRankBoots(boolean use);
+
+    void disableItem(DefaultItem item);
+
+    void disableItem(String item);
 
     void registerCategory(Category category, Set<BackpackItem> items, BackpackInventoryListener listener) throws IllegalArgumentException;
 

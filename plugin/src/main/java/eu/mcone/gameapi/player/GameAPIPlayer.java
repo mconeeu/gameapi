@@ -276,8 +276,6 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
             if (team.getPlayers().size() == 0) {
                 team.setAlive(false);
             }
-
-            this.team = null;
         }
     }
 
