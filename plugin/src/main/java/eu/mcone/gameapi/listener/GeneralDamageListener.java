@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 
 public class GeneralDamageListener implements Listener {
 
@@ -17,10 +18,29 @@ public class GeneralDamageListener implements Listener {
             if (e.getEntity() instanceof Player && e.getDamager() instanceof Player) {
                 GamePlayer gamePlayer = GamePlugin.getGamePlugin().getGamePlayer((Player) e.getEntity());
                 Player damager = (Player) e.getDamager();
+                Player player = (Player) e.getEntity();
                 if (gamePlayer.getTeam() != null) {
                     if (gamePlayer.getTeam().getPlayers().contains(damager)) {
                         e.setCancelled(true);
                     }
+                }
+
+                if (GamePlugin.getGamePlugin().getPlayerManager().isSpectator(damager)
+                        || GamePlugin.getGamePlugin().getPlayerManager().isSpectator(player)) {
+                    e.setCancelled(true);
+                }
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
+    public void onEntityDamageByEntity(EntityDamageEvent e) {
+        if (GamePlugin.getGamePlugin().hasModule(Module.TEAM_MANAGER) && GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)) {
+            if (e.getEntity() instanceof Player) {
+                Player player = (Player) e.getEntity();
+
+                if (GamePlugin.getGamePlugin().getPlayerManager().isSpectator(player)) {
+                    e.setCancelled(true);
                 }
             }
         }

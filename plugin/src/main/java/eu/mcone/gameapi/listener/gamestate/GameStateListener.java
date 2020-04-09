@@ -32,20 +32,14 @@ public class GameStateListener implements Listener {
                 PlayerManager playerManager = GamePlugin.getGamePlugin().getPlayerManager();
 
                 for (CorePlayer cps : CoreSystem.getInstance().getOnlineCorePlayers()) {
-                    GamePlugin.getGamePlugin().getMessager().send(cps.bukkit(), CoreSystem.getInstance().getTranslationManager().get("game.join", cps)
-                            .replace("%player%", player.getName())
-                            .replace("%playing%", Integer.toString(playerManager.getPlaying().size()))
-                            .replace("%max%", String.valueOf(playerManager.getMaxPlayers())));
+                    GamePlugin.getGamePlugin().getMessager().sendTransl(cps.bukkit(), "game.join", player.getName(), playerManager.getPlaying().size(), playerManager.getMaxPlayers());
 
                     CoreSystem.getInstance().createTitle()
                             .stay(5)
                             .fadeIn(2)
                             .fadeOut(2)
                             .title(CoreSystem.getInstance().getTranslationManager().get("game.prefix", cps))
-                            .subTitle(CoreSystem.getInstance().getTranslationManager().get("game.join.title", cps)
-                                    .replace("%player%", player.getName())
-                                    .replace("%playing%", Integer.toString(playerManager.getPlaying().size()))
-                                    .replace("%max%", String.valueOf(playerManager.getMaxPlayers())))
+                            .subTitle(CoreSystem.getInstance().getTranslationManager().get("game.join.title", cps, player.getName(), playerManager.getPlaying().size(), playerManager.getMaxPlayers()))
                             .send(cps.bukkit());
                 }
 

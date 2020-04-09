@@ -26,6 +26,8 @@ public class GeneralInteractListener implements Listener {
                 } else if (e.getItem().equals(DefaultItem.GRAPPLING_HOOK.getItemStack())
                         || e.getItem().equals(DefaultItem.ENDERPEARL.getItemStack())) {
                     e.setCancelled(false);
+                } else if (GamePlugin.getGamePlugin().getPlayerManager().isSpectator(player)) {
+                    e.setCancelled(true);
                 }
             }
         }

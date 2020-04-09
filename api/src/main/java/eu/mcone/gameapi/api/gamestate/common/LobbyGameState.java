@@ -1,7 +1,6 @@
 package eu.mcone.gameapi.api.gamestate.common;
 
 import eu.mcone.coresystem.api.bukkit.CorePlugin;
-import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Module;
 import eu.mcone.gameapi.api.Option;
@@ -38,10 +37,7 @@ public class LobbyGameState extends GameState {
             case 2:
             case 1:
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    plugin.getMessager().send(p, CoreSystem.getInstance().getTranslationManager().get(
-                            "game.countdown.lobby.idling",
-                            CoreSystem.getInstance().getCorePlayer(p)
-                    ).replace("%seconds%", Long.toString(second)));
+                    plugin.getMessager().sendTransl(p, "game.countdown.lobby.idling", second);
                     p.playSound(p.getLocation(), Sound.LEVEL_UP, 1, 1);
                 }
             default:
