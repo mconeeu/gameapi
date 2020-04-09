@@ -90,6 +90,12 @@ public interface GamePlayer {
 
     boolean setKit(Kit kit);
 
+    /**
+     * sets the kit, that the player has buyed. If no Kit was buyed set the default kit (given as argument)
+     * @param defaultKit the default Kit that will be set for free if the player didnt choose any kit
+     */
+    void setChoosedKit(Kit defaultKit);
+
     boolean hasKit(Kit kit);
 
     Kit getCurrentKit();
