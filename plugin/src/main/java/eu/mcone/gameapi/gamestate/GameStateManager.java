@@ -151,6 +151,17 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
         }
     }
 
+    @Override
+    public boolean updateTimeoutCounter(long second) {
+        if (timeoutTask != null) {
+            initializeTimeout(running, second);
+            system.sendConsoleMessage("§fUpdated GameState Timeout manually to "+second);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 
     @Override
     public boolean isCountdownRunning() {
@@ -243,13 +254,17 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
     }
 
     private void initializeTimeout(GameState gameState) {
-        GameStateTimeoutStartEvent timeoutStartEvent = new GameStateTimeoutStartEvent(this, gameState);
+        initializeTimeout(gameState, -1);
+    }
+
+    private void initializeTimeout(GameState gameState, long timeout) {
+        GameStateTimeoutStartEvent timeoutStartEvent = new GameStateTimeoutStartEvent(this, gameState, timeout);
         gameState.onTimeoutStart(timeoutStartEvent);
         gamePlugin.getServer().getPluginManager().callEvent(timeoutStartEvent);
 
         //If Timeout was not cancelled start timeout, otherwise to idle
         if (!timeoutStartEvent.isCancelled()) {
-            long timeout = timeoutStartEvent.getTimeout() > 0 ? timeoutStartEvent.getTimeout() : gameState.getTimeout();
+            timeout = timeoutStartEvent.getTimeout() > 0 ? timeoutStartEvent.getTimeout() : gameState.getTimeout();
 
             system.sendConsoleMessage("§fStarting Gamestate " + gameState.getName() + " with timout of " + timeout + " seconds!");
             timeoutGameState(gameState, timeout);
@@ -261,6 +276,9 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
     private void timeoutGameState(GameState gameState, long timeout) {
         this.timeoutCounter = timeout;
 
+        if (timeoutTask != null) {
+            timeoutTask.cancel();
+        }
         this.timeoutTask = Bukkit.getScheduler().runTaskTimer(system, () -> {
             //If timeoutTask reached the end call timeout event
             if (this.timeoutCounter < 1) {
@@ -288,6 +306,7 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
                 }
             }
 
+            gameState.onTimeoutSecond(GamePlugin.getGamePlugin(), timeoutCounter);
             this.timeoutCounter--;
         }, 0, 20);
     }

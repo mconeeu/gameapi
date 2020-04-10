@@ -10,9 +10,9 @@ import org.bukkit.event.HandlerList;
 @Getter
 public final class GameStateTimeoutStartEvent extends GameStateEvent implements Cancellable {
 
-    public GameStateTimeoutStartEvent(GameStateManager gameStateManager, GameState gameState) {
+    public GameStateTimeoutStartEvent(GameStateManager gameStateManager, GameState gameState, long timeout) {
         super(gameStateManager);
-        this.timeout = gameState.getTimeout();
+        this.timeout = timeout > -1 ? timeout : gameState.getTimeout();
         this.gameState = gameState;
     }
 

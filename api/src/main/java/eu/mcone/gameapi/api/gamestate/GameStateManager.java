@@ -23,6 +23,8 @@ public interface GameStateManager {
 
     boolean startTimeout(boolean force, long countdown);
 
+    boolean updateTimeoutCounter(long second);
+
     boolean isCountdownRunning();
 
     boolean cancelCountdown();

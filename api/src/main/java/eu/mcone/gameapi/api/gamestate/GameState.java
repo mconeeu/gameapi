@@ -40,6 +40,8 @@ public class GameState implements Listener {
 
     public void onStop(GameStateStopEvent event) {}
 
+    public void onTimeoutSecond(CorePlugin plugin, long second) {}
+
     public void onCountdownSecond(CorePlugin plugin, int second) {}
 
     public boolean hasCountdown() {
