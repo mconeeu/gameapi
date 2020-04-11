@@ -31,6 +31,8 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
     private Team wonTeam;
     @Getter
     private boolean exitBySingleDeath;
+    @Getter
+    private List<Option> options;
 
     public TeamManager(GamePlugin plugin, GameAPIPlugin system, Option[] options) {
         this.gamePlugin = plugin;
@@ -38,8 +40,9 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
         GameConfig config = plugin.getGameConfig().parseConfig();
         playersPerTeam = config.getPlayersPerTeam();
         teams = new HashMap<>();
+        this.options = Arrays.asList(options);
 
-        if (Arrays.asList(options).contains(Option.TEAM_MANAGER_EXIT_BY_SINGLE_DEATH)) {
+        if (this.options.contains(Option.TEAM_MANAGER_EXIT_BY_SINGLE_DEATH)) {
             exitBySingleDeath = true;
         }
 
@@ -138,6 +141,44 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
         } else {
             return null;
         }
+    }
+
+    public Team getPrematureWinner() {
+        Map<Team, Integer> potentialWinners = new HashMap<>();
+        Team winner = null;
+        if (this.options.contains(Option.SORT_WHERE_GOALS)) {
+            for (Team team : teams.values()) {
+                for (Player player : team.getPlayers()) {
+                    GamePlayer gamePlayer = GamePlugin.getGamePlugin().getGamePlayer(player);
+                    if (potentialWinners.containsKey(team)) {
+                        potentialWinners.merge(team, gamePlayer.getRoundGoals(), Integer::sum);
+                    } else {
+                        potentialWinners.put(team, gamePlayer.getRoundGoals());
+                    }
+                }
+            }
+        } else {
+            for (Team team : teams.values()) {
+                for (Player player : team.getPlayers()) {
+                    GamePlayer gamePlayer = GamePlugin.getGamePlugin().getGamePlayer(player);
+                    if (potentialWinners.containsKey(team)) {
+                        potentialWinners.merge(team, gamePlayer.getRoundKills(), Integer::sum);
+                    } else {
+                        potentialWinners.put(team, gamePlayer.getRoundKills());
+                    }
+                }
+            }
+        }
+
+        int max = 0;
+        for (Map.Entry<Team, Integer> entry : potentialWinners.entrySet()) {
+            if (entry.getValue() > max) {
+                max = entry.getValue();
+                winner = entry.getKey();
+            }
+        }
+
+        return winner;
     }
 
     public void sendKillMessage(Player receiver, final Player victim, final Player killer) {

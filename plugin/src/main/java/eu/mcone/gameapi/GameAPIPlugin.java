@@ -66,8 +66,8 @@ public class GameAPIPlugin extends GameAPI {
     }
 
     @Override
-    public eu.mcone.gameapi.api.gamestate.GameStateManager constructGameStateManager(GamePlugin gamePlugin) {
-        return new GameStateManager(this, gamePlugin);
+    public eu.mcone.gameapi.api.gamestate.GameStateManager constructGameStateManager(GamePlugin gamePlugin, Option... options) {
+        return new GameStateManager(this, gamePlugin, options);
     }
 
     @Override
@@ -106,10 +106,10 @@ public class GameAPIPlugin extends GameAPI {
         return new eu.mcone.gameapi.replay.session.ReplaySessionManager(options);
     }
 
-    @Override
-    public GameStateManager constructGameStatsManager(GamePlugin gamePlugin) {
-        return new GameStateManager(this, gamePlugin);
-    }
+//    @Override
+//    public GameStateManager constructGameStatsManager(GamePlugin gamePlugin) {
+//        return new GameStateManager(this, gamePlugin);
+//    }
 
     @Override
     public TeamManager constructTeamManager(GamePlugin gamePlugin, Option[] options) {

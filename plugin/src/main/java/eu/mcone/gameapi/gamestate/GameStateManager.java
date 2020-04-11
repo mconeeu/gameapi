@@ -3,6 +3,7 @@ package eu.mcone.gameapi.gamestate;
 import eu.mcone.coresystem.api.bukkit.CorePlugin;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GamePlugin;
+import eu.mcone.gameapi.api.Option;
 import eu.mcone.gameapi.api.event.gamestate.*;
 import eu.mcone.gameapi.api.gamestate.GameState;
 import eu.mcone.gameapi.command.ForceStartCMD;
@@ -11,7 +12,9 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 
 public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStateManager {
 
@@ -20,6 +23,8 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
     private final LinkedList<GameState> pipeline;
     @Getter
     private GameState running = null;
+    @Getter
+    private GameState previous;
 
     private BukkitTask countdownTask, timeoutTask;
     @Getter
@@ -27,10 +32,15 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
     @Getter
     private int countdownCounter;
 
-    public GameStateManager(GameAPIPlugin system, CorePlugin plugin) {
+    @Getter
+    private List<Option> options;
+
+    public GameStateManager(GameAPIPlugin system, CorePlugin plugin, Option... options) {
         this.system = system;
         this.gamePlugin = plugin;
         this.pipeline = new LinkedList<>();
+        this.options = Arrays.asList(options);
+
 
         system.sendConsoleMessage("§aLoading GameStateManager...");
         system.registerEvents(new GameStateListener());
@@ -155,7 +165,7 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
     public boolean updateTimeoutCounter(long second) {
         if (timeoutTask != null) {
             initializeTimeout(running, second);
-            system.sendConsoleMessage("§fUpdated GameState Timeout manually to "+second);
+            system.sendConsoleMessage("§fUpdated GameState Timeout manually to " + second);
             return true;
         } else {
             return false;
@@ -212,7 +222,7 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
     public boolean updateCountdownCounter(int second) {
         if (countdownTask != null) {
             countdownGameState(running, second);
-            system.sendConsoleMessage("§fUpdated GameState Countdown manually to "+second);
+            system.sendConsoleMessage("§fUpdated GameState Countdown manually to " + second);
             return true;
         } else {
             return false;
@@ -220,13 +230,15 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
     }
 
     private void startGameState(GameState gameState) {
-        System.out.println("calling start event");
-        GameStateStartEvent startEvent = new GameStateStartEvent(this, running, gameState);
-        gameState.onStart(startEvent);
-        gamePlugin.getServer().getPluginManager().callEvent(startEvent);
+        //Sets the current GameState as previous GameState
+        previous = running;
 
         //Mark the started GameState as currently running
         running = gameState;
+
+        GameStateStartEvent startEvent = new GameStateStartEvent(this, running, gameState);
+        gameState.onStart(startEvent);
+        gamePlugin.getServer().getPluginManager().callEvent(startEvent);
 
         //Start GameState if not cancelled
         if (!startEvent.isCancelled()) {

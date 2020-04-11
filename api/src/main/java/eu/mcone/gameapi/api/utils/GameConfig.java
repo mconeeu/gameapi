@@ -14,5 +14,7 @@ public class GameConfig {
     private int maxPlayers = 0;
     private int minPlayers = 0;
     private int playersPerTeam = 0;
+    //time in min
+    private int season = 45;
 
 }

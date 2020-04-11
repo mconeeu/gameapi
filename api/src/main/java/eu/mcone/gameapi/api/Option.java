@@ -25,5 +25,9 @@ public enum Option {
     USE_WORLD_DOWNLOADER,
 
     //TeamManager
-    TEAM_MANAGER_EXIT_BY_SINGLE_DEATH
+    TEAM_MANAGER_EXIT_BY_SINGLE_DEATH,
+    SORT_WHERE_GOALS,
+
+    //GameState
+    USE_SEASON_TIMEOUT
 }
