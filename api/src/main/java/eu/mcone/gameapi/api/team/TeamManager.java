@@ -29,6 +29,8 @@ public interface TeamManager {
 
     Collection<Team> getTeams();
 
+    Team getTeam(int index);
+
     Collection<Team> getAliveTeams();
 
     void openTeamInventory(Player p);

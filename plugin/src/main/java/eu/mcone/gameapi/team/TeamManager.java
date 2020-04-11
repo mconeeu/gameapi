@@ -183,6 +183,14 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
         return teams.values();
     }
 
+    public Team getTeam(int index) {
+        if (teams.size() > index) {
+            return new ArrayList<>(teams.values()).get(index);
+        } else {
+            return null;
+        }
+    }
+
     public Collection<Team> getAliveTeams() {
         List<Team> teams = new ArrayList<>();
 

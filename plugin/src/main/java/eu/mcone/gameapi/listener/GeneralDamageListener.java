@@ -19,7 +19,7 @@ public class GeneralDamageListener implements Listener {
                 GamePlayer gamePlayer = GamePlugin.getGamePlugin().getGamePlayer((Player) e.getEntity());
                 Player damager = (Player) e.getDamager();
                 Player player = (Player) e.getEntity();
-                if (gamePlayer.getTeam() != null) {
+                if (gamePlayer != null && gamePlayer.getTeam() != null) {
                     if (gamePlayer.getTeam().getPlayers().contains(damager)) {
                         e.setCancelled(true);
                     }

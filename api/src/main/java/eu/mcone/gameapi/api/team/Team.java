@@ -2,6 +2,7 @@ package eu.mcone.gameapi.api.team;
 
 import eu.mcone.gameapi.api.event.team.TeamDestroyEvent;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -18,6 +19,7 @@ public class Team {
     @Getter
     private boolean alive = false;
     @Getter
+    @Setter
     private String spawnLocation;
     @Getter
     private String npcLocation;
