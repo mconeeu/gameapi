@@ -19,10 +19,11 @@ public final class GameStateCountdownStartEvent extends GameStateEvent implement
     @Getter
     private static final HandlerList handlerList = new HandlerList();
     private final GameState gameState;
-    @Setter
-    private int countdown;
+
     @Setter
     private boolean cancelled;
+    @Setter
+    private int countdown;
 
     public HandlerList getHandlers() {
         return handlerList;
