@@ -68,7 +68,7 @@ public class SplashPotionListener extends GadgetListener {
                         }
 
                         if (p.hasPermission("lobby.silenthub")) {
-                            p.getInventory().setItem(3, DefaultItem.SPLASH_POTION.getItemStack());
+                            p.getInventory().setItem(plugin.getBackpackManager().getItemSlot(), DefaultItem.SPLASH_POTION.getItemStack());
 
                             if (splashPotionEffects.contains(p)) {
                                 splashPotionEffects.remove(p);
@@ -81,7 +81,7 @@ public class SplashPotionListener extends GadgetListener {
                             p.spigot().playEffect(p.getLocation(), Effect.ENDER_SIGNAL, 1, 1, 1, 1, 1, 2, 100, 100);
 
                         } else {
-                            p.getInventory().setItem(2, DefaultItem.SPLASH_POTION.getItemStack());
+                            p.getInventory().setItem(plugin.getBackpackManager().getFallbackSlot(), DefaultItem.SPLASH_POTION.getItemStack());
                             p.getWorld().playEffect(p.getLocation(), Effect.LARGE_SMOKE, 10);
                             p.getWorld().playEffect(p.getLocation(), Effect.FLAME, 10);
                             p.getWorld().playEffect(p.getLocation(), Effect.ENDER_SIGNAL, 10);

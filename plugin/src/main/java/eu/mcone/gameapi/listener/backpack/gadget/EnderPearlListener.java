@@ -48,13 +48,13 @@ public class EnderPearlListener extends GadgetListener {
                         p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
 
                         if (p.hasPermission("lobby.silenthub")) {
-                            p.getInventory().setItem(3, DefaultItem.ENDERPEARL.getItemStack());
+                            p.getInventory().setItem(plugin.getBackpackManager().getItemSlot(), DefaultItem.ENDERPEARL.getItemStack());
                             p.getWorld().playEffect(p.getLocation(), Effect.LARGE_SMOKE, 10);
                             p.spigot().playEffect(p.getLocation(), Effect.FLAME, 1, 1, 1, 1, 1, 2, 100, 100);
                             p.spigot().playEffect(p.getLocation(), Effect.ENDER_SIGNAL, 1, 1, 1, 1, 1, 2, 100, 100);
 
                         } else {
-                            p.getInventory().setItem(2, DefaultItem.ENDERPEARL.getItemStack());
+                            p.getInventory().setItem(plugin.getBackpackManager().getFallbackSlot(), DefaultItem.ENDERPEARL.getItemStack());
                             p.getWorld().playEffect(p.getLocation(), Effect.LARGE_SMOKE, 10);
                             p.spigot().playEffect(p.getLocation(), Effect.FLAME, 1, 1, 1, 1, 1, 2, 100, 100);
                             p.spigot().playEffect(p.getLocation(), Effect.ENDER_SIGNAL, 1, 1, 1, 1, 1, 2, 100, 100);

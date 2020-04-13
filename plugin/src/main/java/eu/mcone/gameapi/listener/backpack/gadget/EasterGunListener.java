@@ -52,9 +52,9 @@ public class EasterGunListener extends GadgetListener {
                     Bukkit.getScheduler().runTaskLater(plugin, () -> {
                         p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
                         if (p.hasPermission("lobby.silenthub")) {
-                            p.getInventory().setItem(3, DefaultItem.EASTERGUN.getItemStack());
+                            p.getInventory().setItem(plugin.getBackpackManager().getItemSlot(), DefaultItem.EASTERGUN.getItemStack());
                         } else {
-                            p.getInventory().setItem(2, DefaultItem.EASTERGUN.getItemStack());
+                            p.getInventory().setItem(plugin.getBackpackManager().getFallbackSlot(), DefaultItem.EASTERGUN.getItemStack());
                         }
 
                     }, 10);
