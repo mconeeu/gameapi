@@ -21,6 +21,6 @@ public class LobbyObjective extends CoreSidebarObjective {
 
     @Override
     public void setScore(int score, String content) {
-        super.setScore(score + 2, content);
+        super.setScore((score == 0 ? score + 3 : score + 2) , content);
     }
 }

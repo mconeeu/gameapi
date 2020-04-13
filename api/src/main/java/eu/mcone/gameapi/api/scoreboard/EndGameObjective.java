@@ -22,12 +22,22 @@ public class EndGameObjective extends CoreSidebarObjective {
                 useTime = true;
                 super.setScore(5, "");
                 super.setScore(4, "§8» §7Zeit:");
-                super.setScore(3, "   §f§l" + InGameObjective.format(((InGameState) GamePlugin.getGamePlugin().getGameStateManager().getPrevious()).getTimeoutSeconds()));
+                super.setScore(3, "   §f§l" + InGameObjective.format(getTimeoutSeconds()));
             }
         }
 
         super.setScore(2, "");
         super.setScore(1, "§f§lMCONE.EU");
+    }
+
+    private double getTimeoutSeconds() {
+        if (GamePlugin.getGamePlugin().getGameStateManager().getRunning() instanceof InGameState) {
+            return ((InGameState) GamePlugin.getGamePlugin().getGameStateManager().getRunning()).getTimeoutSeconds();
+        } else if (GamePlugin.getGamePlugin().getGameStateManager().getPrevious() instanceof InGameState) {
+            return ((InGameState) GamePlugin.getGamePlugin().getGameStateManager().getPrevious()).getTimeoutSeconds();
+        }
+
+        return 0;
     }
 
     @Override
