@@ -37,7 +37,7 @@ public class LobbyGameState extends GameState {
             case 2:
             case 1:
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    plugin.getMessager().sendTransl(p, "game.countdown.lobby.idling", second);
+                    plugin.getMessager().sendTransl(p, "game.gamestate.lobby.countdown.idling", second);
                     p.playSound(p.getLocation(), Sound.LEVEL_UP, 1, 1);
                 }
             default:

@@ -14,3 +14,40 @@ permissions:
         description: Manage BackpackItems of online users
       system.game.start:
         description: Skip LobbyGameState Countdown
+
+translations:
+  # death
+  - game.death.msg
+  - game.death.msg.killed
+  - game.death.bar
+  - game.death.normal
+  - game.death.normal.bar
+  # gamestate
+  - game.gamestate.lobby.countdown.msg
+  - game.gamestate.lobby.countdown.idling
+  - game.gamestate.lobby.countdown.missingPlayers
+  - game.gamestate.lobby.countdown.tooFewPlayers
+  - game.gamestate.lobby.countdown.forcestart
+  - game.gamestate.lobby.countdown.forcestart.error
+  - game.gamestate.lobby.countdown.forcestart.alreadyDone
+  - game.gamestate.lobby.countdown.forcestart.alreadyIngame
+  # game lifecycle
+  - game.excreted
+  - game.excreted.title
+  - game.join
+  - game.join.spectators
+  - game.join.title
+  - game.quit
+  - game.quit.ingame
+  - game.restart
+  - game.spectator
+  # teams
+  - game.team.won
+  - game.team.join
+  - game.team.alreadyJoined
+  - game.team.full
+  - game.team.maxSizeReached
+  # chat
+  - game.chat.team
+  - game.chat.death
+  - game.chat.global

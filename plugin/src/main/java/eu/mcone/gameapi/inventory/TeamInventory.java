@@ -44,7 +44,7 @@ public class TeamInventory extends CoreInventory {
                 GamePlayer gp = gamePlugin.getGamePlayer(p.getUniqueId());
 
                 if (gp.getTeam() != null && gp.getTeam().equals(team)) {
-                    gamePlugin.getMessager().send(p, CoreSystem.getInstance().getTranslationManager().get("game.team.already"));
+                    gamePlugin.getMessager().send(p, CoreSystem.getInstance().getTranslationManager().get("game.team.alreadyJoined"));
                     p.playSound(p.getLocation(), Sound.ANVIL_BREAK, 1, 1);
                 } else {
                     if (team.getSize() < teamManager.getPlayersPerTeam()) {

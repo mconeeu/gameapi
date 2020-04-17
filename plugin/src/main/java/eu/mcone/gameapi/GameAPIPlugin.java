@@ -1,6 +1,5 @@
 package eu.mcone.gameapi;
 
-import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.gameapi.achievement.GameAchievementManager;
 import eu.mcone.gameapi.api.GameAPI;
@@ -45,8 +44,6 @@ public class GameAPIPlugin extends GameAPI {
         system = this;
         setInstance(this);
         this.players = new ArrayList<>();
-
-        CoreSystem.getInstance().getTranslationManager().loadCategories(getGamemode().toString());
 
         registerEvents(
                 new GamePlayerListener(),

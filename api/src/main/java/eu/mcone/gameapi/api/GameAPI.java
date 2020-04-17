@@ -28,7 +28,7 @@ import java.util.UUID;
 public abstract class GameAPI extends CorePlugin {
 
     public GameAPI() {
-        super("gamesystem", ChatColor.DARK_GRAY, "system.prefix.server");
+        super("gameapi", ChatColor.DARK_GRAY, "system.prefix.server");
     }
 
     @Getter
@@ -36,7 +36,7 @@ public abstract class GameAPI extends CorePlugin {
 
     protected void setInstance(final GameAPI instance) {
         if (instance == null) {
-            System.err.println("GameSystem instance cannot be set twice!");
+            System.err.println("GameAPI instance cannot be set twice!");
         } else {
             GameAPI.instance = instance;
         }
@@ -49,8 +49,6 @@ public abstract class GameAPI extends CorePlugin {
     public abstract MapManager constructMapManager();
 
     public abstract ReplaySessionManager constructReplaySessionManager(Option... options);
-
-//    public abstract GameStateManager constructGameStatsManager(GamePlugin gamePlugin);
 
     public abstract TeamManager constructTeamManager(GamePlugin gamePlugin, Option[] options);
 

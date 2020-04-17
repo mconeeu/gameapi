@@ -26,7 +26,6 @@ public class FurnaceListener extends GadgetListener {
 
     @EventHandler
     public void on(PlayerInteractEvent e) {
-        System.out.println(e);
         if (e.hasItem() && e.getItem().equals(DefaultItem.MYSTERY_FURNACHE.getItemStack()) && (e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_AIR))) {
 
             List<Location> locations = new ArrayList<>();

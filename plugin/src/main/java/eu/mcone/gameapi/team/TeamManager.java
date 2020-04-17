@@ -190,7 +190,7 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
                 message = CoreSystem.getInstance().getTranslationManager().get("game.death.normal", receiverCP, "§" + gamePlugin.getGamePlayer(victim.getUniqueId()).getTeam().getTeam().getChatColor().getChar() + victim.getName());
             } else {
                 if (receiver != killer) {
-                    message = CoreSystem.getInstance().getTranslationManager().get("game.death.bykiller", receiverCP,
+                    message = CoreSystem.getInstance().getTranslationManager().get("game.death.msg", receiverCP,
                             "§" + gamePlugin.getGamePlayer(victim.getUniqueId()).getTeam().getTeam().getChatColor().getChar() + victim.getName(),
                             "§" + gamePlugin.getGamePlayer(killer.getUniqueId()).getTeam().getTeam().getChatColor().getChar() + killer.getName());
                 } else {
@@ -208,7 +208,7 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
                     if (killer == null) {
                         message = "§7Du bist gestorben";
                     } else {
-                        message = CoreSystem.getInstance().getTranslationManager().get("game.killed.by", receiverCP, gamePlugin.getGamePlayer(killer.getUniqueId()).getTeam().getTeam().getChatColor().toString() + killer.getName());
+                        message = CoreSystem.getInstance().getTranslationManager().get("game.death.msg.killed", receiverCP, gamePlugin.getGamePlayer(killer.getUniqueId()).getTeam().getTeam().getChatColor().toString() + killer.getName());
                     }
                 } else {
                     message = "§7Du bist gestorben und somit aus dem Spiel ausgeschieden!";
