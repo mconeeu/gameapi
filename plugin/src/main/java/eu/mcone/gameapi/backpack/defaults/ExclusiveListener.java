@@ -19,7 +19,7 @@ public class ExclusiveListener extends BackpackInventoryListener {
     public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player p) {
         handler.setTrail(p, item);
         p.closeInventory();
-        plugin.getMessager().send(p, "§7Du hast den Trail §f" + item.getName() + "§7 aktiviert!");
+        plugin.getMessenger().send(p, "§7Du hast den Trail §f" + item.getName() + "§7 aktiviert!");
     }
 
     @Override

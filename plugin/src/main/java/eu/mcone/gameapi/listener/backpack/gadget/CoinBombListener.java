@@ -93,7 +93,7 @@ public class CoinBombListener extends GadgetListener {
                     }, 80L);
                 }
             } else {
-                GameAPIPlugin.getSystem().getMessager().send(p, "§4Es müssen mindestens 2 Spieler Online sein!");
+                GameAPIPlugin.getSystem().getMessenger().send(p, "§4Es müssen mindestens 2 Spieler Online sein!");
             }
         }
     }

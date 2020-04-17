@@ -96,7 +96,7 @@ public class GamePlayerManager implements eu.mcone.gameapi.api.player.PlayerMana
                 camera.a = target.getEntityId();
                 ((CraftPlayer) player).getHandle().playerConnection.sendPacket(camera);
                 inCamera.add(player);
-                GamePlugin.getGamePlugin().getMessager().send(player, "§7Du bist nun in der Ansicht des Spielers §f" + player);
+                GamePlugin.getGamePlugin().getMessenger().send(player, "§7Du bist nun in der Ansicht des Spielers §f" + player);
             }
         }
     }
@@ -110,7 +110,7 @@ public class GamePlayerManager implements eu.mcone.gameapi.api.player.PlayerMana
                 camera.a = player.getEntityId();
                 ((CraftPlayer) player).getHandle().playerConnection.sendPacket(camera);
                 inCamera.remove(player);
-                GamePlugin.getGamePlugin().getMessager().send(player, "§7Du bist nun nicht mehr in der Ansicht des Spielers §f" + player);
+                GamePlugin.getGamePlugin().getMessenger().send(player, "§7Du bist nun nicht mehr in der Ansicht des Spielers §f" + player);
             }
         }
     }

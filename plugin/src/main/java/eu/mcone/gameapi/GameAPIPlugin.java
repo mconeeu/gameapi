@@ -41,8 +41,11 @@ public class GameAPIPlugin extends GameAPI {
 
     @Override
     public void onEnable() {
+        super.onEnable();
+
         system = this;
         setInstance(this);
+
         this.players = new ArrayList<>();
 
         registerEvents(

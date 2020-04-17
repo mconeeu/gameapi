@@ -110,7 +110,7 @@ public class GameAchievementManager implements AchievementManager {
         if (!event.isCancelled()) {
             ChatColor gamemodeColor = plugin.getPluginColor();
             player.getCorePlayer().addCoins(achievement.getRewardCoins());
-            plugin.getMessager().send(player.bukkit(), "§aDu hast das Achievement " + gamemodeColor.toString() + achievement.getName() + " erfolgreich §afreigeschaltet! ");
+            plugin.getMessenger().send(player.bukkit(), "§aDu hast das Achievement " + gamemodeColor.toString() + achievement.getName() + " erfolgreich §afreigeschaltet! ");
             return true;
         } else {
             return false;

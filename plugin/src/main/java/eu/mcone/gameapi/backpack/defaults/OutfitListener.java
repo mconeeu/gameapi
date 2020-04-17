@@ -23,7 +23,7 @@ public class OutfitListener extends BackpackInventoryListener {
     public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player p) {
         handler.setOutfit(p, item);
         p.closeInventory();
-        plugin.getMessager().send(p, "§7Du hast das Outfit §f" + item.getName() + "§7 angezogen!");
+        plugin.getMessenger().send(p, "§7Du hast das Outfit §f" + item.getName() + "§7 angezogen!");
         p.setWalkSpeed(0.20F);
     }
 
@@ -33,7 +33,7 @@ public class OutfitListener extends BackpackInventoryListener {
 
         inv.setItem(InventorySlot.ROW_6_SLOT_8, new ItemBuilder(Material.BARRIER).displayName("§c§lOutfit ausziehen").lore("§7§oFalls du eines deiner Outfits", "§7§oangezogen hast, kannst Du es", "§7§ohiermit ausziehen.").create(), e -> {
             p.getInventory().setArmorContents(null);
-            plugin.getMessager().send(p, "§7Du hast dein Outfit erfolgreich ausgezogen!");
+            plugin.getMessenger().send(p, "§7Du hast dein Outfit erfolgreich ausgezogen!");
             p.closeInventory();
             p.setWalkSpeed(0.20F);
         });

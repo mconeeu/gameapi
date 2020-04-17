@@ -59,13 +59,13 @@ public class GameBackpackTradeManager implements BackpackTradeManager {
             Player partner = getTraidingPartner(player);
 
             if (partner != null) {
-                GameAPIPlugin.getSystem().getMessager().send(partner, "§4Dein Traiding Partner hat das Handeln abgebrochen. Es wurden keine Items verkauft.");
+                GameAPIPlugin.getSystem().getMessenger().send(partner, "§4Dein Traiding Partner hat das Handeln abgebrochen. Es wurden keine Items verkauft.");
                 inTrade.remove(inTrade.containsKey(player) ? player : partner);
             } else {
                 inTrade.remove(player);
             }
 
-            GameAPIPlugin.getSystem().getMessager().send(player, "§4Du hast das Traiding abgebrochen, da du das Inventar geschlossen hast. Es wurden keine Items verkauft.");
+            GameAPIPlugin.getSystem().getMessenger().send(player, "§4Du hast das Traiding abgebrochen, da du das Inventar geschlossen hast. Es wurden keine Items verkauft.");
         } else {
             throw new IllegalStateException("Player is not traiding!");
         }
@@ -94,13 +94,13 @@ public class GameBackpackTradeManager implements BackpackTradeManager {
                     inTrade.put(p, target);
                     openBackpackTraidInventory(p);
                 } else {
-                    GameAPI.getInstance().getMessager().send(p, "§cDer Spieler ist bereits in einem Tausch!");
+                    GameAPI.getInstance().getMessenger().send(p, "§cDer Spieler ist bereits in einem Tausch!");
                 }
             } else {
-                GameAPI.getInstance().getMessager().send(p, "§cDu bist bereits in einem §4Tausch!");
+                GameAPI.getInstance().getMessenger().send(p, "§cDu bist bereits in einem §4Tausch!");
             }
         } else {
-            GameAPI.getInstance().getMessager().send(p, "§4Du hast §c"+target.getName()+"§4 schon eine Anfrage geschickt");
+            GameAPI.getInstance().getMessenger().send(p, "§4Du hast §c"+target.getName()+"§4 schon eine Anfrage geschickt");
         }
     }
 

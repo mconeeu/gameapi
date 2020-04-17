@@ -29,7 +29,7 @@ public class VendorSellInventory extends CoreInventory {
             gp.removeBackpackItem(category.getName(), item);
             corePlayer.addEmeralds(item.getSellPrice());
 
-            GameAPIPlugin.getSystem().getMessager().send(p, "§2Du hast das Item §a" + item.getName() + " §2für §f" + item.getSellPrice() + " Emeralds §2erfolgreich verkauft!");
+            GameAPIPlugin.getSystem().getMessenger().send(p, "§2Du hast das Item §a" + item.getName() + " §2für §f" + item.getSellPrice() + " Emeralds §2erfolgreich verkauft!");
             new BackpackSellInventory(p, category);
         });
 

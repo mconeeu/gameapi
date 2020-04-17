@@ -33,7 +33,7 @@ public class TeamInventory extends CoreInventory {
             update();
             openInventory();
         } else {
-            gamePlugin.getMessager().send(player, "§cDu kannst das Teamvoting Inventory nicht benutzen da das Team Manager modul nicht aktiviert wurde!");
+            gamePlugin.getMessenger().send(player, "§cDu kannst das Teamvoting Inventory nicht benutzen da das Team Manager modul nicht aktiviert wurde!");
         }
     }
 
@@ -44,17 +44,17 @@ public class TeamInventory extends CoreInventory {
                 GamePlayer gp = gamePlugin.getGamePlayer(p.getUniqueId());
 
                 if (gp.getTeam() != null && gp.getTeam().equals(team)) {
-                    gamePlugin.getMessager().send(p, CoreSystem.getInstance().getTranslationManager().get("game.team.alreadyJoined"));
+                    gamePlugin.getMessenger().send(p, CoreSystem.getInstance().getTranslationManager().get("game.team.alreadyJoined"));
                     p.playSound(p.getLocation(), Sound.ANVIL_BREAK, 1, 1);
                 } else {
                     if (team.getSize() < teamManager.getPlayersPerTeam()) {
                         gp.setTeam(team);
-                        gamePlugin.getMessager().send(p, CoreSystem.getInstance().getTranslationManager().get("game.team.join", CoreSystem.getInstance().getGlobalCorePlayer(p.getUniqueId())).replace("%team%", team.getTeam().getPrefix()));
+                        gamePlugin.getMessenger().send(p, CoreSystem.getInstance().getTranslationManager().get("game.team.join", CoreSystem.getInstance().getGlobalCorePlayer(p.getUniqueId())).replace("%team%", team.getTeam().getPrefix()));
                         update();
                         p.playSound(p.getLocation(), Sound.HORSE_ARMOR, 1, 1);
                         p.updateInventory();
                     } else {
-                        gamePlugin.getMessager().send(p, CoreSystem.getInstance().getTranslationManager().get("game.team.maxSize").replace("%max%", Integer.toString(teamManager.getPlayersPerTeam())));
+                        gamePlugin.getMessenger().send(p, CoreSystem.getInstance().getTranslationManager().get("game.team.maxSize").replace("%max%", Integer.toString(teamManager.getPlayersPerTeam())));
                         p.playSound(p.getLocation(), Sound.ANVIL_BREAK, 1, 1);
                     }
                 }

@@ -34,7 +34,7 @@ public class SpectatorInventory extends CoreInventory {
             ).getItemStack(), e -> {
                 player.teleport(gamePlayer.getCorePlayer().bukkit().getLocation());
                 player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 1);
-                GamePlugin.getGamePlugin().getMessager().send(player, "§7Du wurdest zu dem Spieler " + GamePlugin.getGamePlugin().getPluginColor() + gamePlayer.getCorePlayer().getName() + " §7teleportiert");
+                GamePlugin.getGamePlugin().getMessenger().send(player, "§7Du wurdest zu dem Spieler " + GamePlugin.getGamePlugin().getPluginColor() + gamePlayer.getCorePlayer().getName() + " §7teleportiert");
             });
 
             slot++;

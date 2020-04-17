@@ -125,7 +125,7 @@ public class FurnaceListener extends GadgetListener {
                 }, 10);
             }, 10);
 //            } else {
-//                LobbyPlugin.getInstance().getMessager().send(p, "§4Die Cobweb gun funktioniert hier nicht (Block im Weg!)");
+//                LobbyPlugin.getInstance().getMessenger().send(p, "§4Die Cobweb gun funktioniert hier nicht (Block im Weg!)");
 //                p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
 //                if (p.hasPermission("lobby.silenthub")) {
 //                    p.getInventory().setItem(3, Item.COBWEBGUN.getItemStack());

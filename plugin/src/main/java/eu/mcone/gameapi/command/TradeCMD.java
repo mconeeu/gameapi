@@ -36,16 +36,16 @@ public class TradeCMD extends CoreCommand {
                                 ((GameBackpackManager) GamePlugin.getGamePlugin().getBackpackManager()).getTradeManager().openBackpackTraidInventory(player);
                             }
                         } else {
-                            GameAPI.getInstance().getMessager().send(player, "§4Du kannst nicht mit dir selber handeln!");
+                            GameAPI.getInstance().getMessenger().send(player, "§4Du kannst nicht mit dir selber handeln!");
                         }
                     } else {
-                        GameAPI.getInstance().getMessager().send(player, "§4Der Spieler ist nicht online");
+                        GameAPI.getInstance().getMessenger().send(player, "§4Der Spieler ist nicht online");
                     }
                 } else {
-                    GameAPI.getInstance().getMessager().send(player, "§4Du darfst diesen Spieler keine Tausch Anfrage schicken!");
+                    GameAPI.getInstance().getMessenger().send(player, "§4Du darfst diesen Spieler keine Tausch Anfrage schicken!");
                 }
             } else {
-                GameAPI.getInstance().getMessager().send(player, "§4Du hast das Tauschen ausgeschaltet!");
+                GameAPI.getInstance().getMessenger().send(player, "§4Du hast das Tauschen ausgeschaltet!");
             }
             return true;
         } else if (args.length == 2) {
@@ -59,20 +59,20 @@ public class TradeCMD extends CoreCommand {
                         if (((GameBackpackManager) GamePlugin.getGamePlugin().getBackpackManager()).getTradeManager().hasTraidingRequest(target, player)) {
                             ((GameBackpackManager) GamePlugin.getGamePlugin().getBackpackManager()).getTradeManager().openBackpackTraidInventory(player);
                         } else {
-                            GameAPI.getInstance().getMessager().send(player, "§4Der §cSpieler §4hat dich nicht angefragt!");
+                            GameAPI.getInstance().getMessenger().send(player, "§4Der §cSpieler §4hat dich nicht angefragt!");
                         }
                     } else {
-                        GameAPI.getInstance().getMessager().send(player, "§4Du darfst diesen Spieler keine Tausch Anfrage schicken!");
+                        GameAPI.getInstance().getMessenger().send(player, "§4Du darfst diesen Spieler keine Tausch Anfrage schicken!");
                     }
                 } else {
-                    GameAPI.getInstance().getMessager().send(player, "§4Du hast das Tauschen ausgeschaltet!");
+                    GameAPI.getInstance().getMessenger().send(player, "§4Du hast das Tauschen ausgeschaltet!");
                 }
 
                 return true;
             }
         }
 
-        GameAPI.getInstance().getMessager().send(player, "§4Bitte benutze: §c/trade [<Spieler>]");
+        GameAPI.getInstance().getMessenger().send(player, "§4Bitte benutze: §c/trade [<Spieler>]");
         return false;
     }
 }

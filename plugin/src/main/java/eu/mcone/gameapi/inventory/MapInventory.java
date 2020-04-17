@@ -37,7 +37,7 @@ public class MapInventory extends CoreInventory {
                         mapVotingHandler.vote(p, entry.getKey(), coreInventory);
 
                         p.playSound(p.getLocation(), Sound.NOTE_BASS, 1, 1);
-                        mapVotingHandler.getMapManager().getSystem().getMessager().send(p, "§7Du hast für die Map §f§l" + entry.getKey().getName() + " §7 gevotet.");
+                        mapVotingHandler.getMapManager().getSystem().getMessenger().send(p, "§7Du hast für die Map §f§l" + entry.getKey().getName() + " §7 gevotet.");
                     });
             i++;
         }

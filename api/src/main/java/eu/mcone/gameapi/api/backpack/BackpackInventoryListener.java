@@ -26,7 +26,7 @@ public abstract class BackpackInventoryListener {
                             onBackpackInventoryClick(item, gamePlayer, player);
                         } else {
                             player.closeInventory();
-                            GameAPI.getInstance().getMessager().send(player, "§4Du kannst keine Effekte benutzen, da Effekte von anderen für dich unsichtbar sind");
+                            GameAPI.getInstance().getMessenger().send(player, "§4Du kannst keine Effekte benutzen, da Effekte von anderen für dich unsichtbar sind");
                         }
                     });
                 }

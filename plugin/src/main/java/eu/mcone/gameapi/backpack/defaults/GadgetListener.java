@@ -39,7 +39,7 @@ public class GadgetListener extends BackpackInventoryListener {
             }
         } else {
             p.closeInventory();
-            GameAPI.getInstance().getMessager().send(p, "Du kannst keine Gadgets benutzen, da du sie deaktiviert hast. Aktiviere sie wieder in den §fEinstellungen§7!");
+            GameAPI.getInstance().getMessenger().send(p, "Du kannst keine Gadgets benutzen, da du sie deaktiviert hast. Aktiviere sie wieder in den §fEinstellungen§7!");
         }
     }
 

@@ -66,6 +66,7 @@ public abstract class GamePlugin extends CorePlugin {
     @Override
     public void onEnable() {
         super.onEnable();
+
         this.gameConfig = new CoreJsonConfig<>(this, GameConfig.class, "gameConfig.json");
         onGameEnable();
     }
@@ -73,6 +74,7 @@ public abstract class GamePlugin extends CorePlugin {
     @Override
     public void onDisable() {
         super.onDisable();
+
         if (modules.contains(Module.REPLAY_SESSION_MANAGER)
                 && modules.contains(Module.TEAM_MANAGER)
                 && modules.contains(Module.PLAYER_MANAGER)) {

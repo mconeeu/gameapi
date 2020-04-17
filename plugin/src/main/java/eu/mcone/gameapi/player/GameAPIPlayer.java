@@ -141,16 +141,16 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
                 addBackpackItem(category, item);
 
                 p.closeInventory();
-                GamePlugin.getGamePlugin().getMessager().send(p, "§2Du hast erfolgreich das Item " + item.getName() + "§2 gekauft!");
+                GamePlugin.getGamePlugin().getMessenger().send(p, "§2Du hast erfolgreich das Item " + item.getName() + "§2 gekauft!");
                 p.playSound(p.getLocation(), Sound.LEVEL_UP, 1, 1);
             } else {
                 p.closeInventory();
-                GamePlugin.getGamePlugin().getMessager().send(p, "§4Du hast nicht genügend Emeralds!");
+                GamePlugin.getGamePlugin().getMessenger().send(p, "§4Du hast nicht genügend Emeralds!");
                 p.playSound(p.getLocation(), Sound.NOTE_BASS, 1, 1);
             }
         } else {
             p.closeInventory();
-            GamePlugin.getGamePlugin().getMessager().send(p, "§4Du besitzt dieses Item bereits!");
+            GamePlugin.getGamePlugin().getMessenger().send(p, "§4Du besitzt dieses Item bereits!");
             p.playSound(p.getLocation(), Sound.NOTE_BASS, 1, 1);
         }
     }
@@ -376,7 +376,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
         if (!hasKit(kit)) {
             if (kit.getCoinsPrice() > 0) {
                 if ((getCorePlayer().getCoins() - kit.getCoinsPrice()) < 0) {
-                    GamePlugin.getGamePlugin().getMessager().send(bukkit(), "§4Du hast nicht genügend Coins!");
+                    GamePlugin.getGamePlugin().getMessenger().send(bukkit(), "§4Du hast nicht genügend Coins!");
                     return false;
                 }
 

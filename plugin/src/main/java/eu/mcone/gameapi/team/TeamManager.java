@@ -194,12 +194,12 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
                             "§" + gamePlugin.getGamePlayer(victim.getUniqueId()).getTeam().getTeam().getChatColor().getChar() + victim.getName(),
                             "§" + gamePlugin.getGamePlayer(killer.getUniqueId()).getTeam().getTeam().getChatColor().getChar() + killer.getName());
                 } else {
-                    GamePlugin.getGamePlugin().getMessager().send(killer, "§7Du hast " + GamePlugin.getGamePlugin().getGamePlayer(victim).getTeam().getTeam().getChatColor().toString() + victim.getName() + " §7getötet.");
+                    GamePlugin.getGamePlugin().getMessenger().send(killer, "§7Du hast " + GamePlugin.getGamePlugin().getGamePlayer(victim).getTeam().getTeam().getChatColor().toString() + victim.getName() + " §7getötet.");
                 }
             }
 
             if (!message.isEmpty())
-                gamePlugin.getMessager().send(receiver, message);
+                gamePlugin.getMessenger().send(receiver, message);
         } else {
             GamePlayer gamePlayer = GamePlugin.getGamePlugin().getGamePlayer(victim);
 
@@ -216,7 +216,7 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
             }
 
             if (!message.isEmpty())
-                gamePlugin.getMessager().send(victim, message);
+                gamePlugin.getMessenger().send(victim, message);
         }
     }
 

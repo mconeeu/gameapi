@@ -86,12 +86,12 @@ public class GameMapRotationHandler implements MapRotationHandler {
     private void resumeRotation(long doRotationIn) {
         currentTask = Bukkit.getScheduler().runTaskLaterAsynchronously(mapManager.getSystem(), () -> {
             for (Player p : Bukkit.getOnlinePlayers()) {
-                mapManager.getSystem().getMessager().send(p, "§fDie Map wird in §n1 Minute§r§f gewechselt!");
+                mapManager.getSystem().getMessenger().send(p, "§fDie Map wird in §n1 Minute§r§f gewechselt!");
             }
 
             Bukkit.getScheduler().runTaskLaterAsynchronously(mapManager.getSystem(), () -> {
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    mapManager.getSystem().getMessager().send(p, "§fDie Map wird in §n10 Sekunden§r§f gewechselt!");
+                    mapManager.getSystem().getMessenger().send(p, "§fDie Map wird in §n10 Sekunden§r§f gewechselt!");
                 }
 
                 countdown = 10;

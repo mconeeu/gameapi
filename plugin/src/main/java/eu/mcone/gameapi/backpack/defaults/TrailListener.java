@@ -23,7 +23,7 @@ public class TrailListener extends BackpackInventoryListener {
     public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player p) {
         handler.setTrail(p, item);
         p.closeInventory();
-        plugin.getMessager().send(p, "§7Du hast den Trail §f" + item.getName() + "§7 aktiviert!");
+        plugin.getMessenger().send(p, "§7Du hast den Trail §f" + item.getName() + "§7 aktiviert!");
     }
 
     @Override
@@ -32,7 +32,7 @@ public class TrailListener extends BackpackInventoryListener {
 
         inv.setItem(InventorySlot.ROW_6_SLOT_8, new ItemBuilder(Material.BARRIER, 1, 0).displayName("§c§lTrail deaktivieren").lore("§7§oFalls du einen deiner Trails", "§7§oaktiviert hast, kannst Du ihn", "§7§ohiermit deaktivieren.").create(), e -> {
             handler.removeTrail(p);
-            plugin.getMessager().send(p, "§cDu hast dein aktuellen Trail erfolgreich deaktiviert!");
+            plugin.getMessenger().send(p, "§cDu hast dein aktuellen Trail erfolgreich deaktiviert!");
         });
     }
 

@@ -24,7 +24,7 @@ public class EndGameState extends GameState {
             case 2:
             case 1:
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    plugin.getMessager().send(p, CoreSystem.getInstance().getTranslationManager().get(
+                    plugin.getMessenger().send(p, CoreSystem.getInstance().getTranslationManager().get(
                             "game.countdown.restart",
                             CoreSystem.getInstance().getCorePlayer(p)
                     ).replace("%seconds%", Long.toString(second)));

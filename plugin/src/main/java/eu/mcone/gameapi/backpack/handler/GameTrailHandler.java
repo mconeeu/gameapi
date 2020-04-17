@@ -96,7 +96,7 @@ public class GameTrailHandler implements TrailHandler {
     @Override
     public void removeTrail(Player p) {
         if (this.trails.get(p) != null) {
-            plugin.getMessager().send(p, "§7Trail entfernt!");
+            plugin.getMessenger().send(p, "§7Trail entfernt!");
             this.trails.remove(p);
             p.closeInventory();
         }

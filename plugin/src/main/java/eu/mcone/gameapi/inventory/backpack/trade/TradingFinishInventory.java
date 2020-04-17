@@ -69,8 +69,8 @@ public class TradingFinishInventory extends CoreInventory {
                                 selfChoosedItem
                         );
 
-                        GameAPIPlugin.getSystem().getMessager().send(p, "§2Du hast das Item §a" + selfChoosedItem.getName() + " §2für §f" + partnerChoosedItem.getName() + " §2erfolgreich ausgetauscht!");
-                        GameAPIPlugin.getSystem().getMessager().send(partner, "§2Du hast das Item §a" + partnerChoosedItem.getName() + " §2für §f" + selfChoosedItem.getName() + " §2erfolgreich ausgetauscht!");
+                        GameAPIPlugin.getSystem().getMessenger().send(p, "§2Du hast das Item §a" + selfChoosedItem.getName() + " §2für §f" + partnerChoosedItem.getName() + " §2erfolgreich ausgetauscht!");
+                        GameAPIPlugin.getSystem().getMessenger().send(partner, "§2Du hast das Item §a" + partnerChoosedItem.getName() + " §2für §f" + selfChoosedItem.getName() + " §2erfolgreich ausgetauscht!");
                     } else if (!accpeted) {
                         backpackManager.getTradeManager().getTradeItemAccepted().add(p);
                         new TradingFinishInventory(gp, selfChoosedItem, partnerChoosedItem, true);

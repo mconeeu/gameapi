@@ -20,12 +20,12 @@ public class HatListener extends BackpackInventoryListener {
         if (item.getId() == DefaultItem.HEAD_SECRET_STRIPCLUB.getId()) {
             p.getInventory().setHelmet(item.getItem());
             p.closeInventory();
-            plugin.getMessager().send(p, "§7Du hast den Kopf §f"+item.getName()+"§7 aufgesetzt!");
+            plugin.getMessenger().send(p, "§7Du hast den Kopf §f"+item.getName()+"§7 aufgesetzt!");
             p.setWalkSpeed(0.25F);
         } else {
             p.getInventory().setHelmet(item.getItem());
             p.closeInventory();
-            plugin.getMessager().send(p, "§7Du hast den Kopf §f"+item.getName()+"§7 aufgesetzt!");
+            plugin.getMessenger().send(p, "§7Du hast den Kopf §f"+item.getName()+"§7 aufgesetzt!");
             p.setWalkSpeed(0.20F);
         }
     }
@@ -36,7 +36,7 @@ public class HatListener extends BackpackInventoryListener {
 
         inv.setItem(InventorySlot.ROW_6_SLOT_8, new ItemBuilder(Material.BARRIER).displayName("§c§lKopf absetzen").lore("§7§oFalls du einen deiner Köpfe", "§7§oaufgesetzt hast, kannst Du ihn", "§7§ohiermit absetzen.").create(), e -> {
             p.getInventory().setHelmet(null);
-            plugin.getMessager().send(p, "§7Du hast deinen Kopf erfolgreich abgesetzt!");
+            plugin.getMessenger().send(p, "§7Du hast deinen Kopf erfolgreich abgesetzt!");
             p.setWalkSpeed(0.20F);
         });
     }

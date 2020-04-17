@@ -44,11 +44,11 @@ public class TeamChatManager implements Listener {
                 } else {
                     if (playerMessage.startsWith("@all")) {
                         for (Player all : Bukkit.getOnlinePlayers()) {
-                            GamePlugin.getGamePlugin().getMessager().sendSimple(all, "§8[§b@all§8] " + gamePlayer.getTeam().getTeam().getChatColor().toString() + p.getName() + " §8»§7 " + playerMessage.replace("@all", ""));
+                            GamePlugin.getGamePlugin().getMessenger().sendSimple(all, "§8[§b@all§8] " + gamePlayer.getTeam().getTeam().getChatColor().toString() + p.getName() + " §8»§7 " + playerMessage.replace("@all", ""));
                         }
                     } else {
                         for (Player team : gamePlayer.getTeam().getPlayers()) {
-                            GamePlugin.getGamePlugin().getMessager().sendSimple(team, gamePlayer.getTeam().getTeam().getChatColor().toString() + p.getName() + " §8»§7 " + playerMessage);
+                            GamePlugin.getGamePlugin().getMessenger().sendSimple(team, gamePlayer.getTeam().getTeam().getChatColor().toString() + p.getName() + " §8»§7 " + playerMessage);
                         }
                     }
                 }
@@ -85,7 +85,7 @@ public class TeamChatManager implements Listener {
                     p.sendMessage((cp.isNicked() ? Group.SPIELER.getPrefix() : cp.getMainGroup().getPrefix()) + CoreSystem.getInstance().getTranslationManager().get("system.bukkit.chat").replaceAll("%Player%", p.getName()) + playerMessage);
                 } else {
                     e.setCancelled(true);
-                    CoreSystem.getInstance().getMessager().send(p, "§4Bitte benutze §c/vc <message>§4 um eine Chatnachricht zu schreiben während du im Vanish-Modus bist!");
+                    CoreSystem.getInstance().getMessenger().send(p, "§4Bitte benutze §c/vc <message>§4 um eine Chatnachricht zu schreiben während du im Vanish-Modus bist!");
                 }
             }
         }
