@@ -67,7 +67,7 @@ public class TeamInventory extends CoreInventory {
     private int getPlace(double slot) {
         if (teamManager.isUseCustomTeams()) {
             double row = slot / 6;
-            if (slot % 6 == row) {
+            if (slot % 6 != row) {
                 slot++;
             } else {
                 slot += (9 * row) + 2;

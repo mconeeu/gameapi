@@ -1,6 +1,7 @@
 package eu.mcone.gameapi.api.team;
 
 import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
+import eu.mcone.coresystem.api.bukkit.scoreboard.CoreScoreboard;
 import eu.mcone.gameapi.api.Option;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -15,11 +16,17 @@ public interface TeamManager {
 
     List<Option> getOptions();
 
+    TeamChat getTeamChat();
+
+    CoreScoreboard getTeamTablist();
+
     boolean isExitBySingleDeath();
 
     boolean isUseCustomTeams();
 
     void addCustomTeam(Team team);
+
+    void addTeamTablist(CoreScoreboard scoreboard);
 
     void addTeamChat(TeamChat teamChat);
 

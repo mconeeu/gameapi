@@ -2,6 +2,7 @@ package eu.mcone.gameapi.team;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
+import eu.mcone.coresystem.api.bukkit.scoreboard.CoreScoreboard;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Module;
@@ -29,16 +30,18 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
     @Getter
     private TeamChat teamChat;
     @Getter
+    private CoreScoreboard teamTablist;
+    @Getter
     private Team wonTeam;
     @Getter
     private final List<Option> options;
 
     @Getter
-    private boolean exitBySingleDeath;
+    private final boolean exitBySingleDeath;
     @Getter
-    private boolean useCustomTeams;
+    private final boolean useCustomTeams;
     @Getter
-    private boolean useDefaultTeams;
+    private final boolean useDefaultTeams;
 
     public TeamManager(GamePlugin plugin, GameAPIPlugin system, Option[] options) {
         this.gamePlugin = plugin;
@@ -47,23 +50,16 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
         CoreSystem.getInstance().setPlayerChatEnabled(false);
         GamePlugin.getGamePlugin().registerEvents(new GeneralTeamChatManager(this));
         teamChat = new DefaultTeamChat();
+        teamTablist = new GeneralTeamTablist();
 
         GameConfig config = plugin.getGameConfig().parseConfig();
         playersPerTeam = config.getPlayersPerTeam();
         teams = new HashMap<>();
         this.options = Arrays.asList(options);
 
-        if (this.options.contains(Option.TEAM_MANAGER_EXIT_BY_SINGLE_DEATH)) {
-            exitBySingleDeath = true;
-        }
-
-        if (this.options.contains(Option.USE_CUSTOM_TEAMS)) {
-            useCustomTeams = true;
-        }
-
-        if (this.options.contains(Option.USE_DEFAULT_TEAMS)) {
-            useDefaultTeams = true;
-        }
+        exitBySingleDeath = this.options.contains(Option.TEAM_MANAGER_EXIT_BY_SINGLE_DEATH);
+        useCustomTeams = this.options.contains(Option.USE_CUSTOM_TEAMS);
+        useDefaultTeams = this.options.contains(Option.USE_DEFAULT_TEAMS);
 
         system.sendConsoleMessage("§aLoading TeamManager...");
 
@@ -93,6 +89,10 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
         if (!teams.containsKey(team.getName())) {
             teams.put(team.getName(), team);
         }
+    }
+
+    public void addTeamTablist(CoreScoreboard scoreboard) {
+        this.teamTablist = scoreboard;
     }
 
     public void addTeamChat(TeamChat teamChat) {
