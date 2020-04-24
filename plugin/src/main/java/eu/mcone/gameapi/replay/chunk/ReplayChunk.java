@@ -1,6 +1,6 @@
 package eu.mcone.gameapi.replay.chunk;
 
-import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketWrapper;
+import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketContainer;
 import eu.mcone.coresystem.api.core.util.GenericUtils;
 import lombok.Getter;
 
@@ -22,31 +22,31 @@ public class ReplayChunk implements Serializable, eu.mcone.gameapi.api.replay.ch
         this.chunkData = data;
     }
 
-    public void addServerPacket(int tick, PacketWrapper wrapper) {
+    public void addServerPacket(int tick, PacketContainer wrapper) {
         if (wrapper != null) {
             if (chunkData.serverPackets.containsKey(tick)) {
                 chunkData.serverPackets.get(tick).add(wrapper);
             } else {
-                chunkData.serverPackets.put(tick, new ArrayList<PacketWrapper>() {{
+                chunkData.serverPackets.put(tick, new ArrayList<PacketContainer>() {{
                     add(wrapper);
                 }});
             }
         }
     }
 
-    public void addPacket(UUID uuid, int tick, PacketWrapper wrapper) {
+    public void addPacket(UUID uuid, int tick, PacketContainer wrapper) {
         if (wrapper != null) {
             if (chunkData.playerPackets.containsKey(uuid)) {
                 if (chunkData.playerPackets.get(uuid).containsKey(tick)) {
                     chunkData.playerPackets.get(uuid).get(tick).add(wrapper);
                 } else {
-                    chunkData.playerPackets.get(uuid).put(tick, new ArrayList<PacketWrapper>() {{
+                    chunkData.playerPackets.get(uuid).put(tick, new ArrayList<PacketContainer>() {{
                         add(wrapper);
                     }});
                 }
             } else {
-                chunkData.playerPackets.put(uuid, new HashMap<Integer, List<PacketWrapper>>() {{
-                    put(tick, new ArrayList<PacketWrapper>() {{
+                chunkData.playerPackets.put(uuid, new HashMap<Integer, List<PacketContainer>>() {{
+                    put(tick, new ArrayList<PacketContainer>() {{
                         add(wrapper);
                     }});
                 }});
@@ -54,14 +54,14 @@ public class ReplayChunk implements Serializable, eu.mcone.gameapi.api.replay.ch
         }
     }
 
-    public PacketWrapper getLastPacketInRange(UUID uuid, Object obj, int startTick, int endTick) {
+    public PacketContainer getLastPacketInRange(UUID uuid, Object obj, int startTick, int endTick) {
         if (this.chunkData.playerPackets.containsKey(uuid)) {
-            PacketWrapper found = null;
+            PacketContainer found = null;
             int tick = startTick;
             while (true) {
-                List<PacketWrapper> packets = this.chunkData.playerPackets.get(uuid).get(tick);
+                List<PacketContainer> packets = this.chunkData.playerPackets.get(uuid).get(tick);
                 if (packets != null) {
-                    for (PacketWrapper packet : packets) {
+                    for (PacketContainer packet : packets) {
                         if (packet.getClass().isInstance(obj)) {
                             found = packet;
                         }
@@ -105,12 +105,12 @@ public class ReplayChunk implements Serializable, eu.mcone.gameapi.api.replay.ch
         }
     }
 
-    public Map<Integer, List<PacketWrapper>> getPackets(UUID uuid) {
+    public Map<Integer, List<PacketContainer>> getPackets(UUID uuid) {
         System.out.println("CONTAINS: " + chunkData.playerPackets.containsKey(uuid));
         return chunkData.playerPackets.get(uuid);
     }
 
-    public List<PacketWrapper> getServerPackets(final Integer tick) {
+    public List<PacketContainer> getServerPackets(final Integer tick) {
         return chunkData.serverPackets.getOrDefault(tick, null);
     }
 
@@ -119,9 +119,9 @@ public class ReplayChunk implements Serializable, eu.mcone.gameapi.api.replay.ch
     }
 
     @Getter
-    public class ChunkData implements Serializable, eu.mcone.gameapi.api.replay.chunk.ReplayChunk.ChunkData {
-        private Map<UUID, Map<Integer, List<PacketWrapper>>> playerPackets;
-        private Map<Integer, List<PacketWrapper>> serverPackets;
+    public static class ChunkData implements Serializable, eu.mcone.gameapi.api.replay.chunk.ReplayChunk.ChunkData {
+        private final Map<UUID, Map<Integer, List<PacketContainer>>> playerPackets;
+        private final Map<Integer, List<PacketContainer>> serverPackets;
 
         public ChunkData() {
             playerPackets = new HashMap<>();

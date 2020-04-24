@@ -1,6 +1,6 @@
 package eu.mcone.gameapi.api.replay.session;
 
-import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketWrapper;
+import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketContainer;
 import eu.mcone.gameapi.api.replay.chunk.ReplayChunkHandler;
 import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
 import eu.mcone.gameapi.api.replay.runner.ReplayRunnerManager;
@@ -24,7 +24,7 @@ public interface ReplaySession {
 
     ReplayRecorder getReplayRecorder();
 
-    Map<String, List<PacketWrapper>> getMessages();
+    Map<String, List<PacketContainer>> getMessages();
 
     void recordSession();
 
@@ -71,5 +71,9 @@ public interface ReplaySession {
         int getLastTick();
 
         void setLastTick(int length);
+
+        String getGamemode();
+
+        void setGamemode(String gamemode);
     }
 }

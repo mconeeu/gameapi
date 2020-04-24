@@ -20,8 +20,8 @@ public enum TeamDefinition {
     PURPLE(8, "purple", "§5Lila", ChatColor.LIGHT_PURPLE, Color.PURPLE, new ItemBuilder(Material.WOOL, 1,10).displayName("§5Lila").create()),
     ERROR(9, "error", "§8» §4ERROR §8«", ChatColor.RED, Color.RED, new ItemBuilder(Material.WOOL, 1,14).displayName("§8» §4ERROR §8«").create());
 
-    private int position;
-    private final String team;
+    private final int position;
+    private final String name;
     private final String prefix;
     private final ChatColor chatColor;
     private final Color color;
@@ -35,7 +35,7 @@ public enum TeamDefinition {
                    final ItemStack itemStack) {
 
         this.position = position;
-        this.team = team;
+        this.name = team;
         this.prefix = prefix;
         this.chatColor = chatColor;
         this.color = color;

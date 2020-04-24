@@ -4,7 +4,10 @@ import eu.mcone.gameapi.api.event.team.TeamDestroyEvent;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,26 +16,49 @@ import java.util.List;
 public class Team {
 
     @Getter
-    private final TeamDefinition team;
+    private final String name;
+    @Getter
+    private final String prefix;
     @Getter
     private int size;
     @Getter
     private boolean alive = false;
+
+    @Getter
+    private ChatColor chatColor;
+    @Getter
+    private Color color;
+    @Getter
+    private ItemStack item;
+
     @Getter
     @Setter
     private String spawnLocation;
     @Getter
-    private String npcLocation;
+    private final String npcLocation;
     @Getter
-    private String respawnBlockLocation;
+    private final String respawnBlockLocation;
 
-    private List<Player> players;
+    private final List<Player> players;
 
     public Team(final TeamDefinition teamDefinition) {
-        this.team = teamDefinition;
-        this.spawnLocation = team.getTeam() + ".spawn";
-        this.npcLocation = team.getTeam() + ".npc";
-        this.respawnBlockLocation = team.getTeam() + ".respawn";
+        this.name = teamDefinition.getName();
+        this.prefix = teamDefinition.getPrefix();
+        this.spawnLocation = name + ".spawn";
+        this.npcLocation = name + ".npc";
+        this.respawnBlockLocation = name + ".respawn";
+        this.players = new ArrayList<>();
+    }
+
+    public Team(final String team, final String prefix, ChatColor chatColor, Color color, ItemStack item) {
+        this.name = team;
+        this.prefix = prefix;
+        this.chatColor = chatColor;
+        this.color = color;
+        this.item = item;
+        this.spawnLocation = team + ".spawn";
+        this.npcLocation = team + ".npc";
+        this.respawnBlockLocation = team + ".respawn";
         this.players = new ArrayList<>();
     }
 
@@ -64,5 +90,15 @@ public class Team {
 
     public Collection<Player> getPlayers() {
         return players;
+    }
+
+    public TeamDefinition getDefinition() {
+        for (TeamDefinition teamDefinition : TeamDefinition.values()) {
+            if (teamDefinition.getName().equalsIgnoreCase(name)) {
+                return teamDefinition;
+            }
+        }
+
+        return null;
     }
 }

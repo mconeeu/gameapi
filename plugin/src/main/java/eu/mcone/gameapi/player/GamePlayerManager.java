@@ -9,12 +9,18 @@ import net.minecraft.server.v1_8_R3.PacketPlayOutCamera;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,21 +28,23 @@ import java.util.List;
 public class GamePlayerManager implements eu.mcone.gameapi.api.player.PlayerManager, Listener {
 
     @Getter
-    private List<Player> playing;
+    private final List<Player> playing;
     @Getter
-    private List<Player> spectating;
-    private List<Player> inCamera;
+    private final List<Player> spectating;
+    private final List<Player> inCamera;
     @Getter
-    private int minPlayers;
+    private final int minPlayers;
     @Getter
-    private int maxPlayers;
+    private final int maxPlayers;
 
     public GamePlayerManager(GamePlugin plugin, GameAPIPlugin system) {
         playing = new ArrayList<>();
         spectating = new ArrayList<>();
+        inCamera = new ArrayList<>();
         minPlayers = plugin.getGameConfig().parseConfig().getMinPlayers();
         maxPlayers = plugin.getGameConfig().parseConfig().getMaxPlayers();
 
+        GamePlugin.getGamePlugin().registerEvents(this);
         system.sendConsoleMessage("§aLoading PlayerManager...");
     }
 
@@ -65,16 +73,19 @@ public class GamePlayerManager implements eu.mcone.gameapi.api.player.PlayerMana
                 ((CraftPlayer) player).getHandle().abilities.canInstantlyBuild = false;
                 ((CraftPlayer) player).getHandle().abilities.isInvulnerable = true;
                 ((CraftPlayer) player).getHandle().abilities.isFlying = true;
-                ((CraftPlayer) player).getHandle().abilities.mayBuild = true;
+                ((CraftPlayer) player).getHandle().abilities.mayBuild = false;
 
                 for (Player all : Bukkit.getOnlinePlayers()) {
                     all.hidePlayer(player);
+                }
+
+                for (Player spectator : spectating) {
+                    player.showPlayer(spectator);
                 }
             }
         } else {
             spectating.remove(player);
             player.setGameMode(GameMode.SURVIVAL);
-            player.removePotionEffect(PotionEffectType.INVISIBILITY);
             player.getInventory().remove(SpectatorInventory.NAVIGATOR);
 
             for (Player all : Bukkit.getOnlinePlayers()) {
@@ -82,7 +93,7 @@ public class GamePlayerManager implements eu.mcone.gameapi.api.player.PlayerMana
             }
         }
 
-        player.teleport(CoreSystem.getInstance().getWorldManager().getWorld(GamePlugin.getGamePlugin().getGameConfig().parseConfig().getLobby()).getLocation("spawn"));
+        player.teleport(CoreSystem.getInstance().getWorldManager().getWorld(GamePlugin.getGamePlugin().getGameConfig().parseConfig().getLobby()).getLocation("game.spectator"));
     }
 
     @EventHandler
@@ -111,6 +122,62 @@ public class GamePlayerManager implements eu.mcone.gameapi.api.player.PlayerMana
                 ((CraftPlayer) player).getHandle().playerConnection.sendPacket(camera);
                 inCamera.remove(player);
                 GamePlugin.getGamePlugin().getMessenger().send(player, "§7Du bist nun nicht mehr in der Ansicht des Spielers §f" + player);
+            }
+        }
+    }
+
+    @EventHandler
+    public void on(BlockPlaceEvent e) {
+        Player player = e.getPlayer();
+        if (spectating.contains(player)) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void on(BlockBreakEvent e) {
+        Player player = e.getPlayer();
+        if (spectating.contains(player)) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void on(PlayerDropItemEvent e) {
+        Player player = e.getPlayer();
+        if (spectating.contains(player)) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void on(PlayerPickupItemEvent e) {
+        Player player = e.getPlayer();
+        if (spectating.contains(player)) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void on(EntityDamageByEntityEvent e) {
+        Entity entity = e.getDamager();
+
+        if (entity instanceof Player) {
+            Player player = (Player) entity;
+            if (spectating.contains(player)) {
+                e.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void on(EntityDamageEvent e) {
+        Entity entity = e.getEntity();
+
+        if (entity instanceof Player) {
+            Player player = (Player) entity;
+            if (spectating.contains(player)) {
+                e.setCancelled(true);
             }
         }
     }

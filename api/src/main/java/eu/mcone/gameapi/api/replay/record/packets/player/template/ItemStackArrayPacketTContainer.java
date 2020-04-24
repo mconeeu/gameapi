@@ -2,8 +2,8 @@ package eu.mcone.gameapi.api.replay.record.packets.player.template;
 
 import eu.mcone.coresystem.api.bukkit.config.typeadapter.ItemStackTypeAdapterUtils;
 import eu.mcone.coresystem.api.bukkit.npc.capture.packets.EntityAction;
-import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketType;
-import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketWrapper;
+import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketTyp;
+import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketContainer;
 import eu.mcone.gameapi.api.replay.record.packets.util.SerializableItemStack;
 import lombok.Getter;
 import org.bukkit.Material;
@@ -15,12 +15,12 @@ import java.util.List;
 import java.util.Map;
 
 @Getter
-public class ItemStackArrayPacketTemplate extends PacketWrapper {
+public class ItemStackArrayPacketTContainer extends PacketContainer {
 
     private List<SerializableItemStack> itemStacks;
 
-    public ItemStackArrayPacketTemplate(EntityAction entityAction, ItemStack[] itemStacks) {
-        super(PacketType.ENTITY, entityAction);
+    public ItemStackArrayPacketTContainer(EntityAction entityAction, ItemStack[] itemStacks) {
+        super(PacketTyp.ENTITY, entityAction);
         this.itemStacks = new ArrayList<>();
 
         for (ItemStack itemStack : itemStacks) {

@@ -8,6 +8,7 @@ import eu.mcone.gameapi.api.Module;
 import eu.mcone.gameapi.api.Option;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.team.Team;
+import eu.mcone.gameapi.api.team.TeamChat;
 import eu.mcone.gameapi.api.team.TeamDefinition;
 import eu.mcone.gameapi.api.utils.GameConfig;
 import eu.mcone.gameapi.inventory.TeamInventory;
@@ -22,21 +23,31 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
     @Getter
     private final int playersPerTeam;
 
-    private HashMap<TeamDefinition, Team> teams;
+    private final HashMap<String, Team> teams;
     private final GamePlugin gamePlugin;
 
     @Getter
-    private TeamChatManager teamChatManager;
+    private TeamChat teamChat;
     @Getter
     private Team wonTeam;
     @Getter
+    private final List<Option> options;
+
+    @Getter
     private boolean exitBySingleDeath;
     @Getter
-    private List<Option> options;
+    private boolean useCustomTeams;
+    @Getter
+    private boolean useDefaultTeams;
 
     public TeamManager(GamePlugin plugin, GameAPIPlugin system, Option[] options) {
         this.gamePlugin = plugin;
-        teamChatManager = new TeamChatManager();
+
+        //Chat System
+        CoreSystem.getInstance().setPlayerChatEnabled(false);
+        GamePlugin.getGamePlugin().registerEvents(new GeneralTeamChatManager(this));
+        teamChat = new DefaultTeamChat();
+
         GameConfig config = plugin.getGameConfig().parseConfig();
         playersPerTeam = config.getPlayersPerTeam();
         teams = new HashMap<>();
@@ -44,6 +55,14 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
 
         if (this.options.contains(Option.TEAM_MANAGER_EXIT_BY_SINGLE_DEATH)) {
             exitBySingleDeath = true;
+        }
+
+        if (this.options.contains(Option.USE_CUSTOM_TEAMS)) {
+            useCustomTeams = true;
+        }
+
+        if (this.options.contains(Option.USE_DEFAULT_TEAMS)) {
+            useDefaultTeams = true;
         }
 
         system.sendConsoleMessage("§aLoading TeamManager...");
@@ -57,22 +76,31 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
             GamePlugin.getGamePlugin().getReplaySession().getInfo().setTeams(teamSize);
         }
 
-        int i = 1;
-        for (TeamDefinition team : TeamDefinition.values()) {
-            if (i <= teamSize) {
-                this.teams.put(team, new Team(team));
-                i++;
+        if (useDefaultTeams) {
+            int i = 1;
+            for (TeamDefinition team : TeamDefinition.values()) {
+                if (i <= teamSize) {
+                    this.teams.put(team.getName(), new Team(team));
+                    i++;
+                }
             }
         }
     }
 
-    public void useTeamChat(boolean use) {
-        teamChatManager.setDisable(!use);
-        CoreSystem.getInstance().setPlayerChatEnabled(!use);
+    public void addCustomTeam(Team team) {
+        options.add(Option.USE_CUSTOM_TEAMS);
+
+        if (!teams.containsKey(team.getName())) {
+            teams.put(team.getName(), team);
+        }
     }
 
-    public Team getTeam(final TeamDefinition teamEnum) {
-        return teams.getOrDefault(teamEnum, null);
+    public void addTeamChat(TeamChat teamChat) {
+        this.teamChat = teamChat;
+    }
+
+    public Team getTeam(final String team) {
+        return teams.getOrDefault(team, null);
     }
 
     public boolean hasPlayerTeam(final Player player) {
@@ -88,11 +116,11 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
     public void setupTeam() {
         for (Player p : gamePlugin.getPlayerManager().getPlaying()) {
             GameAPIPlayer gp = GameAPIPlugin.getSystem().getGamePlayer(p.getUniqueId());
-            if (gp.getTeam() == null || gp.getTeam().getTeam() == TeamDefinition.ERROR) {
+            if (gp.getTeam() == null || gp.getTeam().getName().equalsIgnoreCase(TeamDefinition.ERROR.getName())) {
                 int i = 1;
                 for (TeamDefinition teamEnum : TeamDefinition.values()) {
                     if (i <= teams.size()) {
-                        Team team = teams.get(teamEnum);
+                        Team team = teams.get(teamEnum.getName());
                         if (playersPerTeam >= 2) {
                             if (gamePlugin.getPlayerManager().getPlaying().size() < teams.size()) {
                                 if (!team.containsPlayer(p)) {
@@ -187,14 +215,14 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
 
         if (receiver != victim) {
             if (killer == null) {
-                message = CoreSystem.getInstance().getTranslationManager().get("game.death.normal", receiverCP, "§" + gamePlugin.getGamePlayer(victim.getUniqueId()).getTeam().getTeam().getChatColor().getChar() + victim.getName());
+                message = CoreSystem.getInstance().getTranslationManager().get("game.death.normal", receiverCP, "§" + gamePlugin.getGamePlayer(victim.getUniqueId()).getTeam().getChatColor().getChar() + victim.getName());
             } else {
                 if (receiver != killer) {
                     message = CoreSystem.getInstance().getTranslationManager().get("game.death.msg", receiverCP,
-                            "§" + gamePlugin.getGamePlayer(victim.getUniqueId()).getTeam().getTeam().getChatColor().getChar() + victim.getName(),
-                            "§" + gamePlugin.getGamePlayer(killer.getUniqueId()).getTeam().getTeam().getChatColor().getChar() + killer.getName());
+                            "§" + gamePlugin.getGamePlayer(victim.getUniqueId()).getTeam().getChatColor().getChar() + victim.getName(),
+                            "§" + gamePlugin.getGamePlayer(killer.getUniqueId()).getTeam().getChatColor().getChar() + killer.getName());
                 } else {
-                    GamePlugin.getGamePlugin().getMessenger().send(killer, "§7Du hast " + GamePlugin.getGamePlugin().getGamePlayer(victim).getTeam().getTeam().getChatColor().toString() + victim.getName() + " §7getötet.");
+                    GamePlugin.getGamePlugin().getMessenger().send(killer, "§7Du hast " + GamePlugin.getGamePlugin().getGamePlayer(victim).getTeam().getChatColor().toString() + victim.getName() + " §7getötet.");
                 }
             }
 
@@ -208,7 +236,7 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
                     if (killer == null) {
                         message = "§7Du bist gestorben";
                     } else {
-                        message = CoreSystem.getInstance().getTranslationManager().get("game.death.msg.killed", receiverCP, gamePlugin.getGamePlayer(killer.getUniqueId()).getTeam().getTeam().getChatColor().toString() + killer.getName());
+                        message = CoreSystem.getInstance().getTranslationManager().get("game.death.msg.killed", receiverCP, gamePlugin.getGamePlayer(killer.getUniqueId()).getTeam().getChatColor().toString() + killer.getName());
                     }
                 } else {
                     message = "§7Du bist gestorben und somit aus dem Spiel ausgeschieden!";

@@ -1,7 +1,7 @@
 package eu.mcone.gameapi.replay.session;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
-import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketWrapper;
+import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketContainer;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.replay.event.PlayerJoinReplaySessionEvent;
 import eu.mcone.gameapi.api.replay.event.PlayerQuitReplaySessionEvent;
@@ -32,10 +32,12 @@ public class ReplaySession implements eu.mcone.gameapi.api.replay.session.Replay
     private String ID;
     @Getter
     private ServerInfo info;
+    @Getter
+    private Map<String, Object> options;
 
     //Contains Broadcast messages !
     @Getter
-    private HashMap<String, List<PacketWrapper>> messages;
+    private HashMap<String, List<PacketContainer>> messages;
     @Getter
     private HashMap<String, ReplayPlayer> replayPlayers;
 
@@ -47,6 +49,7 @@ public class ReplaySession implements eu.mcone.gameapi.api.replay.session.Replay
         this.ID = replaySessionManager.getSessionID();
 
         info = new ServerInfo();
+        options = new HashMap<>();
         messages = new HashMap<>();
         replayPlayers = new HashMap<>();
 
@@ -56,9 +59,11 @@ public class ReplaySession implements eu.mcone.gameapi.api.replay.session.Replay
     }
 
     @BsonCreator
-    public ReplaySession(@BsonProperty("ID") String ID, @BsonProperty("info") ServerInfo info, @BsonProperty("messages") HashMap<String, List<PacketWrapper>> messages, @BsonProperty("replayPlayers") HashMap<String, ReplayPlayer> replayPlayers) {
+    public ReplaySession(@BsonProperty("ID") String ID, @BsonProperty("info") ServerInfo info, @BsonProperty("options") Map<String, Object> options,
+                         @BsonProperty("messages") HashMap<String, List<PacketContainer>> messages, @BsonProperty("replayPlayers") HashMap<String, ReplayPlayer> replayPlayers) {
         this.ID = ID;
         this.info = info;
+        this.options = options;
         this.messages = messages;
         this.replayPlayers = replayPlayers;
 
@@ -152,6 +157,7 @@ public class ReplaySession implements eu.mcone.gameapi.api.replay.session.Replay
         private int teams;
         private String winnerTeam = "Nicht verfügbar";
         private String world;
+        private String gamemode;
         private int lastTick;
     }
 

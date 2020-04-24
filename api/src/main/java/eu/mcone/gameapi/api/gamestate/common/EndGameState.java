@@ -2,6 +2,9 @@ package eu.mcone.gameapi.api.gamestate.common;
 
 import eu.mcone.coresystem.api.bukkit.CorePlugin;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
+import eu.mcone.gameapi.api.GamePlugin;
+import eu.mcone.gameapi.api.Module;
+import eu.mcone.gameapi.api.event.gamestate.GameStateStartEvent;
 import eu.mcone.gameapi.api.gamestate.GameState;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -34,6 +37,13 @@ public class EndGameState extends GameState {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.setLevel(second);
                 }
+        }
+    }
+
+    @Override
+    public void onStart(GameStateStartEvent event) {
+        if (GamePlugin.getGamePlugin().hasModule(Module.REPLAY)) {
+            GamePlugin.getGamePlugin().getReplaySession().saveSession();
         }
     }
 }

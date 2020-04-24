@@ -17,9 +17,13 @@ public interface TeamManager {
 
     boolean isExitBySingleDeath();
 
-    void useTeamChat(boolean use);
+    boolean isUseCustomTeams();
 
-    Team getTeam(final TeamDefinition team);
+    void addCustomTeam(Team team);
+
+    void addTeamChat(TeamChat teamChat);
+
+    Team getTeam(final String team);
 
     Team getWonTeam();
 

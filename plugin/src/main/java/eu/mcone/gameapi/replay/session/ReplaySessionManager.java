@@ -85,6 +85,7 @@ public class ReplaySessionManager implements eu.mcone.gameapi.api.replay.session
     @Override
     public void saveSession(final ReplaySession session) {
         try {
+            System.out.println("SAVE REPLAY");
             String sessionID = session.getID();
             if (!existsSession(sessionID)) {
                 //Save date
@@ -100,6 +101,7 @@ public class ReplaySessionManager implements eu.mcone.gameapi.api.replay.session
                 }
 
                 if (succeed) {
+                    System.out.println("Succeed, create and save now the replay file...");
                     replaySessions.put(sessionID, session);
                     replayCollection.insertOne((eu.mcone.gameapi.replay.session.ReplaySession) session);
 
@@ -113,7 +115,6 @@ public class ReplaySessionManager implements eu.mcone.gameapi.api.replay.session
                                 fos.write(entry.getValue().compressData());
                                 zipFiles.add(file);
                                 fos.close();
-                                file.delete();
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -134,6 +135,7 @@ public class ReplaySessionManager implements eu.mcone.gameapi.api.replay.session
                                 }
 
                                 fis.close();
+                                file.delete();
                             }
 
                             zipOut.close();

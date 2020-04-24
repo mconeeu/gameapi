@@ -52,7 +52,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
     @Getter
     private int roundGoals;
 
-    private Player player;
+    private final Player player;
     @Getter
     private Team team;
 
@@ -265,7 +265,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
         if (this.team != null)
             this.team.removePlayer(player);
 
-        this.team = GamePlugin.getGamePlugin().getTeamManager().getTeam(team);
+        this.team = GamePlugin.getGamePlugin().getTeamManager().getTeam(team.getName());
         this.team.addPlayer(player);
     }
 

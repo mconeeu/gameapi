@@ -15,13 +15,13 @@ import eu.mcone.gameapi.api.replay.event.PlayerJoinReplaySessionEvent;
 import eu.mcone.gameapi.api.replay.event.PlayerQuitReplaySessionEvent;
 import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
 import eu.mcone.gameapi.api.replay.record.packets.player.*;
-import eu.mcone.gameapi.api.replay.record.packets.player.block.EntityBlockBreakPacketWrapper;
-import eu.mcone.gameapi.api.replay.record.packets.player.block.EntityBlockPlacePacketWrapper;
-import eu.mcone.gameapi.api.replay.record.packets.player.block.EntityPrimeTntPacketWrapper;
-import eu.mcone.gameapi.api.replay.record.packets.player.inventory.EntityChangeInventoryItemPacketWrapper;
-import eu.mcone.gameapi.api.replay.record.packets.player.inventory.EntityChangeInventoryPacketWrapper;
-import eu.mcone.gameapi.api.replay.record.packets.server.EntityTntExplodePacketWrapper;
-import eu.mcone.gameapi.api.replay.record.packets.server.ServerBroadcastMessagePacketWrapper;
+import eu.mcone.gameapi.api.replay.record.packets.player.block.EntityBlockBreakPacketContainer;
+import eu.mcone.gameapi.api.replay.record.packets.player.block.EntityBlockPlacePacketContainer;
+import eu.mcone.gameapi.api.replay.record.packets.player.block.EntityPrimeTntPacketContainer;
+import eu.mcone.gameapi.api.replay.record.packets.player.inventory.EntityChangeInventoryItemPacketContainer;
+import eu.mcone.gameapi.api.replay.record.packets.player.inventory.EntityChangeInventoryPacketContainer;
+import eu.mcone.gameapi.api.replay.record.packets.server.EntityTntExplodePacketContainer;
+import eu.mcone.gameapi.api.replay.record.packets.server.ServerBroadcastMessagePacketContainer;
 import eu.mcone.gameapi.replay.chunk.ReplayChunk;
 import eu.mcone.gameapi.replay.session.ReplaySession;
 import lombok.Getter;
@@ -29,6 +29,7 @@ import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -77,10 +78,10 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
 //                        PacketPlayInBlockDig.EnumPlayerDigType type = packetPlayInBlockDig.c();
 //
 //                        System.out.println("DIG");
-//                        addPacket(player, new EntityBlockActionPacketWrapper(type));
+//                        addPacket(player, new EntityBlockActionPacketContainer(type));
 //
 //                        if (type.equals(PacketPlayInBlockDig.EnumPlayerDigType.STOP_DESTROY_BLOCK)) {
-//                            addPacket(player, new EntityBlockBreakPacketWrapper(position, player.getLocation().getWorld().getName()));
+//                            addPacket(player, new EntityBlockBreakPacketContainer(position, player.getLocation().getWorld().getName()));
 //                        }
 //                    }
 
@@ -88,14 +89,14 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
 //                        PacketPlayInBlockPlace packetPlayInBlockPlace = (PacketPlayInBlockPlace) packet;
 //                        ItemStack itemStack = CraftItemStack.asBukkitCopy(packetPlayInBlockPlace.getItemStack());
 //                        BlockPosition position = (BlockPosition) ReflectionManager.getValue(packetPlayInBlockPlace, "b");
-//                        addPacket(player, new EntityBlockPlacePacketWrapper(itemStack, position, player.getLocation().getWorld().getName()));
+//                        addPacket(player, new EntityBlockPlacePacketContainer(itemStack, position, player.getLocation().getWorld().getName()));
 //                        System.out.println("PLACE");
 //                    }
 
                     if (packet instanceof PacketPlayInHeldItemSlot) {
 //                        PacketPlayInHeldItemSlot packetPlayInHeldItemSlot = (PacketPlayInHeldItemSlot) packet;
 //                        int slot = (int) ReflectionManager.getValue(packetPlayInHeldItemSlot, "itemInHandIndex");
-                        addPacket(player, new EntitySwitchItemPacketWrapper(player.getItemInHand()));
+                        addPacket(player, new EntitySwitchItemPacketContainer(player.getItemInHand()));
                     }
 
                     if (packet instanceof PacketPlayInEntityAction) {
@@ -104,10 +105,10 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
 
                         switch (action) {
                             case START_SNEAKING:
-                                addPacket(player, new EntitySneakPacketWrapper(EntityAction.START_SNEAKING));
+                                addPacket(player, new EntitySneakPacketContainer(EntityAction.START_SNEAKING));
                                 break;
                             case STOP_SNEAKING:
-                                addPacket(player, new EntitySneakPacketWrapper(EntityAction.STOP_SNEAKING));
+                                addPacket(player, new EntitySneakPacketContainer(EntityAction.STOP_SNEAKING));
                                 break;
                             case START_SPRINTING:
                                 break;
@@ -115,13 +116,12 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                                 break;
                         }
                     }
-
 //                    if (packet instanceof PacketPlayOutEntityStatus) {
 //                        PacketPlayOutEntityStatus playOutEntityStatus = (PacketPlayOutEntityStatus) packet;
 //                        byte ID = (byte) ReflectionManager.getValue(playOutEntityStatus, "b");
 //
 //                        if (ID == 2) {
-//                            addPacket(player, new EntityDeathEventPacketWrapper());
+//                            addPacket(player, new EntityDeathEventPacketContainer());
 //                        }
 //                    }
                 }
@@ -145,7 +145,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
 //                            byte yaw = (byte) ReflectionManager.getValue(moveLook, "e");
 //                            byte pitch = (byte) ReflectionManager.getValue(moveLook, "f");
 //
-//                            addPacket(player, new EntityMovePacketWrapper((double) x / 32.0D, (double) y / 32.0D, (double) z / 32.0D, (float) yaw / 256.0F * 360.0F, (float) pitch / 256.0F * 360.0F, player.getLocation().getWorld().getName()));
+//                            addPacket(player, new EntityMovePacketContainer((double) x / 32.0D, (double) y / 32.0D, (double) z / 32.0D, (float) yaw / 256.0F * 360.0F, (float) pitch / 256.0F * 360.0F, player.getLocation().getWorld().getName()));
 //                        }
 //                    }
 
@@ -154,7 +154,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                         int food = (int) ReflectionManager.getValue(packetPlayOutUpdateHealth, "b");
                         float health = (float) ReflectionManager.getValue(packetPlayOutUpdateHealth, "a");
 
-                        addPacket(player, new EntityChangeStatePacketWrapper(food, (int) health));
+                        addPacket(player, new EntityChangeStatePacketContainer(food, (int) health));
                     }
 
                     //Inventory
@@ -164,7 +164,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
 
                         if (windowID == 1) {
                             net.minecraft.server.v1_8_R3.ItemStack[] nmsItems = (net.minecraft.server.v1_8_R3.ItemStack[]) ReflectionManager.getValue(packetPlayOutWindowItems, "b");
-                            addPacket(player, new EntityChangeInventoryPacketWrapper(nmsItems));
+                            addPacket(player, new EntityChangeInventoryPacketContainer(nmsItems));
                         }
                     }
 
@@ -173,16 +173,27 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                         int windowID = (int) ReflectionManager.getValue(packetPlayOutSetSlot, "a");
 
                         if (windowID == 1) {
-                            short slot = (short) ReflectionManager.getValue(packetPlayOutSetSlot, "b");
+                            int slot = (Integer) ReflectionManager.getValue(packetPlayOutSetSlot, "b");
                             net.minecraft.server.v1_8_R3.ItemStack nmsItem = (net.minecraft.server.v1_8_R3.ItemStack) ReflectionManager.getValue(packetPlayOutSetSlot, "c");
-                            addPacket(player, new EntityChangeInventoryItemPacketWrapper(slot, nmsItem));
+                            addPacket(player, new EntityChangeInventoryItemPacketContainer(slot, nmsItem));
                         }
                     }
 
                     if (packet instanceof PacketPlayOutNamedSoundEffect) {
                         PacketPlayOutNamedSoundEffect playOutNamedSoundEffect = (PacketPlayOutNamedSoundEffect) packet;
                         String id = (String) ReflectionManager.getValue(playOutNamedSoundEffect, "a");
-                        System.out.println("IDIDIDIDID: " + id);
+                        int x = (Integer) ReflectionManager.getValue(playOutNamedSoundEffect, "b");
+                        int y = (Integer) ReflectionManager.getValue(playOutNamedSoundEffect, "c");
+                        int z = (Integer) ReflectionManager.getValue(playOutNamedSoundEffect, "d");
+                        float volume = (Float) ReflectionManager.getValue(playOutNamedSoundEffect, "e");
+
+                        addPacket(player, new EntityPlayNamedSoundPacketContainer(id, volume, x, y, z));
+                    }
+
+                    if (packet instanceof PacketPlayOutEntityDestroy) {
+                        PacketPlayOutEntityDestroy playOutEntityDestroy = (PacketPlayOutEntityDestroy) packet;
+                        int[] a = (int[]) ReflectionManager.getValue(playOutEntityDestroy, "a");
+                        System.out.println("IDs: " + a);
                     }
                 }
             }
@@ -195,7 +206,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                 } else {
                     Player player = e.getPlayer();
                     if (session.existsReplayPlayer(player)) {
-                        addPacket(player, new EntityStatsChangePacketWrapper(e.getKills(), e.getDeaths(), e.getGoals()));
+                        addPacket(player, new EntityStatsChangePacketContainer(e.getKills(), e.getDeaths(), e.getGoals()));
                     }
                 }
             }
@@ -205,7 +216,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                 if (isStopped()) {
                     e.getHandlers().unregister(this);
                 } else {
-                    session.getInfo().setWinnerTeam(e.getTeam().getTeam().getTeam());
+                    session.getInfo().setWinnerTeam(e.getTeam().getName().getTeam());
                 }
             }
 
@@ -218,7 +229,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                     if (session.existsReplayPlayer(player)) {
                         ReplayPlayer replayPlayer = session.getReplayPlayer(player.getUniqueId());
                         replayPlayer.getData().setSpawnLocation(new CoreLocation(player.getLocation()));
-                        addPacket(player, new EntitySpawnPacketWrapper(player.getLocation()));
+                        addPacket(player, new EntitySpawnPacketContainer(player.getLocation()));
                     }
                 }
             }
@@ -230,7 +241,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                 } else {
                     Player player = e.getPlayer();
                     if (session.existsReplayPlayer(player)) {
-                        addPacket(player, new EntityDestroyPacketWrapper(e.getPlayer().getUniqueId().toString()));
+                        addPacket(player, new EntityDestroyPacketContainer(e.getPlayer().getUniqueId().toString()));
                     }
                 }
             }
@@ -242,7 +253,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                 } else {
                     Player player = e.getPlayer();
                     if (session.existsReplayPlayer(player)) {
-                        addPacket(player, new EntityArmorChangePacketWrapper(e.getType(), e.getNewArmorPiece()));
+                        addPacket(player, new EntityArmorChangePacketContainer(e.getType(), e.getNewArmorPiece()));
                         if (isStopped()) {
                             e.getHandlers().unregister(this);
                         }
@@ -259,7 +270,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                     Player player = e.getPlayer();
                     if (session.existsReplayPlayer(player)) {
                         if (ticks % 2 == 0) {
-                            addPacket(player, new EntityMovePacketWrapper(player.getLocation()));
+                            addPacket(player, new EntityMovePacketContainer(player.getLocation()));
                         }
                     }
                 }
@@ -273,7 +284,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                     e.getHandlers().unregister(this);
                 } else {
                     if (session.existsReplayPlayer(player)) {
-                        addPacket(player, new EntityBlockBreakPacketWrapper(e.getBlock()));
+                        addPacket(player, new EntityBlockBreakPacketContainer(e.getBlock()));
                     }
                 }
             }
@@ -286,7 +297,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                     e.getHandlers().unregister(this);
                 } else {
                     if (session.existsReplayPlayer(player)) {
-                        addPacket(player, new EntityBlockPlacePacketWrapper(e.getBlock()));
+                        addPacket(player, new EntityBlockPlacePacketContainer(e.getBlock()));
                     }
                 }
             }
@@ -308,9 +319,31 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                                 if (arrow.getShooter() instanceof Player) {
                                     Player shooter = (Player) arrow.getShooter();
                                     if (session.existsReplayPlayer(shooter)) {
-                                        addPacket(shooter, new EntityShootArrowPacketWrapper(damaged.getLocation()));
+                                        addPacket(shooter, new EntityShootArrowPacketContainer(damaged.getLocation()));
+                                        System.out.println("ARROW");
                                     }
                                 }
+                            }
+                        }
+                    }
+                }
+            }
+
+            @EventHandler
+            public void on(EntityShootBowEvent e) {
+                if (isStopped) {
+                    e.getHandlers().unregister(this);
+                } else {
+                    Entity entity = e.getProjectile();
+
+                    if (entity instanceof Arrow) {
+                        if (e.getEntity() instanceof Player) {
+                            Arrow arrow = (Arrow) entity;
+                            Player player = (Player) e.getEntity();
+
+                            if (session.existsReplayPlayer(player)) {
+                                addPacket(player, new EntityShootArrowPacketContainer(arrow.getLocation()));
+                                System.out.println("ARROW");
                             }
                         }
                     }
@@ -329,7 +362,8 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                         if (snowball.getShooter() instanceof Player) {
                             Player shooter = (Player) snowball.getShooter();
                             if (session.existsReplayPlayer(shooter)) {
-                                addPacket(shooter, new EntityLaunchProjectilePacketWrapper(eu.mcone.coresystem.api.bukkit.npc.entity.EntityProjectile.SNOWBALL));
+                                addPacket(shooter, new EntityLaunchProjectilePacketContainer(eu.mcone.coresystem.api.bukkit.npc.entity.EntityProjectile.SNOWBALL));
+                                System.out.println("SNOWBALL");
                             }
                         }
                     } else if (projectile instanceof Egg) {
@@ -337,7 +371,8 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                         if (egg.getShooter() instanceof Player) {
                             Player shooter = (Player) egg.getShooter();
                             if (session.existsReplayPlayer(shooter)) {
-                                addPacket(shooter, new EntityLaunchProjectilePacketWrapper(eu.mcone.coresystem.api.bukkit.npc.entity.EntityProjectile.EGG));
+                                addPacket(shooter, new EntityLaunchProjectilePacketContainer(eu.mcone.coresystem.api.bukkit.npc.entity.EntityProjectile.EGG));
+                                System.out.println("EGG");
                             }
                         }
                     }
@@ -351,7 +386,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                 } else {
                     Player player = e.getEntity();
                     if (session.existsReplayPlayer(player)) {
-                        addPacket(player, new EntityDeathEventPacketWrapper());
+                        addPacket(player, new EntityDeathEventPacketContainer());
                     }
                 }
             }
@@ -363,7 +398,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                 } else {
                     Player player = e.getPlayer();
                     if (session.existsReplayPlayer(player)) {
-                        addPacket(player, new EntityRespawnPacketWrapper(e.getRespawnLocation()));
+                        addPacket(player, new EntityRespawnPacketContainer(e.getRespawnLocation()));
                     }
                 }
             }
@@ -378,18 +413,18 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                         if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
                             if (e.getClickedBlock().getType().equals(Material.TNT) && player.getItemInHand().getType().equals(Material.FLINT_AND_STEEL)) {
                                 //PRIME TNT
-                                addPacket(player, new EntityPrimeTntPacketWrapper(e.getClickedBlock().getLocation()));
+                                addPacket(player, new EntityPrimeTntPacketContainer(e.getClickedBlock().getLocation()));
                             } else if (e.getClickedBlock().getType().equals(Material.STONE_BUTTON) || e.getClickedBlock().getType().equals(Material.STONE_BUTTON)) {
                                 BlockState blockState = e.getClickedBlock().getState();
-                                addPacket(player, new EntityButtonInteractPacketWrapper(e.getClickedBlock().getLocation(), ((Button) blockState.getData()).isPowered()));
-                                addPacket(player, new EntityClickPacketWrapper());
+                                addPacket(player, new EntityButtonInteractPacketContainer(e.getClickedBlock().getLocation(), ((Button) blockState.getData()).isPowered()));
+                                addPacket(player, new EntityClickPacketContainer());
                             } else if (e.getClickedBlock().getType().toString().contains("DOOR")) {
                                 BlockState blockState = e.getClickedBlock().getState();
-                                addPacket(player, new EntityOpenDoorPacketWrapper(e.getClickedBlock().getLocation(), ((Door) blockState.getData()).isOpen()));
-                                addPacket(player, new EntityClickPacketWrapper());
+                                addPacket(player, new EntityOpenDoorPacketContainer(e.getClickedBlock().getLocation(), ((Door) blockState.getData()).isOpen()));
+                                addPacket(player, new EntityClickPacketContainer());
                             }
                         } else if (e.getAction().equals(Action.LEFT_CLICK_AIR) || e.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
-                            addPacket(player, new EntityClickPacketWrapper());
+                            addPacket(player, new EntityClickPacketContainer());
                         }
                     }
                 }
@@ -403,7 +438,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                     if (e.getEntity() instanceof Player) {
                         Player player = (Player) e.getEntity();
                         if (session.existsReplayPlayer(player)) {
-                            addPacket(player, new EntityDamagePacketWrapper());
+                            addPacket(player, new EntityDamagePacketContainer());
                         }
                     }
                 }
@@ -416,7 +451,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                 } else {
                     Player player = e.getPlayer();
                     if (session.existsReplayPlayer(player)) {
-                        addPacket(player, new EntityPickItemUpPacketWrapper(e.getItem()));
+                        addPacket(player, new EntityPickItemUpPacketContainer(e.getItem().getEntityId(), e.getItem()));
                     }
                 }
             }
@@ -428,7 +463,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                 } else {
                     Player player = e.getPlayer();
                     if (session.existsReplayPlayer(player)) {
-                        addPacket(player, new EntityDropItemPacketWrapper(e.getItemDrop().getItemStack()));
+                        addPacket(player, new EntityDropItemPacketContainer(e.getItemDrop().getEntityId(), e.getItemDrop().getItemStack(), e.getItemDrop().getLocation()));
                     }
                 }
             }
@@ -444,7 +479,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                         Player player = e.getPlayer();
 
                         if (potion != null) {
-                            addPacket(player, new EntityPotionEffectPacketWrapper(potion));
+                            addPacket(player, new EntityPotionEffectPacketContainer(potion));
                         }
                     }
                 }
@@ -460,7 +495,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                         Player player = Bukkit.getPlayer(replayPlayer.getUuid());
                         if (e.getAffectedEntities().contains(player)) {
                             if (Potion.fromItemStack(e.getPotion().getItem()) != null) {
-                                addPacket(player, new EntityPotionEffectPacketWrapper(Potion.fromItemStack(e.getPotion().getItem())));
+                                addPacket(player, new EntityPotionEffectPacketContainer(Potion.fromItemStack(e.getPotion().getItem())));
                             }
                         }
                     }
@@ -473,7 +508,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
             @EventHandler
             public void on(EntityExplodeEvent e) {
                 if (e.getEntityType().equals(EntityType.PRIMED_TNT)) {
-                    addServerPacket(new EntityTntExplodePacketWrapper(e.getLocation(), e.blockList()));
+                    addServerPacket(new EntityTntExplodePacketContainer(e.getLocation(), e.blockList()));
                 }
             }
 
@@ -486,8 +521,8 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                     if (session.getMessages().containsKey(sTick)) {
                         session.getMessages().get(sTick);
                     } else {
-                        session.getMessages().put(sTick, new ArrayList<PacketWrapper>() {{
-                            add(new ServerBroadcastMessagePacketWrapper(e.getBroadcast()));
+                        session.getMessages().put(sTick, new ArrayList<PacketContainer>() {{
+                            add(new ServerBroadcastMessagePacketContainer(e.getBroadcast()));
                         }});
                     }
                 }
@@ -495,7 +530,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
         });
     }
 
-    private void addServerPacket(PacketWrapper wrapper) {
+    private void addServerPacket(PacketContainer wrapper) {
         int chunkID = ticks / 600;
         lastTick = ticks;
 
@@ -508,7 +543,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
         }
     }
 
-    private void addPacket(Player player, PacketWrapper wrapper) {
+    private void addPacket(Player player, PacketContainer wrapper) {
         int chunkID = ticks / 600;
         lastTick = ticks;
 

@@ -1,6 +1,6 @@
 package eu.mcone.gameapi.api.replay.chunk;
 
-import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketWrapper;
+import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketContainer;
 
 import java.util.Collection;
 import java.util.List;
@@ -9,25 +9,25 @@ import java.util.UUID;
 
 public interface ReplayChunk {
 
-    void addServerPacket(int tick, PacketWrapper wrapper);
+    void addServerPacket(int tick, PacketContainer wrapper);
 
-    void addPacket(UUID uuid, int tick, PacketWrapper wrapper);
+    void addPacket(UUID uuid, int tick, PacketContainer wrapper);
 
     byte[] compressData();
 
-    Map<Integer, List<PacketWrapper>> getPackets(UUID uuid);
+    Map<Integer, List<PacketContainer>> getPackets(UUID uuid);
 
-    List<PacketWrapper> getServerPackets(Integer tick);
+    List<PacketContainer> getServerPackets(Integer tick);
 
-    PacketWrapper getLastPacketInRange(UUID uuid, Object obj, int startTick, int endTick);
+    PacketContainer getLastPacketInRange(UUID uuid, Object obj, int startTick, int endTick);
 
     Collection<UUID> getPlayers();
 
-    public interface ChunkData {
+    interface ChunkData {
 
-        Map<UUID, Map<Integer, List<PacketWrapper>>> getPlayerPackets();
+        Map<UUID, Map<Integer, List<PacketContainer>>> getPlayerPackets();
 
-        Map<Integer, List<PacketWrapper>> getServerPackets();
+        Map<Integer, List<PacketContainer>> getServerPackets();
 
         int getPacketsAmount();
     }

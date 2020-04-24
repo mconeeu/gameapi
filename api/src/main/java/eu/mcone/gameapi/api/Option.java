@@ -27,6 +27,8 @@ public enum Option {
     //TeamManager
     TEAM_MANAGER_EXIT_BY_SINGLE_DEATH,
     SORT_WHERE_GOALS,
+    USE_CUSTOM_TEAMS,
+    USE_DEFAULT_TEAMS,
 
     //GameState
     USE_SEASON_TIMEOUT

@@ -4,7 +4,7 @@ import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
 import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
 import eu.mcone.coresystem.api.bukkit.npc.capture.packets.EntityAction;
-import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketWrapper;
+import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketContainer;
 import eu.mcone.gameapi.api.replay.record.packets.util.SerializableItemStack;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -19,16 +19,16 @@ import java.util.List;
 import java.util.Map;
 
 @Getter
-public class EntityChangeInventoryPacketWrapper extends PacketWrapper {
+public class EntityChangeInventoryPacketContainer extends PacketContainer {
 
     private Map<Integer, SerializableItemStack> items;
 
-    public EntityChangeInventoryPacketWrapper(Map<Integer, SerializableItemStack> items) {
+    public EntityChangeInventoryPacketContainer(Map<Integer, SerializableItemStack> items) {
         super(EntityAction.CHANGE_INVENTORY);
         this.items = items;
     }
 
-    public EntityChangeInventoryPacketWrapper(net.minecraft.server.v1_8_R3.ItemStack[] items) {
+    public EntityChangeInventoryPacketContainer(net.minecraft.server.v1_8_R3.ItemStack[] items) {
         super(EntityAction.CHANGE_INVENTORY);
         this.items = new HashMap<>();
         int slot = 0;

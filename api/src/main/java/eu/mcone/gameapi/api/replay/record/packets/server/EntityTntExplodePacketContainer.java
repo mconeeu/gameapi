@@ -1,8 +1,8 @@
 package eu.mcone.gameapi.api.replay.record.packets.server;
 
 import eu.mcone.coresystem.api.bukkit.npc.capture.packets.EntityAction;
-import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketType;
-import eu.mcone.coresystem.api.bukkit.npc.capture.packets.templates.EntityLocationWrapperTemplate;
+import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketTyp;
+import eu.mcone.coresystem.api.bukkit.npc.capture.packets.templates.EntityLocationTContainer;
 import eu.mcone.gameapi.api.replay.record.packets.util.SerializableBlock;
 import lombok.Getter;
 import org.bukkit.Location;
@@ -12,12 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public class EntityTntExplodePacketWrapper extends EntityLocationWrapperTemplate {
+public class EntityTntExplodePacketContainer extends EntityLocationTContainer {
 
     private List<SerializableBlock> destroy;
 
-    public EntityTntExplodePacketWrapper(Location location, List<Block> destroy) {
-        super(PacketType.SERVER, EntityAction.DESTROY, location);
+    public EntityTntExplodePacketContainer(Location location, List<Block> destroy) {
+        super(PacketTyp.SERVER, EntityAction.DESTROY, location);
         this.destroy = new ArrayList<>();
 
         for (Block block : destroy) {

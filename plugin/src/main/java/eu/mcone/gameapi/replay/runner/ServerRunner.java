@@ -1,11 +1,11 @@
 package eu.mcone.gameapi.replay.runner;
 
 import eu.mcone.coresystem.api.bukkit.npc.capture.SimplePlayer;
-import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketWrapper;
+import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketContainer;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.replay.chunk.ReplayChunk;
-import eu.mcone.gameapi.api.replay.record.packets.server.EntityTntExplodePacketWrapper;
-import eu.mcone.gameapi.api.replay.record.packets.server.ServerBroadcastMessagePacketWrapper;
+import eu.mcone.gameapi.api.replay.record.packets.server.EntityTntExplodePacketContainer;
+import eu.mcone.gameapi.api.replay.record.packets.server.ServerBroadcastMessagePacketContainer;
 import eu.mcone.gameapi.api.replay.record.packets.util.SerializableBlock;
 import eu.mcone.gameapi.api.replay.runner.ReplaySpeed;
 import lombok.Getter;
@@ -28,7 +28,7 @@ public class ServerRunner extends SimplePlayer {
     private int skipped;
 
     private ReplayRunnerManager manager;
-    private Map<String, List<PacketWrapper>> packets;
+    private Map<String, List<PacketContainer>> packets;
 
     public ServerRunner(final ReplayRunnerManager manager) {
         this.manager = manager;
@@ -46,7 +46,7 @@ public class ServerRunner extends SimplePlayer {
                 String sTick = String.valueOf(tick);
 
                 ReplayChunk chunk = manager.getSession().getChunkHandler().getChunk(tick);
-                List<PacketWrapper> serverPackets = chunk.getServerPackets(tick);
+                List<PacketContainer> serverPackets = chunk.getServerPackets(tick);
 
                 int repeat;
                 if (replaySpeed != null && skipped == replaySpeed.getWait()) {
@@ -59,9 +59,9 @@ public class ServerRunner extends SimplePlayer {
                 if (tick != manager.getSession().getInfo().getLastTick()) {
                     for (int i = 0; i < repeat; i++) {
                         if (packets.containsKey(sTick)) {
-                            for (PacketWrapper packet : packets.get(sTick)) {
-                                if (packet instanceof ServerBroadcastMessagePacketWrapper) {
-                                    ServerBroadcastMessagePacketWrapper broadcast = (ServerBroadcastMessagePacketWrapper) packet;
+                            for (PacketContainer packet : packets.get(sTick)) {
+                                if (packet instanceof ServerBroadcastMessagePacketContainer) {
+                                    ServerBroadcastMessagePacketContainer broadcast = (ServerBroadcastMessagePacketContainer) packet;
                                     Bukkit.broadcastMessage(broadcast.getMessage().getMessage());
                                 }
                             }
@@ -70,16 +70,16 @@ public class ServerRunner extends SimplePlayer {
                         }
 
                         if (serverPackets != null) {
-                            for (PacketWrapper packet : serverPackets) {
-                                if (packet instanceof EntityTntExplodePacketWrapper) {
-                                    EntityTntExplodePacketWrapper tntExplodePacketWrapper = (EntityTntExplodePacketWrapper) packet;
-                                    sendBlockUpdate(tntExplodePacketWrapper.calculateLocation(), Material.AIR, (byte) 0);
+                            for (PacketContainer packet : serverPackets) {
+                                if (packet instanceof EntityTntExplodePacketContainer) {
+                                    EntityTntExplodePacketContainer tntExplodePacketContainer = (EntityTntExplodePacketContainer) packet;
+                                    sendBlockUpdate(tntExplodePacketContainer.calculateLocation(), Material.AIR, (byte) 0);
 
                                     for (Player player : watcher) {
                                         player.playSound(player.getLocation(), Sound.EXPLODE, 1, 1);
                                     }
 
-                                    for (SerializableBlock block : tntExplodePacketWrapper.getDestroy()) {
+                                    for (SerializableBlock block : tntExplodePacketContainer.getDestroy()) {
                                         sendBlockUpdate(block.getLocation(), Material.AIR, (byte) 0);
                                     }
                                 }
@@ -136,9 +136,9 @@ public class ServerRunner extends SimplePlayer {
             while (true) {
                 String sTick = String.valueOf(cTick);
                 if (packets.containsKey(sTick)) {
-                    for (PacketWrapper packet : packets.get(sTick)) {
-                        if (packet instanceof ServerBroadcastMessagePacketWrapper) {
-                            ServerBroadcastMessagePacketWrapper broadcast = (ServerBroadcastMessagePacketWrapper) packet;
+                    for (PacketContainer packet : packets.get(sTick)) {
+                        if (packet instanceof ServerBroadcastMessagePacketContainer) {
+                            ServerBroadcastMessagePacketContainer broadcast = (ServerBroadcastMessagePacketContainer) packet;
                             Bukkit.broadcastMessage(broadcast.getMessage().getMessage());
                         }
                     }

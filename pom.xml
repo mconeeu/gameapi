@@ -7,7 +7,7 @@
     <groupId>eu.mcone.gameapi</groupId>
     <artifactId>mcone-gameapi</artifactId>
     <packaging>pom</packaging>
-    <version>3.3.3-SNAPSHOT</version>
+    <version>3.3.4-SNAPSHOT</version>
 
     <modules>
         <module>plugin</module>
@@ -110,6 +110,12 @@
         <dependency> <!-- MCONE CoreSystem (This includes the Bukkit-API) -->
             <groupId>eu.mcone.coresystem</groupId>
             <artifactId>bukkit-api</artifactId>
+            <version>10.6.3-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency> <!-- MCONE CoreSystem (This includes the Bukkit-API) -->
+            <groupId>eu.mcone.coresystem</groupId>
+            <artifactId>core-api</artifactId>
             <version>10.6.3-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>

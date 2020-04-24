@@ -1,5 +1,6 @@
 package eu.mcone.gameapi.replay.inventory;
 
+import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.coresystem.api.bukkit.inventory.InventoryOption;
 import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
@@ -18,7 +19,12 @@ public class ReplayInformationInventory extends CoreInventory {
     public ReplayInformationInventory(Player player, ReplaySession session) {
         super("§eReplay", player, InventorySlot.ROW_3, InventoryOption.FILL_EMPTY_SLOTS);
 
-        setItem(InventorySlot.ROW_1_SLOT_5, new ItemBuilder(Material.COMMAND, 1).displayName("§eReplay ID: §f§l" + session.getID()).create());
+        if (session.getInfo().getGamemode() != null) {
+            setItem(InventorySlot.ROW_1_SLOT_5, new ItemBuilder(Gamemode.valueOf(session.getInfo().getGamemode()).getItem(), 1).displayName("§eReplay ID: §f§l" + session.getID()).create());
+        } else {
+            setItem(InventorySlot.ROW_1_SLOT_5, new ItemBuilder(Material.COMMAND, 1).displayName("§eReplay ID: §f§l" + session.getID()).create());
+        }
+
         setItem(InventorySlot.ROW_3_SLOT_3, new ItemBuilder(Material.GRASS, 1).displayName("§eMap").lore("§7§l" + session.getInfo().getWorld()).create());
 
         if (session.getInfo().getWinnerTeam().isEmpty()) {
