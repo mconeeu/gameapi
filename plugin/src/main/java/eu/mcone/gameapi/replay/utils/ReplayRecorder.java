@@ -216,7 +216,7 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                 if (isStopped()) {
                     e.getHandlers().unregister(this);
                 } else {
-                    session.getInfo().setWinnerTeam(e.getTeam().getName().getTeam());
+                    session.getInfo().setWinnerTeam(e.getTeam().getName());
                 }
             }
 

@@ -11,7 +11,7 @@ public class TeamTablist extends CoreScoreboard {
     public org.bukkit.scoreboard.Team modifyTeam(CorePlayer owner, CorePlayer p, Team t) {
         GamePlayer gamePlayer = GamePlugin.getGamePlugin().getGamePlayer(p.bukkit());
         if (gamePlayer.getTeam() != null) {
-            t.setPrefix(gamePlayer.getTeam().getName().getChatColor().toString());
+            t.setPrefix(gamePlayer.getTeam().getChatColor().toString());
         }
         return t;
     }
