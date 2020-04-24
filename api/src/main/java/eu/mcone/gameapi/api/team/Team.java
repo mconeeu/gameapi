@@ -1,5 +1,6 @@
 package eu.mcone.gameapi.api.team;
 
+import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.event.team.TeamDestroyEvent;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,16 +21,19 @@ public class Team {
     @Getter
     private final String prefix;
     @Getter
+    @Setter
     private int size;
+    @Getter
+    private final int priority;
     @Getter
     private boolean alive = false;
 
     @Getter
-    private ChatColor chatColor;
+    private final ChatColor chatColor;
     @Getter
-    private Color color;
+    private final Color color;
     @Getter
-    private ItemStack item;
+    private final ItemStack item;
 
     @Getter
     @Setter
@@ -42,17 +46,14 @@ public class Team {
     private final List<Player> players;
 
     public Team(final TeamDefinition teamDefinition) {
-        this.name = teamDefinition.getName();
-        this.prefix = teamDefinition.getPrefix();
-        this.spawnLocation = name + ".spawn";
-        this.npcLocation = name + ".npc";
-        this.respawnBlockLocation = name + ".respawn";
-        this.players = new ArrayList<>();
+        this(teamDefinition.getName(), 0, teamDefinition.getPrefix(), teamDefinition.getChatColor(), teamDefinition.getColor(), teamDefinition.getItemStack());
     }
 
-    public Team(final String team, final String prefix, ChatColor chatColor, Color color, ItemStack item) {
+    public Team(final String team, final int priority, final String prefix, ChatColor chatColor, Color color, ItemStack item) {
         this.name = team;
+        this.priority = priority;
         this.prefix = prefix;
+        this.size = GamePlugin.getGamePlugin().getGameConfig().parseConfig().getPlayersPerTeam();
         this.chatColor = chatColor;
         this.color = color;
         this.item = item;
@@ -64,17 +65,15 @@ public class Team {
 
     public void addPlayer(final Player player) {
         if (!players.contains(player)) {
-            players.add(player);
-            size += 1;
-            alive = true;
+            if (players.size() < size) {
+                players.add(player);
+                alive = true;
+            }
         }
     }
 
     public void removePlayer(final Player player) {
-        if (players.contains(player)) {
-            players.remove(player);
-            size -= 1;
-        }
+        players.remove(player);
     }
 
     public void setAlive(boolean var) {

@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 public interface TeamManager {
@@ -38,6 +39,8 @@ public interface TeamManager {
 
     void setupTeam();
 
+    void setupTeamWherePriority();
+
     Team checkChanceToWin();
 
     Team getPrematureWinner();
@@ -49,6 +52,10 @@ public interface TeamManager {
     Team getTeam(int index);
 
     Collection<Team> getAliveTeams();
+
+    LinkedList<Team> sortTeamsWherePriority();
+
+    LinkedList<Team> sortTeamsWhereSize();
 
     void openTeamInventory(Player p);
 }

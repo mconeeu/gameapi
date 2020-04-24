@@ -19,7 +19,7 @@ import org.bukkit.scoreboard.DisplaySlot;
 
 public class InGameState extends GameState {
 
-    private GameConfig config;
+    private final GameConfig config;
     @Getter
     private double timeoutSeconds = 0;
 
@@ -30,6 +30,11 @@ public class InGameState extends GameState {
 
     public InGameState(int timeout) {
         super("InGame", 0, timeout);
+        config = GamePlugin.getGamePlugin().getGameConfig().parseConfig();
+    }
+
+    public InGameState(int countdown, int timeout) {
+        super("InGame", countdown, timeout);
         config = GamePlugin.getGamePlugin().getGameConfig().parseConfig();
     }
 

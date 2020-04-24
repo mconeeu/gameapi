@@ -76,6 +76,7 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
             int i = 1;
             for (TeamDefinition team : TeamDefinition.values()) {
                 if (i <= teamSize) {
+                    System.out.println("Add team " + team);
                     this.teams.put(team.getName(), new Team(team));
                     i++;
                 }
@@ -118,25 +119,66 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
             GameAPIPlayer gp = GameAPIPlugin.getSystem().getGamePlayer(p.getUniqueId());
             if (gp.getTeam() == null || gp.getTeam().getName().equalsIgnoreCase(TeamDefinition.ERROR.getName())) {
                 int i = 1;
-                for (TeamDefinition teamEnum : TeamDefinition.values()) {
+                for (Team team : teams.values()) {
                     if (i <= teams.size()) {
-                        Team team = teams.get(teamEnum.getName());
-                        if (playersPerTeam >= 2) {
+                        if (team.getSize() >= 2) {
                             if (gamePlugin.getPlayerManager().getPlaying().size() < teams.size()) {
                                 if (!team.containsPlayer(p)) {
                                     if (team.getSize() == 0) {
                                         gp.setTeam(team);
+                                        System.out.println("Set " + team);
                                     }
                                     break;
                                 }
-                            } else if (team.getSize() < playersPerTeam) {
+                            } else if (team.getPlayers().size() < team.getSize()) {
                                 gp.setTeam(team);
+                                System.out.println("Set " + team);
                                 break;
                             }
                         } else {
                             if (!team.containsPlayer(p)) {
-                                if (team.getSize() == 0 || team.getSize() < playersPerTeam) {
+                                if (team.getPlayers().size() == 0 || team.getPlayers().size() < team.getSize()) {
                                     gp.setTeam(team);
+                                    System.out.println("Set " + team);
+                                    break;
+                                }
+                            }
+                            i++;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    public void setupTeamWherePriority() {
+        for (Player p : gamePlugin.getPlayerManager().getPlaying()) {
+            GameAPIPlayer gp = GameAPIPlugin.getSystem().getGamePlayer(p.getUniqueId());
+            if (gp.getTeam() == null || gp.getTeam().getName().equalsIgnoreCase(TeamDefinition.ERROR.getName())) {
+                int i = 1;
+                for (Team team : sortTeamsWherePriority()) {
+                    if (i <= teams.size()) {
+                        if (team.getSize() >= 2) {
+                            if (gamePlugin.getPlayerManager().getPlaying().size() < teams.size()) {
+                                if (!team.containsPlayer(p)) {
+                                    if (team.getSize() == 0) {
+                                        gp.setTeam(team);
+                                        System.out.println("Set " + team);
+                                    }
+                                    break;
+                                }
+                            } else if (team.getPlayers().size() < team.getSize()) {
+                                gp.setTeam(team);
+                                System.out.println("Set " + team);
+                                break;
+                            }
+                        } else {
+                            if (!team.containsPlayer(p)) {
+                                if (team.getPlayers().size() == 0 || team.getPlayers().size() < team.getSize()) {
+                                    gp.setTeam(team);
+                                    System.out.println("Set " + team);
                                     break;
                                 }
                             }
@@ -270,6 +312,50 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
         }
 
         return teams;
+    }
+
+    public LinkedList<Team> sortTeamsWherePriority() {
+        LinkedList<Integer> sortedPriority = new LinkedList<>();
+        LinkedList<Team> sortedTeams = new LinkedList<>();
+
+        for (Team team : this.teams.values()) {
+            sortedPriority.add(team.getPriority());
+        }
+
+        sortedPriority.sort(Comparator.naturalOrder());
+
+        for (int priority : sortedPriority) {
+            for (Team team : this.teams.values()) {
+                if (team.getPriority() == priority) {
+                    sortedTeams.add(team);
+                    break;
+                }
+            }
+        }
+
+        return sortedTeams;
+    }
+
+    public LinkedList<Team> sortTeamsWhereSize() {
+        LinkedList<Integer> sortedSize = new LinkedList<>();
+        LinkedList<Team> sortedTeams = new LinkedList<>();
+
+        for (Team team : this.teams.values()) {
+            sortedSize.add(team.getSize());
+        }
+
+        sortedSize.sort(Comparator.naturalOrder());
+
+        for (int priority : sortedSize) {
+            for (Team team : this.teams.values()) {
+                if (team.getPriority() == priority) {
+                    sortedTeams.add(team);
+                    break;
+                }
+            }
+        }
+
+        return sortedTeams;
     }
 
     public void openTeamInventory(Player p) {
