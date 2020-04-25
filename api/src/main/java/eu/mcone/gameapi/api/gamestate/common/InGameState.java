@@ -72,7 +72,7 @@ public class InGameState extends GameState {
                 CoreScoreboard coreScoreboard = GamePlugin.getGamePlugin().getTeamManager().getTeamTablist();
 
                 if (coreScoreboard != null) {
-                    player.setScoreboard(GamePlugin.getGamePlugin().getTeamManager().getTeamTablist());
+                    player.setScoreboard(coreScoreboard);
                 }
             }
         }

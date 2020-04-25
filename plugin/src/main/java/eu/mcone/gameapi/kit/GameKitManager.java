@@ -42,7 +42,8 @@ public class GameKitManager implements KitManager {
     private Map<UUID, List<String>> playerKits;
     private final Map<UUID, List<ModifiedKit>> customKits;
 
-    @Setter @Getter
+    @Setter
+    @Getter
     private Kit defaultKit;
 
     public GameKitManager(GameAPIPlugin system, GamePlugin plugin, Option... options) {
@@ -57,9 +58,10 @@ public class GameKitManager implements KitManager {
 
         this.kits = new ArrayList<>();
         this.currentKits = new HashMap<>();
-        if (!applyKitsOnce && !chooseKitsForServerLifetime) {
-            this.playerKits = new HashMap<>();
-        }
+        this.playerKits = new HashMap<>();
+//        if (!applyKitsOnce && !chooseKitsForServerLifetime) {
+//            this.playerKits = new HashMap<>();
+//        }
         this.customKits = new HashMap<>();
 
         system.sendConsoleMessage("§aLoading KitManager...");
@@ -185,7 +187,7 @@ public class GameKitManager implements KitManager {
                 system,
                 () -> PLAYER_KITS_COLLECTION.updateOne(
                         eq("uuid", p.getUniqueId().toString()),
-                        set(plugin.getGamemode().toString()+".currentKit", kit.getName()),
+                        set(plugin.getGamemode().toString() + ".currentKit", kit.getName()),
                         new UpdateOptions().upsert(true)
                 )
         );
@@ -284,7 +286,7 @@ public class GameKitManager implements KitManager {
     private void savePlayerKits(Player p) {
         PLAYER_KITS_COLLECTION.updateOne(
                 eq("uuid", p.getUniqueId().toString()),
-                set(plugin.getGamemode().toString()+".kits", playerKits.get(p.getUniqueId())),
+                set(plugin.getGamemode().toString() + ".kits", playerKits.get(p.getUniqueId())),
                 new UpdateOptions().upsert(true)
         );
     }

@@ -55,7 +55,7 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
         GameConfig config = plugin.getGameConfig().parseConfig();
         playersPerTeam = config.getPlayersPerTeam();
         teams = new HashMap<>();
-        this.options = Arrays.asList(options);
+        this.options = new ArrayList<>(Arrays.asList(options));
 
         exitBySingleDeath = this.options.contains(Option.TEAM_MANAGER_EXIT_BY_SINGLE_DEATH);
         useCustomTeams = this.options.contains(Option.USE_CUSTOM_TEAMS);

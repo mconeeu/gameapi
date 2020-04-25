@@ -35,5 +35,4 @@ public class KitListener implements Listener {
             Bukkit.getScheduler().runTaskLater(GameAPIPlugin.getSystem(), () -> manager.setKit(manager.getDefaultKit(), e.getPlayer()), 20);
         }
     }
-
 }
