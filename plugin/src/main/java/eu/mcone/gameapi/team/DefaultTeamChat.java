@@ -2,11 +2,11 @@ package eu.mcone.gameapi.team;
 
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.player.GamePlayer;
-import eu.mcone.gameapi.api.team.TeamChat;
+import eu.mcone.gameapi.api.team.PlayingChat;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-public class DefaultTeamChat extends TeamChat {
+public class DefaultTeamChat extends PlayingChat {
 
     @Override
     public void onTeamChat(String message, Player player, GamePlayer gamePlayer) {
