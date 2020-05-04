@@ -25,6 +25,8 @@ public interface TeamManager {
 
     boolean isUseCustomTeams();
 
+    boolean isWinMethodDeactivated();
+
     void addCustomTeam(Team team);
 
     void addTeamTablist(Class<? extends CoreScoreboard> scoreboard);

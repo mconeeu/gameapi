@@ -24,13 +24,15 @@ public class GeneralDeathListener implements Listener {
                 gamePlayer.removeFromGame();
             }
 
-            Team team = GamePlugin.getGamePlugin().getTeamManager().checkChanceToWin();
-            if (team != null) {
-                Bukkit.getPluginManager().callEvent(new TeamWonEvent(team));
+            if (!GamePlugin.getGamePlugin().getTeamManager().isWinMethodDeactivated()) {
+                Team team = GamePlugin.getGamePlugin().getTeamManager().checkChanceToWin();
+                if (team != null) {
+                    Bukkit.getPluginManager().callEvent(new TeamWonEvent(team));
 
-                for (GamePlayer player : GamePlugin.getGamePlugin().getOnlineGamePlayers()) {
-                    GamePlugin.getGamePlugin().getPlayerManager().setPlaying(player.bukkit(), false);
-                    GamePlugin.getGamePlugin().getPlayerManager().setSpectating(player.bukkit(), false);
+                    for (GamePlayer player : GamePlugin.getGamePlugin().getOnlineGamePlayers()) {
+                        GamePlugin.getGamePlugin().getPlayerManager().setPlaying(player.bukkit(), false);
+                        GamePlugin.getGamePlugin().getPlayerManager().setSpectating(player.bukkit(), false);
+                    }
                 }
             }
         }

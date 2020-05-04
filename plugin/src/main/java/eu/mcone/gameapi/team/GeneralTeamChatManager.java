@@ -40,7 +40,7 @@ public class GeneralTeamChatManager implements Listener {
                 GamePlayer gamePlayer = GamePlugin.getGamePlugin().getGamePlayer(player.getUniqueId());
 
                 if (teamManager.getPlayingChat() != null) {
-                    teamManager.getPlayingChat().onTeamChat(message, player, gamePlayer);
+                    teamManager.getPlayingChat().onPlayingChat(message, player, gamePlayer);
                 }
             }
 

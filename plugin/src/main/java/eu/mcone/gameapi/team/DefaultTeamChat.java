@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 public class DefaultTeamChat extends PlayingChat {
 
     @Override
-    public void onTeamChat(String message, Player player, GamePlayer gamePlayer) {
+    public void onPlayingChat(String message, Player player, GamePlayer gamePlayer) {
         if (message.startsWith("@all")) {
             for (Player all : Bukkit.getOnlinePlayers()) {
                 GamePlugin.getGamePlugin().getMessenger().sendSimple(all, "§8[§b@all§8] " + gamePlayer.getTeam().getChatColor().toString() + player.getName() + " §8»§7 " + message.replace("@all", ""));

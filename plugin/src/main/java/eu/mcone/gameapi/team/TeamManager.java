@@ -42,6 +42,8 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
     private final boolean useCustomTeams;
     @Getter
     private final boolean useDefaultTeams;
+    @Getter
+    private final boolean winMethodDeactivated;
 
     public TeamManager(GamePlugin plugin, GameAPIPlugin system, Option[] options) {
         this.gamePlugin = plugin;
@@ -60,6 +62,7 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
         exitBySingleDeath = this.options.contains(Option.TEAM_MANAGER_EXIT_BY_SINGLE_DEATH);
         useCustomTeams = this.options.contains(Option.USE_CUSTOM_TEAMS);
         useDefaultTeams = this.options.contains(Option.USE_DEFAULT_TEAMS);
+        winMethodDeactivated = this.options.contains(Option.WIN_METHOD_DEACTIVATED);
 
         system.sendConsoleMessage("§aLoading TeamManager...");
 

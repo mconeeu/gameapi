@@ -5,5 +5,5 @@ import org.bukkit.entity.Player;
 
 public abstract class PlayingChat {
 
-    public abstract void onTeamChat(String message, Player player, GamePlayer gamePlayer);
+    public abstract void onPlayingChat(String message, Player player, GamePlayer gamePlayer);
 }
