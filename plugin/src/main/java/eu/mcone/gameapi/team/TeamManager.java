@@ -8,8 +8,8 @@ import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Module;
 import eu.mcone.gameapi.api.Option;
 import eu.mcone.gameapi.api.player.GamePlayer;
+import eu.mcone.gameapi.api.team.PlayingChat;
 import eu.mcone.gameapi.api.team.Team;
-import eu.mcone.gameapi.api.team.TeamChat;
 import eu.mcone.gameapi.api.team.TeamDefinition;
 import eu.mcone.gameapi.api.utils.GameConfig;
 import eu.mcone.gameapi.inventory.TeamInventory;
@@ -28,9 +28,9 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
     private final GamePlugin gamePlugin;
 
     @Getter
-    private TeamChat teamChat;
+    private PlayingChat playingChat;
     @Getter
-    private CoreScoreboard teamTablist;
+    private Class<? extends CoreScoreboard> teamTablist;
     @Getter
     private Team wonTeam;
     @Getter
@@ -42,6 +42,8 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
     private final boolean useCustomTeams;
     @Getter
     private final boolean useDefaultTeams;
+    @Getter
+    private final boolean winMethodDeactivated;
 
     public TeamManager(GamePlugin plugin, GameAPIPlugin system, Option[] options) {
         this.gamePlugin = plugin;
@@ -49,8 +51,8 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
         //Chat System
         CoreSystem.getInstance().setPlayerChatEnabled(false);
         GamePlugin.getGamePlugin().registerEvents(new GeneralTeamChatManager(this));
-        teamChat = new DefaultTeamChat();
-        teamTablist = new GeneralTeamTablist();
+        playingChat = new DefaultTeamChat();
+        teamTablist = GeneralTeamTablist.class;
 
         GameConfig config = plugin.getGameConfig().parseConfig();
         playersPerTeam = config.getPlayersPerTeam();
@@ -60,6 +62,7 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
         exitBySingleDeath = this.options.contains(Option.TEAM_MANAGER_EXIT_BY_SINGLE_DEATH);
         useCustomTeams = this.options.contains(Option.USE_CUSTOM_TEAMS);
         useDefaultTeams = this.options.contains(Option.USE_DEFAULT_TEAMS);
+        winMethodDeactivated = this.options.contains(Option.WIN_METHOD_DEACTIVATED);
 
         system.sendConsoleMessage("§aLoading TeamManager...");
 
@@ -92,12 +95,12 @@ public class TeamManager implements eu.mcone.gameapi.api.team.TeamManager {
         }
     }
 
-    public void addTeamTablist(CoreScoreboard scoreboard) {
+    public void addTeamTablist(Class<? extends CoreScoreboard> scoreboard) {
         this.teamTablist = scoreboard;
     }
 
-    public void addTeamChat(TeamChat teamChat) {
-        this.teamChat = teamChat;
+    public void addTeamChat(PlayingChat teamChat) {
+        this.playingChat = teamChat;
     }
 
     public Team getTeam(final String team) {

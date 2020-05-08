@@ -17,19 +17,21 @@ public interface TeamManager {
 
     List<Option> getOptions();
 
-    TeamChat getTeamChat();
+    PlayingChat getPlayingChat();
 
-    CoreScoreboard getTeamTablist();
+    Class<? extends CoreScoreboard> getTeamTablist();
 
     boolean isExitBySingleDeath();
 
     boolean isUseCustomTeams();
 
+    boolean isWinMethodDeactivated();
+
     void addCustomTeam(Team team);
 
-    void addTeamTablist(CoreScoreboard scoreboard);
+    void addTeamTablist(Class<? extends CoreScoreboard> scoreboard);
 
-    void addTeamChat(TeamChat teamChat);
+    void addTeamChat(PlayingChat teamChat);
 
     Team getTeam(final String team);
 

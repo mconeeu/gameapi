@@ -33,6 +33,7 @@ public class EndGameState extends GameState {
                     ).replace("%seconds%", Long.toString(second)));
                     p.playSound(p.getLocation(), Sound.LEVEL_UP, 1, 1);
                 }
+                break;
             default:
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     p.setLevel(second);

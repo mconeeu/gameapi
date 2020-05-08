@@ -3,6 +3,7 @@ package eu.mcone.gameapi.api.gamestate.common;
 import eu.mcone.coresystem.api.bukkit.CorePlugin;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
+import eu.mcone.coresystem.api.bukkit.scoreboard.CoreObjective;
 import eu.mcone.coresystem.api.bukkit.scoreboard.CoreScoreboard;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Module;
@@ -69,10 +70,17 @@ public class InGameState extends GameState {
         if (GamePlugin.getGamePlugin().hasModule(Module.TEAM_MANAGER) && GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)) {
             for (Player playing : GamePlugin.getGamePlugin().getPlayerManager().getPlaying()) {
                 CorePlayer player = CoreSystem.getInstance().getCorePlayer(playing);
-                CoreScoreboard coreScoreboard = GamePlugin.getGamePlugin().getTeamManager().getTeamTablist();
-
-                if (coreScoreboard != null) {
+                CoreScoreboard coreScoreboard = null;
+                try {
+                    coreScoreboard = GamePlugin.getGamePlugin().getTeamManager().getTeamTablist().newInstance();
+                    CoreObjective objective = player.getScoreboard().getObjective(DisplaySlot.SIDEBAR);
                     player.setScoreboard(coreScoreboard);
+
+                    if (objective != null) {
+                        player.getScoreboard().setNewObjective(objective);
+                    }
+                } catch (InstantiationException | IllegalAccessException e) {
+                    e.printStackTrace();
                 }
             }
         }
