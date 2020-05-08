@@ -3,12 +3,12 @@ package eu.mcone.gameapi.replay.utils;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.event.BroadcastMessageEvent;
 import eu.mcone.coresystem.api.bukkit.event.armor.ArmorEquipEvent;
-import eu.mcone.coresystem.api.bukkit.event.nms.PacketReceiveEvent;
-import eu.mcone.coresystem.api.bukkit.event.nms.PacketSendEvent;
 import eu.mcone.coresystem.api.bukkit.npc.capture.SimpleRecorder;
 import eu.mcone.coresystem.api.bukkit.npc.capture.packets.*;
+import eu.mcone.coresystem.api.bukkit.util.PacketListener;
 import eu.mcone.coresystem.api.bukkit.util.ReflectionManager;
 import eu.mcone.coresystem.api.bukkit.world.CoreLocation;
+import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.event.stats.PlayerRoundStatsChangeEvent;
 import eu.mcone.gameapi.api.event.team.TeamWonEvent;
 import eu.mcone.gameapi.api.replay.event.PlayerJoinReplaySessionEvent;
@@ -29,8 +29,9 @@ import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
-import org.bukkit.entity.Entity;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -63,14 +64,11 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
     public void record() {
         taskID = Bukkit.getScheduler().runTaskTimerAsynchronously(CoreSystem.getInstance(), () -> ticks++, 1L, 1L);
 
-        CoreSystem.getInstance().registerEvents(new Listener() {
-            @EventHandler
-            public void on(PacketReceiveEvent e) {
-                Packet<?> packet = e.getObject();
-                Player player = e.getPlayer();
-
+        CoreSystem.getInstance().getPacketManager().registerPacketListener(new PacketListener() {
+            @Override
+            public void onPacketIn(Player player, Packet<?> packet) {
                 if (isStopped) {
-                    e.getHandlers().unregister(this);
+                    CoreSystem.getInstance().getPacketManager().unregisterPacketListener(this);
                 } else {
 //                    if (packet instanceof PacketPlayInBlockDig) {
 //                        PacketPlayInBlockDig packetPlayInBlockDig = (PacketPlayInBlockDig) packet;
@@ -127,14 +125,12 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                 }
             }
 
-            @EventHandler
-            public void on(PacketSendEvent e) {
-                Packet<?> packet = e.getPacket();
-                EntityPlayer entityPlayer = e.getPlayer();
-                Player player = entityPlayer.getBukkitEntity();
+            @Override
+            public void onPacketOut(Player player, Packet<?> packet) {
+                EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
 
                 if (isStopped) {
-                    e.getHandlers().unregister(this);
+                    CoreSystem.getInstance().getPacketManager().unregisterPacketListener(this);
                 } else {
 //                    if (packet instanceof PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook) {
 //                        if (ticks % 2 == 0) {
@@ -197,7 +193,9 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                     }
                 }
             }
+        });
 
+        GameAPI.getInstance().registerEvents(new Listener() {
             //MCONE EVENTS
             @EventHandler
             public void on(PlayerRoundStatsChangeEvent e) {
@@ -411,11 +409,11 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                     Player player = e.getPlayer();
                     if (session.existsReplayPlayer(player)) {
                         if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-                            if (e.getClickedBlock().getType().equals(Material.TNT) && player.getItemInHand().getType().equals(Material.FLINT_AND_STEEL)) {
+                            if (e.getClickedBlock().getType().equals(org.bukkit.Material.TNT) && player.getItemInHand().getType().equals(org.bukkit.Material.FLINT_AND_STEEL)) {
                                 //PRIME TNT
                                 addPacket(player, new EntityPrimeTntPacketContainer(e.getClickedBlock().getLocation()));
-                            } else if (e.getClickedBlock().getType().equals(Material.STONE_BUTTON) || e.getClickedBlock().getType().equals(Material.STONE_BUTTON)) {
-                                BlockState blockState = e.getClickedBlock().getState();
+                            } else if (e.getClickedBlock().getType().equals(org.bukkit.Material.STONE_BUTTON) || e.getClickedBlock().getType().equals(org.bukkit.Material.STONE_BUTTON)) {
+                                org.bukkit.block.BlockState blockState = e.getClickedBlock().getState();
                                 addPacket(player, new EntityButtonInteractPacketContainer(e.getClickedBlock().getLocation(), ((Button) blockState.getData()).isPowered()));
                                 addPacket(player, new EntityClickPacketContainer());
                             } else if (e.getClickedBlock().getType().toString().contains("DOOR")) {
