@@ -100,4 +100,22 @@ public class Team {
 
         return null;
     }
+
+    @Override
+    public String toString() {
+        return "Team{" +
+                "name='" + name + '\'' +
+                ", prefix='" + prefix + '\'' +
+                ", size=" + size +
+                ", priority=" + priority +
+                ", alive=" + alive +
+                ", chatColor=" + chatColor +
+                ", color=" + color +
+                ", item=" + item +
+                ", spawnLocation='" + spawnLocation + '\'' +
+                ", npcLocation='" + npcLocation + '\'' +
+                ", respawnBlockLocation='" + respawnBlockLocation + '\'' +
+                ", players=" + players +
+                '}';
+    }
 }

@@ -13,7 +13,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 
 public class GeneralDeathListener implements Listener {
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOW)
     public void on(PlayerDeathEvent e) {
         if (GamePlugin.getGamePlugin().hasModule(Module.TEAM_MANAGER)
                 && GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)

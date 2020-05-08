@@ -169,6 +169,10 @@ public abstract class GamePlugin extends CorePlugin {
         return getGamePlayer(player.getUniqueId());
     }
 
+    public GamePlayer getGamePlayer(String name) {
+        return GameAPI.getInstance().getGamePlayer(name);
+    }
+
     public Collection<GamePlayer> getOnlineGamePlayers() {
         return GameAPI.getInstance().getOnlineGamePlayers();
     }

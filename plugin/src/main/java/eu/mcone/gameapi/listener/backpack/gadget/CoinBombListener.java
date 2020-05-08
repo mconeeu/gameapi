@@ -5,27 +5,24 @@
 
 package eu.mcone.gameapi.listener.backpack.gadget;
 
-import eu.mcone.coresystem.api.bukkit.CoreSystem;
-import eu.mcone.coresystem.api.core.util.Random;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.player.GameAPIPlayer;
-import org.bukkit.Bukkit;
-import org.bukkit.Effect;
-import org.bukkit.Sound;
-import org.bukkit.entity.Player;
+import org.bukkit.*;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
+import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class CoinBombListener extends GadgetListener {
 
@@ -33,68 +30,181 @@ public class CoinBombListener extends GadgetListener {
         super(plugin);
     }
 
+
+    public static boolean isExploding = false;
+    private HashSet<Location> BombLocation = new HashSet<>();
+
+
     @EventHandler
     public void on(PlayerInteractEvent e) {
         if (e.hasItem() && e.getItem().equals(DefaultItem.COINBOMB.getItemStack()) && (e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_AIR))) {
             Player p = e.getPlayer();
             GameAPIPlayer gp = GameAPIPlugin.getSystem().getGamePlayer(p);
 
-            List<GamePlayer> targets = new ArrayList<>();
-            for (GamePlayer gamePlayer : GameAPI.getInstance().getOnlineGamePlayers()) {
-                if (gamePlayer.isEffectsVisible()) {
-                    targets.add(gamePlayer);
+
+            if (isExploding) {
+                GameAPI.getInstance().getMessenger().send(p, "§4Bitte warte kurz..");
+                return;
+            }
+            isExploding = true;
+
+            p.getInventory().remove(p.getItemInHand());
+            p.sendMessage("§aDu hast die Coin Bombe erfolgreich gezündet!");
+            DefaultItem.COINBOMB.remove(gp);
+
+
+            for (GamePlayer all : GameAPI.getInstance().getOnlineGamePlayers()) {
+
+                Set<Location> locations = new HashSet<>();
+
+                org.bukkit.entity.Item item = p.getLocation().getWorld().dropItem(p.getEyeLocation(),
+                        new ItemStack(Material.TNT, 1));
+                if (p.hasPermission("lobby.silenthub")) {
+                    p.getInventory().setItem(plugin.getBackpackManager().getItemSlot(), null);
+                } else {
+                    p.getInventory().setItem(plugin.getBackpackManager().getFallbackSlot(), null);
+                }
+
+                Vector v = p.getLocation().getDirection().multiply(0.7);
+                item.setVelocity(v);
+
+
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    item.getWorld().createExplosion(item.getLocation().getX(), item.getLocation().getY(),
+                            item.getLocation().getZ(), 3, false, false);
+
+                    locations.add(item.getLocation());
+                    all.bukkit().spigot().playEffect(item.getLocation(), Effect.LAVADRIP, 1, 1, 1, 1, 1, 2, 35, 10);
+                    all.bukkit().spigot().playEffect(item.getLocation(), Effect.LAVA_POP, 1, 1, 1, 1, 1, 2, 35, 12);
+
+                    for (Location location : locations) {
+                        TNTPrimed tnt = item.getWorld().spawn(location, TNTPrimed.class);
+                        tnt.setFuseTicks(68);
+
+                        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () ->
+                                all.bukkit().sendMessage("§8[§7§l!§8] §fServer §8» §7Eine Coin Bombe wurde von §f" + p.getName() + " §7gezündet sie explodiert in §f3 Sekunden"), 20L);
+
+                        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () ->
+                                all.bukkit().sendMessage("§8[§7§l!§8] §fServer §8» §7Sie startet in §f2 Sekunden"), 40L);
+                        all.bukkit().spigot().playEffect(item.getLocation(), Effect.SPLASH, 1, 1, 1, 1, 1, 1, 100, 10);
+
+                        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
+                            all.bukkit().sendMessage("§8[§7§l!§8] §fServer §8» §7Die Coinbome von §f" + p.getName() + " §7wird in §f1 Sekunde §7gezündet!");
+
+                            all.bukkit().spigot().playEffect(item.getLocation(), Effect.WITCH_MAGIC, 1, 1, 1, 1, 1, 3, 35, 7);
+
+
+                            Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
+                                all.bukkit().sendMessage("§8[§7§l!§8] §fServer §8» §7Die §fCoin Bombe§7 ist §f§lexplodiert§7 hebe die Items auf!");
+                            }, 12L);
+
+                        }, 60L);
+
+                        BombLocation.add(location);
+
+                    }
+
+                }, 40L);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onExplosion(EntityExplodeEvent e) {
+        e.blockList().clear();
+
+
+        Location tnt = e.getLocation();
+
+        org.bukkit.entity.Item item1 = tnt.getWorld().dropItem(tnt,
+                new ItemStack(Material.GOLD_BLOCK));
+
+        org.bukkit.entity.Item item2 = tnt.getWorld().dropItem(tnt,
+                new ItemStack(Material.GOLD_INGOT));
+
+        org.bukkit.entity.Item item3 = tnt.getWorld().dropItem(tnt,
+                new ItemStack(Material.DIAMOND_BLOCK));
+
+        org.bukkit.entity.Item item4 = tnt.getWorld().dropItem(tnt,
+                new ItemStack(Material.IRON_BLOCK));
+
+        org.bukkit.entity.Item item5 = tnt.getWorld().dropItem(tnt,
+                new ItemStack(Material.EMERALD_BLOCK));
+
+        org.bukkit.entity.Item item6 = tnt.getWorld().dropItem(tnt,
+                new ItemStack(Material.EMERALD));
+
+        org.bukkit.entity.Item item7 = tnt.getWorld().dropItem(tnt,
+                new ItemStack(Material.EMERALD));
+
+        Vector v1 = tnt.getDirection().setY(0.8).setZ(0.3);
+        Vector v2 = tnt.getDirection().setY(1).setZ(-0.2);
+        Vector v3 = tnt.getDirection().setY(0.8).setX(-0.2).setZ(0.3);
+        Vector v4 = tnt.getDirection().setY(0.9).setX(0.3);
+        Vector v5 = tnt.getDirection().setY(0.7).setZ(0.3);
+        Vector v6 = tnt.getDirection().setY(0.8).setX(-0.3);
+        Vector v7 = tnt.getDirection().setY(1.5).setX(0.5).setZ(-0.2);
+        Vector v8 = tnt.getDirection().setY(1.7).setX(0.6).setZ(0.2);
+        Vector v9 = tnt.getDirection().setY(0.6).setX(-0.1).setZ(0.5);
+        Vector v10 = tnt.getDirection().setY(0.9).setX(-0.7).setZ(-0.4);
+        Vector v11 = tnt.getDirection().setY(2.9).setX(-0.9).multiply(0.4).setZ(-0.5);
+        Vector v12 = tnt.getDirection().setY(0.9).multiply(0.3).setX(0.1).setZ(0.7).multiply(0.6);
+        Vector v13 = tnt.getDirection().setY(0.8).setZ(0.8).multiply(2);
+        Vector v14 = tnt.getDirection().setY(0.8).setZ(-0.9).multiply(0.5);
+
+        item1.setVelocity(v1);
+        item2.setVelocity(v2);
+        item3.setVelocity(v3);
+        item4.setVelocity(v4);
+        item5.setVelocity(v5);
+        item6.setVelocity(v6);
+        item7.setVelocity(v7);
+        item1.setVelocity(v8);
+        item2.setVelocity(v9);
+        item3.setVelocity(v10);
+
+        item4.setVelocity(v11);
+        item5.setVelocity(v12);
+        item6.setVelocity(v13);
+        item7.setVelocity(v14);
+
+        item3.setVelocity(v6);
+
+        Bukkit.getScheduler().runTaskLater(GameAPI.getInstance(), () -> {
+            for (Entity e1 : item1.getWorld().getEntities()) {
+                if (e1.getType().equals(EntityType.DROPPED_ITEM)) {
+                    e1.remove();
+
+                    isExploding = false;
+
                 }
             }
+        }, 205L);
 
-            if (targets.size() > 0) {
-                p.sendMessage("§aDu hast die Coin Bombe erfolgreich gezündet!");
-                DefaultItem.COINBOMB.remove(gp);
-                p.getInventory().remove(p.getItemInHand());
+    }
 
-                for (GamePlayer gamePlayer : targets) {
-                    Player player = gamePlayer.bukkit();
+    @EventHandler
+    public void onItemPickup(PlayerPickupItemEvent e) {
+        Player player = e.getPlayer();
+        Item item = e.getItem();
 
-                    Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () ->
-                            player.sendMessage("§8[§7§l!§8] §fServer §8» §aEine Coin Bombe wurde von §e" + player.getName() + " §agezündet sie startet in §e3 Sekunden"), 20L);
-
-                    Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () ->
-                            player.sendMessage("§8[§7§l!§8] §fServer §8» §aEine Coin Bombe wurde von §e" + player.getName() + " §agezündet sie startet in §e2 Sekunden"), 40L);
-
-                    Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () ->
-                            player.sendMessage("§8[§7§l!§8] §fServer §8» §aEine Coin Bombe wurde von §e" + player.getName() + " §agezündet sie startet in §41 Sekunden"), 60L);
-
-                    Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
-                        if (gamePlayer.getSettings().isEnableGadgets() && gamePlayer.isEffectsVisible()) {
-                            Vector v = new Vector(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ());
-                            v.normalize();
-                            v.setY(0.9D);
-                            v.multiply(1.5D);
-
-                            player.setVelocity(v);
-                            player.playSound(player.getLocation(), Sound.LEVEL_UP, 1, 1);
-                            player.playEffect(player.getLocation(), Effect.LAVA_POP, 1);
-                            player.playEffect(player.getLocation(), Effect.LAVA_POP, 1);
-                            player.playEffect(player.getLocation(), Effect.LAVA_POP, 1);
-                            player.playEffect(player.getLocation(), Effect.LAVA_POP, 2);
-                        }
-
-                        int random = Random.randomInt(2300, 8000);
-                        int coinbomstartbrandom = Random.randomInt(5500, 12000);
-
-                        if (!player.getName().equalsIgnoreCase(player.getName())) {
-                            player.sendMessage("§8[§7§l!§8] §fServer §8» §fDie Coin Bombe ist §lexplodiert§f du bekommst §e§l" + random + " Coins!");
-                            CoreSystem.getInstance().getCorePlayer(player).addCoins(random);
-                        } else {
-                            player.sendMessage("§8[§7§l!§8] §fServer §8» §fDie Coin Bombe ist §lexplodiert§f du bekommst §e§l" + coinbomstartbrandom + " Coins!");
-                            CoreSystem.getInstance().getCorePlayer(player).addCoins(coinbomstartbrandom);
-                        }
-
-                        DefaultItem.COINBOMB.remove(gamePlayer);
-                    }, 80L);
-                }
-            } else {
-                GameAPIPlugin.getSystem().getMessenger().send(p, "§4Es müssen mindestens 2 Spieler Online sein!");
+        if (isExploding) {
+            if (item.getItemStack().getType().equals(Material.IRON_INGOT) || item.getItemStack().getType().equals(Material.IRON_BLOCK)) {
+                GamePlayer gamePlayer = GameAPI.getInstance().getGamePlayer(player);
+                gamePlayer.getCorePlayer().addCoins(100);
+                GameAPI.getInstance().getMessenger().send(player, "§7Du hast ein §fCoin Bomben§7 Item aufgesammelt §8[§a+100 Coins§8]");
+            } else if (item.getItemStack().getType().equals(Material.EMERALD) || item.getItemStack().getType().equals(Material.EMERALD_BLOCK)) {
+                GamePlayer gamePlayer = GameAPI.getInstance().getGamePlayer(player);
+                gamePlayer.getCorePlayer().addEmeralds(5);
+                GameAPI.getInstance().getMessenger().send(player, "§7Du hast ein §fCoin Bomben§7 Item aufgesammelt §8[§a+5 Emeralds§8]");
+            } else if (item.getItemStack().getType().equals(Material.GOLD_BLOCK) || item.getItemStack().getType().equals(Material.GOLD_INGOT) || item.getItemStack().getType().equals(Material.DIAMOND_BLOCK)) {
+                GamePlayer gamePlayer = GameAPI.getInstance().getGamePlayer(player);
+                gamePlayer.getCorePlayer().addCoins(150);
+                GameAPI.getInstance().getMessenger().send(player, "§7Du hast ein §fCoin Bomben§7 Item aufgesammelt §8[§a+150 Coins§8]");
             }
+            player.playSound(player.getLocation(), Sound.LEVEL_UP, 1, 1);
+            player.playEffect(player.getLocation(), Effect.FLAME, 5);
+            item.remove();
         }
     }
 
