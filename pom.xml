@@ -110,7 +110,7 @@
         <dependency> <!-- MCONE CoreSystem (This includes the Bukkit-API) -->
             <groupId>eu.mcone.coresystem</groupId>
             <artifactId>bukkit-api</artifactId>
-            <version>10.6.3-SNAPSHOT</version>
+            <version>10.7.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency> <!-- MCONE CoreSystem (This includes the Bukkit-API) -->
