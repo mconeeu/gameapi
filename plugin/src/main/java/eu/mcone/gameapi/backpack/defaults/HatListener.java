@@ -20,12 +20,12 @@ public class HatListener extends BackpackInventoryListener {
         if (item.getId() == DefaultItem.HEAD_SECRET_STRIPCLUB.getId()) {
             p.getInventory().setHelmet(item.getItem());
             p.closeInventory();
-            plugin.getMessenger().send(p, "§7Du hast den Kopf §f"+item.getName()+"§7 aufgesetzt!");
+            plugin.getMessenger().send(p, "§7Du hast den §f" + item.getName() + "§7 Kopf aufgesetzt!");
             p.setWalkSpeed(0.25F);
         } else {
             p.getInventory().setHelmet(item.getItem());
             p.closeInventory();
-            plugin.getMessenger().send(p, "§7Du hast den Kopf §f"+item.getName()+"§7 aufgesetzt!");
+            plugin.getMessenger().send(p, "§7Du hast den §f" + item.getName() + "§7 Kopf aufgesetzt!");
             p.setWalkSpeed(0.20F);
         }
     }
