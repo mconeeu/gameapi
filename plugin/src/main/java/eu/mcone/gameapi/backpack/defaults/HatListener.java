@@ -36,7 +36,7 @@ public class HatListener extends BackpackInventoryListener {
 
         inv.setItem(InventorySlot.ROW_6_SLOT_8, new ItemBuilder(Material.BARRIER).displayName("§c§lKopf absetzen").lore("§7§oFalls du einen deiner Köpfe", "§7§oaufgesetzt hast, kannst Du ihn", "§7§ohiermit absetzen.").create(), e -> {
             p.getInventory().setHelmet(null);
-            plugin.getMessenger().send(p, "§7Du hast deinen Kopf erfolgreich abgesetzt!");
+            plugin.getMessenger().send(p, "§7Du hast deinPen Kopf erfolgreich abgesetzt!");
             p.setWalkSpeed(0.20F);
         });
     }

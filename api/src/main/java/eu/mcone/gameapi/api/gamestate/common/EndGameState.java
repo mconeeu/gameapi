@@ -43,6 +43,8 @@ public class EndGameState extends GameState {
 
     @Override
     public void onStart(GameStateStartEvent event) {
+        GamePlugin.getGamePlugin().getGameStateManager().startCountdown();
+
         if (GamePlugin.getGamePlugin().hasModule(Module.REPLAY)) {
             GamePlugin.getGamePlugin().getReplaySession().saveSession();
         }

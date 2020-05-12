@@ -26,6 +26,7 @@ public class GeneralDeathListener implements Listener {
 
             if (!GamePlugin.getGamePlugin().getTeamManager().isWinMethodDeactivated()) {
                 Team team = GamePlugin.getGamePlugin().getTeamManager().checkChanceToWin();
+
                 if (team != null) {
                     Bukkit.getPluginManager().callEvent(new TeamWonEvent(team));
 

@@ -283,6 +283,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
         //TODO: Add team stage integration
         removeTeam();
         GamePlugin.getGamePlugin().getPlayerManager().setPlaying(player, false);
+        GamePlugin.getGamePlugin().getPlayerManager().setSpectating(player, true);
     }
 
     public void addKills(final int var) {
