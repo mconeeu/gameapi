@@ -5,7 +5,6 @@ import eu.mcone.coresystem.api.bukkit.util.Messenger;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
-import eu.mcone.gameapi.api.event.player.GamePlayerUnloadEvent;
 import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftHorse;
 import org.bukkit.entity.ArmorStand;
@@ -18,6 +17,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.util.EulerAngle;
@@ -155,7 +155,7 @@ public class FlyOneCarpetListener extends GadgetListener {
     }
 
     @EventHandler
-    public void onUnload(GamePlayerUnloadEvent e) {
+    public void onUnload(PlayerQuitEvent e) {
         for (Player all : Bukkit.getOnlinePlayers()) {
             World world = all.getWorld();
             if (FlyOneCarpetListener.isRiding.contains(all)) {
@@ -166,17 +166,16 @@ public class FlyOneCarpetListener extends GadgetListener {
                         }
                     }
                 }
-            }
-            for (ArmorStand armorStand : world.getEntitiesByClass(ArmorStand.class)) {
-                if (armorstandId.get(all).equals(armorStand.getEntityId())) {
-                    if (armorstandId.containsKey(all)) {
-                        armorStandMap.remove(all);
-                        horseId.remove(all);
-                        armorStand.remove();
+                for (ArmorStand armorStand : world.getEntitiesByClass(ArmorStand.class)) {
+                    if (armorstandId.get(all).equals(armorStand.getEntityId())) {
+                        if (armorstandId.containsKey(all)) {
+                            armorStandMap.remove(all);
+                            horseId.remove(all);
+                            armorStand.remove();
+                        }
                     }
                 }
             }
-
         }
     }
 
