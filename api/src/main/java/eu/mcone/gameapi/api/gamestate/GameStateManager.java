@@ -1,12 +1,6 @@
 package eu.mcone.gameapi.api.gamestate;
 
-import eu.mcone.gameapi.api.Option;
-
-import java.util.List;
-
 public interface GameStateManager {
-
-    List<Option> getOptions();
 
     GameStateManager addGameState(GameState gameState);
 
@@ -19,6 +13,8 @@ public interface GameStateManager {
     GameState getPrevious();
 
     GameState getNextGameState();
+
+    boolean setNextGameState(boolean force);
 
     boolean setGameState(GameState gameState, boolean force);
 

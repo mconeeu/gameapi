@@ -1,11 +1,14 @@
-package eu.mcone.gameapi.team;
+package eu.mcone.gameapi.listener.team;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.coresystem.api.core.player.Group;
+import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.gamestate.common.InGameState;
 import eu.mcone.gameapi.api.player.GamePlayer;
+import eu.mcone.gameapi.api.player.GamePlayerState;
+import eu.mcone.gameapi.team.GameTeamManager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -16,11 +19,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 @Getter
-public class GeneralTeamChatManager implements Listener {
+public class TeamChatListener implements Listener {
 
-    private final TeamManager teamManager;
+    private final GameTeamManager teamManager;
 
-    public GeneralTeamChatManager(TeamManager teamManager) {
+    public TeamChatListener(GameTeamManager teamManager) {
         this.teamManager = teamManager;
     }
 
@@ -28,19 +31,20 @@ public class GeneralTeamChatManager implements Listener {
     public void on(AsyncPlayerChatEvent e) {
         Player player = e.getPlayer();
         CorePlayer cp = CoreSystem.getInstance().getCorePlayer(player);
+        GamePlayer gp = GameAPI.getInstance().getGamePlayer(player);
 
         String message = e.getMessage();
 
         if (GamePlugin.getGamePlugin().getGameStateManager().getRunning() instanceof InGameState) {
-            if (GamePlugin.getGamePlugin().getPlayerManager().isSpectator(player)) {
-                for (Player spectator : GamePlugin.getGamePlugin().getPlayerManager().getSpectating()) {
+            if (gp.getState().equals(GamePlayerState.SPECTATING)) {
+                for (Player spectator : GamePlugin.getGamePlugin().getPlayerManager().getPlayers(GamePlayerState.SPECTATING)) {
                     spectator.sendMessage("§8[§7Spectator§8] " + CoreSystem.getInstance().getTranslationManager().get("system.bukkit.chat").replaceAll("%Player%", player.getName()) + message);
                 }
             } else {
                 GamePlayer gamePlayer = GamePlugin.getGamePlugin().getGamePlayer(player.getUniqueId());
 
-                if (teamManager.getPlayingChat() != null) {
-                    teamManager.getPlayingChat().onPlayingChat(message, player, gamePlayer);
+                if (teamManager.getTeamChatListener() != null) {
+                    teamManager.getTeamChatListener().onPlayingChat(message, player, gamePlayer);
                 }
             }
 

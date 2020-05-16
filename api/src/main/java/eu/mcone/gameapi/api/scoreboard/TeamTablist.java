@@ -1,4 +1,4 @@
-package eu.mcone.gameapi.team;
+package eu.mcone.gameapi.api.scoreboard;
 
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.coresystem.api.bukkit.scoreboard.CoreScoreboard;
@@ -7,7 +7,7 @@ import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.team.Team;
 
-public class GeneralTeamTablist extends CoreScoreboard {
+public class TeamTablist extends CoreScoreboard {
 
     @Override
     public void modifyTeam(CorePlayer owner, CorePlayer player, CoreScoreboardEntry t) {
@@ -15,7 +15,7 @@ public class GeneralTeamTablist extends CoreScoreboard {
 
         if (gp.getTeam() != null) {
             Team team = gp.getTeam();
-            t.priority(team.getPriority()).prefix(team.getChatColor().toString());
+            t.priority(team.getPriority()).prefix(team.getColor().toString());
         } else {
             t.prefix("§4x §8").priority(9999);
         }

@@ -2,13 +2,13 @@ package eu.mcone.gameapi.api.player;
 
 import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
+import eu.mcone.coresystem.api.bukkit.player.Stats;
 import eu.mcone.gameapi.api.achievement.Achievement;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.api.kit.Kit;
 import eu.mcone.gameapi.api.kit.ModifiedKit;
 import eu.mcone.gameapi.api.team.Team;
-import eu.mcone.gameapi.api.team.TeamDefinition;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -17,6 +17,10 @@ import java.util.Map;
 public interface GamePlayer {
 
     Player bukkit();
+
+    GamePlayerState getState();
+
+    Stats getStats();
 
     int getRoundKills();
 
@@ -64,12 +68,15 @@ public interface GamePlayer {
 
     boolean hasAchievement(String name);
 
-    //Team
-    void setTeam(Team team);
+    void setState(GamePlayerState state);
 
-    void setTeam(TeamDefinition team);
+    boolean isInCameraMode();
 
-    void removeTeam();
+    void setInCameraMode(Player target);
+
+    void removeFromCameraMode();
+
+    void changeTeamTo(Team team);
 
     void removeFromGame();
 

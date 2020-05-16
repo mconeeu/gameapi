@@ -16,18 +16,17 @@ import eu.mcone.gameapi.backpack.GameBackpackManager;
 import eu.mcone.gameapi.damage.GameDamageLogger;
 import eu.mcone.gameapi.gamestate.GameStateManager;
 import eu.mcone.gameapi.kit.GameKitManager;
-import eu.mcone.gameapi.listener.*;
+import eu.mcone.gameapi.listener.GamePlayerListener;
 import eu.mcone.gameapi.map.GameMapManager;
 import eu.mcone.gameapi.player.GameAPIPlayer;
 import eu.mcone.gameapi.player.GamePlayerManager;
 import eu.mcone.gameapi.replay.session.ReplaySession;
 import eu.mcone.gameapi.replay.session.ReplaySessionManager;
-import eu.mcone.gameapi.team.TeamManager;
+import eu.mcone.gameapi.team.GameTeamManager;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -49,12 +48,7 @@ public class GameAPIPlugin extends GameAPI {
         this.players = new ArrayList<>();
 
         registerEvents(
-                new GamePlayerListener(),
-                new GeneralDamageListener(),
-                new GeneralDeathListener(),
-                new GeneralInteractListener(),
-                new GeneralItemListener(),
-                new GeneralBlockListener()
+                new GamePlayerListener()
         );
 
         sendConsoleMessage("§aVersion §f" + this.getDescription().getVersion() + "§a enabled...");
@@ -66,8 +60,8 @@ public class GameAPIPlugin extends GameAPI {
     }
 
     @Override
-    public eu.mcone.gameapi.api.gamestate.GameStateManager constructGameStateManager(GamePlugin gamePlugin, Option... options) {
-        return new GameStateManager(this, gamePlugin, options);
+    public eu.mcone.gameapi.api.gamestate.GameStateManager constructGameStateManager(GamePlugin gamePlugin) {
+        return new GameStateManager(this, gamePlugin);
     }
 
     @Override
@@ -112,8 +106,8 @@ public class GameAPIPlugin extends GameAPI {
 //    }
 
     @Override
-    public TeamManager constructTeamManager(GamePlugin gamePlugin, Option[] options) {
-        return new TeamManager(gamePlugin, this, options);
+    public GameTeamManager constructTeamManager(GamePlugin gamePlugin, Option[] options) {
+        return new GameTeamManager(gamePlugin, this, options);
     }
 
     @Override
@@ -157,7 +151,7 @@ public class GameAPIPlugin extends GameAPI {
     }
 
     @Override
-    public Collection<GamePlayer> getOnlineGamePlayers() {
+    public List<GamePlayer> getOnlineGamePlayers() {
         return new ArrayList<>(players);
     }
 

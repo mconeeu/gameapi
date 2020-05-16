@@ -123,7 +123,7 @@ public abstract class GamePlugin extends CorePlugin {
 
     public GameStateManager getGameStateManager() {
         modules.add(Module.GAME_STATE_MANAGER);
-        return gameStateManager != null ? gameStateManager : (gameStateManager = GameAPI.getInstance().constructGameStateManager(this, options));
+        return gameStateManager != null ? gameStateManager : (gameStateManager = GameAPI.getInstance().constructGameStateManager(this));
     }
 
     public ReplaySession getReplaySession() {

@@ -7,6 +7,7 @@ import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
 import eu.mcone.coresystem.api.bukkit.item.Skull;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.player.GamePlayer;
+import eu.mcone.gameapi.api.player.GamePlayerState;
 import eu.mcone.gameapi.player.GamePlayerManager;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -21,16 +22,16 @@ public class SpectatorInventory extends CoreInventory {
         super("§7Spectator", player, InventorySlot.ROW_6, InventoryOption.FILL_EMPTY_SLOTS);
 
         int slot = 0;
-        for (Player playing : playerManager.getPlaying()) {
+        for (Player playing : playerManager.getPlayers(GamePlayerState.PLAYING)) {
             GamePlayer gamePlayer = GamePlugin.getGamePlugin().getGamePlayer(playing.getUniqueId());
 
             setItem(slot, new Skull(playing.getName()).setDisplayName("§7" + playing.getName()).lore(
-                    "§8» §7§oRanking Platz: §f§l" + gamePlayer.getCorePlayer().getStats().getUserRanking(),
-                    "§8» §7§oKD: §f§l" + gamePlayer.getCorePlayer().getStats().getKD(),
-                    "§8» §7§oKills: §f§l" + gamePlayer.getCorePlayer().getStats().getKill(),
-                    "§8» §7§oTode: §f§l" + gamePlayer.getCorePlayer().getStats().getDeath(),
-                    "§8» §7§oGewonnen: §f§l" + gamePlayer.getCorePlayer().getStats().getWin(),
-                    "§8» §7§oVerloren: §f§l" + gamePlayer.getCorePlayer().getStats().getLose()
+                    "§8» §7§oRanking Platz: §f§l" + gamePlayer.getStats().getUserRanking(),
+                    "§8» §7§oKD: §f§l" + gamePlayer.getStats().getKD(),
+                    "§8» §7§oKills: §f§l" + gamePlayer.getStats().getKill(),
+                    "§8» §7§oTode: §f§l" + gamePlayer.getStats().getDeath(),
+                    "§8» §7§oGewonnen: §f§l" + gamePlayer.getStats().getWin(),
+                    "§8» §7§oVerloren: §f§l" + gamePlayer.getStats().getLose()
             ).getItemStack(), e -> {
                 player.teleport(gamePlayer.getCorePlayer().bukkit().getLocation());
                 player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 1);

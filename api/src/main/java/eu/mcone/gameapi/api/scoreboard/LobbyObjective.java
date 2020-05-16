@@ -5,8 +5,8 @@ import eu.mcone.coresystem.api.bukkit.scoreboard.CoreSidebarObjective;
 
 public class LobbyObjective extends CoreSidebarObjective {
 
-    public LobbyObjective(String name) {
-        super(name);
+    public LobbyObjective() {
+        super("Lobby");
     }
 
     @Override

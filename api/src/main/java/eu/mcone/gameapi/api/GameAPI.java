@@ -22,7 +22,7 @@ import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 public abstract class GameAPI extends CorePlugin {
@@ -44,7 +44,7 @@ public abstract class GameAPI extends CorePlugin {
 
     public abstract ReplaySession createReplaySession(ReplaySessionManager manager);
 
-    public abstract GameStateManager constructGameStateManager(GamePlugin gamePlugin, Option... options);
+    public abstract GameStateManager constructGameStateManager(GamePlugin gamePlugin);
 
     public abstract MapManager constructMapManager();
 
@@ -70,6 +70,6 @@ public abstract class GameAPI extends CorePlugin {
 
     public abstract GamePlayer getGamePlayer(String name);
 
-    public abstract Collection<GamePlayer> getOnlineGamePlayers();
+    public abstract List<GamePlayer> getOnlineGamePlayers();
 
 }

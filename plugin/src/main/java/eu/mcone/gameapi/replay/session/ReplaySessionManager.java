@@ -56,13 +56,13 @@ public class ReplaySessionManager implements eu.mcone.gameapi.api.replay.session
         List<Option> optionsList = Arrays.asList(options);
 
         GameAPIPlugin.getSystem().sendConsoleMessage("§aLoading Replay SessionManager...");
-        if (optionsList.contains(Option.SESSION_MANAGER_LOAD_ALL_REPLAYS)) {
+        if (optionsList.contains(Option.REPLAY_SESSION_MANAGER_LOAD_ALL_REPLAYS)) {
             load();
         } else {
             cache = false;
         }
 
-        if (optionsList.contains(Option.USE_WORLD_DOWNLOADER)) {
+        if (optionsList.contains(Option.REPLAY_SESSION_MANAGER_USE_WORLD_DOWNLOADER)) {
             GameAPIPlugin.getSystem().sendConsoleMessage("§aStarting world downloader...");
             worldDownloader = new WorldDownloader();
             worldDownloader.runDownloader();

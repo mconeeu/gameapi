@@ -1,5 +1,6 @@
 package eu.mcone.gameapi.listener.backpack;
 
+import eu.mcone.gameapi.api.event.player.GamePlayerLoadedEvent;
 import eu.mcone.gameapi.backpack.GameBackpackManager;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;
@@ -18,6 +19,13 @@ public class BackpackListener implements Listener {
                 manager.cancelTraid((Player) e.getPlayer());
             }
         }*/
+    }
+
+    @EventHandler
+    public void onJoin(GamePlayerLoadedEvent e) {
+        if (manager.isUseRankBoots()) {
+            manager.setRankBoots(e.getPlayer().bukkit());
+        }
     }
 
 }

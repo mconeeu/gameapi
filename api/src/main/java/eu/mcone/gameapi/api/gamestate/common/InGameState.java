@@ -2,86 +2,90 @@ package eu.mcone.gameapi.api.gamestate.common;
 
 import eu.mcone.coresystem.api.bukkit.CorePlugin;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
-import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.coresystem.api.bukkit.scoreboard.CoreObjective;
 import eu.mcone.coresystem.api.bukkit.scoreboard.CoreScoreboard;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Module;
-import eu.mcone.gameapi.api.Option;
 import eu.mcone.gameapi.api.event.game.GameDrawEvent;
 import eu.mcone.gameapi.api.event.gamestate.GameStateStartEvent;
 import eu.mcone.gameapi.api.event.gamestate.GameStateStopEvent;
+import eu.mcone.gameapi.api.event.gamestate.GameStateTimeoutEndEvent;
 import eu.mcone.gameapi.api.gamestate.GameState;
-import eu.mcone.gameapi.api.utils.GameConfig;
+import eu.mcone.gameapi.api.player.GamePlayer;
+import eu.mcone.gameapi.api.player.GamePlayerState;
+import eu.mcone.gameapi.api.scoreboard.InGameObjective;
+import eu.mcone.gameapi.api.scoreboard.TeamTablist;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 
 public class InGameState extends GameState {
 
-    private final GameConfig config;
-    @Getter
-    private double timeoutSeconds = 0;
+    @Getter @Setter
+    private static Class<? extends CoreScoreboard> scoreboard;
+    @Getter @Setter
+    private static Class<? extends InGameObjective> objective;
 
     public InGameState() {
-        super("InGame");
-        config = GamePlugin.getGamePlugin().getGameConfig().parseConfig();
+        this(0);
     }
 
     public InGameState(int timeout) {
-        super("InGame", 0, timeout);
-        config = GamePlugin.getGamePlugin().getGameConfig().parseConfig();
+        this(0, timeout);
     }
 
     public InGameState(int countdown, int timeout) {
         super("InGame", countdown, timeout);
-        config = GamePlugin.getGamePlugin().getGameConfig().parseConfig();
     }
 
     @Override
     public void onTimeoutSecond(CorePlugin plugin, long second) {
-        if (GamePlugin.getGamePlugin().getGameStateManager().getOptions().contains(Option.USE_SEASON_TIMEOUT)) {
-            timeoutSeconds = getTimeout() - second;
-            double min = timeoutSeconds / 60;
+        //Update IngameObjective scoreboard automatically
+        if (GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)) {
+            for (Player player : GamePlugin.getGamePlugin().getPlayerManager().getPlayers(GamePlayerState.PLAYING)) {
+                CoreObjective objective = CoreSystem.getInstance().getCorePlayer(player).getScoreboard().getObjective(DisplaySlot.SIDEBAR);
 
-            if (min >= config.getSeason()) {
-                if (GamePlugin.getGamePlugin().hasModule(Module.TEAM_MANAGER)) {
-                    Bukkit.getPluginManager().callEvent(new GameDrawEvent(GamePlugin.getGamePlugin().getTeamManager().getPrematureWinner()));
-                }
-            }
-
-            //Update scoreboard automatically
-            if (GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)) {
-                for (Player player : GamePlugin.getGamePlugin().getPlayerManager().getPlaying()) {
-                    CorePlayer corePlayer = CoreSystem.getInstance().getCorePlayer(player);
-                    corePlayer.getScoreboard().getObjective(DisplaySlot.SIDEBAR).reload();
+                if (objective instanceof InGameObjective) {
+                    objective.reload();
                 }
             }
         }
     }
 
     @Override
-    public void onCountdownSecond(CorePlugin plugin, int second) {
+    public void onTimeoutEnd(GameStateTimeoutEndEvent event) {
+        if (GamePlugin.getGamePlugin().hasModule(Module.TEAM_MANAGER) && !GamePlugin.getGamePlugin().getTeamManager().isDisableWinMethod()) {
+            Bukkit.getPluginManager().callEvent(
+                    new GameDrawEvent(GamePlugin.getGamePlugin().getTeamManager().calculateWinnerByKills())
+            );
+        }
     }
 
     @Override
     public void onStart(GameStateStartEvent event) {
-        if (GamePlugin.getGamePlugin().hasModule(Module.TEAM_MANAGER) && GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)) {
-            for (Player playing : GamePlugin.getGamePlugin().getPlayerManager().getPlaying()) {
-                CorePlayer player = CoreSystem.getInstance().getCorePlayer(playing);
-                CoreScoreboard coreScoreboard = null;
-                try {
-                    coreScoreboard = GamePlugin.getGamePlugin().getTeamManager().getTeamTablist().newInstance();
-                    CoreObjective objective = player.getScoreboard().getObjective(DisplaySlot.SIDEBAR);
-                    player.setScoreboard(coreScoreboard);
-
-                    if (objective != null) {
-                        player.getScoreboard().setNewObjective(objective);
+        if (GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)) {
+            try {
+                if (GamePlugin.getGamePlugin().hasModule(Module.TEAM_MANAGER)) {
+                    if (scoreboard == null) {
+                        scoreboard = TeamTablist.class;
                     }
-                } catch (InstantiationException | IllegalAccessException e) {
-                    e.printStackTrace();
+
+                    for (GamePlayer gp : GamePlugin.getGamePlugin().getPlayerManager().getGamePlayers(GamePlayerState.PLAYING)) {
+                        gp.getCorePlayer().setScoreboard(scoreboard.newInstance());
+                    }
                 }
+
+                if (objective == null) {
+                    objective = InGameObjective.class;
+                }
+
+                for (GamePlayer gp : GamePlugin.getGamePlugin().getPlayerManager().getGamePlayers(GamePlayerState.PLAYING)) {
+                    gp.getCorePlayer().getScoreboard().setNewObjective(objective.newInstance());
+                }
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
             }
         }
 

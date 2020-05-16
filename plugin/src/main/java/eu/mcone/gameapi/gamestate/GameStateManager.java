@@ -3,7 +3,6 @@ package eu.mcone.gameapi.gamestate;
 import eu.mcone.coresystem.api.bukkit.CorePlugin;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GamePlugin;
-import eu.mcone.gameapi.api.Option;
 import eu.mcone.gameapi.api.event.gamestate.*;
 import eu.mcone.gameapi.api.gamestate.GameState;
 import eu.mcone.gameapi.command.ForceStartCMD;
@@ -12,14 +11,13 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.List;
 
 public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStateManager {
 
     private final GameAPIPlugin system;
     private final CorePlugin gamePlugin;
+    @Getter
     private final LinkedList<GameState> pipeline;
     @Getter
     private GameState running = null;
@@ -32,18 +30,13 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
     @Getter
     private int countdownCounter;
 
-    @Getter
-    private List<Option> options;
-
-    public GameStateManager(GameAPIPlugin system, CorePlugin plugin, Option... options) {
+    public GameStateManager(GameAPIPlugin system, CorePlugin plugin) {
         this.system = system;
         this.gamePlugin = plugin;
         this.pipeline = new LinkedList<>();
-        this.options = Arrays.asList(options);
-
 
         system.sendConsoleMessage("§aLoading GameStateManager...");
-        system.registerEvents(new GameStateListener());
+        system.registerEvents(new GameStateListener(this));
         system.registerCommands(new ForceStartCMD());
     }
 
@@ -87,6 +80,11 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
         } else {
             return pipeline.getFirst();
         }
+    }
+
+    @Override
+    public boolean setNextGameState(boolean force) {
+        return setGameState(getNextGameState(), force);
     }
 
     @Override

@@ -5,29 +5,25 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
+import java.util.Set;
 
 public interface PlayerManager {
 
     ItemStack SPECTATOR = new ItemBuilder(Material.BED, 1, 0).displayName("§c§lSpectator §8» §7§oteleportiere dich zu einem Spieler.").create();
 
-    List<Player> getPlaying();
-
-    List<Player> getSpectating();
-
     int getMinPlayers();
 
     int getMaxPlayers();
 
-    void addSpectator(final Player player);
+    Set<Player> getPlayers(GamePlayerState state);
 
-    void removeSpectator(final Player player);
+    Set<GamePlayer> getGamePlayers(GamePlayerState state);
 
-    boolean isSpectator(final Player player);
+    boolean isInCameraMode(GamePlayer player);
 
-    void setSpectating(final Player player, final boolean var);
+    boolean maxPlayersReached();
 
-    void setPlaying(final Player player, final boolean var);
+    boolean minPlayersReached();
 
-    void openSpectatorInventory(final Player player);
+    void openSpectatorInventory(Player player);
 }
