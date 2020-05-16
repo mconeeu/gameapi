@@ -92,7 +92,7 @@ public class GameBackpackManager implements BackpackManager {
 
             //Not needed because the boots are set in the CorePlayerLoaded Event
 //            for (CorePlayer cp : CoreSystem.getInstance().getOnlineCorePlayers()) {
-//                setRankBoots(cp.bukkit());
+//              setRankBoots(cp.bukkit());
 //            }
         }
 
