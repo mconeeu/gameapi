@@ -30,6 +30,9 @@ public enum DefaultItem {
     SPLASH_POTION(8, "Hexen Wurf Trank", DefaultCategory.GADGET, Level.UNUSUAL, 70, 45, new ItemBuilder(Material.POTION, 1, 16430).displayName("§3§lGeister Trank").lore("§7Kategorie: §bGadget", "§7Seltenheit: §3Ungewöhnlich", "", "", "§7Mache dich unsichtbar und erschrecke", "§7Ahnungslose Spieler!").create()),
     MYSTERY_FURNACHE(9, "Mystery Ofen", DefaultCategory.GADGET, Level.LEGENDARY, 135, 95, new ItemBuilder(Material.FURNACE, 1, 0).displayName("§6§lKomischer Ofen").lore("§7Kategorie: §bGadget", "§7Seltenheit: §6Legendär", "", "", "§7Werfe deinen komischen Ofen auf", "§7andere undkoche seltsame Dinge!").create()),
     FLY_CARPET(10, "Fliegender One Teppich", DefaultCategory.GADGET, Level.MYSTICAL, 185, 105, new ItemBuilder(Material.BANNER, 1, 0).displayName("§c§lFliegender One Teppich").lore("§7Kategorie: §bGadget", "§7Seltenheit: §cMythisch", "", "", "§7Springe auf deinem One Teppich", "§7und fliege durch die Insel!").create()),
+    BOAT(11, "Boot", DefaultCategory.GADGET, Level.EPIC, 125, 75, new ItemBuilder(Material.BOAT, 1, 0).displayName("§5§lBoot").lore("§7Kategorie: §bGadget", "§7Seltenheit: §5Episch", "", "", "§7Schipper um die OneIsland", "§7Insel und hupe laut!").create()),
+
+
 
     //Heads
     HEAD_PALUTEN(0, "Palutens", DefaultCategory.HAT, Level.EPIC, 120, 70, Skull.fromUrl("http://textures.minecraft.net/texture/33121196cf12ee65354016861da064948d4ce0912f662bca2e2a6b2a932038", 1).toItemBuilder().displayName("§5§lPalutens Kopf").lore("§7Kategorie: §bKopf", "§7Seltenheit: §5Episch", "§7Rang:§5 Youtuber", "", "§7Edgar bist du da ??").create()),

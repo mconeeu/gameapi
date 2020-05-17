@@ -22,6 +22,7 @@ public class GadgetListener extends BackpackInventoryListener {
                 new LoveGunListener(plugin),
                 new SnowGunListener(plugin),
                 new CobwebGunListener(plugin),
+                new BoatListener(plugin),
                 new FurnaceListener(plugin),
                 new FlyOneCarpetListener(plugin),
                 new GrapplerListener(plugin),
