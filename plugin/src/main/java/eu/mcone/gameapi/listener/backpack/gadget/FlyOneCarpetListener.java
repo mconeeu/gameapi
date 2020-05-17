@@ -122,42 +122,45 @@ public class FlyOneCarpetListener extends GadgetListener {
     @EventHandler
     public void onReload(PlayerCommandPreprocessEvent e) {
         String cmd = e.getMessage();
-        if (cmd.equalsIgnoreCase("/rl") || cmd.equalsIgnoreCase("/reload")) {
-            e.setCancelled(true);
-            GameAPI.getInstance().getMessenger().broadcast(Messenger.Broadcast.BroadcastMessageTyp.INFO_MESSAGE, "§4Der §cServer §4wird neu geladen...");
+        Player p = e.getPlayer();
+        if (p.hasPermission("gameapi.reload")) {
+            if (cmd.equalsIgnoreCase("/rl") || cmd.equalsIgnoreCase("/reload")) {
+                e.setCancelled(true);
+                GameAPI.getInstance().getMessenger().broadcast(Messenger.Broadcast.BroadcastMessageTyp.INFO_MESSAGE, "§4Der §cServer §4wird neu geladen...");
 
-            for (Player all : Bukkit.getOnlinePlayers()) {
-                World world = all.getWorld();
-                if (FlyOneCarpetListener.isRiding.contains(all)) {
-                    for (Horse horse : world.getEntitiesByClass(Horse.class)) {
-                        if (horse != null) {
-                            if (horseId.get(all).equals(horse.getEntityId())) {
-                                if (horseId.containsKey(all)) {
-                                    horse.remove();
+                for (Player all : Bukkit.getOnlinePlayers()) {
+                    World world = all.getWorld();
+                    if (FlyOneCarpetListener.isRiding.contains(all)) {
+                        for (Horse horse : world.getEntitiesByClass(Horse.class)) {
+                            if (horse != null) {
+                                if (horseId.get(all).equals(horse.getEntityId())) {
+                                    if (horseId.containsKey(all)) {
+                                        horse.remove();
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                for (ArmorStand armorStand : world.getEntitiesByClass(ArmorStand.class)) {
-                    if (world.getEntities().contains(armorStand)) {
-                        if (armorStand != null) {
-                            if (!armorstandId.isEmpty()) {
-                                if (armorstandId.get(all).equals(armorStand.getEntityId())) {
-                                    if (armorstandId.containsKey(all)) {
-                                        armorStandMap.remove(all);
-                                        horseId.remove(all);
-                                        armorStand.remove();
+                    for (ArmorStand armorStand : world.getEntitiesByClass(ArmorStand.class)) {
+                        if (world.getEntities().contains(armorStand)) {
+                            if (armorStand != null) {
+                                if (!armorstandId.isEmpty()) {
+                                    if (armorstandId.get(all).equals(armorStand.getEntityId())) {
+                                        if (armorstandId.containsKey(all)) {
+                                            armorStandMap.remove(all);
+                                            horseId.remove(all);
+                                            armorStand.remove();
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
-            }
 
-            Bukkit.reload();
-            GameAPI.getInstance().getMessenger().broadcast(Messenger.Broadcast.BroadcastMessageTyp.INFO_MESSAGE, "§aDer Server wurde erfolgreich neu geladen.");
+                Bukkit.reload();
+                GameAPI.getInstance().getMessenger().broadcast(Messenger.Broadcast.BroadcastMessageTyp.INFO_MESSAGE, "§aDer Server wurde erfolgreich neu geladen.");
+            }
         }
     }
 
