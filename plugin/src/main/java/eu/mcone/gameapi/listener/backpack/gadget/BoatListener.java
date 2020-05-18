@@ -22,6 +22,7 @@ import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.spigotmc.event.entity.EntityDismountEvent;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class BoatListener extends GadgetListener {
 
@@ -30,6 +31,7 @@ public class BoatListener extends GadgetListener {
     }
 
     public static HashMap<Player, Integer> boatId = new HashMap<>();
+    public static HashSet<Integer> boatlist = new HashSet<>();
 
 
     @EventHandler
@@ -46,6 +48,7 @@ public class BoatListener extends GadgetListener {
                     Boat boat = (Boat) p.getWorld().spawnEntity(e.getClickedBlock().getLocation(), EntityType.BOAT);
                     p.playSound(p.getLocation(), Sound.FIREWORK_TWINKLE, 1, 1);
                     boatId.put(p, boat.getEntityId());
+                    boatlist.add(boat.getEntityId());
                     Bukkit.getScheduler().runTaskLater(GameAPI.getInstance(), () -> {
                         boat.setPassenger(p);
                         CoreSystem.getInstance().createActionBar()
@@ -61,7 +64,10 @@ public class BoatListener extends GadgetListener {
 
     @EventHandler
     public void onBoatdDestory(VehicleBlockCollisionEvent e) {
-        e.getVehicle().remove();
+        if (boatlist.contains(e.getVehicle().getEntityId())) {
+            e.getVehicle().remove();
+            boatlist.remove(e.getVehicle().getEntityId());
+        }
     }
 
     @EventHandler
@@ -91,10 +97,15 @@ public class BoatListener extends GadgetListener {
         Player p = (Player) e.getEntity();
 
         if (e.getDismounted().getType().equals(EntityType.BOAT)) {
-            e.getDismounted().remove();
+            if (boatId.containsKey(p)) {
+                if (boatlist.contains(e.getDismounted().getEntityId())) {
+                    e.getDismounted().remove();
 
-            p.playSound(p.getLocation(), Sound.ANVIL_BREAK, 1, 1);
-            boatId.remove(p);
+                    p.playSound(p.getLocation(), Sound.ANVIL_BREAK, 1, 1);
+                    boatId.remove(p);
+                    boatlist.remove(e.getDismounted().getEntityId());
+                }
+            }
         }
     }
 
@@ -105,10 +116,13 @@ public class BoatListener extends GadgetListener {
             for (Player all : Bukkit.getOnlinePlayers()) {
                 World world = all.getWorld();
                 for (Boat boat : world.getEntitiesByClass(Boat.class)) {
-                    if (boatId.get(all).equals(boat.getEntityId())) {
-                        if (boatId.containsKey(all)) {
-                            boat.remove();
-                            boatId.remove(all);
+                    if (boatId.containsKey(all)) {
+                        if (boatId.get(all).equals(boat.getEntityId())) {
+                            if (boatlist.contains(boat.getEntityId())) {
+                                boat.remove();
+                                boatId.remove(all);
+                                boatlist.remove(boat.getEntityId());
+                            }
                         }
                     }
                 }
@@ -122,10 +136,15 @@ public class BoatListener extends GadgetListener {
         World world = p.getWorld();
         for (Player all : Bukkit.getOnlinePlayers()) {
             for (Boat boat : world.getEntitiesByClass(Boat.class)) {
-                if (boatId.get(all).equals(boat.getEntityId())) {
+                if (all != null) {
                     if (boatId.containsKey(all)) {
-                        boat.remove();
-                        boatId.remove(p);
+                        if (boatId.get(all).equals(boat.getEntityId())) {
+                            if (boatlist.contains(boat.getEntityId())) {
+                                boat.remove();
+                                boatId.remove(p);
+                                boatlist.remove(boat.getEntityId());
+                            }
+                        }
                     }
                 }
             }

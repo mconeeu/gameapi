@@ -100,12 +100,16 @@ public class FlyOneCarpetListener extends GadgetListener {
 
                 World world = p.getWorld();
                 for (ArmorStand armorStand : world.getEntitiesByClass(ArmorStand.class)) {
-                    if (armorstandId.get(p).equals(armorStand.getEntityId())) {
-                        if (armorstandId.containsKey(p)) {
-                            armorStandMap.remove(p);
-                            armorstandId.remove(p);
-                            horseId.remove(p);
-                            armorStand.remove();
+                    if (armorStand != null) {
+                        if (armorStandMap.containsValue(armorStand)) {
+                            if (armorstandId.containsKey(p)) {
+                                if (armorstandId.get(p).equals(armorStand.getEntityId())) {
+                                    armorStandMap.remove(p);
+                                    armorstandId.remove(p);
+                                    horseId.remove(p);
+                                    armorStand.remove();
+                                }
+                            }
                         }
                     }
                 }
@@ -117,6 +121,7 @@ public class FlyOneCarpetListener extends GadgetListener {
                 }
             }
         }
+
     }
 
     @EventHandler
@@ -145,8 +150,8 @@ public class FlyOneCarpetListener extends GadgetListener {
                         if (world.getEntities().contains(armorStand)) {
                             if (armorStand != null) {
                                 if (!armorstandId.isEmpty()) {
-                                    if (armorstandId.get(all).equals(armorStand.getEntityId())) {
-                                        if (armorstandId.containsKey(all)) {
+                                    if (armorstandId.containsKey(all)) {
+                                        if (armorstandId.get(all).equals(armorStand.getEntityId())) {
                                             armorStandMap.remove(all);
                                             horseId.remove(all);
                                             armorStand.remove();
@@ -166,23 +171,29 @@ public class FlyOneCarpetListener extends GadgetListener {
 
     @EventHandler
     public void onUnload(PlayerQuitEvent e) {
-        for (Player all : Bukkit.getOnlinePlayers()) {
-            World world = all.getWorld();
-            if (FlyOneCarpetListener.isRiding.contains(all)) {
-                for (Horse horse : world.getEntitiesByClass(Horse.class)) {
-                    if (horseId.get(all).equals(horse.getEntityId())) {
-                        if (horseId.containsKey(all)) {
+        Player p = e.getPlayer();
+        World world = p.getWorld();
+
+        if (isRiding.contains(p)) {
+            for (Horse horse : world.getEntitiesByClass(Horse.class)) {
+                if (horseId.containsValue(horse.getEntityId())) {
+                    if (horseId.get(p).equals(horse.getEntityId())) {
+                        if (horseId.containsKey(p)) {
                             horse.remove();
                         }
                     }
                 }
-                for (ArmorStand armorStand : world.getEntitiesByClass(ArmorStand.class)) {
-                    if (armorstandId.get(all).equals(armorStand.getEntityId())) {
-                        if (armorstandId.containsKey(all)) {
-                            armorStandMap.remove(all);
-                            horseId.remove(all);
-                            armorstandId.remove(all);
-                            armorStand.remove();
+            }
+            for (ArmorStand armorStand : world.getEntitiesByClass(ArmorStand.class)) {
+                if (armorStandMap.containsValue(armorStand)) {
+                    if (armorstandId.containsKey(p)) {
+                        if (armorstandId.get(p).equals(armorStand.getEntityId())) {
+                            if (armorstandId.containsKey(p)) {
+                                armorStandMap.remove(p);
+                                horseId.remove(p);
+                                armorstandId.remove(p);
+                                armorStand.remove();
+                            }
                         }
                     }
                 }
