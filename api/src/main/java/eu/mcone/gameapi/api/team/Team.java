@@ -26,9 +26,15 @@ public interface Team {
 
     String getSpawnLocation();
 
+    void setSpawnLocation(String spawnLocation);
+
     String getNpcLocation();
 
+    void setNpcLocation(String npcLocation);
+
     String getRespawnBlockLocation();
+
+    void setRespawnBlockLocation(String respawnBlockLocation);
 
     List<GamePlayer> getPlayers();
 

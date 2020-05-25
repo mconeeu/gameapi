@@ -23,7 +23,8 @@ public class GameTeam implements Team {
     private boolean alive;
     private final ChatColor color;
     private final ItemStack item;
-    private final String spawnLocation, npcLocation, respawnBlockLocation;
+    @Setter
+    private String spawnLocation, npcLocation, respawnBlockLocation;
     private final List<GamePlayer> players;
 
     public GameTeam(String name, String label, int priority, ChatColor color, ItemStack item) {
