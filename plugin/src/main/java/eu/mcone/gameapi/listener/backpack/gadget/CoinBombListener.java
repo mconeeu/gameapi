@@ -47,10 +47,9 @@ public class CoinBombListener extends GadgetListener {
                 return;
             }
             isExploding = true;
-
             p.getInventory().remove(p.getItemInHand());
-            p.sendMessage("§aDu hast die Coin Bombe erfolgreich gezündet!");
             DefaultItem.COINBOMB.remove(gp);
+            p.sendMessage("§aDu hast die Coin Bombe erfolgreich gezündet!");
 
 
             for (GamePlayer all : GameAPI.getInstance().getOnlineGamePlayers()) {

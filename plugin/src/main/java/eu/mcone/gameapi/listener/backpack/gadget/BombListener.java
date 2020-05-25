@@ -13,6 +13,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
@@ -66,6 +68,11 @@ public class BombListener extends GadgetListener {
                         Vector v1 = player.getLocation().getDirection().setY(0.8).multiply(1.1);
                         Bukkit.getScheduler().runTaskLater(plugin, () -> p.playSound(item.getLocation(), Sound.FIREWORK_TWINKLE, 1, 1), 3);
                         player.setVelocity(v1);
+                    }
+                }
+                for (Entity e1 : item.getWorld().getEntities()) {
+                    if (e1.getType().equals(EntityType.DROPPED_ITEM)) {
+                        e1.remove();
                     }
                 }
                 item.getWorld().playEffect(item.getLocation(), Effect.FIREWORKS_SPARK, 1);

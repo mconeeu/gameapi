@@ -16,12 +16,14 @@ public class GadgetListener extends BackpackInventoryListener {
     static {
         plugin.registerEvents(
                 new BombListener(plugin),
+                new MakesListener(plugin),
                 new CoinBombListener(plugin),
                 new EasterGunListener(plugin),
                 //new EnderGunListener(plugin),
                 new LoveGunListener(plugin),
                 new SnowGunListener(plugin),
                 new CobwebGunListener(plugin),
+                new BoatListener(plugin),
                 new FurnaceListener(plugin),
                 new FlyOneCarpetListener(plugin),
                 new GrapplerListener(plugin),

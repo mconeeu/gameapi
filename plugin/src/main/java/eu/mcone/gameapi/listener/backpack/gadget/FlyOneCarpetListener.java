@@ -5,7 +5,6 @@ import eu.mcone.coresystem.api.bukkit.util.Messenger;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
-import eu.mcone.gameapi.api.event.player.GamePlayerUnloadEvent;
 import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftHorse;
 import org.bukkit.entity.ArmorStand;
@@ -18,6 +17,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.util.EulerAngle;
@@ -100,11 +100,16 @@ public class FlyOneCarpetListener extends GadgetListener {
 
                 World world = p.getWorld();
                 for (ArmorStand armorStand : world.getEntitiesByClass(ArmorStand.class)) {
-                    if (armorstandId.get(p).equals(armorStand.getEntityId())) {
-                        if (armorstandId.containsKey(p)) {
-                            armorStandMap.remove(p);
-                            horseId.remove(p);
-                            armorStand.remove();
+                    if (armorStand != null) {
+                        if (armorStandMap.containsValue(armorStand)) {
+                            if (armorstandId.containsKey(p)) {
+                                if (armorstandId.get(p).equals(armorStand.getEntityId())) {
+                                    armorStandMap.remove(p);
+                                    armorstandId.remove(p);
+                                    horseId.remove(p);
+                                    armorStand.remove();
+                                }
+                            }
                         }
                     }
                 }
@@ -116,67 +121,83 @@ public class FlyOneCarpetListener extends GadgetListener {
                 }
             }
         }
+
     }
 
     @EventHandler
     public void onReload(PlayerCommandPreprocessEvent e) {
         String cmd = e.getMessage();
-        if (cmd.equalsIgnoreCase("/rl") || cmd.equalsIgnoreCase("/reload")) {
-            e.setCancelled(true);
-            GameAPI.getInstance().getMessenger().broadcast(Messenger.Broadcast.BroadcastMessageTyp.INFO_MESSAGE, "§cDer §4Server §cstartet neu...");
+        Player p = e.getPlayer();
+        if (p.hasPermission("gameapi.reload")) {
+            if (cmd.equalsIgnoreCase("/rl") || cmd.equalsIgnoreCase("/reload")) {
+                e.setCancelled(true);
+                GameAPI.getInstance().getMessenger().broadcast(Messenger.Broadcast.BroadcastMessageTyp.INFO_MESSAGE, "§4Der §cServer §4wird neu geladen...");
 
-            for (Player all : Bukkit.getOnlinePlayers()) {
-                World world = all.getWorld();
-                if (FlyOneCarpetListener.isRiding.contains(all)) {
-                    for (Horse horse : world.getEntitiesByClass(Horse.class)) {
-                        if (horseId.get(all).equals(horse.getEntityId())) {
-                            if (horseId.containsKey(all)) {
-                                horse.remove();
+                for (Player all : Bukkit.getOnlinePlayers()) {
+                    World world = all.getWorld();
+                    if (FlyOneCarpetListener.isRiding.contains(all)) {
+                        for (Horse horse : world.getEntitiesByClass(Horse.class)) {
+                            if (horse != null) {
+                                if (horseId.get(all).equals(horse.getEntityId())) {
+                                    if (horseId.containsKey(all)) {
+                                        horse.remove();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    for (ArmorStand armorStand : world.getEntitiesByClass(ArmorStand.class)) {
+                        if (world.getEntities().contains(armorStand)) {
+                            if (armorStand != null) {
+                                if (!armorstandId.isEmpty()) {
+                                    if (armorstandId.containsKey(all)) {
+                                        if (armorstandId.get(all).equals(armorStand.getEntityId())) {
+                                            armorStandMap.remove(all);
+                                            horseId.remove(all);
+                                            armorStand.remove();
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
                 }
-                for (ArmorStand armorStand : world.getEntitiesByClass(ArmorStand.class)) {
-                    if (armorStand != null) {
-                        if (armorstandId.get(all).equals(armorStand.getEntityId())) {
-                            if (armorstandId.containsKey(all)) {
-                                armorStandMap.remove(all);
-                                horseId.remove(all);
-                                armorStand.remove();
-                            }
-                        }
-                    }
-                }
+
+                Bukkit.reload();
+                GameAPI.getInstance().getMessenger().broadcast(Messenger.Broadcast.BroadcastMessageTyp.INFO_MESSAGE, "§aDer Server wurde erfolgreich neu geladen.");
             }
-
-            Bukkit.reload();
-            GameAPI.getInstance().getMessenger().broadcast(Messenger.Broadcast.BroadcastMessageTyp.INFO_MESSAGE, "§aDer Server wurde neugestartet.");
         }
     }
 
     @EventHandler
-    public void onUnload(GamePlayerUnloadEvent e) {
-        for (Player all : Bukkit.getOnlinePlayers()) {
-            World world = all.getWorld();
-            if (FlyOneCarpetListener.isRiding.contains(all)) {
-                for (Horse horse : world.getEntitiesByClass(Horse.class)) {
-                    if (horseId.get(all).equals(horse.getEntityId())) {
-                        if (horseId.containsKey(all)) {
+    public void onUnload(PlayerQuitEvent e) {
+        Player p = e.getPlayer();
+        World world = p.getWorld();
+
+        if (isRiding.contains(p)) {
+            for (Horse horse : world.getEntitiesByClass(Horse.class)) {
+                if (horseId.containsValue(horse.getEntityId())) {
+                    if (horseId.get(p).equals(horse.getEntityId())) {
+                        if (horseId.containsKey(p)) {
                             horse.remove();
                         }
                     }
                 }
             }
             for (ArmorStand armorStand : world.getEntitiesByClass(ArmorStand.class)) {
-                if (armorstandId.get(all).equals(armorStand.getEntityId())) {
-                    if (armorstandId.containsKey(all)) {
-                        armorStandMap.remove(all);
-                        horseId.remove(all);
-                        armorStand.remove();
+                if (armorStandMap.containsValue(armorStand)) {
+                    if (armorstandId.containsKey(p)) {
+                        if (armorstandId.get(p).equals(armorStand.getEntityId())) {
+                            if (armorstandId.containsKey(p)) {
+                                armorStandMap.remove(p);
+                                horseId.remove(p);
+                                armorstandId.remove(p);
+                                armorStand.remove();
+                            }
+                        }
                     }
                 }
             }
-
         }
     }
 
