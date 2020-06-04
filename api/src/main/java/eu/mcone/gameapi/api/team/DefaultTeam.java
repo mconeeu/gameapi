@@ -10,7 +10,7 @@ import org.bukkit.Material;
 public enum DefaultTeam {
 
     RED(
-            GamePlugin.getGamePlugin().getTeamManager().registerNewTeam(
+            GamePlugin.getGamePlugin().getTeamManager().createTeam(
                     "Rot",
                     "§cRot",
                     1,
@@ -22,7 +22,7 @@ public enum DefaultTeam {
     ),
 
     BLUE(
-            GamePlugin.getGamePlugin().getTeamManager().registerNewTeam(
+            GamePlugin.getGamePlugin().getTeamManager().createTeam(
                     "Blau",
                     "§9Blau",
                     2,
@@ -34,7 +34,7 @@ public enum DefaultTeam {
     ),
 
     YELLOW(
-            GamePlugin.getGamePlugin().getTeamManager().registerNewTeam(
+            GamePlugin.getGamePlugin().getTeamManager().createTeam(
                     "Gelb",
                     "§eGelb",
                     3,
@@ -46,7 +46,7 @@ public enum DefaultTeam {
     ),
 
     GREEN(
-            GamePlugin.getGamePlugin().getTeamManager().registerNewTeam(
+            GamePlugin.getGamePlugin().getTeamManager().createTeam(
                     "Grün",
                     "§aGrün",
                     4,
@@ -58,7 +58,7 @@ public enum DefaultTeam {
     ),
 
     ORANGE(
-            GamePlugin.getGamePlugin().getTeamManager().registerNewTeam(
+            GamePlugin.getGamePlugin().getTeamManager().createTeam(
                     "Orange",
                     "§6Orange",
                     5,
@@ -70,7 +70,7 @@ public enum DefaultTeam {
     ),
 
     AQUA(
-            GamePlugin.getGamePlugin().getTeamManager().registerNewTeam(
+            GamePlugin.getGamePlugin().getTeamManager().createTeam(
                     "Türkis",
                     "§5Türkis",
                     6,
@@ -82,7 +82,7 @@ public enum DefaultTeam {
     ),
 
     WHITE(
-            GamePlugin.getGamePlugin().getTeamManager().registerNewTeam(
+            GamePlugin.getGamePlugin().getTeamManager().createTeam(
                     "Weiß",
                     "§fWeiß",
                     7,
@@ -94,7 +94,7 @@ public enum DefaultTeam {
     ),
 
     PURPLE(
-            GamePlugin.getGamePlugin().getTeamManager().registerNewTeam(
+            GamePlugin.getGamePlugin().getTeamManager().createTeam(
                     "Lila",
                     "§5Lila",
                     8,

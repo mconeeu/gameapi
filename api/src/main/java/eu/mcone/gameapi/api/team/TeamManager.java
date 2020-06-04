@@ -13,7 +13,11 @@ public interface TeamManager {
 
     ItemStack TEAM = new ItemBuilder(Material.BED, 1, 0).displayName("§c§lTeam §8» §7§owähle dein Team aus.").create();
 
+    void loadDefaultTeams();
+
     Team registerNewTeam(String name, String label, int priority, ChatColor color, ItemStack item);
+
+    Team createTeam(String name, String label, int priority, ChatColor color, ItemStack item);
 
     Team getTeam(String name);
 

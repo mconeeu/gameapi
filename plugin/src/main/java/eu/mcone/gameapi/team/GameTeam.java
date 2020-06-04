@@ -45,6 +45,8 @@ public class GameTeam implements Team {
             if (players.size() < size) {
                 players.add(player);
                 alive = true;
+            } else {
+                throw new IllegalStateException("Could not add player "+player.bukkit().getName()+" to team "+name+". This team is already full!");
             }
         }
     }

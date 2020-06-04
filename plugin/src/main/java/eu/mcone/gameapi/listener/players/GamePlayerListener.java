@@ -29,6 +29,8 @@ public class GamePlayerListener implements Listener {
         if (GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER) && GamePlugin.getGamePlugin().hasModule(Module.GAME_STATE_MANAGER)) {
             if (GamePlugin.getGamePlugin().getGameStateManager().getRunning() instanceof InGameState) {
                 e.getPlayer().setState(GamePlayerState.SPECTATING);
+            } else {
+                GamePlayerManager.setSpectatorAbilities(e.getBukkitPlayer(), false);
             }
         }
     }

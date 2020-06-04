@@ -11,8 +11,8 @@ import eu.mcone.gameapi.api.event.team.TeamWonEvent;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.GamePlayerState;
 import eu.mcone.gameapi.api.team.DefaultTeam;
-import eu.mcone.gameapi.api.team.TeamChatListener;
 import eu.mcone.gameapi.api.team.Team;
+import eu.mcone.gameapi.api.team.TeamChatListener;
 import eu.mcone.gameapi.api.team.TeamManager;
 import eu.mcone.gameapi.api.utils.GameConfig;
 import eu.mcone.gameapi.inventory.TeamInventory;
@@ -30,7 +30,7 @@ import java.util.*;
 public class GameTeamManager implements TeamManager {
 
     @Getter
-    private final int playersPerTeam;
+    private final int playersPerTeam, teamCount;
 
     private final Set<GameTeam> teams;
     private final GamePlugin gamePlugin;
@@ -40,8 +40,6 @@ public class GameTeamManager implements TeamManager {
 
     @Getter
     private final boolean disableRespawn;
-    @Getter
-    private final boolean useDefaultTeams;
     @Getter
     private final boolean disableWinMethod;
 
@@ -64,31 +62,40 @@ public class GameTeamManager implements TeamManager {
         List<Option> optionList = Arrays.asList(options);
 
         disableRespawn = optionList.contains(Option.TEAM_MANAGER_DISABLE_RESPAWN);
-        useDefaultTeams = optionList.contains(Option.TEAM_MANAGER_USE_DEFAULT_TEAMS);
         disableWinMethod = optionList.contains(Option.TEAM_MANAGER_DISABLE_WIN_METHOD);
 
-        system.sendConsoleMessage("§aLoading TeamManager...");
-
-        int teamCount = 0;
         if (config.getMaxPlayers() != 0 && config.getPlayersPerTeam() != 0) {
-            teamCount = config.getMaxPlayers() / config.getPlayersPerTeam();
+            this.teamCount = config.getMaxPlayers() / config.getPlayersPerTeam();
+        } else {
+            this.teamCount = 0;
         }
 
         if (GamePlugin.getGamePlugin().hasModule(Module.REPLAY_SESSION_MANAGER)) {
             GamePlugin.getGamePlugin().getReplaySession().getInfo().setTeams(teamCount);
         }
 
-        if (useDefaultTeams) {
-            if (teamCount > DefaultTeam.values().length) {
-                throw new IllegalStateException("Could not register Default Teams! More Teams nedded in gameConfig than default teams are available!");
-            }
+        system.sendConsoleMessage("§aLoading TeamManager...");
+    }
 
-            int i = 0;
-            for (DefaultTeam team : DefaultTeam.values()) {
-                if (i < teamCount) {
-                    this.teams.add((GameTeam) team.getTeam());
-                    i++;
-                }
+    @Override
+    public void loadDefaultTeams() {
+        if (teamCount > DefaultTeam.values().length) {
+            throw new IllegalStateException("Could not register Default Teams! More Teams nedded in gameConfig than default teams are available!");
+        }
+
+        int i = 0;
+        for (DefaultTeam team : DefaultTeam.values()) {
+            if (i < teamCount) {
+                GameTeam gameTeam = (GameTeam) team.getTeam();
+                gameTeam.setSize(playersPerTeam);
+                gameTeam.setSpawnLocation("team."+team.name().toLowerCase()+".spawn");
+                gameTeam.setNpcLocation("team."+team.name().toLowerCase()+".npc");
+                gameTeam.setRespawnBlockLocation("team."+team.name().toLowerCase()+".respawnblock");
+
+                this.teams.add((GameTeam) team.getTeam());
+                i++;
+            } else {
+                return;
             }
         }
     }
@@ -96,10 +103,16 @@ public class GameTeamManager implements TeamManager {
     @Override
     public Team registerNewTeam(String name, String label, int priority, ChatColor color, ItemStack item) {
         GameTeam team = new GameTeam(name, label, priority, color, item);
+        team.setSize(playersPerTeam);
         teams.add(team);
 
         GameAPI.getInstance().sendConsoleMessage("§2Registering Team "+name);
         return team;
+    }
+
+    @Override
+    public Team createTeam(String name, String label, int priority, ChatColor color, ItemStack item) {
+        return new GameTeam(name, label, priority, color, item);
     }
 
     @Override
@@ -131,10 +144,15 @@ public class GameTeamManager implements TeamManager {
             if (team.getPlayers().size() <= 0) {
                 team.setAlive(false);
             }
+
+            System.out.println("remove from team, all teams: "+teams);
+        } else {
+            System.err.println("gp.geTeam = null");
         }
 
         if (!disableWinMethod) {
             Team team = GamePlugin.getGamePlugin().getTeamManager().getWinnerTeamIfLastSurvived();
+            System.out.println("calculated winner: "+team+" current teams "+teams);
 
             if (team != null) {
                 stopGameWithWinner(team, false);
@@ -220,7 +238,9 @@ public class GameTeamManager implements TeamManager {
             }
         }
 
-        throw new IllegalStateException("Could not get last survived Team! Not team is alive anymore!");
+        if (winner != null) {
+            return winner;
+        } else throw new IllegalStateException("Could not get last survived Team! Not team is alive anymore!");
     }
 
     @Override

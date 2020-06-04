@@ -107,7 +107,7 @@ public class GameAPIPlugin extends GameAPI {
 
     @Override
     public GameTeamManager constructTeamManager(GamePlugin gamePlugin, Option[] options) {
-        return new GameTeamManager(gamePlugin, this, options);
+       return new GameTeamManager(gamePlugin, this, options);
     }
 
     @Override

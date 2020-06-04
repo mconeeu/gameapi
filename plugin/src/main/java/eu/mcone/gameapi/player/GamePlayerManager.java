@@ -149,7 +149,7 @@ public class GamePlayerManager implements PlayerManager {
         new SpectatorInventory(player, this);
     }
 
-    private static void setSpectatorAbilities(Player p, boolean set) {
+    public static void setSpectatorAbilities(Player p, boolean set) {
         p.setGameMode(GameMode.SURVIVAL);
         PlayerAbilities abilities = ((CraftPlayer) p).getHandle().abilities;
 

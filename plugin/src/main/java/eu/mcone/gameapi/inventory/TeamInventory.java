@@ -42,14 +42,15 @@ public class TeamInventory extends CoreInventory {
         for (int i = 0; i < teams.size(); i++) {
             Team team = teams.get(i);
 
-            setItem(i, new ItemBuilder(Material.BED, team.getSize()).displayName(team.getLabel()).lore(getPlayers(team)).create(), e -> {
+            setItem(i, new ItemBuilder(Material.BED, team.getPlayers().size()).displayName(team.getLabel()).lore(getPlayers(team)).create(), e -> {
+                System.out.println("choosing team "+team+" "+p.getName());
                 GamePlayer gp = gamePlugin.getGamePlayer(p);
 
                 if (gp.getTeam() != null && gp.getTeam().equals(team)) {
                     gamePlugin.getMessenger().send(p, CoreSystem.getInstance().getTranslationManager().get("game.team.alreadyJoined"));
                     p.playSound(p.getLocation(), Sound.ANVIL_BREAK, 1, 1);
                 } else {
-                    if (team.getSize() < teamManager.getPlayersPerTeam()) {
+                    if (team.getPlayers().size() < team.getSize()) {
                         gp.changeTeamTo(team);
                         gamePlugin.getMessenger().send(p, CoreSystem.getInstance().getTranslationManager().get("game.team.join", CoreSystem.getInstance().getGlobalCorePlayer(p.getUniqueId())).replace("%team%", team.getLabel()));
                         p.playSound(p.getLocation(), Sound.HORSE_ARMOR, 1, 1);
@@ -57,10 +58,12 @@ public class TeamInventory extends CoreInventory {
                         //Update all opened Team Inventories
                         for (Player player : Bukkit.getOnlinePlayers()) {
                             CoreInventory inv = CoreSystem.getInstance().getPluginManager().getCurrentCoreInventory(player);
+                            System.out.println("check inventory for: "+player+": "+inv.getInventory().getTitle());
 
                             if (inv instanceof TeamInventory) {
                                 ((TeamInventory) inv).update(player);
                                 player.updateInventory();
+                                System.out.println("setting");
                             }
                         }
                     } else {
