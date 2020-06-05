@@ -14,7 +14,9 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.Calendar;
 import java.util.Random;
+import java.util.TimeZone;
 
 public class GameMapRotationHandler implements MapRotationHandler {
 
@@ -112,7 +114,7 @@ public class GameMapRotationHandler implements MapRotationHandler {
         }, (doRotationIn * 20) - (60 * 20));
     }
 
-    private void rotate() throws IllegalStateException {
+    public void rotate() throws IllegalStateException {
         if (currentTask != null) {
             currentTask.cancel();
         }
@@ -164,4 +166,24 @@ public class GameMapRotationHandler implements MapRotationHandler {
         resumeRotation(rotationInterval);
     }
 
+    @Override
+    public String getFormattedTimeUntilNextRotation() {
+        String date = "...";
+
+        long difference = rotationInterval - ((System.currentTimeMillis() / 1000) - lastRotation);
+        if (difference <= rotationInterval) {
+            Calendar differenceDate = Calendar.getInstance(TimeZone.getTimeZone("CEST"));
+            differenceDate.setTimeInMillis(difference * 1000);
+
+            if (differenceDate.get(Calendar.HOUR) >= 1) {
+                date = differenceDate.get(Calendar.HOUR) + 1 + " Stunden";
+            } else if (differenceDate.get(Calendar.MINUTE) >= 1) {
+                date = differenceDate.get(Calendar.MINUTE) + 1 + " Minuten";
+            } else if (differenceDate.get(Calendar.SECOND) >= 1) {
+                date = differenceDate.get(Calendar.SECOND) + " Sekunden";
+            }
+        }
+
+        return date;
+    }
 }

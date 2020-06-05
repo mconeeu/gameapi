@@ -71,7 +71,11 @@ public class SpectatorListener implements Listener {
             if (i.equals(PlayerManager.SPECTATOR)) {
                 GamePlugin.getGamePlugin().getPlayerManager().openSpectatorInventory(p);
             } else if (i.equals(GameTeamManager.TEAM)) {
-                GamePlugin.getGamePlugin().getTeamManager().openTeamInventory(p);
+                if (!GamePlugin.getGamePlugin().getTeamManager().isTeamsFinallySet()) {
+                    GamePlugin.getGamePlugin().getTeamManager().openTeamInventory(p);
+                } else {
+                    GameAPI.getInstance().getMessenger().send(p, "§4Du kannst dein Team nicht mehr ändern!");
+                }
             }
         }
 

@@ -39,9 +39,9 @@ public class GameTeamManager implements TeamManager {
     private TeamChatListener teamChatListener;
 
     @Getter
-    private final boolean disableRespawn;
+    private final boolean disableRespawn, disableWinMethod;
     @Getter
-    private final boolean disableWinMethod;
+    private boolean teamsFinallySet;
 
     public GameTeamManager(GamePlugin plugin, GameAPIPlugin system, Option[] options) {
         this.gamePlugin = plugin;
@@ -172,56 +172,64 @@ public class GameTeamManager implements TeamManager {
 
     @Override
     public void setTeamsForRemainingPlayersBalanced() {
-        Collection<GamePlayer> players = GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)
-                ? GamePlugin.getGamePlugin().getPlayerManager().getGamePlayers(GamePlayerState.PLAYING)
-                : GameAPI.getInstance().getOnlineGamePlayers();
-        players.removeIf(player -> player.getTeam() != null);
+        if (!teamsFinallySet) {
+            Collection<GamePlayer> players = GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)
+                    ? GamePlugin.getGamePlugin().getPlayerManager().getGamePlayers(GamePlayerState.PLAYING)
+                    : GameAPI.getInstance().getOnlineGamePlayers();
+            players.removeIf(player -> player.getTeam() != null);
 
-        for (GamePlayer p : players) {
-            Map<GameTeam, Integer> teamPlayers = new HashMap<>();
-            for (GameTeam team : teams) {
-                if (team.getPlayers().size() < team.getSize()) {
-                    teamPlayers.put(team, team.getPlayers().size());
+            for (GamePlayer p : players) {
+                Map<GameTeam, Integer> teamPlayers = new HashMap<>();
+                for (GameTeam team : teams) {
+                    if (team.getPlayers().size() < team.getSize()) {
+                        teamPlayers.put(team, team.getPlayers().size());
+                    }
                 }
-            }
 
-            if (!teamPlayers.isEmpty()) {
-                if (teamPlayers.size() > 1) {
-                    p.changeTeamTo(Collections.min(teamPlayers.entrySet(), Map.Entry.comparingByValue()).getKey());
+                if (!teamPlayers.isEmpty()) {
+                    if (teamPlayers.size() > 1) {
+                        p.changeTeamTo(Collections.min(teamPlayers.entrySet(), Map.Entry.comparingByValue()).getKey());
+                    } else {
+                        p.changeTeamTo(teamPlayers.keySet().iterator().next());
+                    }
                 } else {
-                    p.changeTeamTo(teamPlayers.keySet().iterator().next());
+                    throw new IllegalStateException("Could not automatically set team for player " + p.getCorePlayer().getName() + "! No teams with free slots available!");
                 }
-            } else {
-                throw new IllegalStateException("Could not automatically set team for player "+p.getCorePlayer().getName()+"! No teams with free slots available!");
             }
-        }
+
+            teamsFinallySet = true;
+        } else throw new IllegalStateException("Could not set Teams for remaining players. Teams already finally set before!");
     }
 
     @Override
     public void setTeamsForRemainigPlayersByPriority() {
-        Collection<GamePlayer> players = GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)
-                ? GamePlugin.getGamePlugin().getPlayerManager().getGamePlayers(GamePlayerState.PLAYING)
-                : GameAPI.getInstance().getOnlineGamePlayers();
-        players.removeIf(player -> player.getTeam() != null);
+        if (!teamsFinallySet) {
+            Collection<GamePlayer> players = GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)
+                    ? GamePlugin.getGamePlugin().getPlayerManager().getGamePlayers(GamePlayerState.PLAYING)
+                    : GameAPI.getInstance().getOnlineGamePlayers();
+            players.removeIf(player -> player.getTeam() != null);
 
-        for (GamePlayer p : players) {
-            Map<GameTeam, Integer> teamPlayers = new HashMap<>();
-            for (GameTeam team : teams) {
-                if (team.getPlayers().size() < team.getSize()) {
-                    teamPlayers.put(team, team.getPriority());
+            for (GamePlayer p : players) {
+                Map<GameTeam, Integer> teamPlayers = new HashMap<>();
+                for (GameTeam team : teams) {
+                    if (team.getPlayers().size() < team.getSize()) {
+                        teamPlayers.put(team, team.getPriority());
+                    }
                 }
-            }
 
-            if (!teamPlayers.isEmpty()) {
-                if (teamPlayers.size() > 1) {
-                    p.changeTeamTo(Collections.max(teamPlayers.entrySet(), Map.Entry.comparingByValue()).getKey());
+                if (!teamPlayers.isEmpty()) {
+                    if (teamPlayers.size() > 1) {
+                        p.changeTeamTo(Collections.max(teamPlayers.entrySet(), Map.Entry.comparingByValue()).getKey());
+                    } else {
+                        p.changeTeamTo(teamPlayers.keySet().iterator().next());
+                    }
                 } else {
-                    p.changeTeamTo(teamPlayers.keySet().iterator().next());
+                    throw new IllegalStateException("Could not automatically set team for player "+p.getCorePlayer().getName()+"! No teams with free slots available!");
                 }
-            } else {
-                throw new IllegalStateException("Could not automatically set team for player "+p.getCorePlayer().getName()+"! No teams with free slots available!");
             }
-        }
+
+            teamsFinallySet = true;
+        } else throw new IllegalStateException("Could not set Teams for remaining players. Teams already finally set before!");
     }
 
     @Override

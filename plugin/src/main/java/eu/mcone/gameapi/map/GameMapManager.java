@@ -7,6 +7,7 @@ import eu.mcone.gameapi.api.map.GameAPIMap;
 import eu.mcone.gameapi.api.map.MapManager;
 import eu.mcone.gameapi.api.map.MapRotationHandler;
 import eu.mcone.gameapi.api.map.MapVotingHandler;
+import eu.mcone.gameapi.command.MapCMD;
 import lombok.Getter;
 import org.bukkit.Material;
 
@@ -32,6 +33,8 @@ public class GameMapManager implements MapManager {
         this.config = new CoreJsonConfig<>(system, MapsConfig.class, "maps.json");
 
         system.sendConsoleMessage("§aLoading MapManager...");
+        system.registerCommands(new MapCMD(this));
+
         for (GameAPIMap map : config.parseConfig().getMaps()) {
             if (map.getWorld() != null) {
                 system.sendConsoleMessage("§2Loading Map " + map.getName() + "...");
@@ -78,6 +81,14 @@ public class GameMapManager implements MapManager {
     @Override
     public MapRotationHandler getMapRotationHandler() throws IllegalStateException {
         return rotationHandler != null ? rotationHandler : (rotationHandler = new GameMapRotationHandler(this));
+    }
+
+    public boolean isVotingHandlerLoaded() {
+        return votingHandler != null;
+    }
+
+    public boolean isRotationHandlerLoaded() {
+        return rotationHandler != null;
     }
 
 }

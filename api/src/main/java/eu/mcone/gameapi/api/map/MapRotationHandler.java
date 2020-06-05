@@ -12,4 +12,6 @@ public interface MapRotationHandler {
 
     long getRotationInterval();
 
+    String getFormattedTimeUntilNextRotation();
+
 }

@@ -4,6 +4,7 @@ import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.coresystem.api.bukkit.inventory.InventoryOption;
 import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
+import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Module;
 import eu.mcone.gameapi.api.player.GamePlayer;
@@ -43,33 +44,37 @@ public class TeamInventory extends CoreInventory {
             Team team = teams.get(i);
 
             setItem(i, new ItemBuilder(Material.BED, team.getPlayers().size()).displayName(team.getLabel()).lore(getPlayers(team)).create(), e -> {
-                System.out.println("choosing team "+team+" "+p.getName());
-                GamePlayer gp = gamePlugin.getGamePlayer(p);
+                if (!gamePlugin.getTeamManager().isTeamsFinallySet()) {
+                    System.out.println("choosing team "+team+" "+p.getName());
+                    GamePlayer gp = gamePlugin.getGamePlayer(p);
 
-                if (gp.getTeam() != null && gp.getTeam().equals(team)) {
-                    gamePlugin.getMessenger().send(p, CoreSystem.getInstance().getTranslationManager().get("game.team.alreadyJoined"));
-                    p.playSound(p.getLocation(), Sound.ANVIL_BREAK, 1, 1);
-                } else {
-                    if (team.getPlayers().size() < team.getSize()) {
-                        gp.changeTeamTo(team);
-                        gamePlugin.getMessenger().send(p, CoreSystem.getInstance().getTranslationManager().get("game.team.join", CoreSystem.getInstance().getGlobalCorePlayer(p.getUniqueId())).replace("%team%", team.getLabel()));
-                        p.playSound(p.getLocation(), Sound.HORSE_ARMOR, 1, 1);
-
-                        //Update all opened Team Inventories
-                        for (Player player : Bukkit.getOnlinePlayers()) {
-                            CoreInventory inv = CoreSystem.getInstance().getPluginManager().getCurrentCoreInventory(player);
-                            System.out.println("check inventory for: "+player+": "+inv.getInventory().getTitle());
-
-                            if (inv instanceof TeamInventory) {
-                                ((TeamInventory) inv).update(player);
-                                player.updateInventory();
-                                System.out.println("setting");
-                            }
-                        }
-                    } else {
-                        gamePlugin.getMessenger().send(p, CoreSystem.getInstance().getTranslationManager().get("game.team.maxSize").replace("%max%", Integer.toString(teamManager.getPlayersPerTeam())));
+                    if (gp.getTeam() != null && gp.getTeam().equals(team)) {
+                        gamePlugin.getMessenger().send(p, CoreSystem.getInstance().getTranslationManager().get("game.team.alreadyJoined"));
                         p.playSound(p.getLocation(), Sound.ANVIL_BREAK, 1, 1);
+                    } else {
+                        if (team.getPlayers().size() < team.getSize()) {
+                            gp.changeTeamTo(team);
+                            gamePlugin.getMessenger().send(p, CoreSystem.getInstance().getTranslationManager().get("game.team.join", CoreSystem.getInstance().getGlobalCorePlayer(p.getUniqueId())).replace("%team%", team.getLabel()));
+                            p.playSound(p.getLocation(), Sound.HORSE_ARMOR, 1, 1);
+
+                            //Update all opened Team Inventories
+                            for (Player player : Bukkit.getOnlinePlayers()) {
+                                CoreInventory inv = CoreSystem.getInstance().getPluginManager().getCurrentCoreInventory(player);
+                                System.out.println("check inventory for: "+player+": "+inv.getInventory().getTitle());
+
+                                if (inv instanceof TeamInventory) {
+                                    ((TeamInventory) inv).update(player);
+                                    player.updateInventory();
+                                    System.out.println("setting");
+                                }
+                            }
+                        } else {
+                            gamePlugin.getMessenger().send(p, CoreSystem.getInstance().getTranslationManager().get("game.team.maxSize").replace("%max%", Integer.toString(teamManager.getPlayersPerTeam())));
+                            p.playSound(p.getLocation(), Sound.ANVIL_BREAK, 1, 1);
+                        }
                     }
+                } else {
+                    GameAPI.getInstance().getMessenger().send(p, "§4Du kannst dein Team nicht mehr ändern!");
                 }
             });
         }

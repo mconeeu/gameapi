@@ -1,7 +1,6 @@
 package eu.mcone.gameapi.listener.backpack.gadget;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
-import eu.mcone.coresystem.api.bukkit.util.Messenger;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
@@ -14,10 +13,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.util.EulerAngle;
@@ -124,47 +123,38 @@ public class FlyOneCarpetListener extends GadgetListener {
 
     }
 
-    @EventHandler
-    public void onReload(PlayerCommandPreprocessEvent e) {
-        String cmd = e.getMessage();
-        Player p = e.getPlayer();
-        if (p.hasPermission("gameapi.reload")) {
-            if (cmd.equalsIgnoreCase("/rl") || cmd.equalsIgnoreCase("/reload")) {
-                e.setCancelled(true);
-                GameAPI.getInstance().getMessenger().broadcast(Messenger.Broadcast.BroadcastMessageTyp.INFO_MESSAGE, "§4Der §cServer §4wird neu geladen...");
 
-                for (Player all : Bukkit.getOnlinePlayers()) {
-                    World world = all.getWorld();
-                    if (FlyOneCarpetListener.isRiding.contains(all)) {
-                        for (Horse horse : world.getEntitiesByClass(Horse.class)) {
-                            if (horse != null) {
-                                if (horseId.get(all).equals(horse.getEntityId())) {
-                                    if (horseId.containsKey(all)) {
-                                        horse.remove();
-                                    }
-                                }
+    @EventHandler
+    public void onReload(PluginDisableEvent e) {
+        for (Player all : Bukkit.getOnlinePlayers()) {
+            World world = all.getWorld();
+
+            if (FlyOneCarpetListener.isRiding.contains(all)) {
+                for (Horse horse : world.getEntitiesByClass(Horse.class)) {
+                    if (horse != null) {
+                        if (horseId.get(all).equals(horse.getEntityId())) {
+                            if (horseId.containsKey(all)) {
+                                horse.remove();
                             }
                         }
                     }
-                    for (ArmorStand armorStand : world.getEntitiesByClass(ArmorStand.class)) {
-                        if (world.getEntities().contains(armorStand)) {
-                            if (armorStand != null) {
-                                if (!armorstandId.isEmpty()) {
-                                    if (armorstandId.containsKey(all)) {
-                                        if (armorstandId.get(all).equals(armorStand.getEntityId())) {
-                                            armorStandMap.remove(all);
-                                            horseId.remove(all);
-                                            armorStand.remove();
-                                        }
-                                    }
+                }
+            }
+
+            for (ArmorStand armorStand : world.getEntitiesByClass(ArmorStand.class)) {
+                if (world.getEntities().contains(armorStand)) {
+                    if (armorStand != null) {
+                        if (!armorstandId.isEmpty()) {
+                            if (armorstandId.containsKey(all)) {
+                                if (armorstandId.get(all).equals(armorStand.getEntityId())) {
+                                    armorStandMap.remove(all);
+                                    horseId.remove(all);
+                                    armorStand.remove();
                                 }
                             }
                         }
                     }
                 }
-
-                Bukkit.reload();
-                GameAPI.getInstance().getMessenger().broadcast(Messenger.Broadcast.BroadcastMessageTyp.INFO_MESSAGE, "§aDer Server wurde erfolgreich neu geladen.");
             }
         }
     }
@@ -289,28 +279,36 @@ public class FlyOneCarpetListener extends GadgetListener {
     }
 
     public DyeColor getRank(Player player) {
-        if (player.hasPermission("group.admin")) {
-            return DyeColor.RED;
-        } else if (player.hasPermission("group.content")) {
-            return DyeColor.BLUE;
-        } else if (player.hasPermission("group.developer")) {
-            return DyeColor.LIGHT_BLUE;
-        } else if (player.hasPermission("group.builder")) {
-            return DyeColor.YELLOW;
-        } else if (player.hasPermission("group.srmoderator")) {
-            return DyeColor.GREEN;
-        } else if (player.hasPermission("group.moderator")) {
-            return DyeColor.LIME;
-        } else if (player.hasPermission("group.supporter")) {
-            return DyeColor.LIME;
-        } else if (player.hasPermission("group.jrsupporter")) {
-            return DyeColor.LIME;
-        } else if (player.hasPermission("group.youtuber")) {
-            return DyeColor.PURPLE;
-        } else if (player.hasPermission("group.premium") || player.hasPermission("group.premium+")) {
-            return DyeColor.ORANGE;
-        } else {
-            return DyeColor.GRAY;
+        switch (CoreSystem.getInstance().getCorePlayer(player).getMainGroup()) {
+            case ADMIN:
+                return DyeColor.RED;
+            case CONTENT:
+                return DyeColor.BLUE;
+            case SRDEVELOPER:
+            case DEVELOPER:
+            case JRDEVELOPER:
+                return DyeColor.CYAN;
+            case SRBUILDER:
+            case BUILDER:
+            case JRBUILDER:
+                return DyeColor.YELLOW;
+            case SRMODERATOR:
+            case MODERATOR:
+                return DyeColor.LIME;
+            case SUPPORTER:
+            case JRSUPPORTER:
+                return DyeColor.GREEN;
+            case CREATOR:
+                return DyeColor.PURPLE;
+            case ONE:
+                return DyeColor.LIGHT_BLUE;
+            case PREMIUMPLUS:
+            case PREMIUM:
+                return DyeColor.ORANGE;
+            case SPIELVERDERBER:
+            case SPIELER:
+            default:
+                return DyeColor.GRAY;
         }
     }
 

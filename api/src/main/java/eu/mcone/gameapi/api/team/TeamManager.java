@@ -45,5 +45,7 @@ public interface TeamManager {
 
     void openTeamInventory(Player p);
 
+    boolean isTeamsFinallySet();
+
     boolean isDisableWinMethod();
 }
