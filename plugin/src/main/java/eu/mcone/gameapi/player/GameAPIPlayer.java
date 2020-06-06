@@ -46,13 +46,15 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
 
     @Getter
     private GamePlayerState state = GamePlayerState.PLAYING;
-    @Getter @Setter
+    @Getter
+    @Setter
     private boolean effectsVisible = true;
     @Getter
     private int roundKills, roundDeaths, roundGoals;
 
     private final Player player;
-    @Getter @Setter
+    @Getter
+    @Setter
     private Team team;
 
     @Getter
@@ -299,11 +301,11 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
         if (GamePlugin.getGamePlugin().hasModule(Module.TEAM_MANAGER)) {
             ((GameTeamManager) GamePlugin.getGamePlugin().getTeamManager()).removeFromGame(this);
         }
+
         if (GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)) {
             setState(GamePlayerState.SPECTATING);
         }
     }
-
 
     /*
      * Stats System
