@@ -102,7 +102,7 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
                     timeoutTask = null;
                 }
 
-                stopAndStartNextGameState(running, "Manual set new GameState: " + gameState.getName());
+                stopAndStartNextGameState(running, gameState, "Manual set new GameState: " + gameState.getName());
             } else {
                 //Start GameState (start Timeout if present)
                 startGameState(gameState);
@@ -375,8 +375,10 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
     }
 
     private void stopAndStartNextGameState(GameState gameState, String stopReason) {
-        GameState next = getNextGameState();
+        stopAndStartNextGameState(gameState, getNextGameState(), stopReason);
+    }
 
+    private void stopAndStartNextGameState(GameState gameState, GameState next, String stopReason) {
         GameStateStopEvent stopEvent = new GameStateStopEvent(this, gameState, next);
         gameState.onStop(stopEvent);
         gamePlugin.getServer().getPluginManager().callEvent(stopEvent);
