@@ -53,6 +53,24 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
     }
 
     @Override
+    public GameStateManager addGameStateBefore(GameState gameState, GameState addBefore) {
+        pipeline.add(pipeline.indexOf(addBefore), gameState);
+        return this;
+    }
+
+    @Override
+    public GameStateManager addGameStateAfter(GameState gameState, GameState addAfter) {
+        int index = pipeline.indexOf(addAfter);
+
+        if (index < pipeline.size()-1) {
+            pipeline.add(pipeline.indexOf(addAfter)+1, gameState);
+        } else {
+            pipeline.add(gameState);
+        }
+        return this;
+    }
+
+    @Override
     public void startGame() {
         if (running == null) {
             startGameState(pipeline.getFirst());
@@ -385,6 +403,10 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
 
         //If next GameState exists, start it, otherwise do idle
         if (next != null) {
+            if (!pipeline.contains(next)) {
+                addGameStateAfter(next, gameState);
+            }
+
             system.sendConsoleMessage("§fStopping Gamestate " + gameState.getName() + " (" + stopReason + "). Starting new Gamemode " + next.getName());
             startGameState(next);
         } else {
