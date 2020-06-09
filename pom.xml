@@ -109,6 +109,12 @@
         </dependency>
         <dependency> <!-- MCONE CoreSystem (This includes the Bukkit-API) -->
             <groupId>eu.mcone.coresystem</groupId>
+            <artifactId>bukkit-api</artifactId>
+            <version>10.7.6-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency> <!-- MCONE CoreSystem (This includes the Bukkit-API) -->
+            <groupId>eu.mcone.coresystem</groupId>
             <artifactId>core-api</artifactId>
             <version>10.7.6-SNAPSHOT</version>
             <scope>provided</scope>
