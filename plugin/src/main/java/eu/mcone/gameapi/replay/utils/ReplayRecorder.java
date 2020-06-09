@@ -108,10 +108,6 @@ public class ReplayRecorder extends SimpleRecorder implements eu.mcone.gameapi.a
                             case STOP_SNEAKING:
                                 addPacket(player, new EntitySneakPacketContainer(EntityAction.STOP_SNEAKING));
                                 break;
-                            case START_SPRINTING:
-                                break;
-                            case STOP_SPRINTING:
-                                break;
                         }
                     }
 //                    if (packet instanceof PacketPlayOutEntityStatus) {

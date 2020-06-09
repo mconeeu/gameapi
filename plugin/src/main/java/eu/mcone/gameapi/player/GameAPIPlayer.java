@@ -311,11 +311,11 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
         if (GamePlugin.getGamePlugin().hasModule(Module.TEAM_MANAGER)) {
             ((GameTeamManager) GamePlugin.getGamePlugin().getTeamManager()).removeFromGame(this);
         }
+
         if (GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)) {
             setState(GamePlayerState.SPECTATING);
         }
     }
-
 
     /*
      * Stats System

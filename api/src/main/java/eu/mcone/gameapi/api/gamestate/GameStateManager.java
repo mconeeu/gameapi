@@ -6,6 +6,10 @@ public interface GameStateManager {
 
     GameStateManager addGameStateFirst(GameState gameState);
 
+    GameStateManager addGameStateBefore(GameState gameState, GameState addBefore);
+
+    GameStateManager addGameStateAfter(GameState gameState, GameState addAfter);
+
     void startGame();
 
     GameState getRunning();

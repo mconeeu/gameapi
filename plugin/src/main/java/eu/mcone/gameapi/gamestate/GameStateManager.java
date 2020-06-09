@@ -53,6 +53,24 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
     }
 
     @Override
+    public GameStateManager addGameStateBefore(GameState gameState, GameState addBefore) {
+        pipeline.add(pipeline.indexOf(addBefore), gameState);
+        return this;
+    }
+
+    @Override
+    public GameStateManager addGameStateAfter(GameState gameState, GameState addAfter) {
+        int index = pipeline.indexOf(addAfter);
+
+        if (index < pipeline.size()-1) {
+            pipeline.add(pipeline.indexOf(addAfter)+1, gameState);
+        } else {
+            pipeline.add(gameState);
+        }
+        return this;
+    }
+
+    @Override
     public void startGame() {
         if (running == null) {
             startGameState(pipeline.getFirst());
@@ -102,7 +120,7 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
                     timeoutTask = null;
                 }
 
-                stopAndStartNextGameState(running, "Manual set new GameState: " + gameState.getName());
+                stopAndStartNextGameState(running, gameState, "Manual set new GameState: " + gameState.getName());
             } else {
                 //Start GameState (start Timeout if present)
                 startGameState(gameState);
@@ -375,14 +393,20 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
     }
 
     private void stopAndStartNextGameState(GameState gameState, String stopReason) {
-        GameState next = getNextGameState();
+        stopAndStartNextGameState(gameState, getNextGameState(), stopReason);
+    }
 
+    private void stopAndStartNextGameState(GameState gameState, GameState next, String stopReason) {
         GameStateStopEvent stopEvent = new GameStateStopEvent(this, gameState, next);
         gameState.onStop(stopEvent);
         gamePlugin.getServer().getPluginManager().callEvent(stopEvent);
 
         //If next GameState exists, start it, otherwise do idle
         if (next != null) {
+            if (!pipeline.contains(next)) {
+                addGameStateAfter(next, gameState);
+            }
+
             system.sendConsoleMessage("§fStopping Gamestate " + gameState.getName() + " (" + stopReason + "). Starting new Gamemode " + next.getName());
             startGameState(next);
         } else {
