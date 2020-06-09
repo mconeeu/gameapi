@@ -80,6 +80,26 @@ public interface GamePlayer {
 
     void removeFromGame();
 
+    boolean isOnePass();
+
+    void buyOnePass(boolean premium);
+
+    int getOneLevel();
+
+    int getOneXp();
+
+    void setOnePassLevel(int level);
+
+    void addOnePassLevel(int level);
+
+    void removeOnePassLevel(int level);
+
+    void setOnePassXp(int xp);
+
+    void addOnePassXp(int xp);
+
+    void removeOnePassXp(int xp);
+
     void addKills(final int var);
 
     void addDeaths(final int var);

@@ -9,6 +9,7 @@ import eu.mcone.gameapi.api.damage.DamageLogger;
 import eu.mcone.gameapi.api.gamestate.GameStateManager;
 import eu.mcone.gameapi.api.kit.KitManager;
 import eu.mcone.gameapi.api.map.MapManager;
+import eu.mcone.gameapi.api.onepass.OnePassManager;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.PlayerManager;
 import eu.mcone.gameapi.api.replay.exception.GameModuleNotActiveException;
@@ -30,7 +31,7 @@ public abstract class GamePlugin extends CorePlugin {
     @Getter
     private static GamePlugin gamePlugin;
 
-    private List<Module> modules;
+    private final List<Module> modules;
     private final Option[] options;
 
     private MapManager mapManager;
@@ -43,6 +44,7 @@ public abstract class GamePlugin extends CorePlugin {
     private PlayerManager playerManager;
     private ReplaySession replaySession;
     private DamageLogger damageLogger;
+    private OnePassManager onePassManager;
 
     @Getter
     private CoreJsonConfig<GameConfig> gameConfig;
@@ -155,6 +157,10 @@ public abstract class GamePlugin extends CorePlugin {
 
     public DamageLogger getDamageLogger() {
         return damageLogger != null ? damageLogger : (damageLogger = GameAPI.getInstance().constructDamageLogger());
+    }
+
+    public OnePassManager getOnePassManager() {
+        return onePassManager != null ? onePassManager : (onePassManager = GameAPI.getInstance().constructOnePassManager());
     }
 
     public boolean hasModule(Module module) {

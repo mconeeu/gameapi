@@ -26,21 +26,18 @@ public class KitsInventory extends CoreInventory {
                             .addLore(
                                     (manager.isApplyKitsOnce() ? manager.getCurrentKit(p).equals(kit) : gp.hasKit(kit))
                                             ? "§8» §f§nRechtsklick§8 | §7§oKitslots modifizieren"
-                                            : "§8» §f§nRechtsklick§8 | §7§oKit kaufen"
-                            ).create(),
-                    e -> {
-                        if (gp.getCurrentKit() != null && gp.getCurrentKit().getName().equals(kit.getName())) {
-                            new KitSortInventory(p, gp, manager, kit, onBackClick);
-                        } else {
-                            if (kit.getCoinsPrice() > 0) {
-                                new KitBuyInventory(p, gp, manager, kit, onBackClick);
-                            } else {
-                                gp.buyKit(kit);
-                                p.closeInventory();
-                            }
-                        }
+                                            : "§8» §f§nRechtsklick§8 | §7§oKit kaufen").create(), e -> {
+                if (gp.getCurrentKit() != null && gp.getCurrentKit().getName().equals(kit.getName())) {
+                    new KitSortInventory(p, gp, manager, kit, onBackClick);
+                } else {
+                    if (kit.getCoinsPrice() > 0) {
+                        new KitBuyInventory(p, gp, manager, kit, onBackClick);
+                    } else {
+                        gp.buyKit(kit);
+                        p.closeInventory();
                     }
-            );
+                }
+            });
             slot++;
         }
 

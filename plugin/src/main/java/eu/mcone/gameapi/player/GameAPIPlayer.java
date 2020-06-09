@@ -15,9 +15,12 @@ import eu.mcone.gameapi.api.Module;
 import eu.mcone.gameapi.api.achievement.Achievement;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
+import eu.mcone.gameapi.api.event.onepass.LevelChangeEvent;
+import eu.mcone.gameapi.api.event.onepass.XpChangeEvent;
 import eu.mcone.gameapi.api.event.stats.PlayerRoundStatsChangeEvent;
 import eu.mcone.gameapi.api.kit.Kit;
 import eu.mcone.gameapi.api.kit.ModifiedKit;
+import eu.mcone.gameapi.api.onepass.OnePassManager;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.GamePlayerSettings;
 import eu.mcone.gameapi.api.player.GamePlayerState;
@@ -26,6 +29,7 @@ import eu.mcone.gameapi.kit.GameKitManager;
 import eu.mcone.gameapi.team.GameTeamManager;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -35,6 +39,7 @@ import java.util.*;
 @Getter
 public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.GamePlayer<GameAPIPlayerProfile> implements GamePlayer {
 
+    private static final int ONE_PASS_EMERALDS_PRICE = 150;
     private static final GameAPI system = GameAPI.getInstance();
 
     @Getter
@@ -46,13 +51,17 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
 
     @Getter
     private GamePlayerState state = GamePlayerState.PLAYING;
-    @Getter @Setter
+    @Getter
+    @Setter
     private boolean effectsVisible = true;
     @Getter
-    private int roundKills, roundDeaths, roundGoals;
+    private int roundKills, roundDeaths, roundGoals, oneLevel, oneXp;
+    @Getter
+    private boolean onePass;
 
     private final Player player;
-    @Getter @Setter
+    @Getter
+    @Setter
     private Team team;
 
     @Getter
@@ -74,6 +83,9 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
         this.customKits = systemProfile.getCustomKits();
         this.achievements = systemProfile.getAchievementMap();
         this.settings = systemProfile.getSettings();
+        this.oneLevel = systemProfile.getOneLevel();
+        this.oneXp = systemProfile.getOneXp();
+        this.onePass = systemProfile.isOnePass();
 
         return super.reload();
     }
@@ -84,8 +96,8 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
     }
 
     @Override
-    protected void saveData() {
-        system.saveGameProfile(new GameAPIPlayerProfile(corePlayer.bukkit(), backpackItems, achievements));
+    public void saveData() {
+        system.saveGameProfile(new GameAPIPlayerProfile(corePlayer.bukkit(), backpackItems, achievements, oneLevel, oneXp, onePass));
     }
 
 
@@ -459,6 +471,109 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
     @Override
     public ModifiedKit getModifiedKit(String name) {
         return ((GameKitManager) GamePlugin.getGamePlugin().getKitManager()).getModifiedKit(bukkit(), name);
+    }
+
+
+    /*
+     * OnePass
+     */
+
+    @Override
+    public void buyOnePass(boolean premium) throws IllegalStateException {
+        if (!onePass) {
+            if (corePlayer.getEmeralds() >= ONE_PASS_EMERALDS_PRICE) {
+                corePlayer.removeEmeralds(ONE_PASS_EMERALDS_PRICE);
+
+                if (premium) {
+                    setOnePassLevel(OnePassManager.ONE_PASS_PREMIUM_LEVEL);
+                }
+                onePass = true;
+                saveData();
+            } else {
+                player.closeInventory();
+                GameAPI.getInstance().getMessenger().send(player, "§4Du hast nicht genügend Emeralds!");
+                throw new IllegalStateException("Could not buy OnePass for " + corePlayer.getName() + ". Player has not enough emeralds!");
+            }
+        } else {
+            player.closeInventory();
+            GameAPI.getInstance().getMessenger().send(player, "§4Du hast den OnePass bereits gekauft!");
+            throw new IllegalStateException("Could not buy OnePass for " + corePlayer.getName() + ". Player already has OnePass!");
+        }
+    }
+
+    @Override
+    public void setOnePassLevel(int level) {
+        if (level < oneLevel) {
+            removeOnePassLevel(level);
+        } else if (level > oneLevel) {
+            addOnePassLevel(level);
+        }
+    }
+
+    @Override
+    public void addOnePassLevel(int level) {
+        boolean multiAdd = level > 1;
+        while (level > 0) {
+            oneLevel++;
+            level--;
+            Bukkit.getPluginManager().callEvent(new LevelChangeEvent(this, oneLevel - 1));
+            GamePlugin.getGamePlugin().getOnePassManager().levelChanged(this, oneLevel - 1, oneLevel, !multiAdd);
+        }
+
+        saveData();
+    }
+
+    @Override
+    public void removeOnePassLevel(int level) {
+        while (level > 0) {
+            oneLevel--;
+            level--;
+            Bukkit.getPluginManager().callEvent(new LevelChangeEvent(this, oneLevel + 1));
+            GamePlugin.getGamePlugin().getOnePassManager().levelChanged(this, oneLevel + 1, oneLevel, false);
+        }
+
+        saveData();
+    }
+
+    @Override
+    public void setOnePassXp(int xp) {
+        if (xp < oneXp) {
+            removeOnePassXp(xp);
+        } else if (xp > oneXp) {
+            addOnePassXp(xp);
+        }
+    }
+
+    @Override
+    public void addOnePassXp(int xp) {
+        int oldXp = oneXp;
+
+        while ((oneXp + xp) >= OnePassManager.NEEDED_XP_FOR_NEXT_LEVEL) {
+            xp -= OnePassManager.NEEDED_XP_FOR_NEXT_LEVEL;
+            addOnePassLevel(1);
+        }
+        oneXp += xp;
+
+        Bukkit.getPluginManager().callEvent(new XpChangeEvent(this, oldXp));
+        saveData();
+    }
+
+    @Override
+    public void removeOnePassXp(int xp) {
+        int oldXp = oneXp;
+
+        if ((((oneLevel * OnePassManager.NEEDED_XP_FOR_NEXT_LEVEL) + oneXp) - xp) > 0) {
+            while ((oneXp - xp) < 0) {
+                xp -= OnePassManager.NEEDED_XP_FOR_NEXT_LEVEL;
+                removeOnePassLevel(1);
+            }
+            oneXp -= xp;
+
+            Bukkit.getPluginManager().callEvent(new XpChangeEvent(this, oldXp));
+            saveData();
+        } else {
+            throw new IllegalStateException("Cannot remove " + xp + " xp from player " + corePlayer.getName() + ". This player has just " + oneXp + " xp!");
+        }
     }
 
 }

@@ -23,6 +23,7 @@ import eu.mcone.gameapi.api.backpack.handler.PetHandler;
 import eu.mcone.gameapi.api.backpack.handler.TrailHandler;
 import eu.mcone.gameapi.backpack.defaults.*;
 import eu.mcone.gameapi.command.ItemCMD;
+import eu.mcone.gameapi.command.OnePassCMD;
 import eu.mcone.gameapi.command.TradeCMD;
 import eu.mcone.gameapi.inventory.backpack.BackpackInventory;
 import eu.mcone.gameapi.inventory.backpack.BackpackSellInventory;
@@ -74,6 +75,7 @@ public class GameBackpackManager implements BackpackManager {
 
     public GameBackpackManager(GameAPIPlugin system, GamePlugin gamePlugin, Option... gameOptions) {
         system.registerCommands(new ItemCMD(this));
+        system.registerCommands(new OnePassCMD());
         system.registerCommands(new TradeCMD());
         system.registerEvents(new BackpackListener(this));
 

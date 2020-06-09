@@ -24,12 +24,17 @@ public class GameAPIPlayerProfile extends GameProfile {
     private Map<String, Map<String, Long>> achievements = new HashMap<>();
     private List<ModifiedKit> customKits = new ArrayList<>();
     private GamePlayerSettings settings = new GamePlayerSettings();
+    private int oneLevel, oneXp;
+    private boolean onePass;
 
     private transient Map<String, Set<BackpackItem>> itemMap = new HashMap<>();
     private transient Map<Gamemode, Map<Achievement, Long>> achievementMap = new HashMap<>();
 
-    GameAPIPlayerProfile(final Player p, final Map<String, Set<BackpackItem>> playerItems, Map<Gamemode, Map<Achievement, Long>> achievements) {
+    GameAPIPlayerProfile(final Player p, final Map<String, Set<BackpackItem>> playerItems, Map<Gamemode, Map<Achievement, Long>> achievements, int oneLevel, int oneXp, boolean onePass) {
         super(p);
+        this.oneLevel = oneLevel;
+        this.oneXp = oneXp;
+        this.onePass = onePass;
 
         for (Map.Entry<String, Set<BackpackItem>> entry : playerItems.entrySet()) {
             List<Integer> itemIds = new ArrayList<>();

@@ -35,9 +35,10 @@ public class GamePlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onLeave(PlayerQuitEvent e) {
-        GameAPIPlugin.getSystem().unregisterGamePlayer(
-                GameAPIPlugin.getSystem().getGamePlayer(e.getPlayer())
-        );
+        GameAPIPlayer gp = GameAPIPlugin.getSystem().getGamePlayer(e.getPlayer());
+        gp.saveData();
+
+        GameAPIPlugin.getSystem().unregisterGamePlayer(gp);
     }
 
     @EventHandler

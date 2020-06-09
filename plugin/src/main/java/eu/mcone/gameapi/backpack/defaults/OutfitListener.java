@@ -23,7 +23,7 @@ public class OutfitListener extends BackpackInventoryListener {
     public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player p) {
         handler.setOutfit(p, item);
         p.closeInventory();
-        plugin.getMessenger().send(p, "§7Du hast das Outfit §f" + item.getName() + "§7 angezogen!");
+        plugin.getMessenger().send(p, "§7Du hast das §f" + item.getName() + "§7 angezogen!");
         p.setWalkSpeed(0.20F);
     }
 

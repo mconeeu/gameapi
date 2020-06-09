@@ -13,6 +13,7 @@ import eu.mcone.gameapi.api.damage.DamageLogger;
 import eu.mcone.gameapi.api.gamestate.GameStateManager;
 import eu.mcone.gameapi.api.kit.KitManager;
 import eu.mcone.gameapi.api.map.MapManager;
+import eu.mcone.gameapi.api.onepass.OnePassManager;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.PlayerManager;
 import eu.mcone.gameapi.api.replay.session.ReplaySession;
@@ -61,6 +62,8 @@ public abstract class GameAPI extends CorePlugin {
     public abstract AchievementManager constructAchievementManager(GamePlugin gamePlugin, Option... options);
 
     public abstract DamageLogger constructDamageLogger();
+
+    public abstract OnePassManager constructOnePassManager();
 
     public abstract GamePlayer getGamePlayer(CorePlayer cp);
 

@@ -11,6 +11,7 @@ import eu.mcone.gameapi.api.backpack.BackpackManager;
 import eu.mcone.gameapi.api.damage.DamageLogger;
 import eu.mcone.gameapi.api.kit.KitManager;
 import eu.mcone.gameapi.api.map.MapManager;
+import eu.mcone.gameapi.api.onepass.OnePassManager;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.backpack.GameBackpackManager;
 import eu.mcone.gameapi.damage.GameDamageLogger;
@@ -18,6 +19,7 @@ import eu.mcone.gameapi.gamestate.GameStateManager;
 import eu.mcone.gameapi.kit.GameKitManager;
 import eu.mcone.gameapi.listener.GamePlayerListener;
 import eu.mcone.gameapi.map.GameMapManager;
+import eu.mcone.gameapi.onepass.GameOnePassManager;
 import eu.mcone.gameapi.player.GameAPIPlayer;
 import eu.mcone.gameapi.player.GamePlayerManager;
 import eu.mcone.gameapi.replay.session.ReplaySession;
@@ -56,6 +58,10 @@ public class GameAPIPlugin extends GameAPI {
 
     @Override
     public void onDisable() {
+        for (GamePlayer gp : getOnlineGamePlayers()) {
+            ((GameAPIPlayer) gp).saveData();
+        }
+
         sendConsoleMessage("§cPlugin disabled!");
     }
 
@@ -113,6 +119,11 @@ public class GameAPIPlugin extends GameAPI {
     @Override
     public GamePlayerManager constructPlayerManager(GamePlugin gamePlugin) {
         return new GamePlayerManager(gamePlugin, this);
+    }
+
+    @Override
+    public OnePassManager constructOnePassManager() {
+        return new GameOnePassManager();
     }
 
     @Override
