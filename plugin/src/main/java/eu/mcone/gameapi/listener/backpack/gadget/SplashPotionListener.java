@@ -3,6 +3,8 @@ package eu.mcone.gameapi.listener.backpack.gadget;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.backpack.GameBackpackManager;
+import eu.mcone.gameapi.listener.backpack.handler.GadgetScheduler;
+import eu.mcone.gameapi.listener.backpack.handler.GameGadgetHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Sound;
@@ -18,14 +20,15 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 public class SplashPotionListener extends GadgetListener {
 
-    public SplashPotionListener(GamePlugin plugin) {
-        super(plugin);
+    public SplashPotionListener(GamePlugin plugin, GameGadgetHandler handler) {
+        super(plugin, handler);
     }
 
     public static ArrayList<Player> splashPotionEffects = new ArrayList<>();
@@ -35,65 +38,85 @@ public class SplashPotionListener extends GadgetListener {
         if (e.hasItem() && e.getItem().equals(DefaultItem.SPLASH_POTION.getItemStack()) && (e.getAction().equals(Action.RIGHT_CLICK_BLOCK) || e.getAction().equals(Action.RIGHT_CLICK_AIR))) {
             Player p = e.getPlayer();
 
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
-                p.playSound(p.getLocation(), Sound.GLASS, 1, 1);
-                p.playSound(p.getLocation(), Sound.SPLASH2, 2, 1);
-                p.getActivePotionEffects().clear();
-                p.removePotionEffect(PotionEffectType.INVISIBILITY);
-                p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 320, 1));
-                p.getInventory().setBoots(null);
+            handler.register(new GadgetScheduler() {
+                @Override
+                public BukkitTask register() {
+                    return Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                        p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
+                        p.playSound(p.getLocation(), Sound.GLASS, 1, 1);
+                        p.playSound(p.getLocation(), Sound.SPLASH2, 2, 1);
+                        p.getActivePotionEffects().clear();
+                        p.removePotionEffect(PotionEffectType.INVISIBILITY);
+                        p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 320, 1));
+                        p.getInventory().setBoots(null);
 
-                splashPotionEffects.add(p);
+                        splashPotionEffects.add(p);
 
-                World w = p.getWorld();
+                        World w = p.getWorld();
 
-                w.playEffect(p.getLocation(), Effect.FLAME, 3);
-                w.playEffect(p.getLocation(), Effect.FLAME, 1);
-                w.playEffect(p.getLocation(), Effect.WITCH_MAGIC, 5);
+                        w.playEffect(p.getLocation(), Effect.FLAME, 3);
+                        w.playEffect(p.getLocation(), Effect.FLAME, 1);
+                        w.playEffect(p.getLocation(), Effect.WITCH_MAGIC, 5);
 
-                Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
+                        handler.register(new GadgetScheduler() {
+                            @Override
+                            public BukkitTask register() {
+                                return Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                                    p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
                     /*if (p.hasPermission("lobby.silenthub")) {
                         p.getInventory().setItem(3, Item.SPLASH_POTION.getItemStack());
                     } else {
                         p.getInventory().setItem(2, Item.SPLASH_POTION.getItemStack());
                     }*/
 
-                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                        p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
+                                    handler.register(new GadgetScheduler() {
+                                        @Override
+                                        public BukkitTask register() {
+                                            return Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                                                p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
 
-                        if (plugin.getBackpackManager().isUseRankBoots()) {
-                            ((GameBackpackManager) plugin.getBackpackManager()).setRankBoots(p);
-                        }
+                                                if (plugin.getBackpackManager().isUseRankBoots()) {
+                                                    ((GameBackpackManager) plugin.getBackpackManager()).setRankBoots(p);
+                                                }
 
-                        if (p.hasPermission("lobby.silenthub")) {
-                            p.getInventory().setItem(plugin.getBackpackManager().getItemSlot(), DefaultItem.SPLASH_POTION.getItemStack());
+                                                if (p.hasPermission("lobby.silenthub")) {
+                                                    p.getInventory().setItem(plugin.getBackpackManager().getItemSlot(), DefaultItem.SPLASH_POTION.getItemStack());
 
-                            if (splashPotionEffects.contains(p)) {
-                                splashPotionEffects.remove(p);
+                                                    if (splashPotionEffects.contains(p)) {
+                                                        splashPotionEffects.remove(p);
+                                                    }
+
+                                                    p.getWorld().playEffect(p.getLocation(), Effect.LARGE_SMOKE, 10);
+                                                    p.getWorld().playEffect(p.getLocation(), Effect.FLAME, 10);
+                                                    p.getWorld().playEffect(p.getLocation(), Effect.ENDER_SIGNAL, 10);
+                                                    p.spigot().playEffect(p.getLocation(), Effect.FLAME, 1, 1, 1, 1, 1, 2, 100, 100);
+                                                    p.spigot().playEffect(p.getLocation(), Effect.ENDER_SIGNAL, 1, 1, 1, 1, 1, 2, 100, 100);
+
+                                                } else {
+                                                    p.getInventory().setItem(plugin.getBackpackManager().getFallbackSlot(), DefaultItem.SPLASH_POTION.getItemStack());
+                                                    p.getWorld().playEffect(p.getLocation(), Effect.LARGE_SMOKE, 10);
+                                                    p.getWorld().playEffect(p.getLocation(), Effect.FLAME, 10);
+                                                    p.getWorld().playEffect(p.getLocation(), Effect.ENDER_SIGNAL, 10);
+                                                    p.spigot().playEffect(p.getLocation(), Effect.FLAME, 1, 1, 1, 1, 1, 1, 100, 100);
+                                                    p.spigot().playEffect(p.getLocation(), Effect.ENDER_SIGNAL, 1, 1, 1, 1, 1, 2, 100, 100);
+                                                    if (splashPotionEffects.contains(p)) {
+                                                        splashPotionEffects.remove(p);
+                                                    }
+                                                }
+
+                                                handler.remove(this);
+                                            }, 220);
+                                        }
+                                    });
+                                    handler.remove(this);
+                                }, 95);
                             }
+                        });
 
-                            p.getWorld().playEffect(p.getLocation(), Effect.LARGE_SMOKE, 10);
-                            p.getWorld().playEffect(p.getLocation(), Effect.FLAME, 10);
-                            p.getWorld().playEffect(p.getLocation(), Effect.ENDER_SIGNAL, 10);
-                            p.spigot().playEffect(p.getLocation(), Effect.FLAME, 1, 1, 1, 1, 1, 2, 100, 100);
-                            p.spigot().playEffect(p.getLocation(), Effect.ENDER_SIGNAL, 1, 1, 1, 1, 1, 2, 100, 100);
-
-                        } else {
-                            p.getInventory().setItem(plugin.getBackpackManager().getFallbackSlot(), DefaultItem.SPLASH_POTION.getItemStack());
-                            p.getWorld().playEffect(p.getLocation(), Effect.LARGE_SMOKE, 10);
-                            p.getWorld().playEffect(p.getLocation(), Effect.FLAME, 10);
-                            p.getWorld().playEffect(p.getLocation(), Effect.ENDER_SIGNAL, 10);
-                            p.spigot().playEffect(p.getLocation(), Effect.FLAME, 1, 1, 1, 1, 1, 1, 100, 100);
-                            p.spigot().playEffect(p.getLocation(), Effect.ENDER_SIGNAL, 1, 1, 1, 1, 1, 2, 100, 100);
-                            if (splashPotionEffects.contains(p)) {
-                                splashPotionEffects.remove(p);
-                            }
-                        }
-                    }, 220);
-                }, 95);
-            }, 4);
+                        handler.remove(this);
+                    }, 4);
+                }
+            });
         }
     }
 

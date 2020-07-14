@@ -10,20 +10,22 @@ import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
+import java.util.UUID;
+
 public class NpcUtils {
 
-    public static PlayerNpc constructNpcForPlayer(final ReplayPlayer player, final String runnerID, Player... watchers) {
+    public static PlayerNpc constructNpcForPlayer(final ReplayPlayer player, final UUID containerUUID, Player... watchers) {
         return (PlayerNpc) CoreSystem.getInstance().getNpcManager().addNPC(new NpcData(
                         EntityType.PLAYER,
-                        runnerID + "_" + player.getData().getName(),
+                        containerUUID + "_" + player.getDisplayName(),
 //                        (player.getData().isReported() ? "§8[§cR§8] " + player.getData().getName() : player.getData().getDisplayName()),
-                        (player.getData().isReported() ? "§8[§cR§8] " + player.getData().getName() : player.getData().getName()),
-                        player.getData().getSpawnLocation(),
+                        (player.isReported() ? "§8[§cR§8] " + player.getDisplayName() : player.getDisplayName()),
+                        player.getSpawnLocation(),
                         new PlayerNpcData
                                 (
-                                        player.getData().getName(),
+                                        player.getDisplayName(),
                                         //TODO: Insert tab prefix
-                                        (player.getData().isReported() ? "§8[§cR§8] " + player.getData().getName() : player.getData().getDisplayName()),
+                                        (player.isReported() ? "§8[§cR§8] " + player.getDisplayName() : player.getDisplayName()),
                                         SkinInfo.SkinType.PLAYER,
                                         false,
                                         false,

@@ -6,7 +6,7 @@ import eu.mcone.coresystem.api.bukkit.npc.entity.PlayerNpc;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.coresystem.api.bukkit.world.CoreLocation;
 import eu.mcone.coresystem.api.core.player.Group;
-import eu.mcone.gameapi.api.replay.record.packets.util.SerializableItemStack;
+import eu.mcone.gameapi.api.replay.packets.player.objective.ReplayPlayerSidebarObjective;
 import eu.mcone.gameapi.replay.inventory.ReplayPlayerInventory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,10 +14,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
-import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,98 +25,65 @@ import java.util.UUID;
 
 @NoArgsConstructor
 @BsonDiscriminator
+@Getter
 public class ReplayPlayer implements eu.mcone.gameapi.api.replay.player.ReplayPlayer, Listener {
 
-    @Getter
     private UUID uuid;
-    @Getter
-    private Data data;
+    private String name;
+    private String displayName;
     @Setter
-    @BsonIgnore
-    private Map<Integer, SerializableItemStack> inventoryItems;
-    @Getter
+    private boolean reported;
     @Setter
-    @BsonIgnore
-    private eu.mcone.gameapi.api.replay.player.ReplayPlayer.Stats stats;
-    @Getter
+    private long joined;
     @Setter
-    @BsonIgnore
-    private int health;
-    @Getter
+    private CoreLocation spawnLocation;
+
     @Setter
-    @BsonIgnore
-    private int food;
-    @Getter
-    @BsonIgnore
-    private Map<Player, CoreInventory> inventoryViewers;
-    @Getter
+    private transient Map<Integer, ItemStack> inventoryItems;
+    private transient eu.mcone.gameapi.api.replay.player.ReplayPlayer.Stats stats;
     @Setter
-    @BsonIgnore
-    private PlayerNpc npc;
+    private transient int health;
+    @Setter
+    private transient int food;
+    private transient Map<Player, CoreInventory> inventoryViewers;
+    @Setter
+    private transient ReplayPlayerSidebarObjective scoreboard;
+    @Setter
+    private transient PlayerNpc npc;
 
     public ReplayPlayer(final Player player) {
-        uuid = player.getUniqueId();
-        data = new Data(player);
-        inventoryItems = new HashMap<>();
-        stats = new Stats(0, 0, 0);
-        health = 10;
-        food = 20;
-        inventoryViewers = new HashMap<>();
+        CorePlayer corePlayer = CoreSystem.getInstance().getCorePlayer(player);
+        this.uuid = player.getUniqueId();
+        this.name = player.getName();
+        this.displayName = (corePlayer.isNicked() ? Group.SPIELER.getPrefix() : corePlayer.getMainGroup().getPrefix()) + player.getName();
+        this.inventoryItems = new HashMap<>();
+        this.stats = new Stats(0, 0, 0);
+        this.health = 10;
+        this.food = 20;
+        this.inventoryViewers = new HashMap<>();
     }
 
     @BsonCreator
-    public ReplayPlayer(@BsonProperty("uuid") final UUID uuid, @BsonProperty("data") final Data data) {
+    public ReplayPlayer(@BsonProperty("uuid") final UUID uuid, @BsonProperty("displayName") final String displayName,
+                        @BsonProperty("reported") final boolean reported, @BsonProperty("joined") final long joined, @BsonProperty("spawnLocation") CoreLocation spawnLocation) {
         this.uuid = uuid;
-        this.data = data;
+        this.displayName = displayName;
+        this.reported = reported;
+        this.joined = joined;
+        this.spawnLocation = spawnLocation;
+
         inventoryItems = new HashMap<>();
         stats = new Stats(0, 0, 0);
         health = 10;
         inventoryViewers = new HashMap<>();
     }
 
-    public void setNpc(PlayerNpc npc) {
-        this.npc = npc;
-    }
-
-    public void setInventoryItem(int slot, SerializableItemStack itemStack) {
+    public void setInventoryItem(int slot, ItemStack itemStack) {
         inventoryItems.put(slot, itemStack);
     }
 
     public void openInventory(Player player) {
         inventoryViewers.put(player, new ReplayPlayerInventory(player, this, inventoryItems));
-    }
-
-    @Getter
-    @BsonDiscriminator
-    public static class Data implements eu.mcone.gameapi.api.replay.player.ReplayPlayer.Data {
-        private String displayName;
-        private String name;
-        @Setter
-        private String sessionID;
-        @Setter
-        private boolean reported;
-        @Setter
-        private long joined;
-        @Setter
-        private CoreLocation spawnLocation;
-
-        public Data(final Player player) {
-            CorePlayer cp = CoreSystem.getInstance().getCorePlayer(player.getUniqueId());
-            this.displayName = (cp.isNicked() ? Group.SPIELER.getPrefix() : cp.getMainGroup().getPrefix()) + player.getName();
-            this.name = player.getName();
-            this.reported = false;
-        }
-
-        @BsonCreator
-        public Data(@BsonProperty("displayName") final String displayName, @BsonProperty("name") final String name, @BsonProperty("sessionID") final String sessionID,
-                    @BsonProperty("reported") final boolean reported, @BsonProperty("joined") final long joined, @BsonProperty("spawnLocation") CoreLocation spawnLocation) {
-            this.displayName = displayName;
-            this.name = name;
-            this.sessionID = sessionID;
-            this.reported = reported;
-            this.joined = joined;
-            this.spawnLocation = spawnLocation;
-        }
     }
 
     @Setter

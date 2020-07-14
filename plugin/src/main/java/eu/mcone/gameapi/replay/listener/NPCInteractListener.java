@@ -5,8 +5,8 @@ import eu.mcone.coresystem.api.bukkit.npc.NPC;
 import eu.mcone.coresystem.api.bukkit.npc.entity.PlayerNpc;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
+import eu.mcone.gameapi.replay.container.ReplayContainer;
 import eu.mcone.gameapi.replay.inventory.ReplayPlayerInteractInventory;
-import eu.mcone.gameapi.replay.runner.ReplayRunnerManager;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.entity.Player;
@@ -18,13 +18,13 @@ import org.bukkit.inventory.Inventory;
 
 public class NPCInteractListener implements Listener {
 
-    private ReplayRunnerManager manager;
+    private ReplayContainer container;
     @Setter
     @Getter
     private boolean unregister = false;
 
-    public NPCInteractListener(ReplayRunnerManager manager) {
-        this.manager = manager;
+    public NPCInteractListener(ReplayContainer container) {
+        this.container = container;
         GamePlugin.getGamePlugin().registerEvents(this);
     }
 
@@ -36,7 +36,7 @@ public class NPCInteractListener implements Listener {
             e.getHandlers().unregister(this);
         } else {
             if (inv != null && !e.getSlotType().equals(InventoryType.SlotType.OUTSIDE)) {
-                for (ReplayPlayer replayPlayer : manager.getSession().getPlayers()) {
+                for (ReplayPlayer replayPlayer : container.getReplay().getPlayers()) {
                     if (replayPlayer.getNpc().getData().getName().equalsIgnoreCase(inv.getName())) {
                         if (replayPlayer.getInventoryViewers().containsKey(player)) {
                             e.setCancelled(true);
@@ -56,8 +56,7 @@ public class NPCInteractListener implements Listener {
             e.getHandlers().unregister(this);
         } else {
             if (npc instanceof PlayerNpc) {
-                for (ReplayPlayer replayPlayer : manager.getSession().getPlayers()) {
-                    System.out.println(replayPlayer.getData().getName());
+                for (ReplayPlayer replayPlayer : container.getReplay().getPlayers()) {
                     if (replayPlayer.getNpc().equals(npc)) {
                         new ReplayPlayerInteractInventory(replayPlayer, e.getPlayer());
                         break;

@@ -4,6 +4,7 @@ import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
+import eu.mcone.gameapi.listener.backpack.handler.GameGadgetHandler;
 import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftHorse;
 import org.bukkit.entity.ArmorStand;
@@ -28,8 +29,8 @@ import java.util.HashSet;
 public class FlyOneCarpetListener extends GadgetListener {
 
 
-    public FlyOneCarpetListener(GamePlugin plugin) {
-        super(plugin);
+    public FlyOneCarpetListener(GamePlugin plugin, GameGadgetHandler handler) {
+        super(plugin, handler);
     }
 
     public static HashSet<Player> isRiding = new HashSet<>();

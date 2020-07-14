@@ -3,6 +3,8 @@ package eu.mcone.gameapi.listener.backpack.gadget;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
+import eu.mcone.gameapi.listener.backpack.handler.GadgetScheduler;
+import eu.mcone.gameapi.listener.backpack.handler.GameGadgetHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -19,6 +21,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.vehicle.VehicleBlockCollisionEvent;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
+import org.bukkit.scheduler.BukkitTask;
 import org.spigotmc.event.entity.EntityDismountEvent;
 
 import java.util.HashMap;
@@ -26,8 +29,8 @@ import java.util.HashSet;
 
 public class BoatListener extends GadgetListener {
 
-    public BoatListener(GamePlugin plugin) {
-        super(plugin);
+    public BoatListener(GamePlugin plugin, GameGadgetHandler handler) {
+        super(plugin, handler);
     }
 
     public static HashMap<Player, Integer> boatId = new HashMap<>();
@@ -49,12 +52,18 @@ public class BoatListener extends GadgetListener {
                     p.playSound(p.getLocation(), Sound.FIREWORK_TWINKLE, 1, 1);
                     boatId.put(p, boat.getEntityId());
                     boatlist.add(boat.getEntityId());
-                    Bukkit.getScheduler().runTaskLater(GameAPI.getInstance(), () -> {
-                        boat.setPassenger(p);
-                        CoreSystem.getInstance().createActionBar()
-                                .message("§f§oBenutze LSHIFT um auszusteigen")
-                                .send(p);
-                    }, 1L);
+                    handler.register(new GadgetScheduler() {
+                        @Override
+                        public BukkitTask register() {
+                            return Bukkit.getScheduler().runTaskLater(GameAPI.getInstance(), () -> {
+                                boat.setPassenger(p);
+                                CoreSystem.getInstance().createActionBar()
+                                        .message("§f§oBenutze LSHIFT um auszusteigen")
+                                        .send(p);
+                                handler.remove(this);
+                            }, 1L);
+                        }
+                    });
                 } else {
                     GameAPI.getInstance().getMessenger().send(p, "§4Du kannst das §cGadget§4 nur im §cWasser §4benutzen!");
                 }

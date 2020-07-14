@@ -2,6 +2,7 @@ package eu.mcone.gameapi.listener.backpack.gadget;
 
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
+import eu.mcone.gameapi.listener.backpack.handler.GameGadgetHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -14,8 +15,8 @@ import org.bukkit.util.Vector;
 
 public class GrapplerListener extends GadgetListener {
 
-    public GrapplerListener(GamePlugin plugin) {
-        super(plugin);
+    public GrapplerListener(GamePlugin plugin, GameGadgetHandler handler) {
+        super(plugin, handler);
     }
 
     @EventHandler

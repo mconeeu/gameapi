@@ -2,6 +2,7 @@ package eu.mcone.gameapi.api.backpack;
 
 import eu.mcone.gameapi.api.Option;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
+import eu.mcone.gameapi.api.backpack.handler.GadgetHandler;
 import eu.mcone.gameapi.api.backpack.handler.OutfitHandler;
 import eu.mcone.gameapi.api.backpack.handler.PetHandler;
 import eu.mcone.gameapi.api.backpack.handler.TrailHandler;
@@ -66,6 +67,8 @@ public interface BackpackManager {
     TrailHandler getTrailHandler();
 
     OutfitHandler getOutfitHandler();
+
+    GadgetHandler getGadgetHandler();
 
     void setRankBoots(Player p);
 }

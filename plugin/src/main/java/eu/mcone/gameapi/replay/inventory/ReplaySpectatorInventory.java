@@ -6,19 +6,21 @@ import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
 import eu.mcone.coresystem.api.bukkit.item.Skull;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
-import eu.mcone.gameapi.replay.session.ReplaySession;
+import eu.mcone.gameapi.replay.session.Replay;
+import eu.mcone.gameapi.replay.session.ReplayRecord;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class ReplaySpectatorInventory extends CoreInventory {
 
-    public ReplaySpectatorInventory(ReplaySession session, Player p) {
+    public ReplaySpectatorInventory(Replay replay, Player p) {
         super("§eZuschauen", p, InventorySlot.ROW_6, InventoryOption.FILL_EMPTY_SLOTS);
 
         int slot = 0;
-        for (ReplayPlayer rPlayer : session.getPlayers()) {
-            setItem(slot, new Skull(rPlayer.getData().getName()).setDisplayName(rPlayer.getData().getDisplayName()).getItemStack(), e -> {
-                p.teleport((rPlayer.getNpc() != null ? rPlayer.getNpc().getLocation() : rPlayer.getData().getSpawnLocation().bukkit()));
-                GamePlugin.getGamePlugin().getMessenger().send(p, "§aDu wurdest zum Spieler §f" + rPlayer.getData().getName() + " §ateleportiert!");
+        for (ReplayPlayer rPlayer : replay.getPlayers()) {
+            setItem(slot, new Skull(rPlayer.getName()).setDisplayName(rPlayer.getDisplayName()).getItemStack(), e -> {
+                p.teleport((rPlayer.getNpc() != null ? rPlayer.getNpc().getLocation() : rPlayer.getSpawnLocation().bukkit()));
+                GamePlugin.getGamePlugin().getMessenger().send(p, "§aDu wurdest zum Spieler " + rPlayer.getDisplayName() + " §ateleportiert!");
             });
             slot++;
         }

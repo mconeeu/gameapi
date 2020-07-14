@@ -70,10 +70,6 @@ public class GameTeamManager implements TeamManager {
             this.teamCount = 0;
         }
 
-        if (GamePlugin.getGamePlugin().hasModule(Module.REPLAY_SESSION_MANAGER)) {
-            GamePlugin.getGamePlugin().getReplaySession().getInfo().setTeams(teamCount);
-        }
-
         system.sendConsoleMessage("§aLoading TeamManager...");
     }
 

@@ -3,8 +3,9 @@ package eu.mcone.gameapi.api.replay.player;
 import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.coresystem.api.bukkit.npc.entity.PlayerNpc;
 import eu.mcone.coresystem.api.bukkit.world.CoreLocation;
-import eu.mcone.gameapi.api.replay.record.packets.util.SerializableItemStack;
+import eu.mcone.gameapi.api.replay.packets.player.objective.ReplayPlayerSidebarObjective;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
 import java.util.UUID;
@@ -13,21 +14,33 @@ public interface ReplayPlayer {
 
     UUID getUuid();
 
-    Data getData();
+    String getName();
+
+    String getDisplayName();
+
+    boolean isReported();
+
+    CoreLocation getSpawnLocation();
+
+    void setReported(boolean reported);
+
+    void setJoined(long joined);
+
+    void setSpawnLocation(CoreLocation location);
 
     Map<Player, CoreInventory> getInventoryViewers();
 
-    void setInventoryItems(Map<Integer, SerializableItemStack> items);
+    void setInventoryItems(Map<Integer, ItemStack> items);
 
     PlayerNpc getNpc();
 
-    void setInventoryItem(int slot, SerializableItemStack itemStack);
+    void setNpc(PlayerNpc npc);
+
+    void setInventoryItem(int slot, ItemStack itemStack);
 
     void openInventory(Player player);
 
     ReplayPlayer.Stats getStats();
-
-    void setStats(ReplayPlayer.Stats stats);
 
     int getHealth();
 
@@ -37,32 +50,21 @@ public interface ReplayPlayer {
 
     void setFood(int food);
 
-    interface Data {
+    ReplayPlayerSidebarObjective getScoreboard();
 
-        String getDisplayName();
-
-        String getName();
-
-        String getSessionID();
-
-        boolean isReported();
-
-        CoreLocation getSpawnLocation();
-
-        void setSessionID(String sessionID);
-
-        void setReported(boolean reported);
-
-        void setJoined(long joined);
-
-        void setSpawnLocation(CoreLocation location);
-    }
+    void setScoreboard(ReplayPlayerSidebarObjective objective);
 
     interface Stats {
         int getKills();
 
+        void setKills(int kills);
+
         int getDeaths();
 
+        void setDeaths(int deaths);
+
         int getGoals();
+
+        void setGoals(int goals);
     }
 }

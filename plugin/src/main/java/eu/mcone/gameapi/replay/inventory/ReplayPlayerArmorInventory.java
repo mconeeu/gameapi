@@ -16,7 +16,7 @@ import java.util.Map;
 public class ReplayPlayerArmorInventory extends CoreInventory {
 
     public ReplayPlayerArmorInventory(ReplayPlayer replayPlayer, Player player) {
-        super(replayPlayer.getData().getDisplayName(), player, InventorySlot.ROW_1, InventoryOption.FILL_EMPTY_SLOTS);
+        super(replayPlayer.getDisplayName(), player, InventorySlot.ROW_1, InventoryOption.FILL_EMPTY_SLOTS);
 
         PlayerNpcData data = replayPlayer.getNpc().getEntityData();
         if (data.getEquipment().size() > 0) {

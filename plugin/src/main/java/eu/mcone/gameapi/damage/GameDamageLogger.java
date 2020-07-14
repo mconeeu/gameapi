@@ -4,6 +4,7 @@ import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.damage.DamageLogger;
 import eu.mcone.gameapi.listener.DamageLogListener;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -13,7 +14,9 @@ import java.util.UUID;
 
 public class GameDamageLogger implements DamageLogger {
 
-    private static final int DAMAGE_COOLDOWN = 8;
+    @Getter
+    @Setter
+    private int damageCooldown = 8;
 
     @Getter
     private final GameAPIPlugin plugin;
@@ -28,11 +31,12 @@ public class GameDamageLogger implements DamageLogger {
     }
 
     public void logDamage(Player player, Player damager) {
-        System.out.println("LOG DAMAGE " + player.getName() + " DAMAGER: " + damager.getName());
         if (damageLog.containsKey(player.getUniqueId())) {
             damageLog.get(player.getUniqueId()).put(damager.getUniqueId(), System.currentTimeMillis() / 1000);
         } else {
-            damageLog.put(player.getUniqueId(), new HashMap<UUID, Long>(){{put(damager.getUniqueId(), System.currentTimeMillis() / 1000);}});
+            damageLog.put(player.getUniqueId(), new HashMap<UUID, Long>() {{
+                put(damager.getUniqueId(), System.currentTimeMillis() / 1000);
+            }});
         }
     }
 
@@ -45,7 +49,7 @@ public class GameDamageLogger implements DamageLogger {
                 entry = e;
             }
 
-            if ((entry != null) && (entry.getValue() > (System.currentTimeMillis() / 1000) - DAMAGE_COOLDOWN)) {
+            if ((entry != null) && (entry.getValue() > (System.currentTimeMillis() / 1000) - damageCooldown)) {
                 System.out.println(entry.getKey());
                 return Bukkit.getPlayer(entry.getKey());
             }

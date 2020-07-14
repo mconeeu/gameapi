@@ -13,8 +13,8 @@ import eu.mcone.gameapi.api.onepass.OnePassManager;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.PlayerManager;
 import eu.mcone.gameapi.api.replay.exception.GameModuleNotActiveException;
-import eu.mcone.gameapi.api.replay.session.ReplaySession;
-import eu.mcone.gameapi.api.replay.session.ReplaySessionManager;
+import eu.mcone.gameapi.api.replay.session.ReplayRecord;
+import eu.mcone.gameapi.api.replay.session.ReplayManager;
 import eu.mcone.gameapi.api.team.TeamManager;
 import eu.mcone.gameapi.api.utils.GameConfig;
 import lombok.Getter;
@@ -38,11 +38,11 @@ public abstract class GamePlugin extends CorePlugin {
     private BackpackManager backpackManager;
     private AchievementManager achievementManager;
     private KitManager kitManager;
-    private ReplaySessionManager sessionManager;
+    private ReplayManager replayManager;
     private GameStateManager gameStateManager;
     private TeamManager teamManager;
     private PlayerManager playerManager;
-    private ReplaySession replaySession;
+    private ReplayRecord replay;
     private DamageLogger damageLogger;
     private OnePassManager onePassManager;
 
@@ -77,17 +77,18 @@ public abstract class GamePlugin extends CorePlugin {
     public void onDisable() {
         super.onDisable();
 
-        if (modules.contains(Module.REPLAY_SESSION_MANAGER)
+        if (modules.contains(Module.REPLAY_MANAGER)
                 && modules.contains(Module.TEAM_MANAGER)
                 && modules.contains(Module.PLAYER_MANAGER)) {
             //Stop date
-            getReplaySession().getInfo().setStopped(System.currentTimeMillis() / 1000);
+            getReplay().getRecorder().stop();
+            getReplayManager().saveReplay(getReplay());
 //            getSessionManager().getChannelHandler().createUnregisterRequest();
         }
 
-        if (modules.contains(Module.REPLAY_SESSION_MANAGER)) {
-            if (getSessionManager().getWorldDownloader() != null) {
-                getSessionManager().getWorldDownloader().stop();
+        if (modules.contains(Module.REPLAY_MANAGER)) {
+            if (getReplayManager().getWorldDownloader() != null) {
+                getReplayManager().getWorldDownloader().stop();
             }
         }
 
@@ -118,9 +119,9 @@ public abstract class GamePlugin extends CorePlugin {
         return achievementManager != null ? achievementManager : (achievementManager = GameAPI.getInstance().constructAchievementManager(this, options));
     }
 
-    public ReplaySessionManager getSessionManager() {
-        modules.add(Module.REPLAY_SESSION_MANAGER);
-        return sessionManager != null ? sessionManager : (sessionManager = GameAPI.getInstance().constructReplaySessionManager(options));
+    public ReplayManager getReplayManager() {
+        modules.add(Module.REPLAY_MANAGER);
+        return replayManager != null ? replayManager : (replayManager = GameAPI.getInstance().constructReplayManager(options));
     }
 
     public GameStateManager getGameStateManager() {
@@ -128,13 +129,13 @@ public abstract class GamePlugin extends CorePlugin {
         return gameStateManager != null ? gameStateManager : (gameStateManager = GameAPI.getInstance().constructGameStateManager(this));
     }
 
-    public ReplaySession getReplaySession() {
+    public ReplayRecord getReplay() {
         try {
-            if (modules.contains(Module.REPLAY_SESSION_MANAGER)
+            if (modules.contains(Module.REPLAY_MANAGER)
                     && modules.contains(Module.TEAM_MANAGER)
                     && modules.contains(Module.PLAYER_MANAGER)) {
                 modules.add(Module.REPLAY);
-                return replaySession != null ? replaySession : (replaySession = GameAPI.getInstance().createReplaySession(getSessionManager()));
+                return replay != null ? replay : (replay = replayManager.createReplay(getGamemode(), options));
             } else {
                 throw new GameModuleNotActiveException("The game module ReplaysessionManager isn`t active!");
             }

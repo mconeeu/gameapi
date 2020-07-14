@@ -8,10 +8,12 @@ import eu.mcone.gameapi.api.event.player.GamePlayerLoadedEvent;
 import eu.mcone.gameapi.api.event.team.TeamWonEvent;
 import eu.mcone.gameapi.api.gamestate.GameState;
 import eu.mcone.gameapi.api.gamestate.common.EndGameState;
+import eu.mcone.gameapi.api.gamestate.common.InGameState;
 import eu.mcone.gameapi.api.gamestate.common.LobbyGameState;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.GamePlayerState;
 import eu.mcone.gameapi.api.player.PlayerManager;
+import eu.mcone.gameapi.backpack.defaults.GadgetListener;
 import eu.mcone.gameapi.gamestate.GameStateManager;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
@@ -31,8 +33,8 @@ public class GameStateListener implements Listener {
         Player player = e.getPlayer().getCorePlayer().bukkit();
 
         if (GamePlugin.getGamePlugin().hasModule(Module.REPLAY)) {
-            GamePlugin.getGamePlugin().getReplaySession().addPlayer(player);
-            GamePlugin.getGamePlugin().getReplaySession().getReplayPlayer(player).getData().setJoined(System.currentTimeMillis() / 1000);
+            GamePlugin.getGamePlugin().getReplay().addPlayer(player);
+            GamePlugin.getGamePlugin().getReplay().getReplayPlayer(player).setJoined(System.currentTimeMillis() / 1000);
         }
 
         if (GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)) {
@@ -68,6 +70,8 @@ public class GameStateListener implements Listener {
                 if (!manager.isCountdownRunning() && playerManager.getPlayers(GamePlayerState.PLAYING).size() >= playerManager.getMinPlayers()) {
                     manager.startCountdown(false, 60);
                 }
+            } else if (GamePlugin.getGamePlugin().getGameStateManager().getRunning() instanceof InGameState) {
+                GadgetListener.getHandler().stop();
             }
         }
     }

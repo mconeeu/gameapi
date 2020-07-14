@@ -2,6 +2,7 @@ package eu.mcone.gameapi.api.scoreboard;
 
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.coresystem.api.bukkit.scoreboard.CoreSidebarObjective;
+import eu.mcone.coresystem.api.bukkit.scoreboard.CoreSidebarObjectiveEntry;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Module;
 import eu.mcone.gameapi.api.gamestate.GameState;
@@ -16,29 +17,29 @@ public class InGameObjective extends CoreSidebarObjective {
     }
 
     @Override
-    protected void onRegister(CorePlayer player) {
-        onReload(player);
-        super.setScore(2, "");
-        super.setScore(1, "§f§lMCONE.EU");
+    public void setScore(int score, String content) {
+        setScore(score + (useTime ? (score == 0 ? 6 : 5) : (score == 0 ? 3 : 2)), content);
     }
 
     @Override
-    protected void onReload(CorePlayer player) {
+    public void onRegister(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry) {
+        onReload(player, entry);
+        entry.setScore(2, "");
+        entry.setScore(1, "§f§lMCONE.EU");
+    }
+
+    @Override
+    public void onReload(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry) {
         if (GamePlugin.getGamePlugin().hasModule(Module.GAME_STATE_MANAGER) && GamePlugin.getGamePlugin().getGameStateManager().getRunning() instanceof InGameState) {
             GameState state = GamePlugin.getGamePlugin().getGameStateManager().getRunning();
 
             if (state.hasTimeout() && GamePlugin.getGamePlugin().getGameStateManager().isCountdownRunning()) {
                 useTime = true;
-                super.setScore(5, "");
-                super.setScore(4, "§8» §7Zeit:");
-                super.setScore(3, "   §f§l" + format(GamePlugin.getGamePlugin().getGameStateManager().getTimeoutCounter()));
+                entry.setScore(5, "");
+                entry.setScore(4, "§8» §7Zeit:");
+                entry.setScore(3, "   §f§l" + format(GamePlugin.getGamePlugin().getGameStateManager().getTimeoutCounter()));
             }
         }
-    }
-
-    @Override
-    public void setScore(int score, String content) {
-        super.setScore(score + (useTime ? (score == 0 ? 6 : 5) : (score == 0 ? 3 : 2)), content);
     }
 
     public static String format(double time) {

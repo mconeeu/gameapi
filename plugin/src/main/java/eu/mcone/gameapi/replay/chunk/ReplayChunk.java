@@ -1,67 +1,66 @@
 package eu.mcone.gameapi.replay.chunk;
 
-import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketContainer;
+import eu.mcone.coresystem.api.bukkit.codec.Codec;
+import eu.mcone.coresystem.api.bukkit.packets.Chunk;
+import eu.mcone.coresystem.api.core.util.CompressUtils;
 import eu.mcone.coresystem.api.core.util.GenericUtils;
 import lombok.Getter;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
-import java.util.zip.Deflater;
 
-public class ReplayChunk implements Serializable, eu.mcone.gameapi.api.replay.chunk.ReplayChunk {
+public class ReplayChunk extends Chunk implements Serializable, eu.mcone.gameapi.api.replay.chunk.ReplayChunk {
 
-    private ChunkData chunkData;
+    private final ChunkData chunkData;
 
     public ReplayChunk() {
         chunkData = new ChunkData();
     }
 
-    public ReplayChunk(ChunkData data) {
-        this.chunkData = data;
+    public ReplayChunk(ChunkData chunkData) {
+        this.chunkData = chunkData;
     }
 
-    public void addServerPacket(int tick, PacketContainer wrapper) {
-        if (wrapper != null) {
-            if (chunkData.serverPackets.containsKey(tick)) {
-                chunkData.serverPackets.get(tick).add(wrapper);
+    public void addServerPacket(int tick, Codec<?, ?> codec) {
+        if (codec != null) {
+            if (chunkData.serverCodecs.containsKey(tick)) {
+                chunkData.serverCodecs.get(tick).add(codec);
             } else {
-                chunkData.serverPackets.put(tick, new ArrayList<PacketContainer>() {{
-                    add(wrapper);
+                chunkData.serverCodecs.put(tick, new ArrayList<Codec<?, ?>>() {{
+                    add(codec);
                 }});
             }
         }
     }
 
-    public void addPacket(UUID uuid, int tick, PacketContainer wrapper) {
-        if (wrapper != null) {
-            if (chunkData.playerPackets.containsKey(uuid)) {
-                if (chunkData.playerPackets.get(uuid).containsKey(tick)) {
-                    chunkData.playerPackets.get(uuid).get(tick).add(wrapper);
+    public void addPacket(UUID uuid, int tick, Codec<?, ?> codec) {
+        if (codec != null) {
+            if (chunkData.playerCodecs.containsKey(uuid)) {
+                if (chunkData.playerCodecs.get(uuid).containsKey(tick)) {
+                    chunkData.playerCodecs.get(uuid).get(tick).add(codec);
                 } else {
-                    chunkData.playerPackets.get(uuid).put(tick, new ArrayList<PacketContainer>() {{
-                        add(wrapper);
+                    chunkData.playerCodecs.get(uuid).put(tick, new ArrayList<Codec<?, ?>>() {{
+                        add(codec);
                     }});
                 }
             } else {
-                chunkData.playerPackets.put(uuid, new HashMap<Integer, List<PacketContainer>>() {{
-                    put(tick, new ArrayList<PacketContainer>() {{
-                        add(wrapper);
+                chunkData.playerCodecs.put(uuid, new HashMap<Integer, List<Codec<?, ?>>>() {{
+                    put(tick, new ArrayList<Codec<?, ?>>() {{
+                        add(codec);
                     }});
                 }});
             }
         }
     }
 
-    public PacketContainer getLastPacketInRange(UUID uuid, Object obj, int startTick, int endTick) {
-        if (this.chunkData.playerPackets.containsKey(uuid)) {
-            PacketContainer found = null;
+    public Codec<?, ?> getLastPacketInRange(UUID uuid, Object obj, int startTick, int endTick) {
+        if (this.chunkData.playerCodecs.containsKey(uuid)) {
+            Codec<?, ?> found = null;
             int tick = startTick;
-            while (true) {
-                List<PacketContainer> packets = this.chunkData.playerPackets.get(uuid).get(tick);
+            do {
+                List<Codec<?, ?>> packets = this.chunkData.playerCodecs.get(uuid).get(tick);
                 if (packets != null) {
-                    for (PacketContainer packet : packets) {
+                    for (Codec<?, ?> packet : packets) {
                         if (packet.getClass().isInstance(obj)) {
                             found = packet;
                         }
@@ -74,10 +73,7 @@ public class ReplayChunk implements Serializable, eu.mcone.gameapi.api.replay.ch
                     tick++;
                 }
 
-                if (tick == endTick) {
-                    break;
-                }
-            }
+            } while (tick != endTick);
 
             return found;
         } else {
@@ -86,50 +82,34 @@ public class ReplayChunk implements Serializable, eu.mcone.gameapi.api.replay.ch
     }
 
     public byte[] compressData() {
-        try {
-            byte[] unCompressedData = GenericUtils.serialize(chunkData);
-            Deflater deflater = new Deflater();
-            deflater.setInput(unCompressedData);
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream(unCompressedData.length);
-            deflater.finish();
-            byte[] buffer = new byte[1024];
-            while (!deflater.finished()) {
-                int count = deflater.deflate(buffer); // returns the generated code... index
-                outputStream.write(buffer, 0, count);
-            }
-            outputStream.close();
-            return outputStream.toByteArray();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return CompressUtils.compress(GenericUtils.serialize(chunkData));
     }
 
-    public Map<Integer, List<PacketContainer>> getPackets(UUID uuid) {
-        System.out.println("CONTAINS: " + chunkData.playerPackets.containsKey(uuid));
-        return chunkData.playerPackets.get(uuid);
+    public Map<Integer, List<Codec<?, ?>>> getPackets(UUID uuid) {
+        return chunkData.playerCodecs.get(uuid);
     }
 
-    public List<PacketContainer> getServerPackets(final Integer tick) {
-        return chunkData.serverPackets.getOrDefault(tick, null);
+    public List<Codec<?, ?>> getServerCodecs(final int tick) {
+        return chunkData.serverCodecs.getOrDefault(tick, null);
     }
 
     public Collection<UUID> getPlayers() {
-        return chunkData.playerPackets.keySet();
+        return chunkData.playerCodecs.keySet();
     }
 
     @Getter
-    public static class ChunkData implements Serializable, eu.mcone.gameapi.api.replay.chunk.ReplayChunk.ChunkData {
-        private final Map<UUID, Map<Integer, List<PacketContainer>>> playerPackets;
-        private final Map<Integer, List<PacketContainer>> serverPackets;
+    public static class ChunkData extends eu.mcone.coresystem.api.bukkit.packets.ChunkData implements eu.mcone.gameapi.api.replay.chunk.ReplayChunk.ChunkData {
+        private final Map<UUID, Map<Integer, List<Codec<?, ?>>>> playerCodecs;
+        private final Map<Integer, List<Codec<?, ?>>> serverCodecs;
 
         public ChunkData() {
-            playerPackets = new HashMap<>();
-            serverPackets = new HashMap<>();
+            playerCodecs = new HashMap<>();
+            serverCodecs = new HashMap<>();
         }
 
-        public int getPacketsAmount() {
-            return playerPackets.size() + serverPackets.size();
+        @Override
+        public int getLength() {
+            return playerCodecs.size() + serverCodecs.size();
         }
     }
 }

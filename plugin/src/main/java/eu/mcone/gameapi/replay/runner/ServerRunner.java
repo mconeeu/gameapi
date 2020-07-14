@@ -1,97 +1,62 @@
 package eu.mcone.gameapi.replay.runner;
 
-import eu.mcone.coresystem.api.bukkit.npc.capture.SimplePlayer;
-import eu.mcone.coresystem.api.bukkit.npc.capture.packets.PacketContainer;
-import eu.mcone.gameapi.api.GameAPI;
+import eu.mcone.coresystem.api.bukkit.codec.Codec;
 import eu.mcone.gameapi.api.replay.chunk.ReplayChunk;
-import eu.mcone.gameapi.api.replay.record.packets.server.EntityTntExplodePacketContainer;
-import eu.mcone.gameapi.api.replay.record.packets.server.ServerBroadcastMessagePacketContainer;
-import eu.mcone.gameapi.api.replay.record.packets.util.SerializableBlock;
+import eu.mcone.gameapi.api.replay.packets.server.MessageWrapper;
 import eu.mcone.gameapi.api.replay.runner.ReplaySpeed;
+import eu.mcone.gameapi.replay.container.ReplayContainer;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
-public class ServerRunner extends SimplePlayer {
+public class ServerRunner extends eu.mcone.coresystem.api.bukkit.npc.capture.Player implements eu.mcone.gameapi.api.replay.runner.ServerRunner {
 
     @Setter
     @Getter
     private ReplaySpeed replaySpeed = null;
-    private int skipped;
 
-    private ReplayRunnerManager manager;
-    private Map<String, List<PacketContainer>> packets;
+    private final ReplayContainer container;
+    private final ScheduledThreadPoolExecutor executor;
 
-    public ServerRunner(final ReplayRunnerManager manager) {
-        this.manager = manager;
-        packets = manager.getSession().getMessages();
+    public ServerRunner(final ReplayContainer container) {
+        this.container = container;
+        this.executor = (ScheduledThreadPoolExecutor) Executors.newSingleThreadExecutor();
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
     public void play() {
-        currentTick = new AtomicInteger(0);
-        AtomicInteger packetsCount = new AtomicInteger(0);
+        if (!playing) {
+            currentTick.set(0);
+        }
 
-        playingTask = Bukkit.getScheduler().runTaskTimer(GameAPI.getInstance(), () -> {
+        executor.schedule(() -> {
             if (playing) {
                 int tick = currentTick.get();
-                String sTick = String.valueOf(tick);
-
-                ReplayChunk chunk = manager.getSession().getChunkHandler().getChunk(tick);
-                List<PacketContainer> serverPackets = chunk.getServerPackets(tick);
-
-                int repeat;
-                if (replaySpeed != null && skipped == replaySpeed.getWait()) {
-                    repeat = (replaySpeed.isAdd() ? 2 : 0);
-                    skipped = 0;
-                } else {
-                    repeat = 1;
-                }
-
-                if (tick != manager.getSession().getInfo().getLastTick()) {
-                    for (int i = 0; i < repeat; i++) {
-                        if (packets.containsKey(sTick)) {
-                            for (PacketContainer packet : packets.get(sTick)) {
-                                if (packet instanceof ServerBroadcastMessagePacketContainer) {
-                                    ServerBroadcastMessagePacketContainer broadcast = (ServerBroadcastMessagePacketContainer) packet;
-                                    Bukkit.broadcastMessage(broadcast.getMessage().getMessage());
-                                }
+                if (tick != container.getReplay().getLastTick()) {
+                    String sTick = String.valueOf(tick);
+                    ReplayChunk chunk = container.getChunkHandler().getChunk(tick);
+                    List<Codec<?, ?>> codecs = chunk.getServerCodecs(tick);
+                    if (codecs != null) {
+                        for (Codec codec : codecs) {
+                            if (codec.getEncodeClass().equals(eu.mcone.gameapi.api.replay.runner.ServerRunner.class)) {
+                                codec.encode(this);
                             }
-
-                            skipped++;
                         }
+                    }
 
-                        if (serverPackets != null) {
-                            for (PacketContainer packet : serverPackets) {
-                                if (packet instanceof EntityTntExplodePacketContainer) {
-                                    EntityTntExplodePacketContainer tntExplodePacketContainer = (EntityTntExplodePacketContainer) packet;
-                                    sendBlockUpdate(tntExplodePacketContainer.calculateLocation(), Material.AIR, (byte) 0);
-
-                                    for (Player player : watcher) {
-                                        player.playSound(player.getLocation(), Sound.EXPLODE, 1, 1);
-                                    }
-
-                                    for (SerializableBlock block : tntExplodePacketContainer.getDestroy()) {
-                                        sendBlockUpdate(block.getLocation(), Material.AIR, (byte) 0);
-                                    }
-                                }
+                    if (container.getReplay().getMessages().containsKey(sTick)) {
+                        for (MessageWrapper wrapper : container.getReplay().getMessages().get(sTick)) {
+                            for (Player watcher : getWatchers()) {
+                                watcher.sendMessage(wrapper.getMessage());
                             }
-
-                            skipped++;
-                        }
-
-                        if (forward) {
-                            packetsCount.getAndIncrement();
-                        } else {
-                            packetsCount.getAndDecrement();
                         }
                     }
 
@@ -107,11 +72,13 @@ public class ServerRunner extends SimplePlayer {
                     }
                 } else {
                     playing = false;
-                    playingTask.cancel();
                 }
             }
+        }, replaySpeed.getSpeed(), TimeUnit.MILLISECONDS);
 
-        }, 1L, 1L);
+        if (playing) {
+            play();
+        }
     }
 
     private void sendBlockUpdate(Location location, Material material, byte ID) {
@@ -123,40 +90,30 @@ public class ServerRunner extends SimplePlayer {
     public void skip(int skipTicks) {
         if (playing) {
             int cTick = currentTick.get();
-            int end;
-            end = cTick + skipTicks;
+            int end = cTick + skipTicks;
 
             //Check if the end tick is higher then the last tick
-            if (end > manager.getSession().getInfo().getLastTick()) {
-                end = manager.getSession().getInfo().getLastTick();
+            if (end > container.getReplay().getLastTick()) {
+                end = container.getReplay().getLastTick();
             } else if (end < 0) {
                 end = 0;
             }
 
-            while (true) {
+            do {
                 String sTick = String.valueOf(cTick);
-                if (packets.containsKey(sTick)) {
-                    for (PacketContainer packet : packets.get(sTick)) {
-                        if (packet instanceof ServerBroadcastMessagePacketContainer) {
-                            ServerBroadcastMessagePacketContainer broadcast = (ServerBroadcastMessagePacketContainer) packet;
-                            Bukkit.broadcastMessage(broadcast.getMessage().getMessage());
+                if (container.getReplay().getMessages().containsKey(sTick)) {
+                    for (MessageWrapper wrapper : container.getReplay().getMessages().get(sTick)) {
+                        for (Player watcher : getWatchers()) {
+                            watcher.sendMessage(wrapper.getMessage());
                         }
                     }
                 }
 
                 cTick++;
-
-                if (cTick <= end) {
-                    break;
-                }
-            }
+            } while (cTick > end);
 
             int newTick = cTick;
-            if (newTick > 0) {
-                currentTick.set(newTick);
-            } else {
-                currentTick.set(0);
-            }
+            currentTick.set(Math.max(newTick, 0));
         }
     }
 }

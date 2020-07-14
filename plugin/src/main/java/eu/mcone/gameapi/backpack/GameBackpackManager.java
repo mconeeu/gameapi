@@ -18,6 +18,7 @@ import eu.mcone.gameapi.api.backpack.BackpackManager;
 import eu.mcone.gameapi.api.backpack.Category;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultCategory;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
+import eu.mcone.gameapi.api.backpack.handler.GadgetHandler;
 import eu.mcone.gameapi.api.backpack.handler.OutfitHandler;
 import eu.mcone.gameapi.api.backpack.handler.PetHandler;
 import eu.mcone.gameapi.api.backpack.handler.TrailHandler;
@@ -29,6 +30,7 @@ import eu.mcone.gameapi.inventory.backpack.BackpackInventory;
 import eu.mcone.gameapi.inventory.backpack.BackpackSellInventory;
 import eu.mcone.gameapi.inventory.backpack.trade.TradeChooseInventory;
 import eu.mcone.gameapi.listener.backpack.BackpackListener;
+import eu.mcone.gameapi.listener.backpack.handler.GameGadgetHandler;
 import eu.mcone.gameapi.player.GameAPIPlayer;
 import lombok.Getter;
 import lombok.Setter;
@@ -354,7 +356,7 @@ public class GameBackpackManager implements BackpackManager {
 
     @Override
     public void stop() {
-
+        GadgetListener.getHandler().stop();
     }
 
     public Set<Category> getCategories() {
@@ -417,6 +419,11 @@ public class GameBackpackManager implements BackpackManager {
     @Override
     public OutfitHandler getOutfitHandler() {
         return OutfitListener.getHandler();
+    }
+
+    @Override
+    public GadgetHandler getGadgetHandler() {
+        return GadgetListener.getHandler();
     }
 
     @Override

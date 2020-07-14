@@ -4,6 +4,8 @@ import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.api.player.GamePlayer;
+import eu.mcone.gameapi.listener.backpack.handler.GadgetScheduler;
+import eu.mcone.gameapi.listener.backpack.handler.GameGadgetHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -14,6 +16,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -22,12 +25,12 @@ import java.util.HashMap;
 public class MakesListener extends GadgetListener {
 
 
-    public MakesListener(GamePlugin plugin) {
-        super(plugin);
+    public MakesListener(GamePlugin plugin, GameGadgetHandler handler) {
+        super(plugin, handler);
     }
 
     private final HashMap<Player, Location> playerLocation = new HashMap<>();
-    private ArrayList<Player> isUse = new ArrayList<>();
+    private final ArrayList<Player> isUse = new ArrayList<>();
 
 
     @EventHandler
@@ -62,29 +65,64 @@ public class MakesListener extends GadgetListener {
                                     players.playEffect(player.getLocation(), Effect.WITCH_MAGIC, 20);
                                     players.playEffect(player.getLocation(), Effect.CLICK1, 20);
                                     players.playEffect(player.getLocation(), Effect.SMALL_SMOKE, 5);
-                                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                                        players.playEffect(otherplayer.getLocation(), Effect.MOBSPAWNER_FLAMES, 5);
-                                        players.playEffect(otherplayer.getLocation(), Effect.LARGE_SMOKE, 5);
-                                        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                                            otherplayer.setVelocity(new Vector(x / 1.6f, 1.8f, z / 1.9f));
-                                            players.playEffect(otherplayer.getLocation(), Effect.EXPLOSION_LARGE, 5);
-                                            otherplayer.playSound(otherplayer.getLocation(), Sound.EXPLODE, 1, 1);
-                                            Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                                                otherplayer.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 43, 1));
-                                                otherplayer.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 42, 1));
-                                                Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                                                    if (playerLocation.containsKey(otherplayer)) {
-                                                        otherplayer.teleport(playerLocation.get(otherplayer));
-                                                        playerLocation.remove(otherplayer);
-                                                        otherplayer.playSound(otherplayer.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 1);
+                                    handler.register(new GadgetScheduler() {
+                                        @Override
+                                        public BukkitTask register() {
+                                            return Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                                                players.playEffect(otherplayer.getLocation(), Effect.MOBSPAWNER_FLAMES, 5);
+                                                players.playEffect(otherplayer.getLocation(), Effect.LARGE_SMOKE, 5);
+                                                handler.register(new GadgetScheduler() {
+                                                    @Override
+                                                    public BukkitTask register() {
+                                                        return Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                                                            otherplayer.setVelocity(new Vector(x / 1.6f, 1.8f, z / 1.9f));
+                                                            players.playEffect(otherplayer.getLocation(), Effect.EXPLOSION_LARGE, 5);
+                                                            otherplayer.playSound(otherplayer.getLocation(), Sound.EXPLODE, 1, 1);
+                                                            handler.register(new GadgetScheduler() {
+                                                                @Override
+                                                                public BukkitTask register() {
+                                                                    return Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                                                                        otherplayer.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 43, 1));
+                                                                        otherplayer.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 42, 1));
+                                                                        handler.register(new GadgetScheduler() {
+                                                                            @Override
+                                                                            public BukkitTask register() {
+                                                                                return Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                                                                                    if (playerLocation.containsKey(otherplayer)) {
+                                                                                        otherplayer.teleport(playerLocation.get(otherplayer));
+                                                                                        playerLocation.remove(otherplayer);
+                                                                                        otherplayer.playSound(otherplayer.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 1);
+                                                                                    }
+
+                                                                                    handler.register(new GadgetScheduler() {
+                                                                                        @Override
+                                                                                        public BukkitTask register() {
+                                                                                            return Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                                                                                                isUse.remove(player);
+                                                                                                handler.remove(this);
+                                                                                            }, 120L);
+                                                                                        }
+                                                                                    });
+
+                                                                                    handler.remove(this);
+                                                                                }, 9L);
+                                                                            }
+                                                                        });
+
+                                                                        handler.remove(this);
+                                                                    }, 7L);
+                                                                }
+                                                            });
+
+                                                            handler.remove(this);
+                                                        }, 12L);
                                                     }
-                                                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                                                        isUse.remove(player);
-                                                    }, 120L);
-                                                }, 9L);
-                                            }, 7L);
-                                        }, 12L);
-                                    }, 9L);
+                                                });
+
+                                                handler.remove(this);
+                                            }, 9L);
+                                        }
+                                    });
 
                                 }
                             }

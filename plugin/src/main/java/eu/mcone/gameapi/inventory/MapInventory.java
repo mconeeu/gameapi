@@ -42,7 +42,9 @@ public class MapInventory extends CoreInventory {
             i++;
         }
 
-        setItem(InventorySlot.ROW_2_SLOT_9, new ItemBuilder(Material.IRON_DOOR, 1).displayName("§c§l↩ Zurück").create(), e -> coreInventory.openInventory());
+        if (coreInventory != null) {
+            setItem(InventorySlot.ROW_2_SLOT_9, new ItemBuilder(Material.IRON_DOOR, 1).displayName("§c§l↩ Zurück").create(), e -> coreInventory.openInventory());
+        }
 
         player.playSound(player.getLocation(), Sound.LEVEL_UP, 1, 1);
         openInventory();

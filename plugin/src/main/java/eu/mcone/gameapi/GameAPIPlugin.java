@@ -22,8 +22,8 @@ import eu.mcone.gameapi.map.GameMapManager;
 import eu.mcone.gameapi.onepass.GameOnePassManager;
 import eu.mcone.gameapi.player.GameAPIPlayer;
 import eu.mcone.gameapi.player.GamePlayerManager;
-import eu.mcone.gameapi.replay.session.ReplaySession;
-import eu.mcone.gameapi.replay.session.ReplaySessionManager;
+import eu.mcone.gameapi.replay.session.ReplayRecord;
+import eu.mcone.gameapi.replay.session.ReplayManager;
 import eu.mcone.gameapi.team.GameTeamManager;
 import lombok.Getter;
 import org.bukkit.entity.Player;
@@ -71,17 +71,6 @@ public class GameAPIPlugin extends GameAPI {
     }
 
     @Override
-    public eu.mcone.gameapi.api.replay.session.ReplaySession createReplaySession(eu.mcone.gameapi.api.replay.session.ReplaySessionManager manager) {
-        if (GamePlugin.getGamePlugin().hasModule(Module.REPLAY_SESSION_MANAGER)) {
-            ReplaySession session = new ReplaySession(manager);
-            session.getInfo().setStarted(System.currentTimeMillis() / 1000);
-            return session;
-        } else {
-            return null;
-        }
-    }
-
-    @Override
     public MapManager constructMapManager() {
         return new GameMapManager(GamePlugin.getGamePlugin());
     }
@@ -102,8 +91,8 @@ public class GameAPIPlugin extends GameAPI {
     }
 
     @Override
-    public ReplaySessionManager constructReplaySessionManager(Option... options) {
-        return new eu.mcone.gameapi.replay.session.ReplaySessionManager(options);
+    public ReplayManager constructReplayManager(Option... options) {
+        return new ReplayManager(options);
     }
 
 //    @Override
@@ -113,7 +102,7 @@ public class GameAPIPlugin extends GameAPI {
 
     @Override
     public GameTeamManager constructTeamManager(GamePlugin gamePlugin, Option[] options) {
-       return new GameTeamManager(gamePlugin, this, options);
+        return new GameTeamManager(gamePlugin, this, options);
     }
 
     @Override
