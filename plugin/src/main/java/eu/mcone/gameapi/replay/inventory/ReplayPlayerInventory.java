@@ -3,7 +3,6 @@ package eu.mcone.gameapi.replay.inventory;
 import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
 import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
-import eu.mcone.gameapi.api.replay.packets.util.SerializableItemStack;
 import eu.mcone.gameapi.replay.player.ReplayPlayer;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
