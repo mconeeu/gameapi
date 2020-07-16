@@ -4,7 +4,6 @@ import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.gameapi.achievement.GameAchievementManager;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
-import eu.mcone.gameapi.api.Module;
 import eu.mcone.gameapi.api.Option;
 import eu.mcone.gameapi.api.achievement.AchievementManager;
 import eu.mcone.gameapi.api.backpack.BackpackManager;
@@ -22,9 +21,9 @@ import eu.mcone.gameapi.map.GameMapManager;
 import eu.mcone.gameapi.onepass.GameOnePassManager;
 import eu.mcone.gameapi.player.GameAPIPlayer;
 import eu.mcone.gameapi.player.GamePlayerManager;
-import eu.mcone.gameapi.replay.session.ReplayRecord;
 import eu.mcone.gameapi.replay.session.ReplayManager;
 import eu.mcone.gameapi.team.GameTeamManager;
+import io.sentry.Sentry;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 
@@ -42,27 +41,40 @@ public class GameAPIPlugin extends GameAPI {
 
     @Override
     public void onEnable() {
-        super.onEnable();
+        try {
+            //Sentry error logging
+            Sentry.init("https://2529672f0fcf4f21b41524b81f147ae6@o267551.ingest.sentry.io/5198718");
 
-        system = this;
-        setInstance(this);
+            super.onEnable();
 
-        this.players = new ArrayList<>();
+            system = this;
+            setInstance(this);
 
-        registerEvents(
-                new GamePlayerListener()
-        );
+            this.players = new ArrayList<>();
 
-        sendConsoleMessage("§aVersion §f" + this.getDescription().getVersion() + "§a enabled...");
+            registerEvents(
+                    new GamePlayerListener()
+            );
+
+            sendConsoleMessage("§aVersion §f" + this.getDescription().getVersion() + "§a enabled...");
+        } catch (Exception e) {
+            Sentry.capture(e);
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onDisable() {
-        for (GamePlayer gp : getOnlineGamePlayers()) {
-            ((GameAPIPlayer) gp).saveData();
-        }
+        try {
+            for (GamePlayer gp : getOnlineGamePlayers()) {
+                ((GameAPIPlayer) gp).saveData();
+            }
 
-        sendConsoleMessage("§cPlugin disabled!");
+            sendConsoleMessage("§cPlugin disabled!");
+        } catch (Exception e) {
+            Sentry.capture(e);
+            e.printStackTrace();
+        }
     }
 
     @Override
