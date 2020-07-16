@@ -39,12 +39,14 @@ public class GameAPIPlugin extends GameAPI {
     @Getter
     private List<GameAPIPlayer> players;
 
+    public GameAPIPlugin() {
+        //Sentry error logging
+        Sentry.init("https://2529672f0fcf4f21b41524b81f147ae6@o267551.ingest.sentry.io/5198718");
+    }
+
     @Override
     public void onEnable() {
         try {
-            //Sentry error logging
-            Sentry.init("https://2529672f0fcf4f21b41524b81f147ae6@o267551.ingest.sentry.io/5198718");
-
             super.onEnable();
 
             system = this;
