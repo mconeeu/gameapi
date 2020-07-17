@@ -60,6 +60,7 @@ public class BoatListener extends GadgetListener {
                                 CoreSystem.getInstance().createActionBar()
                                         .message("§f§oBenutze LSHIFT um auszusteigen")
                                         .send(p);
+
                                 handler.remove(this);
                             }, 1L);
                         }
@@ -81,11 +82,18 @@ public class BoatListener extends GadgetListener {
 
     @EventHandler
     public void onBoatSpawn(VehicleCreateEvent e) {
-        Bukkit.getScheduler().runTaskLater(GameAPI.getInstance(), () -> {
-            if (!boatId.containsValue(e.getVehicle().getEntityId())) {
-                e.getVehicle().remove();
+        handler.register(new GadgetScheduler() {
+            @Override
+            public BukkitTask register() {
+                return Bukkit.getScheduler().runTaskLater(GameAPI.getInstance(), () -> {
+                    if (!boatId.containsValue(e.getVehicle().getEntityId())) {
+                        e.getVehicle().remove();
+                    }
+
+                    handler.remove(this);
+                }, 1L);
             }
-        }, 1L);
+        });
     }
 
     @EventHandler

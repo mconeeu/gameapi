@@ -72,7 +72,15 @@ public class BombListener extends GadgetListener {
                                 player.playEffect(item.getLocation(), Effect.LAVA_POP, 1);
 
                                 Vector v1 = player.getLocation().getDirection().setY(0.8).multiply(1.1);
-                                Bukkit.getScheduler().runTaskLater(plugin, () -> p.playSound(item.getLocation(), Sound.FIREWORK_TWINKLE, 1, 1), 3);
+                                handler.register(new GadgetScheduler() {
+                                    @Override
+                                    public BukkitTask register() {
+                                        return Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                                            p.playSound(item.getLocation(), Sound.FIREWORK_TWINKLE, 1, 1);
+                                            handler.remove(this);
+                                        }, 3);
+                                    }
+                                });
                                 player.setVelocity(v1);
                             }
                         }
@@ -85,19 +93,18 @@ public class BombListener extends GadgetListener {
                         item.getWorld().playSound(item.getLocation(), Sound.GLASS, 1, 1);
 
                         handler.remove(this);
-
                     }, 20);
                 }
             });
 
             p.playSound(p.getLocation(), Sound.CHICKEN_EGG_POP, 1, 1);
 
-            handler.remove(new GadgetScheduler() {
+            handler.register(new GadgetScheduler() {
                 @Override
                 public BukkitTask register() {
                     return Bukkit.getScheduler().runTaskLater(plugin, () -> {
                         p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
-                        handler.remove(new GadgetScheduler() {
+                        handler.register(new GadgetScheduler() {
                             @Override
                             public BukkitTask register() {
                                 return Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -114,11 +121,13 @@ public class BombListener extends GadgetListener {
                                                 } else {
                                                     p.getInventory().setItem(plugin.getBackpackManager().getFallbackSlot(), DefaultItem.BOMB.getItemStack());
                                                 }
-                                                
+
                                                 handler.remove(this);
                                             }, 30);
                                         }
                                     });
+
+                                    handler.remove(this);
                                 }, 10);
                             }
                         });

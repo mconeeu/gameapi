@@ -19,7 +19,7 @@ public class EntityDamageByEntityEventCodec extends Codec<EntityDamageByEntityEv
     private double z;
 
     public EntityDamageByEntityEventCodec() {
-        super("SHOOT");
+        super("SHOOT", EntityDamageByEntityEvent.class, PlayerNpc.class);
     }
 
     @Override

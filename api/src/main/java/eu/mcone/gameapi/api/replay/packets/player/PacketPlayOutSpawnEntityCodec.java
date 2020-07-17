@@ -27,7 +27,7 @@ public class PacketPlayOutSpawnEntityCodec extends Codec<PacketPlayOutSpawnEntit
     private int pitch;
 
     public PacketPlayOutSpawnEntityCodec() {
-        super("SpawnEntity");
+        super("SpawnEntity", PacketPlayOutSpawnEntity.class, PlayerRunner.class);
     }
 
     @Override

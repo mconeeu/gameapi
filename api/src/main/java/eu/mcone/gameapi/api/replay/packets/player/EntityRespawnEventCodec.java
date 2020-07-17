@@ -18,7 +18,7 @@ public class EntityRespawnEventCodec extends Codec<PlayerRespawnEvent, PlayerRun
     private double z;
 
     public EntityRespawnEventCodec() {
-        super("Respawn");
+        super("Respawn", PlayerRespawnEvent.class, PlayerRunner.class);
     }
 
     @Override

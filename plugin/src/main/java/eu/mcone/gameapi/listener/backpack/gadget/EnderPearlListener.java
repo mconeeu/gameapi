@@ -41,7 +41,7 @@ public class EnderPearlListener extends GadgetListener {
 
             p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
 
-            handler.remove(new GadgetScheduler() {
+            handler.register(new GadgetScheduler() {
                 @Override
                 public BukkitTask register() {
                     return Bukkit.getScheduler().runTaskLater(plugin, () -> {

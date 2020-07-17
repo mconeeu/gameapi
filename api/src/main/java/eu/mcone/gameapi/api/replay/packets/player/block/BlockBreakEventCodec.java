@@ -22,7 +22,7 @@ public class BlockBreakEventCodec extends Codec<BlockBreakEvent, PlayerRunner> {
     private String world;
 
     public BlockBreakEventCodec() {
-        super("BlockBreak");
+        super("BlockBreak", BlockBreakEvent.class, PlayerRunner.class);
     }
 
     @Override

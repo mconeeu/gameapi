@@ -23,8 +23,8 @@ public class EntityExplodeEventCodec extends Codec<EntityExplodeEvent, ServerRun
 
     private List<CoreLocation> destroy;
 
-    public EntityExplodeEventCodec(String type) {
-        super(type);
+    public EntityExplodeEventCodec() {
+        super("Explode", EntityExplodeEvent.class, ServerRunner.class);
         destroy = new ArrayList<>();
     }
 

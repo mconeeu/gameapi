@@ -18,7 +18,7 @@ public class PlayerPickupItemEventCodec extends Codec<PlayerPickupItemEvent, Pla
     private int entityID;
 
     public PlayerPickupItemEventCodec() {
-        super("Pickup");
+        super("Pickup", PlayerPickupItemEvent.class, PlayerRunner.class);
     }
 
     @Override

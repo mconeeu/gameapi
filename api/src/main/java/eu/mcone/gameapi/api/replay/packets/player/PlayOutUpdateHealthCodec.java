@@ -18,7 +18,7 @@ public class PlayOutUpdateHealthCodec extends Codec<PacketPlayOutUpdateHealth, R
     private int food;
 
     public PlayOutUpdateHealthCodec() {
-        super("HEALTH");
+        super("HEALTH", PacketPlayOutUpdateHealth.class, ReplayPlayer.class);
     }
 
     @Override

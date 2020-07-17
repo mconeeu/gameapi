@@ -21,7 +21,7 @@ public class ArmorEquipEventCodec extends Codec<ArmorEquipEvent, PlayerRunner> {
     private int slot;
 
     public ArmorEquipEventCodec() {
-        super("ArmorChange");
+        super("ArmorChange", ArmorEquipEvent.class, PlayerRunner.class);
     }
 
     @Override

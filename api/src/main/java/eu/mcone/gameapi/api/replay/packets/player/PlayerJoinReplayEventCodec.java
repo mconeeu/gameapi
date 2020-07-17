@@ -23,7 +23,7 @@ public class PlayerJoinReplayEventCodec extends Codec<PlayerJoinReplayEvent, Pla
     private float pitch;
 
     public PlayerJoinReplayEventCodec() {
-        super("JOIN");
+        super("Join", PlayerJoinReplayEvent.class, PlayerRunner.class);
     }
 
     @Override

@@ -77,9 +77,13 @@ public class LoveGunListener extends GadgetListener {
                                             }, 9);
                                         }
                                     });
+
+                                    handler.remove(this);
                                 }, 10);
                             }
                         });
+
+                        handler.remove(this);
                     }, 13);
                 }
             });

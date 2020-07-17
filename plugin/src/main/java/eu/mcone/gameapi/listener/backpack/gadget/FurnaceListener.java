@@ -47,40 +47,43 @@ public class FurnaceListener extends GadgetListener {
 
 
 //            if ((oldItemDown.getType().equals(Material.GRASS) || oldItemDown.getType().equals(Material.AIR)) && oldItemUp.getType().equals(Material.AIR)) {
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                item.getWorld().createExplosion(item.getLocation().getX(), item.getLocation().getY(),
-                        item.getLocation().getZ(), 3, false, false);
+            handler.register(new GadgetScheduler() {
+                @Override
+                public BukkitTask register() {
+                    return Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                        item.getWorld().createExplosion(item.getLocation().getX(), item.getLocation().getY(),
+                                item.getLocation().getZ(), 3, false, false);
 
                 /*Block yplus1 = item.getLocation().getWorld().getBlockAt(new Location(item.getWorld(), item.getLocation().getBlockX(), item.getLocation().getBlockY() + 1, item.getLocation().getBlockZ()));
                 Block startair = item.getLocation().getWorld().getBlockAt(new Location(item.getWorld(), item.getLocation().getBlockX(), item.getLocation().getBlockY(), item.getLocation().getBlockZ()));
                  */
 
-                for (int i = 0; i <= 1; i++) {
-                    int x;
-                    int y;
-                    int z;
+                        for (int i = 0; i <= 1; i++) {
+                            int x;
+                            int y;
+                            int z;
 
-                    Random random = new Random();
-                    x = random.nextInt(1);
-                    y = random.nextInt(1);
-                    z = random.nextInt(1);
-                    locations.add(item.getLocation().add(x, y, z));
-                }
-
-
-                for (Location location : locations) {
-                    if (item.getLocation().getWorld().getBlockAt(location).getType().equals(Material.AIR)) {
-                        for (GamePlayer gp : GameAPI.getInstance().getOnlineGamePlayers()) {
-                            gp.bukkit().getWorld().getBlockAt(location).setType(Material.FURNACE);
-                            furnaceLocations.add(location);
-
-                            if (!gp.getSettings().isEnableGadgets() || !gp.isEffectsVisible()) {
-                                gp.bukkit().getWorld().getBlockAt(location).setType(Material.AIR);
-                            }
+                            Random random = new Random();
+                            x = random.nextInt(1);
+                            y = random.nextInt(1);
+                            z = random.nextInt(1);
+                            locations.add(item.getLocation().add(x, y, z));
                         }
-                    }
 
-                }
+
+                        for (Location location : locations) {
+                            if (item.getLocation().getWorld().getBlockAt(location).getType().equals(Material.AIR)) {
+                                for (GamePlayer gp : GameAPI.getInstance().getOnlineGamePlayers()) {
+                                    gp.bukkit().getWorld().getBlockAt(location).setType(Material.FURNACE);
+                                    furnaceLocations.add(location);
+
+                                    if (!gp.getSettings().isEnableGadgets() || !gp.isEffectsVisible()) {
+                                        gp.bukkit().getWorld().getBlockAt(location).setType(Material.AIR);
+                                    }
+                                }
+                            }
+
+                        }
 
 
 //                    Location loc1 = item.getLocation();
@@ -95,13 +98,15 @@ public class FurnaceListener extends GadgetListener {
 //                                .setType(Material.WEB);
 //                    }
 
-                item.getWorld().playEffect(item.getLocation(), Effect.FIREWORKS_SPARK, 1);
-                item.getWorld().playSound(item.getLocation(), Sound.GLASS, 1, 1);
-                Bukkit.getScheduler().runTaskLater(plugin, () -> item.getWorld().playSound(item.getLocation(), Sound.FIREWORK_TWINKLE, 1, 1), 3);
-            }, 20);
+                        item.getWorld().playEffect(item.getLocation(), Effect.FIREWORKS_SPARK, 1);
+                        item.getWorld().playSound(item.getLocation(), Sound.GLASS, 1, 1);
+                        Bukkit.getScheduler().runTaskLater(plugin, () -> item.getWorld().playSound(item.getLocation(), Sound.FIREWORK_TWINKLE, 1, 1), 3);
+                    }, 20);
+                }
+            });
 
             p.playSound(p.getLocation(), Sound.CHICKEN_EGG_POP, 1, 1);
-            handler.remove(new GadgetScheduler() {
+            handler.register(new GadgetScheduler() {
                 @Override
                 public BukkitTask register() {
                     return Bukkit.getScheduler().runTaskLater(plugin, () -> {

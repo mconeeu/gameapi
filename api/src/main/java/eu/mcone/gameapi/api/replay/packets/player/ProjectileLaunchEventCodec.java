@@ -20,7 +20,7 @@ public class ProjectileLaunchEventCodec extends Codec<ProjectileLaunchEvent, Pla
     private int id;
 
     public ProjectileLaunchEventCodec() {
-        super("Projectile");
+        super("Projectile", ProjectileLaunchEvent.class, PlayerNpc.class);
     }
 
     @Override

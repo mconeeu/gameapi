@@ -16,7 +16,7 @@ import java.io.ObjectOutputStream;
 public class PlayerQuitReplayEventCodec extends Codec<PlayerQuitReplayEvent, PlayerNpc> {
 
     public PlayerQuitReplayEventCodec() {
-        super("DestroyNpc");
+        super("DestroyNpc", PlayerQuitReplayEvent.class, PlayerNpc.class);
     }
 
     @Override

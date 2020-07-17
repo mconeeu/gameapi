@@ -14,7 +14,7 @@ public class CoreObjectiveCreateEventCodec extends Codec<CoreObjectiveCreateEven
     private String name;
 
     public CoreObjectiveCreateEventCodec() {
-        super("Scoreboard");
+        super("Scoreboard", CoreObjectiveCreateEvent.class, ReplayPlayer.class);
     }
 
     @Override

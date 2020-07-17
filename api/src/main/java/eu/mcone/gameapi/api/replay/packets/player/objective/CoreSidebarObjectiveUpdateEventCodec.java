@@ -16,7 +16,7 @@ public class CoreSidebarObjectiveUpdateEventCodec extends Codec<CoreSidebarObjec
     private Map<Integer, String> scores;
 
     public CoreSidebarObjectiveUpdateEventCodec() {
-        super("UpdateObjective");
+        super("UpdateObjective", CoreSidebarObjectiveUpdateEvent.class, ReplayPlayer.class);
     }
 
     @Override

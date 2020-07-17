@@ -22,7 +22,7 @@ public class PlayerItemConsumeEventCodec extends Codec<PlayerItemConsumeEvent, P
     private int level;
 
     public PlayerItemConsumeEventCodec() {
-        super("ItemConsume");
+        super("ItemConsume", PlayerItemConsumeEvent.class, PlayerRunner.class);
     }
 
     @Override

@@ -12,7 +12,7 @@ import java.io.ObjectOutputStream;
 public class PlayerDeathEventCodec extends Codec<PlayerDeathEvent, PlayerRunner> {
 
     public PlayerDeathEventCodec() {
-        super("Death");
+        super("Death", PlayerDeathEvent.class, PlayerRunner.class);
     }
 
     @Override

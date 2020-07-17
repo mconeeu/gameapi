@@ -51,7 +51,7 @@ public class CobwebGunListener extends GadgetListener {
 
 
 //            if ((oldItemDown.getType().equals(Material.GRASS) || oldItemDown.getType().equals(Material.AIR)) && oldItemUp.getType().equals(Material.AIR)) {
-            handler.remove(new GadgetScheduler() {
+            handler.register(new GadgetScheduler() {
                 @Override
                 public BukkitTask register() {
                     return Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -122,7 +122,7 @@ public class CobwebGunListener extends GadgetListener {
                     return Bukkit.getScheduler().runTaskLater(plugin, () -> {
                         p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
 
-                        handler.remove(new GadgetScheduler() {
+                        handler.register(new GadgetScheduler() {
                             @Override
                             public BukkitTask register() {
                                 return Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -154,7 +154,7 @@ public class CobwebGunListener extends GadgetListener {
                                                             } else {
                                                                 p.getInventory().setItem(plugin.getBackpackManager().getFallbackSlot(), DefaultItem.COBWEBGUN.getItemStack());
                                                             }
-                                                            
+
                                                             handler.remove(this);
                                                         }, 33);
                                                     }

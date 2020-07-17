@@ -22,7 +22,7 @@ public class PacketPlayOutNamedSoundEffectCodec extends Codec<PacketPlayOutNamed
     private double z;
 
     public PacketPlayOutNamedSoundEffectCodec() {
-        super("Sound");
+        super("Sound", PacketPlayOutNamedSoundEffect.class, PlayerRunner.class);
     }
 
     @Override

@@ -78,7 +78,7 @@ public class SnowGunListener extends GadgetListener {
                             }
                         });
 
-                        handler.register(this);
+                        handler.remove(this);
                     }, 10);
                 }
             });

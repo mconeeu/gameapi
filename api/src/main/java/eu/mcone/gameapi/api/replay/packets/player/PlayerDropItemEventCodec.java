@@ -24,7 +24,7 @@ public class PlayerDropItemEventCodec extends Codec<PlayerDropItemEvent, PlayerR
     private double z;
 
     public PlayerDropItemEventCodec() {
-        super("DropItem");
+        super("DropItem", PlayerDropItemEvent.class, PlayerRunner.class);
     }
 
     @Override

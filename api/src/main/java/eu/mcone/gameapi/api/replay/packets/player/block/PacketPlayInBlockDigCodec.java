@@ -14,7 +14,7 @@ public class PacketPlayInBlockDigCodec extends Codec<PacketPlayInBlockDig, Playe
     private PacketPlayInBlockDig.EnumPlayerDigType action;
 
     public PacketPlayInBlockDigCodec() {
-        super("BlockDig");
+        super("BlockDig", PacketPlayInBlockDig.class, PlayerRunner.class);
     }
 
     @Override

@@ -16,7 +16,7 @@ public class StatsChangeEventCodec extends Codec<PlayerRoundStatsChangeEvent, Re
     private int goals;
 
     public StatsChangeEventCodec() {
-        super("STATS");
+        super("STATS", PlayerRoundStatsChangeEvent.class, ReplayPlayer.class);
     }
 
     @Override

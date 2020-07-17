@@ -46,7 +46,7 @@ public class EasterGunListener extends GadgetListener {
 
 
             p.playSound(p.getLocation(), Sound.CHICKEN_EGG_POP, 1, 1);
-            handler.remove(new GadgetScheduler() {
+            handler.register(new GadgetScheduler() {
                 @Override
                 public BukkitTask register() {
                     return Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -58,7 +58,7 @@ public class EasterGunListener extends GadgetListener {
                                 return Bukkit.getScheduler().runTaskLater(plugin, () -> {
                                     p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
 
-                                    handler.remove(new GadgetScheduler() {
+                                    handler.register(new GadgetScheduler() {
                                         @Override
                                         public BukkitTask register() {
                                             return Bukkit.getScheduler().runTaskLater(plugin, () -> {

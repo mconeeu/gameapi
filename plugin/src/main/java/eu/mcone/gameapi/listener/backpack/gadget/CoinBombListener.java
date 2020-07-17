@@ -200,7 +200,7 @@ public class CoinBombListener extends GadgetListener {
 
         item3.setVelocity(v6);
 
-        handler.remove(new GadgetScheduler() {
+        handler.register(new GadgetScheduler() {
             @Override
             public BukkitTask register() {
                 return Bukkit.getScheduler().runTaskLater(GameAPI.getInstance(), () -> {

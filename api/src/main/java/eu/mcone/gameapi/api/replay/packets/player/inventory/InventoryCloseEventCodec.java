@@ -20,7 +20,7 @@ public class InventoryCloseEventCodec extends Codec<InventoryCloseEvent, PlayerR
     private HashMap<Integer, ItemStack> content;
 
     public InventoryCloseEventCodec() {
-        super("Close");
+        super("Close", InventoryCloseEvent.class, PlayerRunner.class);
     }
 
     @Override

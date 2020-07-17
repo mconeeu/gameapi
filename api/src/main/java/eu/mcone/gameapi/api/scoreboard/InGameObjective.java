@@ -17,11 +17,6 @@ public abstract class InGameObjective extends LobbyObjective {
     }
 
     @Override
-    public void setScore(int score, String content) {
-        setScore(score + (useTime ? (score == 0 ? 6 : 5) : (score == 0 ? 3 : 2)), content);
-    }
-
-    @Override
     protected void onLobbyRegister(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry) {
         CoreSidebarObjectiveEntry inGameEntry = new CoreSidebarObjectiveEntry();
         onInGameRegister(player, inGameEntry);

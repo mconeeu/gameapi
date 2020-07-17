@@ -21,7 +21,7 @@ public class PacketPlayOutEntityEffectCodec extends Codec<PacketPlayOutEntityEff
     private byte amplifier;
 
     public PacketPlayOutEntityEffectCodec() {
-        super("PotionSplash");
+        super("PotionSplash", PacketPlayOutEntityEffect.class, PlayerRunner.class);
     }
 
     @Override

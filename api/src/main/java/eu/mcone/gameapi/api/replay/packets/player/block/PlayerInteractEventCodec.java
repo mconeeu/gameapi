@@ -25,7 +25,7 @@ public class PlayerInteractEventCodec extends Codec<PlayerInteractEvent, PlayerR
     private double z;
 
     public PlayerInteractEventCodec() {
-        super("Interact");
+        super("Interact", PlayerInteractEvent.class, PlayerRunner.class);
     }
 
     @Override

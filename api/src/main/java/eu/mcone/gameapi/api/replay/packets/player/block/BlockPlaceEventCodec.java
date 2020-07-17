@@ -28,7 +28,7 @@ public class BlockPlaceEventCodec extends Codec<BlockPlaceEvent, PlayerRunner> {
     private String world;
 
     public BlockPlaceEventCodec() {
-        super("BlockPlace");
+        super("BlockPlace", BlockPlaceEvent.class, PlayerRunner.class);
     }
 
     @BsonIgnore
