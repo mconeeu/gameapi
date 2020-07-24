@@ -23,7 +23,6 @@ import eu.mcone.gameapi.player.GameAPIPlayer;
 import eu.mcone.gameapi.player.GamePlayerManager;
 import eu.mcone.gameapi.replay.session.ReplayManager;
 import eu.mcone.gameapi.team.GameTeamManager;
-import io.sentry.Sentry;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 
@@ -39,14 +38,9 @@ public class GameAPIPlugin extends GameAPI {
     @Getter
     private List<GameAPIPlayer> players;
 
-    public GameAPIPlugin() {
-        //Sentry error logging
-        Sentry.init("https://2529672f0fcf4f21b41524b81f147ae6@o267551.ingest.sentry.io/5198718");
-    }
-
     @Override
     public void onEnable() {
-        try {
+        withErrorLogging(() -> {
             super.onEnable();
 
             system = this;
@@ -59,24 +53,18 @@ public class GameAPIPlugin extends GameAPI {
             );
 
             sendConsoleMessage("§aVersion §f" + this.getDescription().getVersion() + "§a enabled...");
-        } catch (Exception e) {
-            Sentry.capture(e);
-            e.printStackTrace();
-        }
+        });
     }
 
     @Override
     public void onDisable() {
-        try {
+        withErrorLogging(() -> {
             for (GamePlayer gp : getOnlineGamePlayers()) {
                 ((GameAPIPlayer) gp).saveData();
             }
 
             sendConsoleMessage("§cPlugin disabled!");
-        } catch (Exception e) {
-            Sentry.capture(e);
-            e.printStackTrace();
-        }
+        });
     }
 
     @Override

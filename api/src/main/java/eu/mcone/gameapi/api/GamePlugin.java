@@ -50,7 +50,11 @@ public abstract class GamePlugin extends CorePlugin {
     private CoreJsonConfig<GameConfig> gameConfig;
 
     protected GamePlugin(String pluginName, ChatColor pluginColor, String prefixTranslation, Option... options) {
-        super(pluginName, pluginColor, prefixTranslation);
+        this(pluginName, pluginColor, prefixTranslation, null, options);
+    }
+
+    protected GamePlugin(String pluginName, ChatColor pluginColor, String prefixTranslation, String sentryDsn, Option... options) {
+        super(pluginName, pluginColor, prefixTranslation, sentryDsn);
         gamePlugin = this;
 
         this.modules = new ArrayList<>();
@@ -58,7 +62,11 @@ public abstract class GamePlugin extends CorePlugin {
     }
 
     protected GamePlugin(Gamemode pluginGamemode, String prefixTranslation, Option... options) {
-        super(pluginGamemode, prefixTranslation);
+        this(pluginGamemode, prefixTranslation, null, options);
+    }
+
+    protected GamePlugin(Gamemode pluginGamemode, String prefixTranslation, String sentryDsn, Option... options) {
+        super(pluginGamemode, prefixTranslation, sentryDsn);
         gamePlugin = this;
 
         this.modules = new ArrayList<>();
@@ -67,32 +75,36 @@ public abstract class GamePlugin extends CorePlugin {
 
     @Override
     public void onEnable() {
-        super.onEnable();
+        GameAPI.getInstance().withErrorLogging(() -> {
+            super.onEnable();
+            this.gameConfig = new CoreJsonConfig<>(this, GameConfig.class, "gameConfig.json");
+        });
 
-        this.gameConfig = new CoreJsonConfig<>(this, GameConfig.class, "gameConfig.json");
-        onGameEnable();
+        withErrorLogging(this::onGameEnable);
     }
 
     @Override
     public void onDisable() {
-        super.onDisable();
+        GameAPI.getInstance().withErrorLogging(() -> {
+            super.onDisable();
 
-        if (modules.contains(Module.REPLAY_MANAGER)
-                && modules.contains(Module.TEAM_MANAGER)
-                && modules.contains(Module.PLAYER_MANAGER)) {
-            //Stop date
-            getReplay().getRecorder().stop();
-            getReplayManager().saveReplay(getReplay());
+            if (modules.contains(Module.REPLAY_MANAGER)
+                    && modules.contains(Module.TEAM_MANAGER)
+                    && modules.contains(Module.PLAYER_MANAGER)) {
+                //Stop date
+                getReplay().getRecorder().stop();
+                getReplayManager().saveReplay(getReplay());
 //            getSessionManager().getChannelHandler().createUnregisterRequest();
-        }
-
-        if (modules.contains(Module.REPLAY_MANAGER)) {
-            if (getReplayManager().getWorldDownloader() != null) {
-                getReplayManager().getWorldDownloader().stop();
             }
-        }
 
-        onGameDisable();
+            if (modules.contains(Module.REPLAY_MANAGER)) {
+                if (getReplayManager().getWorldDownloader() != null) {
+                    getReplayManager().getWorldDownloader().stop();
+                }
+            }
+        });
+
+        withErrorLogging(this::onGameEnable);
     }
 
     public abstract void onGameEnable();

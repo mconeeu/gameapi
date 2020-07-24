@@ -16,7 +16,6 @@ import eu.mcone.gameapi.api.map.MapManager;
 import eu.mcone.gameapi.api.onepass.OnePassManager;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.PlayerManager;
-import eu.mcone.gameapi.api.replay.session.ReplayRecord;
 import eu.mcone.gameapi.api.replay.session.ReplayManager;
 import eu.mcone.gameapi.api.team.TeamManager;
 import lombok.Getter;
@@ -29,7 +28,12 @@ import java.util.UUID;
 public abstract class GameAPI extends CorePlugin {
 
     public GameAPI() {
-        super("gameapi", ChatColor.DARK_GRAY, "system.prefix.server");
+        super(
+                "gameapi",
+                ChatColor.DARK_GRAY,
+                "system.prefix.server",
+                "https://2529672f0fcf4f21b41524b81f147ae6@o267551.ingest.sentry.io/5198718"
+        );
     }
 
     @Getter
