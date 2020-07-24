@@ -86,8 +86,6 @@ public abstract class GamePlugin extends CorePlugin {
     @Override
     public void onDisable() {
         GameAPI.getInstance().withErrorLogging(() -> {
-            super.onDisable();
-
             if (modules.contains(Module.REPLAY_MANAGER)
                     && modules.contains(Module.TEAM_MANAGER)
                     && modules.contains(Module.PLAYER_MANAGER)) {
@@ -104,7 +102,7 @@ public abstract class GamePlugin extends CorePlugin {
             }
         });
 
-        withErrorLogging(this::onGameEnable);
+        withErrorLogging(this::onGameDisable);
     }
 
     public abstract void onGameEnable();
