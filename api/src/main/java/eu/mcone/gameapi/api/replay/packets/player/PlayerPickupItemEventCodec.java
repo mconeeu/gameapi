@@ -8,9 +8,7 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 
 @Getter
 public class PlayerPickupItemEventCodec extends Codec<PlayerPickupItemEvent, PlayerRunner> {
@@ -18,13 +16,13 @@ public class PlayerPickupItemEventCodec extends Codec<PlayerPickupItemEvent, Pla
     private int entityID;
 
     public PlayerPickupItemEventCodec() {
-        super("Pickup", PlayerPickupItemEvent.class, PlayerRunner.class);
+        super((byte) 0, (byte) 0);
     }
 
     @Override
     public Object[] decode(Player player, PlayerPickupItemEvent pickupItemEvent) {
         entityID = pickupItemEvent.getItem().getEntityId();
-        return new Object[]{player};
+        return new Object[]{pickupItemEvent.getPlayer()};
     }
 
     @Override
@@ -35,12 +33,12 @@ public class PlayerPickupItemEventCodec extends Codec<PlayerPickupItemEvent, Pla
     }
 
     @Override
-    protected void onWriteObject(ObjectOutputStream out) throws IOException {
+    protected void onWriteObject(DataOutputStream out) throws IOException {
         out.writeInt(entityID);
     }
 
     @Override
-    protected void onReadObject(ObjectInputStream in) throws IOException {
+    protected void onReadObject(DataInputStream in) throws IOException, ClassNotFoundException {
         entityID = in.readInt();
     }
 }

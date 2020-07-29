@@ -11,9 +11,7 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerDropItemEvent;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 
 @Getter
 public class PlayerDropItemEventCodec extends Codec<PlayerDropItemEvent, PlayerRunner> {
@@ -24,7 +22,7 @@ public class PlayerDropItemEventCodec extends Codec<PlayerDropItemEvent, PlayerR
     private double z;
 
     public PlayerDropItemEventCodec() {
-        super("DropItem", PlayerDropItemEvent.class, PlayerRunner.class);
+        super((byte) 0, (byte) 0);
     }
 
     @Override
@@ -33,7 +31,7 @@ public class PlayerDropItemEventCodec extends Codec<PlayerDropItemEvent, PlayerR
         x = dropItemEvent.getItemDrop().getLocation().getX();
         y = dropItemEvent.getItemDrop().getLocation().getY();
         z = dropItemEvent.getItemDrop().getLocation().getZ();
-        return new Object[]{player};
+        return new Object[]{dropItemEvent.getPlayer()};
     }
 
     @Override
@@ -51,7 +49,7 @@ public class PlayerDropItemEventCodec extends Codec<PlayerDropItemEvent, PlayerR
     }
 
     @Override
-    protected void onWriteObject(ObjectOutputStream out) throws IOException {
+    protected void onWriteObject(DataOutputStream out) throws IOException {
         out.writeInt(entityID);
         out.writeDouble(x);
         out.writeDouble(y);
@@ -59,7 +57,7 @@ public class PlayerDropItemEventCodec extends Codec<PlayerDropItemEvent, PlayerR
     }
 
     @Override
-    protected void onReadObject(ObjectInputStream in) throws IOException {
+    protected void onReadObject(DataInputStream in) throws IOException, ClassNotFoundException {
         entityID = in.readInt();
         x = in.readDouble();
         y = in.readDouble();

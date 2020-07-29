@@ -1,9 +1,12 @@
 package eu.mcone.gameapi.replay.chunk;
 
 import eu.mcone.coresystem.api.bukkit.codec.Codec;
+import eu.mcone.coresystem.api.bukkit.codec.CodecInputStream;
+import eu.mcone.coresystem.api.bukkit.codec.CodecOutputStream;
+import eu.mcone.coresystem.api.bukkit.codec.DeserializeCallback;
 import eu.mcone.coresystem.api.bukkit.packets.Chunk;
-import eu.mcone.coresystem.api.core.util.CompressUtils;
 import eu.mcone.coresystem.api.core.util.GenericUtils;
+import eu.mcone.gameapi.api.GamePlugin;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -11,13 +14,18 @@ import java.util.*;
 
 public class ReplayChunk extends Chunk implements Serializable, eu.mcone.gameapi.api.replay.chunk.ReplayChunk {
 
+    @Getter
     private final ChunkData chunkData;
+    @Getter
+    private final int ID;
 
-    public ReplayChunk() {
+    public ReplayChunk(int ID) {
         chunkData = new ChunkData();
+        this.ID = ID;
     }
 
-    public ReplayChunk(ChunkData chunkData) {
+    public ReplayChunk(int ID, ChunkData chunkData) {
+        this.ID = ID;
         this.chunkData = chunkData;
     }
 
@@ -81,10 +89,6 @@ public class ReplayChunk extends Chunk implements Serializable, eu.mcone.gameapi
         }
     }
 
-    public byte[] compressData() {
-        return CompressUtils.compress(GenericUtils.serialize(chunkData));
-    }
-
     public Map<Integer, List<Codec<?, ?>>> getPackets(UUID uuid) {
         return chunkData.playerCodecs.get(uuid);
     }
@@ -99,12 +103,97 @@ public class ReplayChunk extends Chunk implements Serializable, eu.mcone.gameapi
 
     @Getter
     public static class ChunkData extends eu.mcone.coresystem.api.bukkit.packets.ChunkData implements eu.mcone.gameapi.api.replay.chunk.ReplayChunk.ChunkData {
-        private final Map<UUID, Map<Integer, List<Codec<?, ?>>>> playerCodecs;
-        private final Map<Integer, List<Codec<?, ?>>> serverCodecs;
+        private final transient Map<UUID, Map<Integer, List<Codec<?, ?>>>> playerCodecs;
+        private final transient Map<Integer, List<Codec<?, ?>>> serverCodecs;
+
+        private Map<UUID, Map<Integer, byte[]>> genericPlayerCodecs;
+        private Map<Integer, byte[]> genericServerCodecs;
 
         public ChunkData() {
             playerCodecs = new HashMap<>();
             serverCodecs = new HashMap<>();
+
+            genericPlayerCodecs = new HashMap<>();
+            genericServerCodecs = new HashMap<>();
+        }
+
+        public byte[] serialize() {
+            CodecOutputStream codecOutputStream = new CodecOutputStream();
+
+            for (Map.Entry<UUID, Map<Integer, List<Codec<?, ?>>>> entry : playerCodecs.entrySet()) {
+                for (Map.Entry<Integer, List<Codec<?, ?>>> innerEntry : entry.getValue().entrySet()) {
+                    if (!genericPlayerCodecs.containsKey(entry.getKey())) {
+                        genericPlayerCodecs.put(entry.getKey(), new HashMap<>());
+                    }
+
+                    genericPlayerCodecs.get(entry.getKey()).put(innerEntry.getKey(), codecOutputStream.serialize(innerEntry.getValue()));
+                }
+            }
+
+            for (Map.Entry<Integer, List<Codec<?, ?>>> entry : serverCodecs.entrySet()) {
+                genericServerCodecs.put(entry.getKey(), codecOutputStream.serialize(entry.getValue()));
+            }
+
+            return GenericUtils.serialize(this);
+        }
+
+        public byte[] deserialize() {
+            CodecInputStream codecInputStream = new CodecInputStream(GamePlugin.getGamePlugin().getReplayManager().getCodecRegistry());
+            boolean migrate = false;
+
+            Map<UUID, Map<Integer, byte[]>> tmpGenericPlayerCodecs = genericPlayerCodecs;
+            Map<Integer, byte[]> tmpGenericServerCodecs = genericServerCodecs;
+
+            for (Map.Entry<UUID, Map<Integer, byte[]>> entry : genericPlayerCodecs.entrySet()) {
+                for (Map.Entry<Integer, byte[]> innerEntry : entry.getValue().entrySet()) {
+                    DeserializeCallback callback = codecInputStream.deserialize(innerEntry.getValue());
+
+                    if (playerCodecs.containsKey(entry.getKey())) {
+                        playerCodecs.get(entry.getKey()).put(innerEntry.getKey(), callback.getCodecs());
+
+                        if (callback.getMigrated() != 0) {
+                            tmpGenericPlayerCodecs.get(entry.getKey()).put(innerEntry.getKey(), callback.getMigratedCodecs());
+                        }
+                    } else {
+                        playerCodecs.put(entry.getKey(), new HashMap<Integer, List<Codec<?, ?>>>() {{
+                            put(innerEntry.getKey(), callback.getCodecs());
+                        }});
+
+
+                        if (callback.getMigrated() != 0) {
+                            genericPlayerCodecs.put(entry.getKey(), new HashMap<Integer, byte[]>() {{
+                                put(innerEntry.getKey(), callback.getMigratedCodecs());
+                            }});
+                        }
+                    }
+
+                    if (!migrate) {
+                        migrate = callback.getMigrated() != 0;
+                    }
+                }
+            }
+
+            for (Map.Entry<Integer, byte[]> entry : genericServerCodecs.entrySet()) {
+                DeserializeCallback callback = codecInputStream.deserialize(entry.getValue());
+                serverCodecs.put(entry.getKey(), callback.getCodecs());
+
+                if (callback.getMigrated() != 0) {
+                    genericServerCodecs.put(entry.getKey(), callback.getMigratedCodecs());
+                }
+
+                if (!migrate) {
+                    migrate = callback.getMigrated() != 0;
+                }
+            }
+
+            if (migrate) {
+                genericPlayerCodecs = tmpGenericPlayerCodecs;
+                genericServerCodecs = tmpGenericServerCodecs;
+                return GenericUtils.serialize(this);
+            }
+
+            System.gc();
+            return null;
         }
 
         @Override

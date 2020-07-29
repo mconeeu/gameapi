@@ -10,9 +10,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 
 @Getter
 public class ProjectileLaunchEventCodec extends Codec<ProjectileLaunchEvent, PlayerNpc> {
@@ -20,7 +18,7 @@ public class ProjectileLaunchEventCodec extends Codec<ProjectileLaunchEvent, Pla
     private int id;
 
     public ProjectileLaunchEventCodec() {
-        super("Projectile", ProjectileLaunchEvent.class, PlayerNpc.class);
+        super((byte) 0, (byte) 0);
     }
 
     @Override
@@ -52,6 +50,16 @@ public class ProjectileLaunchEventCodec extends Codec<ProjectileLaunchEvent, Pla
         playerNpc.throwProjectile(getProjectile(), playerNpc.getLocation().getDirection());
     }
 
+    @Override
+    protected void onWriteObject(DataOutputStream out) throws IOException {
+        out.writeInt(id);
+    }
+
+    @Override
+    protected void onReadObject(DataInputStream in) throws IOException, ClassNotFoundException {
+        id = in.readInt();
+    }
+
     private EntityProjectile getProjectile() {
         for (EntityProjectile projectile : EntityProjectile.values()) {
             if (projectile.getId() == id) {
@@ -60,15 +68,5 @@ public class ProjectileLaunchEventCodec extends Codec<ProjectileLaunchEvent, Pla
         }
 
         return null;
-    }
-
-    @Override
-    protected void onWriteObject(ObjectOutputStream out) throws IOException {
-        out.writeInt(id);
-    }
-
-    @Override
-    protected void onReadObject(ObjectInputStream in) throws IOException {
-        id = in.readInt();
     }
 }

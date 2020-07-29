@@ -41,7 +41,6 @@ public class GamePlayerListener implements Listener {
 
         Bukkit.getPluginManager().callEvent(new GamePlayerUnloadEvent(e.getPlayer(), gp.getCorePlayer(), gp));
 
-
         GameAPIPlugin.getSystem().unregisterGamePlayer(gp);
     }
 

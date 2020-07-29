@@ -5,22 +5,26 @@ import eu.mcone.gameapi.api.replay.runner.PlayerRunner;
 import net.minecraft.server.v1_8_R3.PacketPlayInBlockDig;
 import org.bukkit.entity.Player;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 
 public class PacketPlayInBlockDigCodec extends Codec<PacketPlayInBlockDig, PlayerRunner> {
 
-    private PacketPlayInBlockDig.EnumPlayerDigType action;
+    private EnumPlayerDigType action;
 
     public PacketPlayInBlockDigCodec() {
-        super("BlockDig", PacketPlayInBlockDig.class, PlayerRunner.class);
+        super((byte) 0, (byte) 0);
     }
 
     @Override
     public Object[] decode(Player player, PacketPlayInBlockDig blockDig) {
-        action = blockDig.c();
-        return new Object[]{player};
+        switch (blockDig.c()) {
+            case START_DESTROY_BLOCK:
+            case STOP_DESTROY_BLOCK:
+                action = EnumPlayerDigType.fromNMS(blockDig.c());
+                break;
+        }
+
+        return (action != null ? new Object[]{player} : null);
     }
 
     @Override
@@ -36,12 +40,12 @@ public class PacketPlayInBlockDigCodec extends Codec<PacketPlayInBlockDig, Playe
     }
 
     @Override
-    protected void onWriteObject(ObjectOutputStream out) throws IOException {
-        out.writeUTF(action.toString());
+    protected void onWriteObject(DataOutputStream out) throws IOException {
+        out.writeByte(action.getId());
     }
 
     @Override
-    protected void onReadObject(ObjectInputStream in) throws IOException {
-        PacketPlayInBlockDig.EnumPlayerDigType.valueOf(in.readUTF());
+    protected void onReadObject(DataInputStream in) throws IOException {
+        action = EnumPlayerDigType.getWhereID(in.readByte());
     }
 }

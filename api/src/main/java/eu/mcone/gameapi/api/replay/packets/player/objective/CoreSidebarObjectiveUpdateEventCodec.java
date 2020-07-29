@@ -1,28 +1,29 @@
 package eu.mcone.gameapi.api.replay.packets.player.objective;
 
+import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.codec.Codec;
 import eu.mcone.coresystem.api.bukkit.event.objectiv.CoreSidebarObjectiveUpdateEvent;
 import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
+import lombok.Getter;
 import org.bukkit.entity.Player;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
+@Getter
 public class CoreSidebarObjectiveUpdateEventCodec extends Codec<CoreSidebarObjectiveUpdateEvent, ReplayPlayer> {
 
     private Map<Integer, String> scores;
 
     public CoreSidebarObjectiveUpdateEventCodec() {
-        super("UpdateObjective", CoreSidebarObjectiveUpdateEvent.class, ReplayPlayer.class);
+        super((byte) 0, (byte) 0);
     }
 
     @Override
     public Object[] decode(Player player, CoreSidebarObjectiveUpdateEvent objectiveUpdateEvent) {
         scores = objectiveUpdateEvent.getCoreSidebarObjectiveEntry().getScores();
-        return new Object[]{player};
+        return new Object[]{objectiveUpdateEvent.getPlayer()};
     }
 
     @Override
@@ -32,13 +33,12 @@ public class CoreSidebarObjectiveUpdateEventCodec extends Codec<CoreSidebarObjec
     }
 
     @Override
-    protected void onWriteObject(ObjectOutputStream out) throws IOException {
-        out.writeUnshared(scores);
+    protected void onWriteObject(DataOutputStream out) throws IOException {
+        out.writeUTF(CoreSystem.getInstance().getGson().toJson(scores));
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    protected void onReadObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        scores = ((HashMap<Integer, String>) in.readUnshared());
+    protected void onReadObject(DataInputStream in) throws IOException {
+        scores = CoreSystem.getInstance().getGson().fromJson(in.readUTF(), HashMap.class);
     }
 }

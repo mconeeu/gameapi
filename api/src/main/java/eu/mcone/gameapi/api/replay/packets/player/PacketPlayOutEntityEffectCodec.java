@@ -3,6 +3,7 @@ package eu.mcone.gameapi.api.replay.packets.player;
 import eu.mcone.coresystem.api.bukkit.codec.Codec;
 import eu.mcone.coresystem.api.bukkit.util.ReflectionManager;
 import eu.mcone.gameapi.api.replay.runner.PlayerRunner;
+import lombok.Getter;
 import net.minecraft.server.v1_8_R3.MobEffect;
 import net.minecraft.server.v1_8_R3.PacketPlayOutEntityEffect;
 import org.bukkit.entity.Player;
@@ -11,23 +12,22 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 
+@Getter
 public class PacketPlayOutEntityEffectCodec extends Codec<PacketPlayOutEntityEffect, PlayerRunner> {
 
     private byte typ;
     private byte amplifier;
 
     public PacketPlayOutEntityEffectCodec() {
-        super("PotionSplash", PacketPlayOutEntityEffect.class, PlayerRunner.class);
+        super((byte) 0, (byte) 0);
     }
 
     @Override
     public Object[] decode(Player player, PacketPlayOutEntityEffect entityEffect) {
-        typ = ReflectionManager.getValue(entityEffect, "b", byte.class);
-        amplifier = ReflectionManager.getValue(entityEffect, "c", byte.class);
+        typ = ReflectionManager.getValue(entityEffect, "b", Byte.class);
+        amplifier = ReflectionManager.getValue(entityEffect, "c", Byte.class);
 
         return new Object[]{player};
     }
@@ -39,19 +39,19 @@ public class PacketPlayOutEntityEffectCodec extends Codec<PacketPlayOutEntityEff
         }
     }
 
-    public Potion getPotion() {
-        return new Potion(PotionType.getByEffect(PotionEffectType.getById(typ)), amplifier);
+    @Override
+    protected void onWriteObject(DataOutputStream out) throws IOException {
+        out.writeByte(typ);
+        out.writeByte(amplifier);
     }
 
     @Override
-    protected void onWriteObject(ObjectOutputStream out) throws IOException {
-        out.write(typ);
-        out.write(amplifier);
-    }
-
-    @Override
-    protected void onReadObject(ObjectInputStream in) throws IOException {
+    protected void onReadObject(DataInputStream in) throws IOException {
         typ = in.readByte();
         amplifier = in.readByte();
+    }
+
+    public Potion getPotion() {
+        return new Potion(PotionType.getByEffect(PotionEffectType.getById(typ)), amplifier);
     }
 }

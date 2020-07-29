@@ -1,4 +1,4 @@
-package eu.mcone.gameapi.api.replay.packets.player.objective;
+package eu.mcone.gameapi.api.replay.objectives;
 
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.coresystem.api.bukkit.scoreboard.CoreSidebarObjective;

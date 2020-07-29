@@ -9,11 +9,11 @@ import java.util.UUID;
 
 public interface ReplayChunk {
 
+    ChunkData getChunkData();
+
     void addServerPacket(int tick, Codec<?, ?> wrapper);
 
     void addPacket(UUID uuid, int tick, Codec<?, ?> wrapper);
-
-    byte[] compressData();
 
     Map<Integer, List<Codec<?, ?>>> getPackets(UUID uuid);
 
@@ -28,6 +28,10 @@ public interface ReplayChunk {
         Map<UUID, Map<Integer, List<Codec<?, ?>>>> getPlayerCodecs();
 
         Map<Integer, List<Codec<?, ?>>> getServerCodecs();
+
+        byte[] serialize();
+
+        byte[] deserialize();
 
         int getLength();
     }

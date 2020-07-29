@@ -13,6 +13,7 @@ import eu.mcone.gameapi.replay.chunk.ChunkHandler;
 import eu.mcone.gameapi.replay.container.ReplayContainer;
 import eu.mcone.gameapi.replay.inventory.ReplayInformationInventory;
 import lombok.Getter;
+import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -34,10 +35,12 @@ public class Replay implements eu.mcone.gameapi.api.replay.session.Replay, Seria
     private final Map<String, List<MessageWrapper>> messages;
     private final Map<String, ReplayPlayer> replayPlayers;
 
-    private final transient ChunkHandler chunkHandler;
-
-    private final Map<UUID, ReplayContainer> containers;
-    private final Map<UUID, UUID> watchers;
+    @BsonIgnore
+    private transient final ChunkHandler chunkHandler;
+    @BsonIgnore
+    private transient final Map<UUID, eu.mcone.gameapi.api.replay.container.ReplayContainer> containers;
+    @BsonIgnore
+    private transient final Map<UUID, UUID> watchers;
 
     public Replay(final ReplayRecord replayRecord) {
         this.ID = replayRecord.getID();
@@ -56,6 +59,7 @@ public class Replay implements eu.mcone.gameapi.api.replay.session.Replay, Seria
         watchers = new HashMap<>();
     }
 
+    @BsonIgnore
     public ReplayContainer createContainer() {
         ReplayContainer container = new ReplayContainer(this);
         containers.put(container.getContainerUUID(), container);
@@ -63,6 +67,12 @@ public class Replay implements eu.mcone.gameapi.api.replay.session.Replay, Seria
         return container;
     }
 
+    @BsonIgnore
+    public Collection<eu.mcone.gameapi.api.replay.container.ReplayContainer> getContainers() {
+        return containers.values();
+    }
+
+    @BsonIgnore
     public void removeContainer(UUID uuid) {
         if (containers.containsKey(uuid)) {
             GameAPIPlugin.getInstance().sendConsoleMessage("§aRemoving Container §f" + uuid);
@@ -83,12 +93,14 @@ public class Replay implements eu.mcone.gameapi.api.replay.session.Replay, Seria
         }
     }
 
-    public ReplayContainer getContainer(UUID uuid) {
+    @BsonIgnore
+    public eu.mcone.gameapi.api.replay.container.ReplayContainer getContainer(UUID uuid) {
         return containers.getOrDefault(uuid, null);
     }
 
-    public ReplayContainer getContainer(Player player) {
-        for (ReplayContainer container : containers.values()) {
+    @BsonIgnore
+    public eu.mcone.gameapi.api.replay.container.ReplayContainer getContainer(Player player) {
+        for (eu.mcone.gameapi.api.replay.container.ReplayContainer container : containers.values()) {
             if (container.getWatchers().contains(player)) {
                 return container;
             }
@@ -97,30 +109,37 @@ public class Replay implements eu.mcone.gameapi.api.replay.session.Replay, Seria
         return null;
     }
 
+    @BsonIgnore
     public eu.mcone.gameapi.api.replay.player.ReplayPlayer getReplayPlayer(final UUID uuid) {
         return replayPlayers.getOrDefault(uuid.toString(), null);
     }
 
+    @BsonIgnore
     public eu.mcone.gameapi.api.replay.player.ReplayPlayer getReplayPlayer(final Player player) {
         return getReplayPlayer(player.getUniqueId());
     }
 
+    @BsonIgnore
     public Collection<eu.mcone.gameapi.api.replay.player.ReplayPlayer> getPlayers() {
         return new ArrayList<>(replayPlayers.values());
     }
 
+    @BsonIgnore
     public Collection<eu.mcone.gameapi.api.replay.player.ReplayPlayer> getPlayersAsObject() {
         return new ArrayList<>(replayPlayers.values());
     }
 
+    @BsonIgnore
     public boolean existsReplayPlayer(final UUID uuid) {
         return replayPlayers.containsKey(uuid.toString());
     }
 
+    @BsonIgnore
     public boolean existsReplayPlayer(final Player player) {
         return existsReplayPlayer(player.getUniqueId());
     }
 
+    @BsonIgnore
     public void openInformationInventory(Player player) {
         new ReplayInformationInventory(player, this);
     }

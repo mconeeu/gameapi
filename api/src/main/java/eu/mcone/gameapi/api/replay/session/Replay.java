@@ -1,6 +1,7 @@
 package eu.mcone.gameapi.api.replay.session;
 
 import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
+import eu.mcone.gameapi.api.replay.container.ReplayContainer;
 import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
 import org.bukkit.entity.Player;
 
@@ -22,6 +23,16 @@ public interface Replay {
     Gamemode getGamemode();
 
     int getLastTick();
+
+    ReplayContainer createContainer();
+
+    Collection<ReplayContainer> getContainers();
+
+    void removeContainer(UUID uuid);
+
+    ReplayContainer getContainer(UUID uuid);
+
+    ReplayContainer getContainer(Player player);
 
     eu.mcone.gameapi.api.replay.player.ReplayPlayer getReplayPlayer(final UUID uuid);
 

@@ -1,24 +1,24 @@
 package eu.mcone.gameapi.replay.chunk;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
-import eu.mcone.coresystem.api.bukkit.packets.ChunkData;
-import eu.mcone.coresystem.api.core.util.CompressUtils;
 import eu.mcone.coresystem.api.core.util.GenericUtils;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.replay.event.chunk.ReplayChunkLoadedEvent;
 import eu.mcone.gameapi.api.replay.event.chunk.ReplayChunkUnloadedEvent;
-import eu.mcone.gameapi.api.replay.event.runner.ReplayStopEvent;
-import eu.mcone.gameapi.api.replay.exception.ReplaySessionAlreadyExistsException;
-import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
 import eu.mcone.gameapi.replay.session.Replay;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.io.*;
-import java.util.*;
-import java.util.zip.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 public class ChunkHandler implements eu.mcone.gameapi.api.replay.chunk.ReplayChunkHandler, Serializable {
 
@@ -26,16 +26,21 @@ public class ChunkHandler implements eu.mcone.gameapi.api.replay.chunk.ReplayChu
     private final Map<Integer, eu.mcone.gameapi.api.replay.chunk.ReplayChunk> chunks;
     @Getter
     private transient File replayFile;
-    @Getter
+    private transient final File tmpDir;
     private transient int currentChunkID;
     private transient int lastChunkID;
     private transient BukkitTask unloadChunkTask;
+
+    private final HashMap<Integer, byte[]> toMigrate;
 
     public ChunkHandler(final Replay replay) {
         this.replay = replay;
         chunks = new HashMap<>();
         lastChunkID = replay.getLastTick() / 600;
         replayFile = new File("./plugins/" + GameAPIPlugin.getInstance().getPluginName() + "/", replay.getID() + ".replay");
+        tmpDir = new File("./plugins/" + GameAPIPlugin.getInstance().getPluginName() + "/");
+
+        toMigrate = new HashMap<>();
     }
 
     public ChunkHandler(final Replay replay, Map<Integer, eu.mcone.gameapi.api.replay.chunk.ReplayChunk> chunks) {
@@ -43,15 +48,18 @@ public class ChunkHandler implements eu.mcone.gameapi.api.replay.chunk.ReplayChu
         this.chunks = chunks;
         lastChunkID = replay.getLastTick() / 600;
         replayFile = new File("./plugins/" + GameAPIPlugin.getInstance().getPluginName() + "/", replay.getID() + ".replay");
+        tmpDir = new File("./plugins/" + GameAPIPlugin.getInstance().getPluginName() + "/");
+
+        toMigrate = new HashMap<>();
     }
 
-    public ReplayChunk createNewChunk() {
-        return new ReplayChunk();
+    public ReplayChunk createNewChunk(int ID) {
+        return new ReplayChunk(ID);
     }
 
     private void unloadChunk() {
         if (unloadChunkTask == null) {
-            unloadChunkTask = Bukkit.getScheduler().runTaskTimer(GameAPIPlugin.getInstance(), () -> {
+            unloadChunkTask = Bukkit.getScheduler().runTaskTimerAsynchronously(GameAPIPlugin.getInstance(), () -> {
                 if (currentChunkID > 2) {
                     List<Integer> whitelist = new ArrayList<>();
                     whitelist.add(currentChunkID - 1);
@@ -91,19 +99,14 @@ public class ChunkHandler implements eu.mcone.gameapi.api.replay.chunk.ReplayChu
                 loadChunk(nextChunk);
             }
 
-            System.out.println("DEBUG-2");
         } else {
             Bukkit.getScheduler().cancelTask(unloadChunkTask.getTaskId());
-            System.out.println("DEBUG-3");
         }
 
         return chunks.get(currentChunkID);
     }
 
     public File save() {
-        System.out.println("SAVE REPLAY");
-        String replayID = replay.getID();
-
         boolean succeed = true;
         if (!CoreSystem.getInstance().getWorldManager().existsWorldInDatabase(replay.getWorld())) {
             succeed = CoreSystem.getInstance().getWorldManager().upload(CoreSystem.getInstance().getWorldManager().getWorld(replay.getWorld()));
@@ -112,41 +115,21 @@ public class ChunkHandler implements eu.mcone.gameapi.api.replay.chunk.ReplayChu
         if (succeed) {
             System.out.println("World upload Succeeded, create and save now the replay file...");
             Bukkit.getScheduler().runTaskAsynchronously(GameAPIPlugin.getInstance(), () -> {
-                List<File> zipFiles = new ArrayList<>();
-
-                for (Map.Entry<Integer, eu.mcone.gameapi.api.replay.chunk.ReplayChunk> entry : chunks.entrySet()) {
-                    File file = new File("CHUNK:" + entry.getKey());
-                    try {
-                        FileOutputStream fos = new FileOutputStream(file);
-                        fos.write(entry.getValue().compressData());
-                        zipFiles.add(file);
-                        fos.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-
                 try {
-                    replayFile = new File("./plugins/" + GameAPIPlugin.getInstance().getPluginName() + "/" + replayID + ".replay");
-                    FileOutputStream fos = new FileOutputStream(replayFile);
-                    ZipOutputStream zipOut = new ZipOutputStream(fos);
-                    for (File file : zipFiles) {
-                        FileInputStream fis = new FileInputStream(file);
-                        ZipEntry zipEntry = new ZipEntry(file.getName());
-                        zipOut.putNextEntry(zipEntry);
+                    ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(replayFile));
+                    for (Map.Entry<Integer, eu.mcone.gameapi.api.replay.chunk.ReplayChunk> entry : chunks.entrySet()) {
+                        try {
+                            ZipEntry zipEntry = new ZipEntry("CHUNK:" + entry.getKey());
+                            zipOut.putNextEntry(zipEntry);
+                            zipOut.write(entry.getValue().getChunkData().serialize());
 
-                        byte[] bytes = new byte[1024];
-                        int length;
-                        while ((length = fis.read(bytes)) >= 0) {
-                            zipOut.write(bytes, 0, length);
+                            zipOut.closeEntry();
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-
-                        fis.close();
-                        file.delete();
                     }
 
                     zipOut.close();
-                    fos.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -165,24 +148,26 @@ public class ChunkHandler implements eu.mcone.gameapi.api.replay.chunk.ReplayChu
                     FileInputStream fileInputStream = null;
                     ZipInputStream zipInputStream = null;
 
-                    System.out.println("LOAD CHUNK: " + chunkID);
-
                     try {
                         fileInputStream = new FileInputStream(replayFile);
                         zipInputStream = new ZipInputStream(fileInputStream);
 
                         for (ZipEntry zipEntry; (zipEntry = zipInputStream.getNextEntry()) != null; ) {
                             if (zipEntry.getName().equalsIgnoreCase("CHUNK:" + chunkID)) {
-                                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                                try {
+                                try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
                                     final byte[] buf = new byte[1024];
                                     int length;
                                     while ((length = zipInputStream.read(buf, 0, buf.length)) >= 0) {
                                         byteArrayOutputStream.write(buf, 0, length);
                                     }
 
-                                    byte[] compressedData = byteArrayOutputStream.toByteArray();
-                                    ReplayChunk chunk = new ReplayChunk(GenericUtils.deserialize(ReplayChunk.ChunkData.class, CompressUtils.unCompress(compressedData)));
+                                    ReplayChunk chunk = new ReplayChunk(chunkID, GenericUtils.deserialize(ReplayChunk.ChunkData.class, byteArrayOutputStream.toByteArray()));
+                                    byte[] migrated = chunk.getChunkData().deserialize();
+
+                                    if (migrated != null) {
+                                        toMigrate.put(chunkID, migrated);
+                                    }
+
                                     System.out.println(chunk.getPlayers().size());
                                     chunks.put(chunkID, chunk);
                                     Bukkit.getPluginManager().callEvent(new ReplayChunkLoadedEvent(replay.getID(), "CHUNK:" + chunkID));
@@ -190,8 +175,6 @@ public class ChunkHandler implements eu.mcone.gameapi.api.replay.chunk.ReplayChu
                                     unloadChunk();
                                 } catch (IOException ex) {
                                     ex.printStackTrace();
-                                } finally {
-                                    byteArrayOutputStream.close();
                                 }
                             }
                         }
@@ -199,6 +182,8 @@ public class ChunkHandler implements eu.mcone.gameapi.api.replay.chunk.ReplayChu
                         zipInputStream.close();
                         fileInputStream.close();
                         System.gc();
+
+                        migrate();
                     } catch (IOException e) {
                         e.printStackTrace();
                     } finally {
@@ -216,6 +201,101 @@ public class ChunkHandler implements eu.mcone.gameapi.api.replay.chunk.ReplayChu
                     }
                 } else {
                     throw new NullPointerException("Replay file not found");
+                }
+            });
+        }
+    }
+
+    private void migrate() {
+        if (toMigrate.size() > 0) {
+            Bukkit.getScheduler().runTaskAsynchronously(GamePlugin.getGamePlugin(), () -> {
+                GameAPIPlugin.getInstance().sendConsoleMessage("§aStarting migration...");
+
+                List<byte[]> data = new ArrayList<>();
+
+                //Read file
+                FileInputStream fileInputStream = null;
+                ZipInputStream zipInputStream = null;
+
+                try {
+                    fileInputStream = new FileInputStream(replayFile);
+                    zipInputStream = new ZipInputStream(fileInputStream);
+
+                    for (ZipEntry zipEntry; (zipEntry = zipInputStream.getNextEntry()) != null; ) {
+                        for (Map.Entry<Integer, byte[]> migrationEntry : toMigrate.entrySet()) {
+                            if (zipEntry.getName().equalsIgnoreCase("CHUNK:" + migrationEntry.getKey())) {
+                                data.add(migrationEntry.getValue());
+                            } else {
+                                try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+                                    final byte[] buf = new byte[1024];
+                                    int length;
+                                    while ((length = zipInputStream.read(buf, 0, buf.length)) >= 0) {
+                                        byteArrayOutputStream.write(buf, 0, length);
+                                    }
+
+                                    data.add(byteArrayOutputStream.toByteArray());
+                                } catch (IOException ex) {
+                                    ex.printStackTrace();
+                                }
+                            }
+                        }
+                    }
+
+                    zipInputStream.close();
+                    fileInputStream.close();
+                    System.gc();
+
+                    migrate();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (zipInputStream != null) {
+                            zipInputStream.close();
+                        }
+
+                        if (fileInputStream != null) {
+                            fileInputStream.close();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                if (!data.isEmpty()) {
+                    //Write new file
+                    GamePlugin.getGamePlugin().sendConsoleMessage("§aWriting migrated chunks to file...");
+
+                    replayFile = new File("./plugins/" + GameAPIPlugin.getInstance().getPluginName() + "/" + replay.getID() + ".replay");
+
+                    if (replayFile.exists()) {
+                        if (replayFile.delete()) {
+                            GamePlugin.getGamePlugin().sendConsoleMessage("§aDeleted old replay file!");
+                        }
+                    }
+
+                    try {
+                        ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(replayFile));
+
+                        int chunkID = 0;
+                        for (byte[] chunkData : data) {
+                            ZipEntry zipEntry = new ZipEntry("CHUNK:" + chunkID);
+                            zipOut.putNextEntry(zipEntry);
+                            zipOut.write(chunkData);
+
+                            zipOut.closeEntry();
+
+                            chunkID++;
+                        }
+
+                        zipOut.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    GamePlugin.getGamePlugin().sendConsoleMessage("§aMigration completed!");
+                } else {
+                    GamePlugin.getGamePlugin().sendConsoleMessage("§cError by migrating Chunk data to newer Version, ID " + replay.getID() + " (empty chunk data!)");
                 }
             });
         }

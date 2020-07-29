@@ -13,6 +13,7 @@ import eu.mcone.gameapi.api.gamestate.common.LobbyGameState;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.GamePlayerState;
 import eu.mcone.gameapi.api.player.PlayerManager;
+import eu.mcone.gameapi.api.scoreboard.LobbyObjective;
 import eu.mcone.gameapi.backpack.defaults.GadgetListener;
 import eu.mcone.gameapi.gamestate.GameStateManager;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scoreboard.DisplaySlot;
 
+import java.lang.reflect.InvocationTargetException;
+
 @RequiredArgsConstructor
 public class GameStateListener implements Listener {
 
@@ -32,13 +35,13 @@ public class GameStateListener implements Listener {
     public void on(GamePlayerLoadedEvent e) {
         Player player = e.getPlayer().getCorePlayer().bukkit();
 
-        if (GamePlugin.getGamePlugin().hasModule(Module.REPLAY)) {
-            GamePlugin.getGamePlugin().getReplay().addPlayer(player);
-            GamePlugin.getGamePlugin().getReplay().getReplayPlayer(player).setJoined(System.currentTimeMillis() / 1000);
-        }
+        if (GamePlugin.getGamePlugin().getGameStateManager().getRunning() instanceof LobbyGameState) {
+            if (GamePlugin.getGamePlugin().hasModule(Module.REPLAY)) {
+                GamePlugin.getGamePlugin().getReplay().addPlayer(player);
+                GamePlugin.getGamePlugin().getReplay().getReplayPlayer(player).setJoined(System.currentTimeMillis() / 1000);
+            }
 
-        if (GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)) {
-            if (GamePlugin.getGamePlugin().getGameStateManager().getRunning() instanceof LobbyGameState) {
+            if (GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)) {
                 PlayerManager playerManager = GamePlugin.getGamePlugin().getPlayerManager();
 
                 for (CorePlayer cps : CoreSystem.getInstance().getOnlineCorePlayers()) {
@@ -54,7 +57,8 @@ public class GameStateListener implements Listener {
                 }
 
                 try {
-                    e.getCorePlayer().getScoreboard().setNewObjective(LobbyGameState.getObjective().newInstance());
+                    LobbyObjective objective = LobbyGameState.getObjective().newInstance();
+                    e.getCorePlayer().getScoreboard().setNewObjective(objective);
 
                     for (CorePlayer cp : CoreSystem.getInstance().getOnlineCorePlayers()) {
                         if (cp.getScoreboard() != null) {
@@ -78,6 +82,12 @@ public class GameStateListener implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
+        if (GamePlugin.getGamePlugin().hasModule(Module.REPLAY)) {
+            if (!GamePlugin.getGamePlugin().getReplayManager().getRecording().isEmpty()) {
+                GamePlugin.getGamePlugin().getReplay().removePlayer(e.getPlayer());
+            }
+        }
+
         if (GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)) {
             PlayerManager playerManager = GamePlugin.getGamePlugin().getPlayerManager();
             GamePlayer gamePlayer = GamePlugin.getGamePlugin().getGamePlayer(e.getPlayer());

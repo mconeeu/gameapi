@@ -6,15 +6,12 @@ import eu.mcone.coresystem.api.bukkit.npc.entity.PlayerNpc;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.coresystem.api.bukkit.world.CoreLocation;
 import eu.mcone.coresystem.api.core.player.Group;
-import eu.mcone.gameapi.api.replay.packets.player.objective.ReplayPlayerSidebarObjective;
+import eu.mcone.gameapi.api.replay.objectives.ReplayPlayerSidebarObjective;
 import eu.mcone.gameapi.replay.inventory.ReplayPlayerInventory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.bson.codecs.pojo.annotations.BsonCreator;
-import org.bson.codecs.pojo.annotations.BsonDiscriminator;
-import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -24,7 +21,6 @@ import java.util.Map;
 import java.util.UUID;
 
 @NoArgsConstructor
-@BsonDiscriminator
 @Getter
 public class ReplayPlayer implements eu.mcone.gameapi.api.replay.player.ReplayPlayer, Listener {
 
@@ -35,6 +31,8 @@ public class ReplayPlayer implements eu.mcone.gameapi.api.replay.player.ReplayPl
     private boolean reported;
     @Setter
     private long joined;
+    @Setter
+    private long leaved;
     @Setter
     private CoreLocation spawnLocation;
 
@@ -62,22 +60,6 @@ public class ReplayPlayer implements eu.mcone.gameapi.api.replay.player.ReplayPl
         this.food = 20;
         this.inventoryViewers = new HashMap<>();
     }
-
-    @BsonCreator
-    public ReplayPlayer(@BsonProperty("uuid") final UUID uuid, @BsonProperty("displayName") final String displayName,
-                        @BsonProperty("reported") final boolean reported, @BsonProperty("joined") final long joined, @BsonProperty("spawnLocation") CoreLocation spawnLocation) {
-        this.uuid = uuid;
-        this.displayName = displayName;
-        this.reported = reported;
-        this.joined = joined;
-        this.spawnLocation = spawnLocation;
-
-        inventoryItems = new HashMap<>();
-        stats = new Stats(0, 0, 0);
-        health = 10;
-        inventoryViewers = new HashMap<>();
-    }
-
     public void setInventoryItem(int slot, ItemStack itemStack) {
         inventoryItems.put(slot, itemStack);
     }

@@ -10,45 +10,47 @@ import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 
 public class ArmorEquipEventCodec extends Codec<ArmorEquipEvent, PlayerRunner> {
 
-    private String material;
+    private int material;
     private String enchantments;
-    private int slot;
+    private byte slot;
 
     public ArmorEquipEventCodec() {
-        super("ArmorChange", ArmorEquipEvent.class, PlayerRunner.class);
+        super((byte) 0, (byte) 0);
     }
 
     @Override
     public Object[] decode(Player player, ArmorEquipEvent armorEquipEvent) {
-        material = armorEquipEvent.getNewArmorPiece().getType().toString();
-        enchantments = ItemStackTypeAdapterUtils.serializeEnchantments(armorEquipEvent.getNewArmorPiece().getEnchantments());
-        slot = armorEquipEvent.getType().getSlot();
-        return new Object[]{player};
+        if (armorEquipEvent.getNewArmorPiece() != null) {
+            material = armorEquipEvent.getNewArmorPiece().getType().getId();
+            enchantments = ItemStackTypeAdapterUtils.serializeEnchantments(armorEquipEvent.getNewArmorPiece().getEnchantments());
+            slot = (byte) armorEquipEvent.getType().getSlot();
+            return new Object[]{armorEquipEvent.getPlayer()};
+        } else {
+            return null;
+        }
     }
 
     @Override
     public void encode(PlayerRunner runner) {
-        ItemBuilder itemBuilder = new ItemBuilder(Material.valueOf(material), 1).enchantments(ItemStackTypeAdapterUtils.getEnchantments(enchantments));
+        ItemBuilder itemBuilder = new ItemBuilder(Material.getMaterial(material), 1).enchantments(ItemStackTypeAdapterUtils.getEnchantments(enchantments));
         runner.getPlayer().getNpc().setEquipment(EquipmentPosition.getPosition(slot), itemBuilder.create());
     }
 
     @Override
-    protected void onWriteObject(ObjectOutputStream out) throws IOException {
-        out.writeUTF(material);
+    protected void onWriteObject(DataOutputStream out) throws IOException {
+        out.writeInt(material);
         out.writeUTF(enchantments);
-        out.writeInt(slot);
+        out.writeByte(slot);
     }
 
     @Override
-    protected void onReadObject(ObjectInputStream in) throws IOException {
-        material = in.readUTF();
+    protected void onReadObject(DataInputStream in) throws IOException {
+        material = in.readInt();
         enchantments = in.readUTF();
-        slot = in.readInt();
+        slot = in.readByte();
     }
 }

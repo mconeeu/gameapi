@@ -11,6 +11,7 @@ import eu.mcone.gameapi.api.gamestate.GameState;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.GamePlayerState;
 import eu.mcone.gameapi.api.scoreboard.LobbyObjective;
+import eu.mcone.gameapi.api.scoreboard.LobbyObjectiveImpl;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -21,10 +22,11 @@ import org.bukkit.inventory.ItemStack;
 
 public class LobbyGameState extends GameState {
 
-    public static final ItemStack QUIT_ITEM = new ItemBuilder(Material.IRON_DOOR, 1, 0).displayName("§4§lVerlassem §8» §7§overlasse die Spielrunde.").create();
+    public static final ItemStack QUIT_ITEM = new ItemBuilder(Material.IRON_DOOR, 1, 0).displayName("§4§lVerlassen §8» §7§overlasse die Runde.").create();
     private static final int FORCE_START_TIME = 10;
 
-    @Setter @Getter
+    @Setter
+    @Getter
     private static Class<? extends LobbyObjective> objective;
 
     public LobbyGameState() {
@@ -62,7 +64,7 @@ public class LobbyGameState extends GameState {
         if (GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)) {
             try {
                 if (objective == null) {
-                    objective = LobbyObjective.class;
+                    objective = LobbyObjectiveImpl.class;
                 }
 
                 for (GamePlayer gp : GamePlugin.getGamePlugin().getPlayerManager().getGamePlayers(GamePlayerState.PLAYING)) {

@@ -38,12 +38,16 @@ public class SpectatorListener implements Listener {
         Player player = e.getPlayer();
         GamePlayer gp = GameAPI.getInstance().getGamePlayer(player);
 
-        if (e.getRightClicked().getType().equals(EntityType.PLAYER)) {
-            Player t = (Player) e.getRightClicked();
-            GamePlayer tgp = GameAPI.getInstance().getGamePlayer(t);
+        if (gp != null) {
+            if (e.getRightClicked().getType().equals(EntityType.PLAYER)) {
+                Player t = (Player) e.getRightClicked();
+                GamePlayer tgp = GameAPI.getInstance().getGamePlayer(t);
 
-            if (gp.getState().equals(GamePlayerState.SPECTATING) && tgp.getState().equals(GamePlayerState.PLAYING)) {
-                gp.setInCameraMode(t);
+                if (tgp != null) {
+                    if (gp.getState().equals(GamePlayerState.SPECTATING) && tgp.getState().equals(GamePlayerState.PLAYING)) {
+                        gp.setInCameraMode(t);
+                    }
+                }
             }
         }
     }
@@ -53,8 +57,10 @@ public class SpectatorListener implements Listener {
         Player player = e.getPlayer();
         GamePlayer gp = GameAPI.getInstance().getGamePlayer(player);
 
-        if (gp.getState().equals(GamePlayerState.SPECTATING) && gp.isInCameraMode()) {
-            gp.removeFromCameraMode();
+        if (gp != null) {
+            if (gp.getState().equals(GamePlayerState.SPECTATING) && gp.isInCameraMode()) {
+                gp.removeFromCameraMode();
+            }
         }
     }
 

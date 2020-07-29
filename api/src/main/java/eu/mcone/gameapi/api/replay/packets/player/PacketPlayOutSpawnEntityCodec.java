@@ -3,17 +3,17 @@ package eu.mcone.gameapi.api.replay.packets.player;
 import eu.mcone.coresystem.api.bukkit.codec.Codec;
 import eu.mcone.coresystem.api.bukkit.util.ReflectionManager;
 import eu.mcone.gameapi.api.replay.runner.PlayerRunner;
+import lombok.Getter;
 import net.minecraft.server.v1_8_R3.Entity;
 import net.minecraft.server.v1_8_R3.PacketPlayOutSpawnEntity;
 import org.bukkit.craftbukkit.v1_8_R3.metadata.EntityMetadataStore;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.lang.reflect.Field;
 
+@Getter
 public class PacketPlayOutSpawnEntityCodec extends Codec<PacketPlayOutSpawnEntity, PlayerRunner> {
 
     private int id;
@@ -27,24 +27,30 @@ public class PacketPlayOutSpawnEntityCodec extends Codec<PacketPlayOutSpawnEntit
     private int pitch;
 
     public PacketPlayOutSpawnEntityCodec() {
-        super("SpawnEntity", PacketPlayOutSpawnEntity.class, PlayerRunner.class);
+        super((byte) 0, (byte) 0);
     }
 
     @Override
     public Object[] decode(Player player, PacketPlayOutSpawnEntity spawnEntity) {
-        id = ReflectionManager.getValue(spawnEntity, "a", int.class);
-        typ = ReflectionManager.getValue(spawnEntity, "j", int.class);
+        typ = ReflectionManager.getValue(spawnEntity, "j", Integer.class);
+        EntityType type = EntityType.fromId(typ);
+        if (type != null) {
+            if (type == EntityType.PLAYER) {
+                System.out.println("SPAWN PLAYER");
+                id = ReflectionManager.getValue(spawnEntity, "a", Integer.class);
+                data = ReflectionManager.getValue(spawnEntity, "k", Integer.class);
 
-//        EntityType.fromId()
-        data = ReflectionManager.getValue(spawnEntity, "k", int.class);
+                x = ReflectionManager.getValue(spawnEntity, "b", Integer.class);
+                y = ReflectionManager.getValue(spawnEntity, "c", Integer.class);
+                z = ReflectionManager.getValue(spawnEntity, "d", Integer.class);
+                yaw = ReflectionManager.getValue(spawnEntity, "h", Integer.class);
+                pitch = ReflectionManager.getValue(spawnEntity, "i", Integer.class);
 
-        x = ReflectionManager.getValue(spawnEntity, "b", int.class);
-        y = ReflectionManager.getValue(spawnEntity, "c", int.class);
-        z = ReflectionManager.getValue(spawnEntity, "d", int.class);
-        yaw = ReflectionManager.getValue(spawnEntity, "h", int.class);
-        pitch = ReflectionManager.getValue(spawnEntity, "i", int.class);
+                return new Object[]{player};
+            }
+        }
 
-        return new Object[]{player};
+        return null;
     }
 
     @Override
@@ -64,7 +70,7 @@ public class PacketPlayOutSpawnEntityCodec extends Codec<PacketPlayOutSpawnEntit
     }
 
     @Override
-    protected void onWriteObject(ObjectOutputStream out) throws IOException {
+    protected void onWriteObject(DataOutputStream out) throws IOException {
         out.writeInt(id);
         out.writeInt(typ);
         out.writeInt(data);
@@ -76,7 +82,7 @@ public class PacketPlayOutSpawnEntityCodec extends Codec<PacketPlayOutSpawnEntit
     }
 
     @Override
-    protected void onReadObject(ObjectInputStream in) throws IOException {
+    protected void onReadObject(DataInputStream in) throws IOException {
         id = in.readInt();
         typ = in.readInt();
         data = in.readInt();

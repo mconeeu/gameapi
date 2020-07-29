@@ -3,12 +3,12 @@ package eu.mcone.gameapi.api.replay.packets.player;
 import eu.mcone.coresystem.api.bukkit.codec.Codec;
 import eu.mcone.gameapi.api.event.stats.PlayerRoundStatsChangeEvent;
 import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
+import lombok.Getter;
 import org.bukkit.entity.Player;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 
+@Getter
 public class StatsChangeEventCodec extends Codec<PlayerRoundStatsChangeEvent, ReplayPlayer> {
 
     private int kills;
@@ -16,7 +16,7 @@ public class StatsChangeEventCodec extends Codec<PlayerRoundStatsChangeEvent, Re
     private int goals;
 
     public StatsChangeEventCodec() {
-        super("STATS", PlayerRoundStatsChangeEvent.class, ReplayPlayer.class);
+        super((byte) 0, (byte) 0);
     }
 
     @Override
@@ -25,7 +25,7 @@ public class StatsChangeEventCodec extends Codec<PlayerRoundStatsChangeEvent, Re
         deaths = statsChangeEvent.getDeaths();
         goals = statsChangeEvent.getGoals();
 
-        return new Object[]{player};
+        return new Object[]{statsChangeEvent.getPlayer()};
     }
 
     @Override
@@ -36,14 +36,14 @@ public class StatsChangeEventCodec extends Codec<PlayerRoundStatsChangeEvent, Re
     }
 
     @Override
-    protected void onWriteObject(ObjectOutputStream out) throws IOException {
+    protected void onWriteObject(DataOutputStream out) throws IOException {
         out.writeInt(kills);
         out.write(deaths);
         out.writeInt(goals);
     }
 
     @Override
-    protected void onReadObject(ObjectInputStream in) throws IOException {
+    protected void onReadObject(DataInputStream in) throws IOException, ClassNotFoundException {
         kills = in.readInt();
         deaths = in.readInt();
         goals = in.readInt();

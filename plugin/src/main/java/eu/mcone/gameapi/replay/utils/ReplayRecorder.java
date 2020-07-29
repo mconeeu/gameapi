@@ -43,24 +43,28 @@ public class ReplayRecorder extends Recorder implements eu.mcone.gameapi.api.uti
 
     @Override
     public void record() {
+        registry.listeningForCodecs(true);
         started = System.currentTimeMillis() / 1000;
         task = Bukkit.getScheduler().runTaskTimerAsynchronously(CoreSystem.getInstance(), () -> ticks++, 1L, 1L);
 
-        codecListener = (codec, objects) -> {
-            if (objects != null) {
-                if (codec.getCodecClass().equals(PlayerMoveEvent.class)) {
-                    if (ticks % 2 == 0) {
-                        addCodec((Player) objects[0], codec);
+        Bukkit.getScheduler().runTaskAsynchronously(GamePlugin.getGamePlugin(), () -> {
+            registry.registerCodecListener(codecListener = (codec, objects) -> {
+                if (objects != null) {
+                    Class<?> trigger = registry.getTriggerClass(codec.getCodecID());
+                    if (trigger != null) {
+                        if (registry.getTriggerClass(codec.getCodecID()).equals(PlayerMoveEvent.class)) {
+                            if ((ticks % 2) == 0) {
+                                addCodec((Player) objects[0], codec);
+                            }
+                        } else {
+                            addCodec((Player) objects[0], codec);
+                        }
                     }
                 } else {
-                    addCodec((Player) objects[0], codec);
+                    addServerCodec(codec);
                 }
-            } else {
-                addServerCodec(codec);
-            }
-        };
-
-        registry.registerCodecListener(codecListener);
+            });
+        });
     }
 
     private void addServerCodec(Codec<?, ?> codec) {
@@ -70,7 +74,7 @@ public class ReplayRecorder extends Recorder implements eu.mcone.gameapi.api.uti
         if (chunks.containsKey(chunkID)) {
             chunks.get(chunkID).addServerPacket(ticks, codec);
         } else {
-            ReplayChunk chunk = new ReplayChunk();
+            ReplayChunk chunk = new ReplayChunk(chunkID);
             chunk.addServerPacket(ticks, codec);
             chunks.put(chunkID, chunk);
         }
@@ -84,7 +88,7 @@ public class ReplayRecorder extends Recorder implements eu.mcone.gameapi.api.uti
             if (chunks.containsKey(chunkID)) {
                 chunks.get(chunkID).addPacket(player.getUniqueId(), ticks, codec);
             } else {
-                ReplayChunk chunk = new ReplayChunk();
+                ReplayChunk chunk = new ReplayChunk(chunkID);
                 chunk.addPacket(player.getUniqueId(), ticks, codec);
                 chunks.put(chunkID, chunk);
             }
@@ -95,6 +99,7 @@ public class ReplayRecorder extends Recorder implements eu.mcone.gameapi.api.uti
         stopped = System.currentTimeMillis() / 1000;
         stop = true;
         task.cancel();
+        registry.listeningForCodecs(false);
         registry.unregisterCodecListener(codecListener);
     }
 }

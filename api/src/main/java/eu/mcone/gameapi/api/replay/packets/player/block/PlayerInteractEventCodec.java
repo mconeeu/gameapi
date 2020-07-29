@@ -13,35 +13,33 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 
 public class PlayerInteractEventCodec extends Codec<PlayerInteractEvent, PlayerRunner> {
 
-    private Action action;
+    private eu.mcone.gameapi.api.replay.packets.player.block.Action action;
     private double x;
     private double y;
     private double z;
 
     public PlayerInteractEventCodec() {
-        super("Interact", PlayerInteractEvent.class, PlayerRunner.class);
+        super((byte) 0, (byte) 0);
     }
 
     @Override
     public Object[] decode(Player player, PlayerInteractEvent interactEvent) {
         if (interactEvent.getAction().equals(Action.RIGHT_CLICK_BLOCK)
                 && interactEvent.getClickedBlock().getType().equals(org.bukkit.Material.TNT)
-                && player.getItemInHand().getType().equals(org.bukkit.Material.FLINT_AND_STEEL)) {
+                && interactEvent.getPlayer().getItemInHand().getType().equals(org.bukkit.Material.FLINT_AND_STEEL)) {
             x = interactEvent.getClickedBlock().getLocation().getX();
             x = interactEvent.getClickedBlock().getLocation().getY();
             z = interactEvent.getClickedBlock().getLocation().getZ();
-            action = interactEvent.getAction();
-            return new Object[]{player};
+            action = eu.mcone.gameapi.api.replay.packets.player.block.Action.fromNMS(interactEvent.getAction());
+            return new Object[]{interactEvent.getPlayer()};
         } else if (interactEvent.getAction().equals(Action.LEFT_CLICK_AIR)
                 || interactEvent.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
-            action = interactEvent.getAction();
-            return new Object[]{player};
+            action = eu.mcone.gameapi.api.replay.packets.player.block.Action.fromNMS(interactEvent.getAction());
+            return new Object[]{interactEvent.getPlayer()};
         }
 
         return null;
@@ -75,17 +73,16 @@ public class PlayerInteractEventCodec extends Codec<PlayerInteractEvent, PlayerR
     }
 
     @Override
-    protected void onWriteObject(ObjectOutputStream out) throws IOException {
-        out.writeUTF(action.toString());
+    protected void onWriteObject(DataOutputStream out) throws IOException {
+        out.writeByte(action.getId());
         out.writeDouble(x);
         out.writeDouble(y);
         out.writeDouble(z);
     }
 
     @Override
-    protected void onReadObject(ObjectInputStream in) throws IOException {
-        String action = in.readUTF();
-        this.action = (!action.isEmpty() ? Action.valueOf(action) : null);
+    protected void onReadObject(DataInputStream in) throws IOException {
+        action = eu.mcone.gameapi.api.replay.packets.player.block.Action.getWhereID(in.readByte());
         x = in.readDouble();
         y = in.readDouble();
         z = in.readDouble();

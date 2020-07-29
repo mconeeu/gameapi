@@ -62,8 +62,8 @@ public class GameStateManager implements eu.mcone.gameapi.api.gamestate.GameStat
     public GameStateManager addGameStateAfter(GameState gameState, GameState addAfter) {
         int index = pipeline.indexOf(addAfter);
 
-        if (index < pipeline.size()-1) {
-            pipeline.add(pipeline.indexOf(addAfter)+1, gameState);
+        if (index < pipeline.size() - 1) {
+            pipeline.add(pipeline.indexOf(addAfter) + 1, gameState);
         } else {
             pipeline.add(gameState);
         }

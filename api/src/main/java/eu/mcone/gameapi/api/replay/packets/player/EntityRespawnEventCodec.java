@@ -4,13 +4,13 @@ import eu.mcone.coresystem.api.bukkit.codec.Codec;
 import eu.mcone.coresystem.api.bukkit.spawnable.ListMode;
 import eu.mcone.coresystem.api.bukkit.world.CoreLocation;
 import eu.mcone.gameapi.api.replay.runner.PlayerRunner;
+import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 
+@Getter
 public class EntityRespawnEventCodec extends Codec<PlayerRespawnEvent, PlayerRunner> {
 
     private double x;
@@ -18,13 +18,15 @@ public class EntityRespawnEventCodec extends Codec<PlayerRespawnEvent, PlayerRun
     private double z;
 
     public EntityRespawnEventCodec() {
-        super("Respawn", PlayerRespawnEvent.class, PlayerRunner.class);
+        super((byte) 0, (byte) 0);
     }
 
     @Override
     public Object[] decode(Player player, PlayerRespawnEvent playerRespawnEvent) {
-
-        return new Object[]{player};
+        x = playerRespawnEvent.getPlayer().getLocation().getX();
+        y = playerRespawnEvent.getPlayer().getLocation().getY();
+        z = playerRespawnEvent.getPlayer().getLocation().getZ();
+        return new Object[]{playerRespawnEvent.getPlayer()};
     }
 
     @Override
@@ -39,14 +41,14 @@ public class EntityRespawnEventCodec extends Codec<PlayerRespawnEvent, PlayerRun
     }
 
     @Override
-    protected void onWriteObject(ObjectOutputStream out) throws IOException {
+    protected void onWriteObject(DataOutputStream out) throws IOException {
         out.writeDouble(x);
         out.writeDouble(y);
         out.writeDouble(z);
     }
 
     @Override
-    protected void onReadObject(ObjectInputStream in) throws IOException {
+    protected void onReadObject(DataInputStream in) throws IOException, ClassNotFoundException {
         x = in.readDouble();
         y = in.readDouble();
         z = in.readDouble();

@@ -9,9 +9,7 @@ import lombok.Getter;
 import net.minecraft.server.v1_8_R3.PacketPlayOutNamedSoundEffect;
 import org.bukkit.entity.Player;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 
 @Getter
 public class PacketPlayOutNamedSoundEffectCodec extends Codec<PacketPlayOutNamedSoundEffect, PlayerRunner> {
@@ -22,15 +20,15 @@ public class PacketPlayOutNamedSoundEffectCodec extends Codec<PacketPlayOutNamed
     private double z;
 
     public PacketPlayOutNamedSoundEffectCodec() {
-        super("Sound", PacketPlayOutNamedSoundEffect.class, PlayerRunner.class);
+        super((byte) 0, (byte) 0);
     }
 
     @Override
     public Object[] decode(Player player, PacketPlayOutNamedSoundEffect namedSoundEffect) {
         id = ReflectionManager.getValue(namedSoundEffect, "a", String.class);
-        x = ReflectionManager.getValue(namedSoundEffect, "b", int.class);
-        y = ReflectionManager.getValue(namedSoundEffect, "c", int.class);
-        z = ReflectionManager.getValue(namedSoundEffect, "d", int.class);
+        x = ReflectionManager.getValue(namedSoundEffect, "b", Integer.class);
+        y = ReflectionManager.getValue(namedSoundEffect, "c", Integer.class);
+        z = ReflectionManager.getValue(namedSoundEffect, "d", Integer.class);
 
         return new Object[]{player};
     }
@@ -46,7 +44,7 @@ public class PacketPlayOutNamedSoundEffectCodec extends Codec<PacketPlayOutNamed
     }
 
     @Override
-    protected void onWriteObject(ObjectOutputStream out) throws IOException {
+    protected void onWriteObject(DataOutputStream out) throws IOException {
         out.writeUTF(id);
         out.writeDouble(x);
         out.writeDouble(y);
@@ -54,7 +52,7 @@ public class PacketPlayOutNamedSoundEffectCodec extends Codec<PacketPlayOutNamed
     }
 
     @Override
-    protected void onReadObject(ObjectInputStream in) throws IOException {
+    protected void onReadObject(DataInputStream in) throws IOException {
         id = in.readUTF();
         x = in.readDouble();
         y = in.readDouble();

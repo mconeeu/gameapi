@@ -7,23 +7,21 @@ import lombok.Getter;
 import net.minecraft.server.v1_8_R3.PacketPlayOutUpdateHealth;
 import org.bukkit.entity.Player;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 
 @Getter
 public class PlayOutUpdateHealthCodec extends Codec<PacketPlayOutUpdateHealth, ReplayPlayer> {
 
-    private int health;
+    private float health;
     private int food;
 
     public PlayOutUpdateHealthCodec() {
-        super("HEALTH", PacketPlayOutUpdateHealth.class, ReplayPlayer.class);
+        super((byte) 0, (byte) 0);
     }
 
     @Override
     public Object[] decode(Player player, PacketPlayOutUpdateHealth updateHealth) {
-        this.health = ReflectionManager.getValue(updateHealth, "a", Integer.class);
+        this.health = ReflectionManager.getValue(updateHealth, "a", Float.class);
         this.food = ReflectionManager.getValue(updateHealth, "b", Integer.class);
 
         return new Object[]{player};
@@ -31,19 +29,19 @@ public class PlayOutUpdateHealthCodec extends Codec<PacketPlayOutUpdateHealth, R
 
     @Override
     public void encode(ReplayPlayer replayPlayer) {
-        replayPlayer.setHealth(health);
+        replayPlayer.setHealth((int) health);
         replayPlayer.setFood(food);
     }
 
     @Override
-    protected void onWriteObject(ObjectOutputStream out) throws IOException {
-        out.writeInt(health);
+    protected void onWriteObject(DataOutputStream out) throws IOException {
+        out.writeFloat(health);
         out.writeInt(food);
     }
 
     @Override
-    protected void onReadObject(ObjectInputStream in) throws IOException {
-        health = in.readInt();
+    protected void onReadObject(DataInputStream in) throws IOException, ClassNotFoundException {
+        health = in.readFloat();
         food = in.readInt();
     }
 }

@@ -3,6 +3,7 @@ package eu.mcone.gameapi.api.scoreboard;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.coresystem.api.bukkit.scoreboard.CoreSidebarObjective;
 import eu.mcone.coresystem.api.bukkit.scoreboard.CoreSidebarObjectiveEntry;
+import lombok.NoArgsConstructor;
 
 public abstract class LobbyObjective extends CoreSidebarObjective {
 

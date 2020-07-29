@@ -1,6 +1,8 @@
 package eu.mcone.gameapi.replay.runner;
 
 import eu.mcone.coresystem.api.bukkit.codec.Codec;
+import eu.mcone.coresystem.api.bukkit.codec.CodecRegistry;
+import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.replay.chunk.ReplayChunk;
 import eu.mcone.gameapi.api.replay.packets.server.MessageWrapper;
 import eu.mcone.gameapi.api.replay.runner.ReplaySpeed;
@@ -25,7 +27,10 @@ public class ServerRunner extends eu.mcone.coresystem.api.bukkit.npc.capture.Pla
     private final ReplayContainer container;
     private final ScheduledThreadPoolExecutor executor;
 
+    private final CodecRegistry codecRegistry;
+
     public ServerRunner(final ReplayContainer container) {
+        this.codecRegistry = GamePlugin.getGamePlugin().getReplayManager().getCodecRegistry();
         this.container = container;
         this.executor = (ScheduledThreadPoolExecutor) Executors.newSingleThreadExecutor();
     }
@@ -46,7 +51,7 @@ public class ServerRunner extends eu.mcone.coresystem.api.bukkit.npc.capture.Pla
                     List<Codec<?, ?>> codecs = chunk.getServerCodecs(tick);
                     if (codecs != null) {
                         for (Codec codec : codecs) {
-                            if (codec.getEncodeClass().equals(eu.mcone.gameapi.api.replay.runner.ServerRunner.class)) {
+                            if (codecRegistry.getEncoderClass(codec.getEncoderID()).equals(eu.mcone.gameapi.api.replay.runner.ServerRunner.class)) {
                                 codec.encode(this);
                             }
                         }

@@ -11,9 +11,7 @@ import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionType;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 
 @Getter
 public class PlayerItemConsumeEventCodec extends Codec<PlayerItemConsumeEvent, PlayerRunner> {
@@ -22,7 +20,7 @@ public class PlayerItemConsumeEventCodec extends Codec<PlayerItemConsumeEvent, P
     private int level;
 
     public PlayerItemConsumeEventCodec() {
-        super("ItemConsume", PlayerItemConsumeEvent.class, PlayerRunner.class);
+        super((byte) 0, (byte) 0);
     }
 
     @Override
@@ -31,7 +29,7 @@ public class PlayerItemConsumeEventCodec extends Codec<PlayerItemConsumeEvent, P
             Potion potion = Potion.fromItemStack(itemConsumeEvent.getItem());
             typ = potion.getType().name();
             level = potion.getLevel();
-            return new Object[]{player};
+            return new Object[]{itemConsumeEvent.getPlayer()};
         }
 
         return null;
@@ -44,19 +42,19 @@ public class PlayerItemConsumeEventCodec extends Codec<PlayerItemConsumeEvent, P
         }
     }
 
-    public Potion getPotion() {
-        return new Potion(PotionType.valueOf(typ), level);
-    }
-
     @Override
-    protected void onWriteObject(ObjectOutputStream out) throws IOException {
+    protected void onWriteObject(DataOutputStream out) throws IOException {
         out.writeUTF(typ);
         out.writeInt(level);
     }
 
     @Override
-    protected void onReadObject(ObjectInputStream in) throws IOException {
+    protected void onReadObject(DataInputStream in) throws IOException, ClassNotFoundException {
         typ = in.readUTF();
         level = in.readInt();
+    }
+
+    public Potion getPotion() {
+        return new Potion(PotionType.valueOf(typ), level);
     }
 }

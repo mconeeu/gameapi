@@ -12,14 +12,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 
 @Getter
 public class BlockPlaceEventCodec extends Codec<BlockPlaceEvent, PlayerRunner> {
 
-    private String material;
+    private int id;
     private byte subID;
 
     private double x;
@@ -28,58 +26,60 @@ public class BlockPlaceEventCodec extends Codec<BlockPlaceEvent, PlayerRunner> {
     private String world;
 
     public BlockPlaceEventCodec() {
-        super("BlockPlace", BlockPlaceEvent.class, PlayerRunner.class);
+        super((byte) 0, (byte) 0);
     }
 
     @BsonIgnore
     public ItemStack getItemStack() {
-        return new ItemBuilder(Material.valueOf(material), 1, subID).create();
+        return new ItemBuilder(Material.getMaterial(id), 1, subID).create();
     }
 
     @Override
     public Object[] decode(Player player, BlockPlaceEvent blockPlaceEvent) {
         Block block = blockPlaceEvent.getBlock();
 
-        material = block.getType().toString();
+        id = block.getType().getId();
         subID = block.getData();
 
         x = block.getLocation().getX();
         y = block.getLocation().getY();
         z = block.getLocation().getZ();
         world = block.getLocation().getWorld().getName();
-        return new Object[]{player};
+        return new Object[]{blockPlaceEvent.getPlayer()};
     }
 
     @Override
     public void encode(PlayerRunner runner) {
         for (Player player : runner.getWatchers()) {
-            player.sendBlockChange(getLocation().bukkit(), Material.valueOf(material), subID);
+            if (player.getLocation().getWorld().getName().equalsIgnoreCase(world)) {
+                player.sendBlockChange(getLocation().bukkit(), Material.getMaterial(id), subID);
+            }
         }
+    }
+
+    @Override
+    protected void onWriteObject(DataOutputStream out) throws IOException {
+        out.writeInt(id);
+        out.writeByte(subID);
+
+        out.writeDouble(x);
+        out.writeDouble(y);
+        out.writeDouble(z);
+        out.writeUTF(world);
+    }
+
+    @Override
+    protected void onReadObject(DataInputStream in) throws IOException {
+        id = in.readInt();
+        subID = in.readByte();
+
+        x = in.readDouble();
+        y = in.readDouble();
+        z = in.readDouble();
+        world = in.readUTF();
     }
 
     private CoreLocation getLocation() {
         return new CoreLocation(world, x, y, z, 0, 0);
-    }
-
-    @Override
-    protected void onWriteObject(ObjectOutputStream out) throws IOException {
-        out.writeUTF(material);
-        out.writeByte(subID);
-
-        out.writeUTF(world);
-        out.writeDouble(x);
-        out.writeDouble(y);
-        out.writeDouble(z);
-    }
-
-    @Override
-    protected void onReadObject(ObjectInputStream in) throws IOException {
-        material = in.readUTF();
-        subID = in.readByte();
-
-        world = in.readUTF();
-        x = in.readDouble();
-        y = in.readDouble();
-        z = in.readDouble();
     }
 }

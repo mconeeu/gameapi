@@ -1,43 +1,19 @@
 package eu.mcone.gameapi.replay.session;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
-import eu.mcone.coresystem.api.bukkit.codec.CodecRegistry;
-import eu.mcone.coresystem.api.bukkit.event.StatsChangeEvent;
-import eu.mcone.coresystem.api.bukkit.event.armor.ArmorEquipEvent;
-import eu.mcone.coresystem.api.bukkit.event.objectiv.CoreObjectiveCreateEvent;
-import eu.mcone.coresystem.api.bukkit.event.objectiv.CoreSidebarObjectiveUpdateEvent;
 import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
-import eu.mcone.coresystem.api.bukkit.npc.capture.codecs.*;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Option;
 import eu.mcone.gameapi.api.replay.event.PlayerJoinReplayEvent;
 import eu.mcone.gameapi.api.replay.event.PlayerQuitReplayEvent;
 import eu.mcone.gameapi.api.replay.exception.ReplayPlayerAlreadyExistsException;
-import eu.mcone.gameapi.api.replay.packets.player.*;
-import eu.mcone.gameapi.api.replay.packets.player.block.BlockBreakEventCodec;
-import eu.mcone.gameapi.api.replay.packets.player.block.BlockPlaceEventCodec;
-import eu.mcone.gameapi.api.replay.packets.player.block.PacketPlayInBlockDigCodec;
-import eu.mcone.gameapi.api.replay.packets.player.block.PlayerInteractEventCodec;
-import eu.mcone.gameapi.api.replay.packets.player.inventory.InventoryCloseEventCodec;
-import eu.mcone.gameapi.api.replay.packets.player.objective.CoreObjectiveCreateEventCodec;
-import eu.mcone.gameapi.api.replay.packets.player.objective.CoreSidebarObjectiveUpdateEventCodec;
-import eu.mcone.gameapi.api.replay.packets.server.EntityExplodeEventCodec;
 import eu.mcone.gameapi.api.utils.IDUtils;
 import eu.mcone.gameapi.replay.player.ReplayPlayer;
 import eu.mcone.gameapi.replay.utils.ReplayRecorder;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.player.*;
 
 import java.util.*;
 
@@ -51,7 +27,6 @@ public class ReplayRecord implements eu.mcone.gameapi.api.replay.session.ReplayR
     private List<Option> options;
 
     private Map<String, eu.mcone.gameapi.api.replay.player.ReplayPlayer> players;
-    private CodecRegistry codecRegistry;
     private ReplayRecorder recorder;
 
     public ReplayRecord(final String ID, final Gamemode gamemode, Option... options) {
@@ -60,50 +35,21 @@ public class ReplayRecord implements eu.mcone.gameapi.api.replay.session.ReplayR
         this.options = Arrays.asList(options);
 
         players = new HashMap<>();
-        codecRegistry = CoreSystem.getInstance().createCodecRegistry(true);
-        //Default Codecs
-        codecRegistry.registerCodec(PacketPlayInEntityAction.class, PlayInEntityActionCodec.class);
-        codecRegistry.registerCodec(PlayerItemHeldEvent.class, ItemSwitchEventCodec.class);
-        codecRegistry.registerCodec(PacketPlayInUseEntity.class, PlayInUseCodec.class);
-        codecRegistry.registerCodec(PacketPlayOutAnimation.class, PlayOutAnimationCodec.class);
-        codecRegistry.registerCodec(PlayerMoveEvent.class, PlayerMoveEventCodec.class);
-
-        //Replay Codecs - Events
-        codecRegistry.registerCodec(StatsChangeEvent.class, StatsChangeEventCodec.class);
-        codecRegistry.registerCodec(ProjectileLaunchEvent.class, ProjectileLaunchEventCodec.class);
-        codecRegistry.registerCodec(PlayerQuitReplayEvent.class, PlayerQuitReplayEventCodec.class);
-        codecRegistry.registerCodec(PlayerJoinReplayEvent.class, PlayerJoinReplayEventCodec.class);
-        codecRegistry.registerCodec(PlayerItemConsumeEvent.class, PlayerItemConsumeEventCodec.class);
-        codecRegistry.registerCodec(PlayerDropItemEvent.class, PlayerDropItemEventCodec.class);
-        codecRegistry.registerCodec(PlayerDeathEvent.class, PlayerDeathEventCodec.class);
-        codecRegistry.registerCodec(EntityDamageByEntityEvent.class, EntityDamageByEntityEventCodec.class);
-        codecRegistry.registerCodec(ArmorEquipEvent.class, ArmorEquipEventCodec.class);
-        codecRegistry.registerCodec(CoreSidebarObjectiveUpdateEvent.class, CoreSidebarObjectiveUpdateEventCodec.class);
-        codecRegistry.registerCodec(CoreObjectiveCreateEvent.class, CoreObjectiveCreateEventCodec.class);
-        codecRegistry.registerCodec(InventoryCloseEvent.class, InventoryCloseEventCodec.class);
-        codecRegistry.registerCodec(PlayerInteractEvent.class, PlayerInteractEventCodec.class);
-        codecRegistry.registerCodec(BlockPlaceEvent.class, BlockPlaceEventCodec.class);
-        codecRegistry.registerCodec(BlockBreakEvent.class, BlockBreakEventCodec.class);
-        codecRegistry.registerCodec(EntityExplodeEvent.class, EntityExplodeEventCodec.class);
-
-        //Replay Codecs - Packets
-        codecRegistry.registerCodec(PacketPlayOutUpdateHealth.class, PlayOutUpdateHealthCodec.class);
-        codecRegistry.registerCodec(PacketPlayOutNamedSoundEffect.class, PacketPlayOutNamedSoundEffectCodec.class);
-        codecRegistry.registerCodec(PacketPlayOutEntityEffect.class, PacketPlayOutNamedSoundEffectCodec.class);
-        codecRegistry.registerCodec(PacketPlayInBlockDig.class, PacketPlayInBlockDigCodec.class);
-        codecRegistry.registerCodec(PacketPlayOutSpawnEntity.class, PacketPlayOutSpawnEntityCodec.class);
-
-        recorder = new ReplayRecorder(this, codecRegistry);
+        recorder = new ReplayRecorder(this, GamePlugin.getGamePlugin().getReplayManager().getCodecRegistry());
     }
 
     public ReplayRecord(final Gamemode gamemode, final Option... options) {
         this.ID = IDUtils.generateID();
+
+        if (GamePlugin.getGamePlugin().getReplayManager().existsReplay(ID)) {
+            ID = IDUtils.generateID();
+        }
+
         this.gamemode = gamemode;
         this.options = Arrays.asList(options);
 
         players = new HashMap<>();
-        codecRegistry = CoreSystem.getInstance().createCodecRegistry(true);
-        recorder = new ReplayRecorder(this, codecRegistry);
+        recorder = new ReplayRecorder(this, GamePlugin.getGamePlugin().getReplayManager().getCodecRegistry());
     }
 
     public void recordSession() {
@@ -117,7 +63,8 @@ public class ReplayRecord implements eu.mcone.gameapi.api.replay.session.ReplayR
 
             //Adds the world entity spawn packet
             for (eu.mcone.gameapi.api.replay.player.ReplayPlayer player : players.values()) {
-                Bukkit.getServer().getPluginManager().callEvent(new PlayerJoinReplayEvent(Bukkit.getPlayer(player.getUuid())));
+                Player bukkitPlayer = Bukkit.getPlayer(player.getUuid());
+                Bukkit.getServer().getPluginManager().callEvent(new PlayerJoinReplayEvent(bukkitPlayer));
             }
         } else {
             throw new IllegalStateException("[REPLAY] Could not upload World " + recorder.getWorld() + " to database!");
@@ -144,7 +91,7 @@ public class ReplayRecord implements eu.mcone.gameapi.api.replay.session.ReplayR
     public void removePlayer(final Player player) {
         try {
             if (players.containsKey(player.getUniqueId().toString())) {
-                players.remove(player.getUniqueId().toString());
+                players.get(player.getUniqueId().toString()).setLeaved(System.currentTimeMillis() / 1000);
                 Bukkit.getServer().getPluginManager().callEvent(new PlayerQuitReplayEvent(player));
             } else {
                 throw new NullPointerException("ReplayPlayer " + player.getName() + " doesnt exists!");

@@ -17,8 +17,6 @@ public interface ReplayRecord {
 
     List<Option> getOptions();
 
-    CodecRegistry getCodecRegistry();
-
     ReplayRecorder getRecorder();
 
     void recordSession();

@@ -6,13 +6,13 @@ import eu.mcone.coresystem.api.bukkit.spawnable.ListMode;
 import eu.mcone.coresystem.api.bukkit.world.CoreLocation;
 import eu.mcone.gameapi.api.replay.event.PlayerJoinReplayEvent;
 import eu.mcone.gameapi.api.replay.runner.PlayerRunner;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 
+@Getter
 public class PlayerJoinReplayEventCodec extends Codec<PlayerJoinReplayEvent, PlayerRunner> {
 
     private String world;
@@ -23,19 +23,19 @@ public class PlayerJoinReplayEventCodec extends Codec<PlayerJoinReplayEvent, Pla
     private float pitch;
 
     public PlayerJoinReplayEventCodec() {
-        super("Join", PlayerJoinReplayEvent.class, PlayerRunner.class);
+        super((byte) 0, (byte) 0);
     }
 
     @Override
     public Object[] decode(Player player, PlayerJoinReplayEvent playerJoin) {
-        this.world = player.getLocation().getWorld().getName();
-        this.x = player.getLocation().getX();
-        this.y = player.getLocation().getY();
-        this.z = player.getLocation().getZ();
-        this.yaw = player.getLocation().getYaw();
-        pitch = player.getLocation().getPitch();
+        this.world = playerJoin.getPlayer().getLocation().getWorld().getName();
+        this.x = playerJoin.getPlayer().getLocation().getX();
+        this.y = playerJoin.getPlayer().getLocation().getY();
+        this.z = playerJoin.getPlayer().getLocation().getZ();
+        this.yaw = playerJoin.getPlayer().getLocation().getYaw();
+        pitch = playerJoin.getPlayer().getLocation().getPitch();
 
-        return new Object[]{player};
+        return new Object[]{playerJoin.getPlayer()};
     }
 
     @Override
@@ -46,7 +46,7 @@ public class PlayerJoinReplayEventCodec extends Codec<PlayerJoinReplayEvent, Pla
     }
 
     @Override
-    protected void onWriteObject(ObjectOutputStream out) throws IOException {
+    protected void onWriteObject(DataOutputStream out) throws IOException {
         out.writeUTF(world);
         out.writeDouble(x);
         out.writeDouble(y);
@@ -56,7 +56,7 @@ public class PlayerJoinReplayEventCodec extends Codec<PlayerJoinReplayEvent, Pla
     }
 
     @Override
-    protected void onReadObject(ObjectInputStream in) throws IOException {
+    protected void onReadObject(DataInputStream in) throws IOException, ClassNotFoundException {
         world = in.readUTF();
         x = in.readDouble();
         y = in.readDouble();

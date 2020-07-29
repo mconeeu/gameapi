@@ -8,9 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.util.Vector;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 
 public class EntityDamageByEntityEventCodec extends Codec<EntityDamageByEntityEvent, PlayerNpc> {
 
@@ -19,7 +17,7 @@ public class EntityDamageByEntityEventCodec extends Codec<EntityDamageByEntityEv
     private double z;
 
     public EntityDamageByEntityEventCodec() {
-        super("SHOOT", EntityDamageByEntityEvent.class, PlayerNpc.class);
+        super((byte) 0, (byte) 0);
     }
 
     @Override
@@ -54,21 +52,22 @@ public class EntityDamageByEntityEventCodec extends Codec<EntityDamageByEntityEv
         playerNpc.getLocation().getWorld().playSound(playerNpc.getLocation(), Sound.ARROW_HIT, 1, 1);
     }
 
-    public Vector getVector() {
-        return new Vector(x, y, z);
-    }
-
     @Override
-    protected void onWriteObject(ObjectOutputStream out) throws IOException {
+    protected void onWriteObject(DataOutputStream out) throws IOException {
         out.writeDouble(x);
         out.writeDouble(y);
         out.writeDouble(z);
+
     }
 
     @Override
-    protected void onReadObject(ObjectInputStream in) throws IOException {
+    protected void onReadObject(DataInputStream in) throws IOException {
         x = in.readDouble();
         y = in.readDouble();
         z = in.readDouble();
+    }
+
+    public Vector getVector() {
+        return new Vector(x, y, z);
     }
 }

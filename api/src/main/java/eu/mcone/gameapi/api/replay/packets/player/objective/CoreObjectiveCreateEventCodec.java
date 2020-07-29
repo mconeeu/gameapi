@@ -2,25 +2,26 @@ package eu.mcone.gameapi.api.replay.packets.player.objective;
 
 import eu.mcone.coresystem.api.bukkit.codec.Codec;
 import eu.mcone.coresystem.api.bukkit.event.objectiv.CoreObjectiveCreateEvent;
+import eu.mcone.gameapi.api.replay.objectives.ReplayPlayerSidebarObjective;
 import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
+import lombok.Getter;
 import org.bukkit.entity.Player;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 
+@Getter
 public class CoreObjectiveCreateEventCodec extends Codec<CoreObjectiveCreateEvent, ReplayPlayer> {
 
     private String name;
 
     public CoreObjectiveCreateEventCodec() {
-        super("Scoreboard", CoreObjectiveCreateEvent.class, ReplayPlayer.class);
+        super((byte) 0, (byte) 0);
     }
 
     @Override
     public Object[] decode(Player player, CoreObjectiveCreateEvent objectiveCreateEvent) {
         name = objectiveCreateEvent.getSidebarObjective().getName();
-        return new Object[]{player};
+        return new Object[]{objectiveCreateEvent.getPlayer()};
     }
 
     @Override
@@ -29,12 +30,12 @@ public class CoreObjectiveCreateEventCodec extends Codec<CoreObjectiveCreateEven
     }
 
     @Override
-    protected void onWriteObject(ObjectOutputStream out) throws IOException {
+    protected void onWriteObject(DataOutputStream out) throws IOException {
         out.writeUTF(name);
     }
 
     @Override
-    protected void onReadObject(ObjectInputStream in) throws IOException {
+    protected void onReadObject(DataInputStream in) throws IOException {
         name = in.readUTF();
     }
 }

@@ -1,5 +1,6 @@
 package eu.mcone.gameapi.api.replay.packets.server;
 
+import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.codec.Codec;
 import eu.mcone.coresystem.api.bukkit.world.CoreLocation;
 import eu.mcone.gameapi.api.replay.runner.PlayerRunner;
@@ -12,9 +13,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityExplodeEvent;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +23,7 @@ public class EntityExplodeEventCodec extends Codec<EntityExplodeEvent, ServerRun
     private List<CoreLocation> destroy;
 
     public EntityExplodeEventCodec() {
-        super("Explode", EntityExplodeEvent.class, ServerRunner.class);
+        super((byte) 0, (byte) 0);
         destroy = new ArrayList<>();
     }
 
@@ -35,7 +34,7 @@ public class EntityExplodeEventCodec extends Codec<EntityExplodeEvent, ServerRun
                 destroy.add(new CoreLocation(block.getLocation()));
             }
 
-            return new Object[]{player};
+            return new Object[]{entityExplodeEvent.getEntity()};
         }
 
         return null;
@@ -52,13 +51,12 @@ public class EntityExplodeEventCodec extends Codec<EntityExplodeEvent, ServerRun
     }
 
     @Override
-    protected void onWriteObject(ObjectOutputStream out) throws IOException {
-        out.writeUnshared(destroy);
+    protected void onWriteObject(DataOutputStream out) throws IOException {
+        out.writeUTF(CoreSystem.getInstance().getGson().toJson(destroy));
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    protected void onReadObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        destroy = (List<CoreLocation>) in.readUnshared();
+    protected void onReadObject(DataInputStream in) throws IOException, ClassNotFoundException {
+        destroy = CoreSystem.getInstance().getGson().fromJson(in.readUTF(), ArrayList.class);
     }
 }

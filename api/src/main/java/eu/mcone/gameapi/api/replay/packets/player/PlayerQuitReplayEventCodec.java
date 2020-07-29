@@ -9,19 +9,18 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 
 @Getter
 public class PlayerQuitReplayEventCodec extends Codec<PlayerQuitReplayEvent, PlayerNpc> {
 
     public PlayerQuitReplayEventCodec() {
-        super("DestroyNpc", PlayerQuitReplayEvent.class, PlayerNpc.class);
+        super((byte) 0, (byte) 0);
     }
 
     @Override
     public Object[] decode(Player player, PlayerQuitReplayEvent replayEvent) {
-        return new Object[]{player};
+        return new Object[]{replayEvent.getPlayer()};
     }
 
     @Override
@@ -31,10 +30,12 @@ public class PlayerQuitReplayEventCodec extends Codec<PlayerQuitReplayEvent, Pla
     }
 
     @Override
-    protected void onWriteObject(ObjectOutputStream objectOutputStream) {
+    protected void onWriteObject(DataOutputStream dataOutputStream) throws IOException {
+
     }
 
     @Override
-    protected void onReadObject(ObjectInputStream objectInputStream) {
+    protected void onReadObject(DataInputStream dataInputStream) throws IOException, ClassNotFoundException {
+
     }
 }

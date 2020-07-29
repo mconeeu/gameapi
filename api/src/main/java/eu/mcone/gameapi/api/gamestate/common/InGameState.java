@@ -14,6 +14,7 @@ import eu.mcone.gameapi.api.gamestate.GameState;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.GamePlayerState;
 import eu.mcone.gameapi.api.scoreboard.InGameObjective;
+import eu.mcone.gameapi.api.scoreboard.InGameObjectiveImpl;
 import eu.mcone.gameapi.api.scoreboard.TeamTablist;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,9 +24,11 @@ import org.bukkit.scoreboard.DisplaySlot;
 
 public class InGameState extends GameState {
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private static Class<? extends CoreScoreboard> scoreboard;
-    @Getter @Setter
+    @Getter
+    @Setter
     private static Class<? extends InGameObjective> objective;
 
     public InGameState() {
@@ -78,7 +81,7 @@ public class InGameState extends GameState {
                 }
 
                 if (objective == null) {
-                    objective = InGameObjective.class;
+                    objective = InGameObjectiveImpl.class;
                 }
 
                 for (GamePlayer gp : GamePlugin.getGamePlugin().getPlayerManager().getGamePlayers(GamePlayerState.PLAYING)) {

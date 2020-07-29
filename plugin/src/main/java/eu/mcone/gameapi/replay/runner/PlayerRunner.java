@@ -2,9 +2,11 @@ package eu.mcone.gameapi.replay.runner;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.codec.Codec;
+import eu.mcone.coresystem.api.bukkit.codec.CodecRegistry;
 import eu.mcone.coresystem.api.bukkit.event.npc.NpcAnimationStateChangeEvent;
 import eu.mcone.coresystem.api.bukkit.npc.entity.PlayerNpc;
 import eu.mcone.coresystem.api.bukkit.npc.enums.NpcAnimation;
+import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.replay.chunk.ReplayChunk;
 import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
 import eu.mcone.gameapi.api.replay.runner.ReplaySpeed;
@@ -45,7 +47,10 @@ public class PlayerRunner extends eu.mcone.coresystem.api.bukkit.npc.capture.Pla
     @Setter
     private boolean breaking = false;
 
+    private final CodecRegistry codecRegistry;
+
     public PlayerRunner(final ReplayPlayer player, final ReplayContainer container) {
+        this.codecRegistry = GamePlugin.getGamePlugin().getReplayManager().getCodecRegistry();
         this.player = player;
         this.container = container;
         placedBlocks = new HashMap<>();
@@ -81,11 +86,11 @@ public class PlayerRunner extends eu.mcone.coresystem.api.bukkit.npc.capture.Pla
 
                     if (codecs.containsKey(tick)) {
                         for (Codec codec : codecs.get(tick)) {
-                            if (codec.getEncodeClass().equals(PlayerNpc.class)) {
+                            if (codecRegistry.getEncoderClass(codec.getCodecID()).equals(PlayerNpc.class)) {
                                 codec.encode(player.getNpc());
-                            } else if (codec.getEncodeClass().equals(eu.mcone.gameapi.api.replay.runner.PlayerRunner.class)) {
+                            } else if (codecRegistry.getEncoderClass(codec.getCodecID()).equals(eu.mcone.gameapi.api.replay.runner.PlayerRunner.class)) {
                                 codec.encode(this);
-                            } else if (codec.getEncodeClass().equals(eu.mcone.gameapi.replay.player.ReplayPlayer.class)) {
+                            } else if (codecRegistry.getEncoderClass(codec.getCodecID()).equals(eu.mcone.gameapi.replay.player.ReplayPlayer.class)) {
                                 codec.encode(player);
                             }
                         }
@@ -166,11 +171,11 @@ public class PlayerRunner extends eu.mcone.coresystem.api.bukkit.npc.capture.Pla
                 } else {
                     if (codecs.containsKey(cTick)) {
                         for (Codec codec : codecs.get(cTick)) {
-                            if (codec.getEncodeClass().equals(PlayerNpc.class)) {
+                            if (codecRegistry.getEncoderClass(codec.getCodecID()).equals(PlayerNpc.class)) {
                                 codec.encode(player.getNpc());
-                            } else if (codec.getEncodeClass().equals(eu.mcone.gameapi.api.replay.runner.PlayerRunner.class)) {
+                            } else if (codecRegistry.getEncoderClass(codec.getCodecID()).equals(eu.mcone.gameapi.api.replay.runner.PlayerRunner.class)) {
                                 codec.encode(this);
-                            } else if (codec.getEncodeClass().equals(eu.mcone.gameapi.replay.player.ReplayPlayer.class)) {
+                            } else if (codecRegistry.getEncoderClass(codec.getCodecID()).equals(eu.mcone.gameapi.replay.player.ReplayPlayer.class)) {
                                 codec.encode(player);
                             }
                         }

@@ -3,7 +3,7 @@ package eu.mcone.gameapi.api.replay.player;
 import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.coresystem.api.bukkit.npc.entity.PlayerNpc;
 import eu.mcone.coresystem.api.bukkit.world.CoreLocation;
-import eu.mcone.gameapi.api.replay.packets.player.objective.ReplayPlayerSidebarObjective;
+import eu.mcone.gameapi.api.replay.objectives.ReplayPlayerSidebarObjective;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -24,7 +24,13 @@ public interface ReplayPlayer {
 
     void setReported(boolean reported);
 
+    long getJoined();
+
+    long getLeaved();
+
     void setJoined(long joined);
+
+    void setLeaved(long leaved);
 
     void setSpawnLocation(CoreLocation location);
 

@@ -9,9 +9,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 
 @Getter
 public class BlockBreakEventCodec extends Codec<BlockBreakEvent, PlayerRunner> {
@@ -22,7 +20,7 @@ public class BlockBreakEventCodec extends Codec<BlockBreakEvent, PlayerRunner> {
     private String world;
 
     public BlockBreakEventCodec() {
-        super("BlockBreak", BlockBreakEvent.class, PlayerRunner.class);
+        super((byte) 0, (byte) 0);
     }
 
     @Override
@@ -32,22 +30,20 @@ public class BlockBreakEventCodec extends Codec<BlockBreakEvent, PlayerRunner> {
         y = block.getY();
         z = block.getZ();
         world = block.getWorld().getName();
-        return new Object[]{player};
+        return new Object[]{blockBreakEvent.getPlayer()};
     }
 
     @Override
     public void encode(PlayerRunner runner) {
         for (Player player : runner.getWatchers()) {
-            player.sendBlockChange(getLocation().bukkit(), Material.AIR, (byte) 0);
+            if (player.getLocation().getWorld().getName().equalsIgnoreCase(world)) {
+                player.sendBlockChange(getLocation().bukkit(), Material.AIR, (byte) 0);
+            }
         }
     }
 
-    private CoreLocation getLocation() {
-        return new CoreLocation(world, x, y, z, 0, 0);
-    }
-
     @Override
-    protected void onWriteObject(ObjectOutputStream out) throws IOException {
+    protected void onWriteObject(DataOutputStream out) throws IOException {
         out.writeUTF(world);
         out.writeDouble(x);
         out.writeDouble(y);
@@ -55,10 +51,14 @@ public class BlockBreakEventCodec extends Codec<BlockBreakEvent, PlayerRunner> {
     }
 
     @Override
-    protected void onReadObject(ObjectInputStream in) throws IOException {
+    protected void onReadObject(DataInputStream in) throws IOException {
         world = in.readUTF();
         x = in.readDouble();
         y = in.readDouble();
         z = in.readDouble();
+    }
+
+    private CoreLocation getLocation() {
+        return new CoreLocation(world, x, y, z, 0, 0);
     }
 }
