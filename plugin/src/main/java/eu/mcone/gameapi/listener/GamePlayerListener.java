@@ -31,7 +31,9 @@ public class GamePlayerListener implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
-        GameAPI.getInstance().getGamePlayer(e.getPlayer()).removeFromGame();
+        if (GamePlugin.isGamePluginInitialized()) {
+            GameAPI.getInstance().getGamePlayer(e.getPlayer()).removeFromGame();
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

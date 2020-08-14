@@ -54,6 +54,8 @@ public interface GamePlayer {
 
     void removeDefaultItem(DefaultItem item);
 
+    void resetEffectsVisible();
+
     void addAchievement(String name) throws IllegalArgumentException;
 
     Map<Achievement, Long> getAchievements();

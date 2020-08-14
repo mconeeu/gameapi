@@ -71,7 +71,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
         super(player);
         this.player = player.bukkit();
 
-        this.stats = GamePlugin.getGamePlugin().getGamemode() != null
+        this.stats = GamePlugin.isGamePluginInitialized() && GamePlugin.getGamePlugin().getGamemode() != null
                 ? player.getStats(GamePlugin.getGamePlugin().getGamemode())
                 : null;
     }
@@ -83,6 +83,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
         this.customKits = systemProfile.getCustomKits();
         this.achievements = systemProfile.getAchievementMap();
         this.settings = systemProfile.getSettings();
+        this.effectsVisible = systemProfile.getSettings().isEnableGadgets();
         this.oneLevel = systemProfile.getOneLevel();
         this.oneXp = systemProfile.getOneXp();
         this.onePass = systemProfile.isOnePass();
@@ -194,6 +195,11 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
                 item.getCategory().name(),
                 GamePlugin.getGamePlugin().getBackpackManager().getBackpackItem(item.getCategory().name(), item.getId())
         );
+    }
+
+    @Override
+    public void resetEffectsVisible() {
+        this.effectsVisible = settings.isEnableGadgets();
     }
 
 

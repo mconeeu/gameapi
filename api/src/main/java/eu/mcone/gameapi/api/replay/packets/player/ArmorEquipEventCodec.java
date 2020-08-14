@@ -6,11 +6,12 @@ import eu.mcone.coresystem.api.bukkit.event.armor.ArmorEquipEvent;
 import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
 import eu.mcone.coresystem.api.bukkit.npc.enums.EquipmentPosition;
 import eu.mcone.gameapi.api.replay.runner.PlayerRunner;
-import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 public class ArmorEquipEventCodec extends Codec<ArmorEquipEvent, PlayerRunner> {
 

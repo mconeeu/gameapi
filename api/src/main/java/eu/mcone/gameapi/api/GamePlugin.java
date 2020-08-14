@@ -193,4 +193,9 @@ public abstract class GamePlugin extends CorePlugin {
     public Collection<GamePlayer> getOnlineGamePlayers() {
         return GameAPI.getInstance().getOnlineGamePlayers();
     }
+
+    public static boolean isGamePluginInitialized() {
+        return gamePlugin != null;
+    }
+
 }

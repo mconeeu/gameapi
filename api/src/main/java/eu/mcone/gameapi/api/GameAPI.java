@@ -32,7 +32,7 @@ public abstract class GameAPI extends CorePlugin {
                 "gameapi",
                 ChatColor.DARK_GRAY,
                 "system.prefix.server",
-                "https://2529672f0fcf4f21b41524b81f147ae6@o267551.ingest.sentry.io/5198718"
+                "https://2529672f0fcf4f21b41524b81f147ae6@o267551.ingest.sentry.io/5198718?stacktrace.app.packages=eu.mcone.gameapi"
         );
     }
 
