@@ -2,6 +2,7 @@ package eu.mcone.gameapi.api.replay.packets.player;
 
 import eu.mcone.coresystem.api.bukkit.codec.Codec;
 import eu.mcone.coresystem.api.bukkit.spawnable.ListMode;
+import eu.mcone.gameapi.api.replay.runner.AsyncPlayerRunner;
 import eu.mcone.gameapi.api.replay.runner.PlayerRunner;
 import lombok.Getter;
 import org.bukkit.entity.Player;
@@ -9,10 +10,13 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 
 import java.io.*;
 
+@Getter
 public class PlayerDeathEventCodec extends Codec<PlayerDeathEvent, PlayerRunner> {
 
+    public static final byte CODEC_VERSION = 1;
+
     public PlayerDeathEventCodec() {
-        super((byte) 0, (byte) 0);
+        super((byte) 13, (byte) 3);
     }
 
     @Override
@@ -22,7 +26,7 @@ public class PlayerDeathEventCodec extends Codec<PlayerDeathEvent, PlayerRunner>
 
     @Override
     public void encode(PlayerRunner runner) {
-        runner.getPlayer().getNpc().togglePlayerVisibility(ListMode.BLACKLIST, runner.getWatchers().toArray(new Player[0]));
+        runner.getPlayer().getNpc().togglePlayerVisibility(ListMode.BLACKLIST, runner.getViewers().toArray(new Player[0]));
     }
 
     @Override

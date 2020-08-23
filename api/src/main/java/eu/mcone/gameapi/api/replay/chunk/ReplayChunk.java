@@ -9,6 +9,8 @@ import java.util.UUID;
 
 public interface ReplayChunk {
 
+    int getID();
+
     ChunkData getChunkData();
 
     void addServerPacket(int tick, Codec<?, ?> wrapper);
@@ -19,7 +21,9 @@ public interface ReplayChunk {
 
     List<Codec<?, ?>> getServerCodecs(int tick);
 
-    Codec<?, ?> getLastPacketInRange(UUID uuid, Object obj, int startTick, int endTick);
+    Codec<?, ?> getLastServerPacketInRange(int start, int end);
+
+    Codec<?, ?> getLastPlayerPacketInRange(UUID uuid, int startTick, int endTick);
 
     Collection<UUID> getPlayers();
 

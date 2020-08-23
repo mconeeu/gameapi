@@ -3,7 +3,6 @@ package eu.mcone.gameapi.api.replay.packets.server;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.codec.Codec;
 import eu.mcone.coresystem.api.bukkit.world.CoreLocation;
-import eu.mcone.gameapi.api.replay.runner.PlayerRunner;
 import eu.mcone.gameapi.api.replay.runner.ServerRunner;
 import lombok.Getter;
 import org.bukkit.Material;
@@ -20,10 +19,12 @@ import java.util.List;
 @Getter
 public class EntityExplodeEventCodec extends Codec<EntityExplodeEvent, ServerRunner> {
 
+    public static final byte CODEC_VERSION = 1;
+
     private List<CoreLocation> destroy;
 
     public EntityExplodeEventCodec() {
-        super((byte) 0, (byte) 0);
+        super((byte) 23, (byte) 5);
         destroy = new ArrayList<>();
     }
 
@@ -43,7 +44,7 @@ public class EntityExplodeEventCodec extends Codec<EntityExplodeEvent, ServerRun
     @Override
     public void encode(ServerRunner runner) {
         for (CoreLocation location : destroy) {
-            for (Player player : runner.getWatchers()) {
+            for (Player player : runner.getViewers()) {
                 player.playSound(player.getLocation(), Sound.EXPLODE, 1, 1);
                 player.sendBlockChange(location.bukkit(), Material.AIR, (byte) 0);
             }

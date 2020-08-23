@@ -1,4 +1,4 @@
-package eu.mcone.gameapi.api.utils;
+package eu.mcone.gameapi.api.replay.utils;
 
 import eu.mcone.gameapi.api.replay.chunk.ReplayChunk;
 import eu.mcone.gameapi.api.replay.packets.server.MessageWrapper;
@@ -11,10 +11,6 @@ public interface ReplayRecorder {
     Map<Integer, ReplayChunk> getChunks();
 
     String getRecorderID();
-
-    String getWinnerTeam();
-
-    Map<String, List<MessageWrapper>> getMessages();
 
     String getWorld();
 
@@ -31,4 +27,6 @@ public interface ReplayRecorder {
     void stop();
 
     int getLastTick();
+
+    void addMessage(MessageWrapper wrapper);
 }

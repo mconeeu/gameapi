@@ -2,7 +2,9 @@ package eu.mcone.gameapi.api.replay.packets.player.block;
 
 import eu.mcone.coresystem.api.bukkit.codec.Codec;
 import eu.mcone.coresystem.api.bukkit.world.CoreLocation;
+import eu.mcone.gameapi.api.replay.runner.AsyncPlayerRunner;
 import eu.mcone.gameapi.api.replay.runner.PlayerRunner;
+import eu.mcone.gameapi.api.replay.runner.ReplayRunner;
 import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -14,13 +16,15 @@ import java.io.*;
 @Getter
 public class BlockBreakEventCodec extends Codec<BlockBreakEvent, PlayerRunner> {
 
+    public static final byte CODEC_VERSION = 1;
+
     private double x;
     private double y;
     private double z;
     private String world;
 
     public BlockBreakEventCodec() {
-        super((byte) 0, (byte) 0);
+        super((byte) 9, (byte) 3);
     }
 
     @Override
@@ -35,7 +39,7 @@ public class BlockBreakEventCodec extends Codec<BlockBreakEvent, PlayerRunner> {
 
     @Override
     public void encode(PlayerRunner runner) {
-        for (Player player : runner.getWatchers()) {
+        for (Player player : runner.getViewers()) {
             if (player.getLocation().getWorld().getName().equalsIgnoreCase(world)) {
                 player.sendBlockChange(getLocation().bukkit(), Material.AIR, (byte) 0);
             }
@@ -44,18 +48,18 @@ public class BlockBreakEventCodec extends Codec<BlockBreakEvent, PlayerRunner> {
 
     @Override
     protected void onWriteObject(DataOutputStream out) throws IOException {
-        out.writeUTF(world);
         out.writeDouble(x);
         out.writeDouble(y);
         out.writeDouble(z);
+        out.writeUTF(world);
     }
 
     @Override
     protected void onReadObject(DataInputStream in) throws IOException {
-        world = in.readUTF();
         x = in.readDouble();
         y = in.readDouble();
         z = in.readDouble();
+        world = in.readUTF();
     }
 
     private CoreLocation getLocation() {

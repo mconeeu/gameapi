@@ -3,11 +3,13 @@ package eu.mcone.gameapi.api.player;
 import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.coresystem.api.bukkit.player.Stats;
+import eu.mcone.coresystem.api.bukkit.stats.CoreStats;
 import eu.mcone.gameapi.api.achievement.Achievement;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.api.kit.Kit;
 import eu.mcone.gameapi.api.kit.ModifiedKit;
+import eu.mcone.gameapi.api.stats.StatsHistory;
 import eu.mcone.gameapi.api.team.Team;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -20,7 +22,9 @@ public interface GamePlayer {
 
     GamePlayerState getState();
 
-    Stats getStats();
+    StatsHistory getStatsHistory();
+
+    CoreStats getStats();
 
     int getRoundKills();
 
@@ -121,6 +125,7 @@ public interface GamePlayer {
 
     /**
      * sets the kit, that the player has buyed. If no Kit was buyed set the default kit (given as argument)
+     *
      * @param defaultKit the default Kit that will be set for free if the player didnt choose any kit
      */
     void setChoosedKit(Kit defaultKit);

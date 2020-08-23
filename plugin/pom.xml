@@ -12,7 +12,7 @@
     <parent>
         <artifactId>mcone-gameapi</artifactId>
         <groupId>eu.mcone.gameapi</groupId>
-        <version>3.9.0-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -69,7 +69,7 @@
         <dependency>
             <groupId>eu.mcone.gameapi</groupId>
             <artifactId>api</artifactId>
-            <version>3.9.0-SNAPSHOT</version>
+            <version>4.0.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency> <!-- Sentry Error Logging -->

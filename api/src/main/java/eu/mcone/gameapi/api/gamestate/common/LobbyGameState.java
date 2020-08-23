@@ -81,11 +81,11 @@ public class LobbyGameState extends GameState {
         super.onCountdownEnd(event);
 
         if (GamePlugin.getGamePlugin().hasModule(Module.BACKPACK_MANAGER)) {
-            if (GamePlugin.getGamePlugin().getBackpackManager().getGameOptions().contains(Option.BACKPACK_MANAGER_REGISTER_TRAIL_CATEGORY)) {
+            if (GamePlugin.getGamePlugin().hasOption(Option.BACKPACK_MANAGER_REGISTER_TRAIL_CATEGORY)) {
                 GamePlugin.getGamePlugin().getBackpackManager().getTrailHandler().stop();
             }
 
-            if (GamePlugin.getGamePlugin().getBackpackManager().getGameOptions().contains(Option.BACKPACK_MANAGER_REGISTER_PET_CATEGORY)) {
+            if (GamePlugin.getGamePlugin().hasOption(Option.BACKPACK_MANAGER_REGISTER_PET_CATEGORY)) {
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     GamePlugin.getGamePlugin().getBackpackManager().getPetHandler().despawnPet(player);
                 }

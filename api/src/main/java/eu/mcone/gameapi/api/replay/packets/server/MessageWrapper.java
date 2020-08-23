@@ -2,12 +2,14 @@ package eu.mcone.gameapi.api.replay.packets.server;
 
 import eu.mcone.coresystem.api.bukkit.util.Messenger;
 import lombok.Getter;
+import lombok.Setter;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
 @Getter
-@BsonDiscriminator
+@Setter
+//@BsonDiscriminator
 public class MessageWrapper {
 
     private final String message;
@@ -26,10 +28,10 @@ public class MessageWrapper {
         this.timestamp = System.currentTimeMillis() / 1000;
     }
 
-    @BsonCreator
-    public MessageWrapper(@BsonProperty("message") final String message, @BsonProperty("typ") Messenger.Broadcast.BroadcastMessageTyp typ, @BsonProperty("timestamp") long timestamp) {
-        this.message = message;
-        this.typ = typ;
-        this.timestamp = timestamp;
-    }
+//    @BsonCreator
+//    public MessageWrapper(@BsonProperty("message") final String message, @BsonProperty("typ") Messenger.Broadcast.BroadcastMessageTyp typ, @BsonProperty("timestamp") long timestamp) {
+//        this.message = message;
+//        this.typ = typ;
+//        this.timestamp = timestamp;
+//    }
 }

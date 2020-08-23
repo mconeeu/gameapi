@@ -2,24 +2,37 @@ package eu.mcone.gameapi.api.replay.runner;
 
 import eu.mcone.gameapi.api.replay.container.ReplayContainer;
 import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
+import eu.mcone.gameapi.api.replay.utils.SkipUnit;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public interface PlayerRunner {
 
     ReplayContainer getContainer();
 
-    Collection<Player> getWatchers();
+    ReplayPlayer getPlayer();
+
+    boolean isSync();
+
+    boolean isBreaking();
 
     void setBreaking(boolean breaking);
 
-    ReplayPlayer getPlayer();
+    boolean isForward();
 
-    ReplaySpeed getReplaySpeed();
+    boolean isPlaying();
 
-    void setReplaySpeed(ReplaySpeed speed);
+    ReplaySpeed getSpeed();
 
-    void skip(int ticks);
+    Collection<Player> getViewers();
+
+    void play();
+
+    void stop();
+
+    void skip(SkipUnit unit, int amount);
+
+    AtomicInteger getCurrentTick();
 }

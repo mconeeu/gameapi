@@ -63,9 +63,9 @@ public class GamePlayerManager implements PlayerManager {
     public Set<Player> getPlayers(GamePlayerState state) {
         Set<Player> result = new HashSet<>();
 
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            if (GameAPI.getInstance().getGamePlayer(p).getState().equals(state)) {
-                result.add(p);
+        for (GamePlayer gamePlayer : GamePlugin.getGamePlugin().getOnlineGamePlayers()) {
+            if (gamePlayer.getState().equals(state)) {
+                result.add(gamePlayer.bukkit());
             }
         }
 
@@ -146,7 +146,8 @@ public class GamePlayerManager implements PlayerManager {
             cameraPlayers.add(gp);
 
             GamePlugin.getGamePlugin().getMessenger().send(p, "§7Du bist nun in der Ansicht des Spielers §f" + t.getName());
-        } else throw new IllegalStateException("Could not set player "+p.getName()+" to camera mode. Player is not a spectator!");
+        } else
+            throw new IllegalStateException("Could not set player " + p.getName() + " to camera mode. Player is not a spectator!");
     }
 
     public void removeFromCameraMode(GamePlayer gp) {
@@ -157,7 +158,8 @@ public class GamePlayerManager implements PlayerManager {
             cameraPlayers.remove(gp);
 
             GamePlugin.getGamePlugin().getMessenger().send(p, "§7Du hast die Kameraansicht verlassen!");
-        } else throw new IllegalStateException("Could not remove player "+p.getName()+" from camera mode. Player is not in camera mode!");
+        } else
+            throw new IllegalStateException("Could not remove player " + p.getName() + " from camera mode. Player is not in camera mode!");
     }
 
     public void openSpectatorInventory(Player player) {
@@ -180,5 +182,4 @@ public class GamePlayerManager implements PlayerManager {
         camera.a = t.getEntityId();
         ((CraftPlayer) p).getHandle().playerConnection.sendPacket(camera);
     }
-
 }

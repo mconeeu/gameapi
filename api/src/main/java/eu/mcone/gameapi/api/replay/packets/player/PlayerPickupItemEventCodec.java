@@ -1,6 +1,7 @@
 package eu.mcone.gameapi.api.replay.packets.player;
 
 import eu.mcone.coresystem.api.bukkit.codec.Codec;
+import eu.mcone.gameapi.api.replay.runner.AsyncPlayerRunner;
 import eu.mcone.gameapi.api.replay.runner.PlayerRunner;
 import lombok.Getter;
 import net.minecraft.server.v1_8_R3.PacketPlayOutEntityDestroy;
@@ -13,10 +14,12 @@ import java.io.*;
 @Getter
 public class PlayerPickupItemEventCodec extends Codec<PlayerPickupItemEvent, PlayerRunner> {
 
+    public static final byte CODEC_VERSION = 1;
+
     private int entityID;
 
     public PlayerPickupItemEventCodec() {
-        super((byte) 0, (byte) 0);
+        super((byte) 11, (byte) 3);
     }
 
     @Override
@@ -27,8 +30,15 @@ public class PlayerPickupItemEventCodec extends Codec<PlayerPickupItemEvent, Pla
 
     @Override
     public void encode(PlayerRunner runner) {
-        for (Player player : runner.getWatchers()) {
-            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityDestroy(entityID));
+        if (entityID != 0) {
+            System.out.println("ENTITY ID != 0");
+            int id = runner.getContainer().getEntities().getOrDefault(entityID, 0);
+            if (id != 0) {
+                System.out.println("ID != 0");
+                for (Player player : runner.getViewers()) {
+                    ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityDestroy(id));
+                }
+            }
         }
     }
 

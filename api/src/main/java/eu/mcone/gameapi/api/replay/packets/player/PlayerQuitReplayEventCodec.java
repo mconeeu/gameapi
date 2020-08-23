@@ -14,8 +14,10 @@ import java.io.*;
 @Getter
 public class PlayerQuitReplayEventCodec extends Codec<PlayerQuitReplayEvent, PlayerNpc> {
 
+    public static final byte CODEC_VERSION = 1;
+
     public PlayerQuitReplayEventCodec() {
-        super((byte) 0, (byte) 0);
+        super((byte) 8, (byte) 2);
     }
 
     @Override

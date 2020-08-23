@@ -2,11 +2,12 @@ package eu.mcone.gameapi.api.replay.packets.player;
 
 import eu.mcone.coresystem.api.bukkit.codec.Codec;
 import eu.mcone.coresystem.api.bukkit.util.ReflectionManager;
+import eu.mcone.gameapi.api.replay.runner.AsyncPlayerRunner;
 import eu.mcone.gameapi.api.replay.runner.PlayerRunner;
 import lombok.Getter;
 import net.minecraft.server.v1_8_R3.Entity;
 import net.minecraft.server.v1_8_R3.PacketPlayOutSpawnEntity;
-import org.bukkit.craftbukkit.v1_8_R3.metadata.EntityMetadataStore;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
@@ -15,6 +16,8 @@ import java.lang.reflect.Field;
 
 @Getter
 public class PacketPlayOutSpawnEntityCodec extends Codec<PacketPlayOutSpawnEntity, PlayerRunner> {
+
+    public static final byte CODEC_VERSION = 1;
 
     private int id;
     private int typ; //j
@@ -27,7 +30,7 @@ public class PacketPlayOutSpawnEntityCodec extends Codec<PacketPlayOutSpawnEntit
     private int pitch;
 
     public PacketPlayOutSpawnEntityCodec() {
-        super((byte) 0, (byte) 0);
+        super((byte) 30, (byte) 3);
     }
 
     @Override
@@ -65,8 +68,11 @@ public class PacketPlayOutSpawnEntityCodec extends Codec<PacketPlayOutSpawnEntit
         ReflectionManager.setValue(spawnEntity, "d", z);
         ReflectionManager.setValue(spawnEntity, "h", yaw);
         ReflectionManager.setValue(spawnEntity, "i", pitch);
-
         runner.getContainer().getEntities().put(this.id, id);
+
+        for (Player player : runner.getViewers()) {
+            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(spawnEntity);
+        }
     }
 
     @Override
@@ -93,7 +99,7 @@ public class PacketPlayOutSpawnEntityCodec extends Codec<PacketPlayOutSpawnEntit
         pitch = in.readInt();
     }
 
-    private static synchronized int getNextEntityId() {
+    public static synchronized int getNextEntityId() {
         try {
             Field field = Entity.class.getDeclaredField("entityCount");
             field.setAccessible(true);

@@ -1,24 +1,22 @@
-package eu.mcone.gameapi.api.replay.event.runner;
+package eu.mcone.gameapi.api.replay.event;
 
+import eu.mcone.coresystem.api.bukkit.npc.entity.PlayerNpc;
 import eu.mcone.gameapi.api.replay.container.ReplayContainer;
-import eu.mcone.gameapi.api.replay.session.Replay;
-import eu.mcone.gameapi.api.replay.session.ReplayRecord;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import java.util.UUID;
-
 @RequiredArgsConstructor
 @Getter
-public class ReplayWatcherQuitEvent extends Event {
+public class PlayerJoinReplayCameraEvent extends Event {
 
     @Getter
     private static final HandlerList handlerList = new HandlerList();
-    private final Player player;
     private final ReplayContainer container;
+    private final Player player;
+    private final PlayerNpc playerNpc;
 
     public HandlerList getHandlers() {
         return handlerList;

@@ -41,6 +41,7 @@ import org.bukkit.entity.Player;
 import java.util.*;
 
 import static com.mongodb.MongoClientSettings.getDefaultCodecRegistry;
+import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.combine;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
@@ -52,8 +53,6 @@ public class GameBackpackManager implements BackpackManager {
             fromRegistries(getDefaultCodecRegistry(), fromProviders(new ItemStackCodecProvider(), PojoCodecProvider.builder().automatic(true).build()))
     ).getCollection("gamesystem_backpack_items", BackpackItemCategory.class);
 
-    @Getter
-    private final List<Option> gameOptions;
     private final CorePlugin gamePlugin, system;
     private final List<BackpackItemCategory> backpackItems;
     @Getter
@@ -75,13 +74,12 @@ public class GameBackpackManager implements BackpackManager {
     @Setter
     private int fallbackSlot = 2;
 
-    public GameBackpackManager(GameAPIPlugin system, GamePlugin gamePlugin, Option... gameOptions) {
+    public GameBackpackManager(GameAPIPlugin system, GamePlugin gamePlugin) {
         system.registerCommands(new ItemCMD(this));
         system.registerCommands(new OnePassCMD());
         system.registerCommands(new TradeCMD());
         system.registerEvents(new BackpackListener(this));
 
-        this.gameOptions = Arrays.asList(gameOptions);
         this.gamePlugin = gamePlugin;
         this.system = system;
         this.backpackItems = new ArrayList<>();
@@ -91,7 +89,7 @@ public class GameBackpackManager implements BackpackManager {
 
         system.sendConsoleMessage("§aLoading BackpackManager...");
 
-        if (Arrays.asList(gameOptions).contains(Option.BACKPACK_MANAGER_USE_RANK_BOOTS)) {
+        if (GamePlugin.getGamePlugin().hasOption(Option.BACKPACK_MANAGER_USE_RANK_BOOTS)) {
             useRankBoots = true;
 
             //Not needed because the boots are set in the CorePlayerLoaded Event
@@ -249,7 +247,7 @@ public class GameBackpackManager implements BackpackManager {
     public void reload() {
         backpackItems.clear();
 
-        registerDefaultCategories(gameOptions);
+        registerDefaultCategories();
 
         //Load all Categories that are marked for additional loading
         List<Bson> searchQuery = new ArrayList<>();
@@ -259,7 +257,7 @@ public class GameBackpackManager implements BackpackManager {
         //Load all categories that belongs to this gamemode automatically
         searchQuery.add(eq("category.gamemode", gamePlugin.getGamemode().toString()));
 
-        for (BackpackItemCategory item : BACKPACK_ITEM_GAMEMODE_COLLECTION.find(combine(searchQuery.toArray(new Bson[0])))) {
+        for (BackpackItemCategory item : BACKPACK_ITEM_GAMEMODE_COLLECTION.find(and(searchQuery.toArray(new Bson[0])))) {
             system.sendConsoleMessage("§2Loading Backpack Category " + item.getCategory().getName());
             this.backpackItems.add(item);
         }

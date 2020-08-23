@@ -5,13 +5,15 @@
 
 package eu.mcone.gameapi.player;
 
+import com.sun.org.apache.xpath.internal.operations.Mod;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
-import eu.mcone.coresystem.api.bukkit.player.Stats;
+import eu.mcone.coresystem.api.bukkit.stats.CoreStats;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Module;
+import eu.mcone.gameapi.api.Option;
 import eu.mcone.gameapi.api.achievement.Achievement;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
@@ -24,6 +26,7 @@ import eu.mcone.gameapi.api.onepass.OnePassManager;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.GamePlayerSettings;
 import eu.mcone.gameapi.api.player.GamePlayerState;
+import eu.mcone.gameapi.api.stats.StatsHistory;
 import eu.mcone.gameapi.api.team.Team;
 import eu.mcone.gameapi.kit.GameKitManager;
 import eu.mcone.gameapi.team.GameTeamManager;
@@ -55,7 +58,9 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
     @Setter
     private boolean effectsVisible = true;
     @Getter
-    private int roundKills, roundDeaths, roundGoals, oneLevel, oneXp;
+    private final StatsHistory statsHistory;
+    @Getter
+    private int oneLevel, oneXp;
     @Getter
     private boolean onePass;
 
@@ -65,14 +70,15 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
     private Team team;
 
     @Getter
-    private final Stats stats;
+    private final CoreStats stats;
 
     public GameAPIPlayer(CorePlayer player) {
         super(player);
         this.player = player.bukkit();
 
+        statsHistory = new StatsHistory();
         this.stats = GamePlugin.isGamePluginInitialized() && GamePlugin.getGamePlugin().getGamemode() != null
-                ? player.getStats(GamePlugin.getGamePlugin().getGamemode())
+                ? player.getStats(GamePlugin.getGamePlugin().getGamemode(), CoreStats.class)
                 : null;
     }
 
@@ -98,14 +104,20 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
 
     @Override
     public void saveData() {
+        CoreSystem.getInstance().getCoreStatsManager().save(stats);
+
+        if (GamePlugin.getGamePlugin().hasModule(Module.GAME_HISTORY_MANAGER)) {
+            if (GamePlugin.getGamePlugin().hasOption(Option.GAME_HISTORY_HISTORY_MODE)) {
+                GamePlugin.getGamePlugin().getGameHistoryManager().getCurrentGameHistory().getPlayer(player).setStatsHistory(statsHistory);
+            }
+        }
+
         system.saveGameProfile(new GameAPIPlayerProfile(corePlayer.bukkit(), backpackItems, achievements, oneLevel, oneXp, onePass));
     }
-
 
     /*
      * Backpack System
      */
-
     @Override
     public void addBackpackItem(String category, BackpackItem item) throws IllegalArgumentException {
         if (GamePlugin.getGamePlugin().getBackpackManager().categoryExists(category)) {
@@ -328,47 +340,58 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
      */
 
     public void addKills(int kills) {
-        this.roundKills = this.roundKills + kills;
+        statsHistory.addKills(kills);
         stats.addKills(kills);
         callStatsEvent();
     }
 
+    @Override
     public void addDeaths(int deaths) {
-        this.roundDeaths = this.roundDeaths + deaths;
+        statsHistory.addDeaths(deaths);
         stats.addDeaths(deaths);
         callStatsEvent();
     }
 
+    @Override
     public void addGoals(int goals) {
-        this.roundGoals = this.roundGoals + goals;
-        stats.addGoal(goals);
+        statsHistory.addGoals(goals);
+        stats.addGoals(goals);
         callStatsEvent();
     }
 
+    @Override
     public void addLose(int loses) {
-        stats.addLoses(loses);
+        stats.addLosses(loses);
         callStatsEvent();
     }
 
     private void callStatsEvent() {
-        GamePlugin.getGamePlugin().getServer().getPluginManager().callEvent(new PlayerRoundStatsChangeEvent(player, roundKills, roundDeaths, roundGoals));
+        GamePlugin.getGamePlugin().getServer().getPluginManager().callEvent(new PlayerRoundStatsChangeEvent(player, statsHistory.getKills(), statsHistory.getDeaths(), statsHistory.getGoals()));
     }
 
+    @Override
     public double getRoundKD() {
-        double KD = (double) roundDeaths / roundKills;
-
-        if (KD <= 0.0) {
-            return 0;
-        } else {
-            return KD;
-        }
+        return statsHistory.getKD();
     }
 
+    @Override
+    public int getRoundKills() {
+        return statsHistory.getKills();
+    }
+
+    @Override
+    public int getRoundDeaths() {
+        return statsHistory.getDeaths();
+    }
+
+    @Override
+    public int getRoundGoals() {
+        return statsHistory.getGoals();
+    }
 
     /*
      * Kit System
      */
-
     @Override
     public void modifyKit(final Kit kit, final Map<ItemStack, Integer> items) {
         GamePlugin.getGamePlugin().getKitManager().modifyKit(bukkit(), kit, items);

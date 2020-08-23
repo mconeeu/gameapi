@@ -2,8 +2,12 @@ package eu.mcone.gameapi.api.replay.packets.player.inventory;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.codec.Codec;
+import eu.mcone.coresystem.api.bukkit.config.typeadapter.ItemStackTypeAdapterUtils;
+import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
+import eu.mcone.gameapi.api.replay.runner.AsyncPlayerRunner;
 import eu.mcone.gameapi.api.replay.runner.PlayerRunner;
 import lombok.Getter;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -15,45 +19,61 @@ import java.util.HashMap;
 @Getter
 public class InventoryCloseEventCodec extends Codec<InventoryCloseEvent, PlayerRunner> {
 
+    public static final byte CODEC_VERSION = 1;
+
+    private int material;
+    private String enchantments;
     private HashMap<Integer, ItemStack> content;
 
     public InventoryCloseEventCodec() {
-        super((byte) 0, (byte) 0);
+        super((byte) 17, (byte) 3);
     }
 
     @Override
     public Object[] decode(Player player, InventoryCloseEvent closeEvent) {
-        if (closeEvent.getInventory().getType().equals(InventoryType.CRAFTING)) {
-            content = new HashMap<>();
-
-            for (int i = 0; i < closeEvent.getPlayer().getInventory().getSize(); i++) {
-                ItemStack item = closeEvent.getPlayer().getInventory().getItem(i);
-
-                if (item != null) {
-                    content.put(i, item);
-                }
-            }
-
-            return new Object[]{closeEvent.getPlayer()};
+        Player invOwner = (Player) closeEvent.getPlayer();
+        //Item in hand
+        ItemStack itemStack = closeEvent.getPlayer().getItemInHand();
+        if (itemStack != null) {
+            this.material = itemStack.getType().getId();
+            this.enchantments = ItemStackTypeAdapterUtils.serializeEnchantments(itemStack.getEnchantments());
         }
 
-        return null;
+        //Inventory
+        content = new HashMap<>();
+
+        for (int i = 0; i < invOwner.getInventory().getSize(); i++) {
+            ItemStack item = invOwner.getInventory().getItem(i);
+
+            if (item != null) {
+                content.put(i, item);
+            }
+        }
+
+        return new Object[]{closeEvent.getPlayer()};
     }
 
     @Override
     public void encode(PlayerRunner runner) {
+        runner.getPlayer().getNpc().setItemInHand(getItem());
         runner.getPlayer().setInventoryItems(content);
     }
 
     @Override
     protected void onWriteObject(DataOutputStream out) throws IOException {
-        String json = CoreSystem.getInstance().getGson().toJson(content);
-        out.writeUTF(json);
+        out.writeInt(material);
+        out.writeUTF(enchantments);
+        out.writeUTF(CoreSystem.getInstance().getGson().toJson(content));
     }
 
     @Override
     protected void onReadObject(DataInputStream in) throws IOException {
+        material = in.readInt();
+        enchantments = in.readUTF();
         content = (HashMap<Integer, ItemStack>) CoreSystem.getInstance().getGson().fromJson(in.readUTF(), HashMap.class);
     }
 
+    public ItemStack getItem() {
+        return new ItemBuilder(Material.getMaterial(material), 1).enchantments(ItemStackTypeAdapterUtils.getEnchantments(enchantments)).create();
+    }
 }

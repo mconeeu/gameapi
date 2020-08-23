@@ -155,7 +155,7 @@ public class StatsWall {
     private void setSign(final Location pos1, final OfflineCorePlayer offlinePlayer, final Document document, final int place) {
         Sign sign = (Sign) pos1.getBlock().getState();
         sign.setLine(0, "Platz #" + place);
-        sign.setLine(1, offlinePlayer.getMainGroup().getFormattingCode() + offlinePlayer.getName());
+        sign.setLine(1, offlinePlayer.getMainGroup().getPrefix() + offlinePlayer.getName());
         sign.setLine(2, document.getInteger("kill") + " Kills");
         sign.setLine(3, getKD(document) + " K/D");
         sign.update();

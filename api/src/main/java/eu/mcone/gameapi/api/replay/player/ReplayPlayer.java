@@ -3,13 +3,16 @@ package eu.mcone.gameapi.api.replay.player;
 import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.coresystem.api.bukkit.npc.entity.PlayerNpc;
 import eu.mcone.coresystem.api.bukkit.world.CoreLocation;
+import eu.mcone.gameapi.api.replay.container.ReplayContainer;
 import eu.mcone.gameapi.api.replay.objectives.ReplayPlayerSidebarObjective;
+import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
 import java.util.UUID;
 
+@BsonDiscriminator
 public interface ReplayPlayer {
 
     UUID getUuid();
@@ -44,9 +47,9 @@ public interface ReplayPlayer {
 
     void setInventoryItem(int slot, ItemStack itemStack);
 
-    void openInventory(Player player);
+    void openInventory(ReplayContainer container, Player player);
 
-    ReplayPlayer.Stats getStats();
+    Stats getStats();
 
     int getHealth();
 

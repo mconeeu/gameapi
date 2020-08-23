@@ -1,11 +1,11 @@
 package eu.mcone.gameapi.api.replay.packets.player;
 
 import eu.mcone.coresystem.api.bukkit.codec.Codec;
-import eu.mcone.coresystem.api.bukkit.npc.entity.PlayerNpc;
 import eu.mcone.coresystem.api.bukkit.util.ReflectionManager;
+import eu.mcone.gameapi.api.replay.runner.AsyncPlayerRunner;
 import eu.mcone.gameapi.api.replay.runner.PlayerRunner;
 import lombok.Getter;
-import net.minecraft.server.v1_8_R3.PacketPlayOutEntityDestroy;
+import net.minecraft.server.v1_8_R3.MathHelper;
 import net.minecraft.server.v1_8_R3.PacketPlayOutSpawnEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -13,8 +13,12 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 
 import java.io.*;
 
+import static eu.mcone.gameapi.api.replay.packets.player.PacketPlayOutSpawnEntityCodec.getNextEntityId;
+
 @Getter
 public class PlayerDropItemEventCodec extends Codec<PlayerDropItemEvent, PlayerRunner> {
+
+    public static final byte CODEC_VERSION = 1;
 
     private int entityID;
     private double x;
@@ -22,7 +26,7 @@ public class PlayerDropItemEventCodec extends Codec<PlayerDropItemEvent, PlayerR
     private double z;
 
     public PlayerDropItemEventCodec() {
-        super((byte) 0, (byte) 0);
+        super((byte) 12, (byte) 3);
     }
 
     @Override
@@ -36,14 +40,17 @@ public class PlayerDropItemEventCodec extends Codec<PlayerDropItemEvent, PlayerR
 
     @Override
     public void encode(PlayerRunner runner) {
-        for (Player player : runner.getWatchers()) {
-            PacketPlayOutSpawnEntity spawnEntity = new PacketPlayOutSpawnEntity();
-            ReflectionManager.setValue(spawnEntity, "a", entityID);
-            ReflectionManager.setValue(spawnEntity, "b", x);
-            ReflectionManager.setValue(spawnEntity, "c", y);
-            ReflectionManager.setValue(spawnEntity, "d", z);
-            ReflectionManager.setValue(spawnEntity, "h", 0);
-            ReflectionManager.setValue(spawnEntity, "i", 0);
+        PacketPlayOutSpawnEntity spawnEntity = new PacketPlayOutSpawnEntity();
+        int nextID = getNextEntityId();
+        ReflectionManager.setValue(spawnEntity, "a", nextID);
+        ReflectionManager.setValue(spawnEntity, "b", MathHelper.floor(x * 32.0D));
+        ReflectionManager.setValue(spawnEntity, "c", MathHelper.floor(y * 32.0D));
+        ReflectionManager.setValue(spawnEntity, "d", MathHelper.floor(z * 32.0D));
+        ReflectionManager.setValue(spawnEntity, "h", 0);
+        ReflectionManager.setValue(spawnEntity, "i", 0);
+        runner.getContainer().getEntities().put(entityID, nextID);
+
+        for (Player player : runner.getViewers()) {
             ((CraftPlayer) player).getHandle().playerConnection.sendPacket(spawnEntity);
         }
     }

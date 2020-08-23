@@ -2,6 +2,7 @@ package eu.mcone.gameapi.api.replay.packets.player;
 
 import eu.mcone.coresystem.api.bukkit.codec.Codec;
 import eu.mcone.coresystem.api.bukkit.npc.entity.PlayerNpc;
+import lombok.Getter;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
@@ -10,14 +11,17 @@ import org.bukkit.util.Vector;
 
 import java.io.*;
 
+@Getter
 public class EntityDamageByEntityEventCodec extends Codec<EntityDamageByEntityEvent, PlayerNpc> {
+
+    public static final byte CODEC_VERSION = 1;
 
     private double x;
     private double y;
     private double z;
 
     public EntityDamageByEntityEventCodec() {
-        super((byte) 0, (byte) 0);
+        super((byte) 15, (byte) 2);
     }
 
     @Override

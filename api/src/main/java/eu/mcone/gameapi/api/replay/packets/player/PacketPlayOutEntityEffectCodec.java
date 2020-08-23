@@ -2,6 +2,7 @@ package eu.mcone.gameapi.api.replay.packets.player;
 
 import eu.mcone.coresystem.api.bukkit.codec.Codec;
 import eu.mcone.coresystem.api.bukkit.util.ReflectionManager;
+import eu.mcone.gameapi.api.replay.runner.AsyncPlayerRunner;
 import eu.mcone.gameapi.api.replay.runner.PlayerRunner;
 import lombok.Getter;
 import net.minecraft.server.v1_8_R3.MobEffect;
@@ -17,11 +18,13 @@ import java.io.*;
 @Getter
 public class PacketPlayOutEntityEffectCodec extends Codec<PacketPlayOutEntityEffect, PlayerRunner> {
 
+    public static final byte CODEC_VERSION = 1;
+
     private byte typ;
     private byte amplifier;
 
     public PacketPlayOutEntityEffectCodec() {
-        super((byte) 0, (byte) 0);
+        super((byte) 28, (byte) 3);
     }
 
     @Override
@@ -35,7 +38,7 @@ public class PacketPlayOutEntityEffectCodec extends Codec<PacketPlayOutEntityEff
     @Override
     public void encode(PlayerRunner runner) {
         for (PotionEffect effect : getPotion().getEffects()) {
-            runner.getPlayer().getNpc().addPotionEffect(new MobEffect(typ, effect.getDuration(), effect.getAmplifier(), effect.isAmbient(), effect.hasParticles()), runner.getWatchers().toArray(new Player[0]));
+            runner.getPlayer().getNpc().addPotionEffect(new MobEffect(typ, effect.getDuration(), effect.getAmplifier(), effect.isAmbient(), effect.hasParticles()), runner.getViewers().toArray(new Player[0]));
         }
     }
 
@@ -52,6 +55,6 @@ public class PacketPlayOutEntityEffectCodec extends Codec<PacketPlayOutEntityEff
     }
 
     public Potion getPotion() {
-        return new Potion(PotionType.getByEffect(PotionEffectType.getById(typ)), amplifier);
+        return new Potion(PotionType.getByEffect(PotionEffectType.getById(typ)), 2);
     }
 }

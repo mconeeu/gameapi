@@ -14,9 +14,9 @@ import java.util.List;
 @Getter
 public class GameAPIMap {
 
-    private String name;
-    private List<String> lore;
-    private Material item;
+    private final String name;
+    private final List<String> lore;
+    private final Material item;
 
     public CoreWorld getWorld() {
         return CoreSystem.getInstance().getWorldManager().getWorld(name);

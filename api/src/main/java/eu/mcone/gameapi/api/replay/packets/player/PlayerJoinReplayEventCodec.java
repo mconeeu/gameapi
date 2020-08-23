@@ -5,6 +5,7 @@ import eu.mcone.coresystem.api.bukkit.event.npc.NpcAnimationStateChangeEvent;
 import eu.mcone.coresystem.api.bukkit.spawnable.ListMode;
 import eu.mcone.coresystem.api.bukkit.world.CoreLocation;
 import eu.mcone.gameapi.api.replay.event.PlayerJoinReplayEvent;
+import eu.mcone.gameapi.api.replay.runner.AsyncPlayerRunner;
 import eu.mcone.gameapi.api.replay.runner.PlayerRunner;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -15,6 +16,8 @@ import java.io.*;
 @Getter
 public class PlayerJoinReplayEventCodec extends Codec<PlayerJoinReplayEvent, PlayerRunner> {
 
+    public static final byte CODEC_VERSION = 1;
+
     private String world;
     private double x;
     private double y;
@@ -23,7 +26,7 @@ public class PlayerJoinReplayEventCodec extends Codec<PlayerJoinReplayEvent, Pla
     private float pitch;
 
     public PlayerJoinReplayEventCodec() {
-        super((byte) 0, (byte) 0);
+        super((byte) 7, (byte) 3);
     }
 
     @Override
@@ -41,7 +44,7 @@ public class PlayerJoinReplayEventCodec extends Codec<PlayerJoinReplayEvent, Pla
     @Override
     public void encode(PlayerRunner runner) {
         runner.getPlayer().getNpc().teleport(getLocation());
-        runner.getPlayer().getNpc().togglePlayerVisibility(ListMode.WHITELIST, runner.getWatchers().toArray(new Player[0]));
+        runner.getPlayer().getNpc().togglePlayerVisibility(ListMode.WHITELIST, runner.getContainer().getViewers().toArray(new Player[0]));
         Bukkit.getPluginManager().callEvent(new NpcAnimationStateChangeEvent(runner.getPlayer().getNpc(), NpcAnimationStateChangeEvent.NpcAnimationState.START));
     }
 

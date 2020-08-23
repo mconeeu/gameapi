@@ -3,7 +3,8 @@ package eu.mcone.gameapi.replay.inventory;
 import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
 import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
-import eu.mcone.gameapi.replay.player.ReplayPlayer;
+import eu.mcone.gameapi.api.replay.container.ReplayContainer;
+import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -12,7 +13,7 @@ import java.util.Map;
 
 public class ReplayPlayerInventory extends CoreInventory {
 
-    public ReplayPlayerInventory(Player player, ReplayPlayer replay, Map<Integer, ItemStack> items) {
+    public ReplayPlayerInventory(Player player, ReplayContainer container, ReplayPlayer replay, Map<Integer, ItemStack> items) {
         super(replay.getDisplayName(), player, InventorySlot.ROW_5);
 
         if (!items.isEmpty()) {
@@ -31,7 +32,7 @@ public class ReplayPlayerInventory extends CoreInventory {
         setItem(InventorySlot.ROW_5_SLOT_6, CoreInventory.PLACEHOLDER_ITEM);
         setItem(InventorySlot.ROW_5_SLOT_7, CoreInventory.PLACEHOLDER_ITEM);
         setItem(InventorySlot.ROW_5_SLOT_8, CoreInventory.PLACEHOLDER_ITEM);
-        setItem(InventorySlot.ROW_5_SLOT_9, CoreInventory.BACK_ITEM, e -> new ReplayPlayerInteractInventory(replay, player));
+        setItem(InventorySlot.ROW_5_SLOT_9, CoreInventory.BACK_ITEM, e -> new ReplayPlayerInteractInventory(container, replay, player));
         openInventory();
     }
 }

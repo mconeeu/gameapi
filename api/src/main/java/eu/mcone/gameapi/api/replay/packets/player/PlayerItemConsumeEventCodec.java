@@ -1,6 +1,7 @@
 package eu.mcone.gameapi.api.replay.packets.player;
 
 import eu.mcone.coresystem.api.bukkit.codec.Codec;
+import eu.mcone.gameapi.api.replay.runner.AsyncPlayerRunner;
 import eu.mcone.gameapi.api.replay.runner.PlayerRunner;
 import lombok.Getter;
 import net.minecraft.server.v1_8_R3.MobEffect;
@@ -16,11 +17,13 @@ import java.io.*;
 @Getter
 public class PlayerItemConsumeEventCodec extends Codec<PlayerItemConsumeEvent, PlayerRunner> {
 
+    public static final byte CODEC_VERSION = 1;
+
     private String typ;
     private int level;
 
     public PlayerItemConsumeEventCodec() {
-        super((byte) 0, (byte) 0);
+        super((byte) 21, (byte) 3);
     }
 
     @Override
@@ -38,7 +41,7 @@ public class PlayerItemConsumeEventCodec extends Codec<PlayerItemConsumeEvent, P
     @Override
     public void encode(PlayerRunner runner) {
         for (PotionEffect effect : getPotion().getEffects()) {
-            runner.getPlayer().getNpc().addPotionEffect(new MobEffect(effect.getType().getId(), effect.getDuration(), effect.getAmplifier(), effect.isAmbient(), effect.hasParticles()), runner.getWatchers().toArray(new Player[0]));
+            runner.getPlayer().getNpc().addPotionEffect(new MobEffect(effect.getType().getId(), effect.getDuration(), effect.getAmplifier(), effect.isAmbient(), effect.hasParticles()), runner.getViewers().toArray(new Player[0]));
         }
     }
 

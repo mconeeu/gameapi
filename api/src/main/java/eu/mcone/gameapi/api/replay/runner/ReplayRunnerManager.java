@@ -49,9 +49,9 @@ public interface ReplayRunnerManager {
 
     HashSet<Player> getWatchers();
 
-    Collection<PlayerRunner> getSingleRunners();
+    Collection<AsyncPlayerRunner> getSingleRunners();
 
-    PlayerRunner createSingleRunner(final ReplayPlayer replayPlayer);
+    AsyncPlayerRunner createSingleRunner(final ReplayPlayer replayPlayer);
 
     void openSpectatorInventory(Player player);
 }

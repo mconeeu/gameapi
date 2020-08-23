@@ -1,9 +1,8 @@
-package eu.mcone.gameapi.replay.session;
+package eu.mcone.gameapi.replay;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
-import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import eu.mcone.gameapi.api.GamePlugin;
-import eu.mcone.gameapi.api.Option;
+import eu.mcone.gameapi.api.game.GameHistory;
 import eu.mcone.gameapi.api.replay.event.PlayerJoinReplayEvent;
 import eu.mcone.gameapi.api.replay.event.PlayerQuitReplayEvent;
 import eu.mcone.gameapi.api.replay.exception.ReplayPlayerAlreadyExistsException;
@@ -19,37 +18,39 @@ import java.util.*;
 
 @Getter
 @Setter
-public class ReplayRecord implements eu.mcone.gameapi.api.replay.session.ReplayRecord {
+public class ReplayRecord implements eu.mcone.gameapi.api.replay.ReplayRecord {
 
     @Getter
     private String ID;
-    private Gamemode gamemode;
-    private List<Option> options;
+    @Getter
+    private String gameID;
 
     private Map<String, eu.mcone.gameapi.api.replay.player.ReplayPlayer> players;
     private ReplayRecorder recorder;
 
-    public ReplayRecord(final String ID, final Gamemode gamemode, Option... options) {
+    public ReplayRecord(String ID, String gameID) {
         this.ID = ID;
-        this.gamemode = gamemode;
-        this.options = Arrays.asList(options);
+        this.gameID = gameID;
 
         players = new HashMap<>();
         recorder = new ReplayRecorder(this, GamePlugin.getGamePlugin().getReplayManager().getCodecRegistry());
     }
 
-    public ReplayRecord(final Gamemode gamemode, final Option... options) {
+    public ReplayRecord(String gameID) {
         this.ID = IDUtils.generateID();
 
         if (GamePlugin.getGamePlugin().getReplayManager().existsReplay(ID)) {
             ID = IDUtils.generateID();
         }
 
-        this.gamemode = gamemode;
-        this.options = Arrays.asList(options);
+        this.gameID = gameID;
 
         players = new HashMap<>();
         recorder = new ReplayRecorder(this, GamePlugin.getGamePlugin().getReplayManager().getCodecRegistry());
+    }
+
+    public GameHistory getGameHistory() {
+        return GamePlugin.getGamePlugin().getGameHistoryManager().getCurrentGameHistory();
     }
 
     public void recordSession() {

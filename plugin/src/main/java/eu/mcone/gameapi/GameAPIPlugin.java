@@ -4,7 +4,6 @@ import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.gameapi.achievement.GameAchievementManager;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
-import eu.mcone.gameapi.api.Option;
 import eu.mcone.gameapi.api.achievement.AchievementManager;
 import eu.mcone.gameapi.api.backpack.BackpackManager;
 import eu.mcone.gameapi.api.damage.DamageLogger;
@@ -14,6 +13,7 @@ import eu.mcone.gameapi.api.onepass.OnePassManager;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.backpack.GameBackpackManager;
 import eu.mcone.gameapi.damage.GameDamageLogger;
+import eu.mcone.gameapi.game.GameHistoryManager;
 import eu.mcone.gameapi.gamestate.GameStateManager;
 import eu.mcone.gameapi.kit.GameKitManager;
 import eu.mcone.gameapi.listener.GamePlayerListener;
@@ -21,7 +21,7 @@ import eu.mcone.gameapi.map.GameMapManager;
 import eu.mcone.gameapi.onepass.GameOnePassManager;
 import eu.mcone.gameapi.player.GameAPIPlayer;
 import eu.mcone.gameapi.player.GamePlayerManager;
-import eu.mcone.gameapi.replay.session.ReplayManager;
+import eu.mcone.gameapi.replay.ReplayManager;
 import eu.mcone.gameapi.team.GameTeamManager;
 import lombok.Getter;
 import org.bukkit.entity.Player;
@@ -78,33 +78,28 @@ public class GameAPIPlugin extends GameAPI {
     }
 
     @Override
-    public BackpackManager constructBackpackManager(GamePlugin gamePlugin, Option... options) {
-        return new GameBackpackManager(this, gamePlugin, options);
+    public BackpackManager constructBackpackManager(GamePlugin gamePlugin) {
+        return new GameBackpackManager(this, gamePlugin);
     }
 
     @Override
-    public KitManager constructKitManager(GamePlugin gamePlugin, Option... options) {
-        return new GameKitManager(this, gamePlugin, options);
+    public KitManager constructKitManager(GamePlugin gamePlugin) {
+        return new GameKitManager(this, gamePlugin);
     }
 
     @Override
-    public AchievementManager constructAchievementManager(GamePlugin gamePlugin, Option... options) {
-        return new GameAchievementManager(gamePlugin, this, options);
+    public AchievementManager constructAchievementManager(GamePlugin gamePlugin) {
+        return new GameAchievementManager(gamePlugin, this);
     }
 
     @Override
-    public ReplayManager constructReplayManager(Option... options) {
-        return new ReplayManager(options);
+    public ReplayManager constructReplayManager() {
+        return new ReplayManager();
     }
 
-//    @Override
-//    public GameStateManager constructGameStatsManager(GamePlugin gamePlugin) {
-//        return new GameStateManager(this, gamePlugin);
-//    }
-
     @Override
-    public GameTeamManager constructTeamManager(GamePlugin gamePlugin, Option[] options) {
-        return new GameTeamManager(gamePlugin, this, options);
+    public GameTeamManager constructTeamManager(GamePlugin gamePlugin) {
+        return new GameTeamManager(gamePlugin, this);
     }
 
     @Override
@@ -115,6 +110,11 @@ public class GameAPIPlugin extends GameAPI {
     @Override
     public OnePassManager constructOnePassManager() {
         return new GameOnePassManager();
+    }
+
+    @Override
+    public GameHistoryManager constructGameHistoryManager() {
+        return new GameHistoryManager();
     }
 
     @Override

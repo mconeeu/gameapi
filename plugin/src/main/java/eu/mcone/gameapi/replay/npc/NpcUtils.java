@@ -14,25 +14,23 @@ import java.util.UUID;
 
 public class NpcUtils {
 
-    public static PlayerNpc constructNpcForPlayer(final ReplayPlayer player, final UUID containerUUID, Player... watchers) {
+    public static PlayerNpc constructNpcForPlayer(final ReplayPlayer player, final UUID containerUUID, Player... viewers) {
         return (PlayerNpc) CoreSystem.getInstance().getNpcManager().addNPC(new NpcData(
-                        EntityType.PLAYER,
-                        containerUUID + "_" + player.getDisplayName(),
-//                        (player.getData().isReported() ? "§8[§cR§8] " + player.getData().getName() : player.getData().getDisplayName()),
-                        (player.isReported() ? "§8[§cR§8] " + player.getDisplayName() : player.getDisplayName()),
-                        player.getSpawnLocation(),
-                        new PlayerNpcData
-                                (
-                                        player.getDisplayName(),
-                                        //TODO: Insert tab prefix
-                                        (player.isReported() ? "§8[§cR§8] " + player.getDisplayName() : player.getDisplayName()),
-                                        SkinInfo.SkinType.PLAYER,
-                                        false,
-                                        false,
-                                        false,
-                                        null
-                                )
-                ), ListMode.WHITELIST, watchers
-        );
+                EntityType.PLAYER,
+                containerUUID + "_" + player.getName(),
+                (player.isReported() ? "§8[§cR§8] " + player.getName() : player.getName() + "_1"),
+                player.getSpawnLocation(),
+                new PlayerNpcData
+                        (
+                                player.getName(),
+                                //TODO: Insert tab prefix
+                                (player.isReported() ? "§8[§cR§8] " + player.getName() : player.getName() + "_1"),
+                                SkinInfo.SkinType.PLAYER,
+                                false,
+                                false,
+                                false,
+                                null
+                        )
+        ), ListMode.WHITELIST, viewers);
     }
 }

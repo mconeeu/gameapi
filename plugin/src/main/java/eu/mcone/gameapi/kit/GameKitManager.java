@@ -46,12 +46,11 @@ public class GameKitManager implements KitManager {
     @Getter
     private Kit defaultKit;
 
-    public GameKitManager(GameAPIPlugin system, GamePlugin plugin, Option... options) {
-        List<Option> optionList = Arrays.asList(options);
+    public GameKitManager(GameAPIPlugin system, GamePlugin plugin) {
 
-        this.clearInvOnKitSet = optionList.contains(Option.KIT_MANAGER_CLEAR_INVENTORY_ON_KIT_SET);
-        this.applyKitsOnce = optionList.contains(Option.KIT_MANAGER_APPLY_KITS_ONCE);
-        this.chooseKitsForServerLifetime = optionList.contains(Option.KIT_MANAGER_CHOOSE_KITS_FOR_SERVER_LIFETIME);
+        this.clearInvOnKitSet = GamePlugin.getGamePlugin().hasOption(Option.KIT_MANAGER_CLEAR_INVENTORY_ON_KIT_SET);
+        this.applyKitsOnce = GamePlugin.getGamePlugin().hasOption(Option.KIT_MANAGER_APPLY_KITS_ONCE);
+        this.chooseKitsForServerLifetime = GamePlugin.getGamePlugin().hasOption(Option.KIT_MANAGER_CHOOSE_KITS_FOR_SERVER_LIFETIME);
 
         this.system = system;
         this.plugin = plugin;

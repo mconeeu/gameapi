@@ -1,85 +1,78 @@
 package eu.mcone.gameapi.api.replay.container;
 
-import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
-import eu.mcone.coresystem.api.bukkit.item.Skull;
+import eu.mcone.coresystem.api.bukkit.npc.entity.PlayerNpc;
+import eu.mcone.gameapi.api.replay.Replay;
+import eu.mcone.gameapi.api.replay.chunk.ReplayChunkHandler;
 import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
+import eu.mcone.gameapi.api.replay.runner.AsyncPlayerRunner;
+import eu.mcone.gameapi.api.replay.runner.ReplayRunner;
 import eu.mcone.gameapi.api.replay.runner.ReplaySpeed;
-import eu.mcone.gameapi.api.replay.session.Replay;
-import org.bukkit.Material;
+import eu.mcone.gameapi.api.replay.utils.SkipUnit;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public interface ReplayContainer {
-
-    //Slot 1
-    ItemStack REPLAY_TELEPORT = new ItemBuilder(Material.COMPASS, 1).displayName("§7Teleporter").create();
-    //Slot 2
-    ItemStack REPLAY_INFORMATION = new ItemBuilder(Material.REDSTONE_COMPARATOR, 1).displayName("§eReplay").create();
-
-    //Slot 4
-    ItemStack REPLAY_SKIP_FORWARD = new Skull("natatos").setDisplayName("§7Überspringen").getItemStack();
-    //Slot 5
-    ItemStack REPLAY_PAUSE = new ItemBuilder(Material.WOOL, 1, 14).displayName("§7Pausieren").create();
-    //Slot 5
-    ItemStack REPLAY_START = new ItemBuilder(Material.WOOL, 1, 13).displayName("§7Vortfahren").create();
-    //Slot 6
-    ItemStack REPLAY_SKIP_BACKWARD = new Skull("saidus2").setDisplayName("§7Zurückspringen").getItemStack();
-
-    //Slot 7
-    ItemStack REPLAY_FORWARD = new Skull("MHF_ArrowRight").setDisplayName("§7Vorwährts§8/§7§lRückwährts").getItemStack();
-    //Slot 7
-    ItemStack REPLAY_BACKWARD = new Skull("MHF_ArrowLeft").setDisplayName("§7§lVorwährts§8/§7Rückwährts").getItemStack();
-    //Slot 8
-    ItemStack REPLAY_SPEED_INCREASE = new ItemBuilder(Material.EMERALD, 1).displayName("§7Vorspulen §8(§ex1.0§8)").create();
 
     Replay getReplay();
 
     UUID getContainerUUID();
 
-    boolean isPlaying();
+    int getTick();
 
-    AtomicInteger getCurrentTick();
+    boolean isPlaying();
 
     boolean isForward();
 
-    boolean isBackward();
+    boolean isShowProgress();
 
-    ReplaySpeed getReplaySpeed();
+    ReplaySpeed getSpeed();
 
-    HashSet<Player> getWatchers();
+    HashSet<Player> getViewers();
 
     HashMap<Integer, Integer> getEntities();
 
-    void addWatcher(final Player... players);
+    ReplayChunkHandler getChunkHandler();
 
-    void removeWatcher(final Player... players);
+    void addViewers(final Player... players);
 
-    void restart();
+    void removeViewers(final Player... players);
 
     void play();
 
+    void restart();
+
     void stop();
 
-    void startPlaying();
+    void playing(boolean playing);
 
-    void stopPlaying();
+    void forward(boolean forward);
 
-    void forward();
-
-    void backward();
+    void nextSpeed();
 
     void setSpeed(ReplaySpeed speed);
 
-    void skip(int ticks);
+    void skip(SkipUnit unit, int amount);
+
+    void addIdling(ReplayRunner replayRunner);
+
+    void removeIdling(ReplayRunner replayRunner);
+
+    boolean isInCamera(Player player);
+
+    void joinCamera(Player player, PlayerNpc playerNpc);
+
+    void leaveCamera(Player player);
+
+    AsyncPlayerRunner createAsyncRunner(final ReplayPlayer player);
+
+    AsyncPlayerRunner getAsyncRunner(ReplayPlayer player);
 
     void invite(final Player sender, final Player target);
 
-    eu.mcone.gameapi.api.replay.runner.PlayerRunner createSingleRunner(final ReplayPlayer replayPlayer);
-
     void openSpectatorInventory(Player player);
+
+    void showProgress(boolean show);
 }

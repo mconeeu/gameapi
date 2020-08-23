@@ -1,28 +1,29 @@
-package eu.mcone.gameapi.api.replay.session;
+package eu.mcone.gameapi.api.replay;
 
-import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
+import eu.mcone.gameapi.api.game.GameHistory;
 import eu.mcone.gameapi.api.replay.container.ReplayContainer;
+import eu.mcone.gameapi.api.replay.packets.server.MessageWrapper;
 import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
+import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+@BsonDiscriminator
 public interface Replay {
 
     String getID();
 
-    long getStarted();
-
-    long getStopped();
-
-    String getWinnerTeam();
-
     String getWorld();
 
-    Gamemode getGamemode();
-
     int getLastTick();
+
+    Map<String, List<MessageWrapper>> getMessages();
+
+    GameHistory getGameHistory();
 
     ReplayContainer createContainer();
 
@@ -39,8 +40,6 @@ public interface Replay {
     eu.mcone.gameapi.api.replay.player.ReplayPlayer getReplayPlayer(final Player player);
 
     Collection<ReplayPlayer> getPlayers();
-
-    Collection<ReplayPlayer> getPlayersAsObject();
 
     boolean existsReplayPlayer(final UUID uuid);
 

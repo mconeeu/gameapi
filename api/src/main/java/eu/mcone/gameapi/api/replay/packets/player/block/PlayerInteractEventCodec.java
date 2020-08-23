@@ -3,7 +3,10 @@ package eu.mcone.gameapi.api.replay.packets.player.block;
 import eu.mcone.coresystem.api.bukkit.codec.Codec;
 import eu.mcone.coresystem.api.bukkit.npc.enums.NpcAnimation;
 import eu.mcone.coresystem.api.bukkit.world.CoreLocation;
+import eu.mcone.gameapi.api.replay.runner.AsyncPlayerRunner;
 import eu.mcone.gameapi.api.replay.runner.PlayerRunner;
+import eu.mcone.gameapi.api.replay.runner.ReplayRunner;
+import lombok.Getter;
 import net.minecraft.server.v1_8_R3.EntityTNTPrimed;
 import net.minecraft.server.v1_8_R3.PacketPlayOutSpawnEntity;
 import org.bukkit.Material;
@@ -15,7 +18,10 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.io.*;
 
+@Getter
 public class PlayerInteractEventCodec extends Codec<PlayerInteractEvent, PlayerRunner> {
+
+    public static final byte CODEC_VERSION = 1;
 
     private eu.mcone.gameapi.api.replay.packets.player.block.Action action;
     private double x;
@@ -23,21 +29,17 @@ public class PlayerInteractEventCodec extends Codec<PlayerInteractEvent, PlayerR
     private double z;
 
     public PlayerInteractEventCodec() {
-        super((byte) 0, (byte) 0);
+        super((byte) 20, (byte) 3);
     }
 
     @Override
     public Object[] decode(Player player, PlayerInteractEvent interactEvent) {
         if (interactEvent.getAction().equals(Action.RIGHT_CLICK_BLOCK)
-                && interactEvent.getClickedBlock().getType().equals(org.bukkit.Material.TNT)
-                && interactEvent.getPlayer().getItemInHand().getType().equals(org.bukkit.Material.FLINT_AND_STEEL)) {
+                && interactEvent.getClickedBlock().getType().equals(Material.TNT)
+                && interactEvent.getPlayer().getItemInHand().getType().equals(Material.FLINT_AND_STEEL)) {
             x = interactEvent.getClickedBlock().getLocation().getX();
             x = interactEvent.getClickedBlock().getLocation().getY();
             z = interactEvent.getClickedBlock().getLocation().getZ();
-            action = eu.mcone.gameapi.api.replay.packets.player.block.Action.fromNMS(interactEvent.getAction());
-            return new Object[]{interactEvent.getPlayer()};
-        } else if (interactEvent.getAction().equals(Action.LEFT_CLICK_AIR)
-                || interactEvent.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
             action = eu.mcone.gameapi.api.replay.packets.player.block.Action.fromNMS(interactEvent.getAction());
             return new Object[]{interactEvent.getPlayer()};
         }
@@ -47,27 +49,21 @@ public class PlayerInteractEventCodec extends Codec<PlayerInteractEvent, PlayerR
 
     @Override
     public void encode(PlayerRunner runner) {
-        if (action != null) {
-            switch (action) {
-                case LEFT_CLICK_AIR:
-                case LEFT_CLICK_BLOCK:
-                    runner.getPlayer().getNpc().sendAnimation(NpcAnimation.SWING_ARM, runner.getWatchers().toArray(new Player[0]));
-                    break;
-                case RIGHT_CLICK_BLOCK:
-                    CoreLocation location = new CoreLocation(runner.getPlayer().getNpc().getLocation());
-                    location.setX(x);
-                    location.setZ(y);
-                    location.setZ(z);
+        if (action != null && runner.getPlayer() != null) {
+            if (action == eu.mcone.gameapi.api.replay.packets.player.block.Action.RIGHT_CLICK_BLOCK) {
+                CoreLocation location = new CoreLocation(runner.getPlayer().getNpc().getLocation());
+                location.setX(x);
+                location.setZ(y);
+                location.setZ(z);
 
-                    EntityTNTPrimed tnt = new EntityTNTPrimed(((CraftWorld) location.bukkit().getWorld()).getHandle());
-                    tnt.setPosition(location.getX(), location.getY(), location.getZ());
-                    PacketPlayOutSpawnEntity spawnEntity = new PacketPlayOutSpawnEntity(tnt, 50);
+                EntityTNTPrimed tnt = new EntityTNTPrimed(((CraftWorld) location.bukkit().getWorld()).getHandle());
+                tnt.setPosition(location.getX(), location.getY(), location.getZ());
+                PacketPlayOutSpawnEntity spawnEntity = new PacketPlayOutSpawnEntity(tnt, 50);
 
-                    for (Player player : runner.getWatchers()) {
-                        player.sendBlockChange(location.bukkit(), Material.AIR, (byte) 0);
-                        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(spawnEntity);
-                    }
-                    break;
+                for (Player player : runner.getViewers()) {
+                    player.sendBlockChange(location.bukkit(), Material.AIR, (byte) 0);
+                    ((CraftPlayer) player).getHandle().playerConnection.sendPacket(spawnEntity);
+                }
             }
         }
     }

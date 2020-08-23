@@ -5,6 +5,7 @@ import eu.mcone.coresystem.api.bukkit.config.typeadapter.ItemStackTypeAdapterUti
 import eu.mcone.coresystem.api.bukkit.event.armor.ArmorEquipEvent;
 import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
 import eu.mcone.coresystem.api.bukkit.npc.enums.EquipmentPosition;
+import eu.mcone.gameapi.api.replay.runner.AsyncPlayerRunner;
 import eu.mcone.gameapi.api.replay.runner.PlayerRunner;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -15,12 +16,14 @@ import java.io.IOException;
 
 public class ArmorEquipEventCodec extends Codec<ArmorEquipEvent, PlayerRunner> {
 
+    public static final byte CODEC_VERSION = 1;
+
     private int material;
     private String enchantments;
     private byte slot;
 
     public ArmorEquipEventCodec() {
-        super((byte) 0, (byte) 0);
+        super((byte) 16, (byte) 3);
     }
 
     @Override

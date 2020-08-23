@@ -6,6 +6,7 @@ import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import eu.mcone.gameapi.api.achievement.AchievementManager;
 import eu.mcone.gameapi.api.backpack.BackpackManager;
 import eu.mcone.gameapi.api.damage.DamageLogger;
+import eu.mcone.gameapi.api.game.GameHistoryManager;
 import eu.mcone.gameapi.api.gamestate.GameStateManager;
 import eu.mcone.gameapi.api.kit.KitManager;
 import eu.mcone.gameapi.api.map.MapManager;
@@ -13,18 +14,15 @@ import eu.mcone.gameapi.api.onepass.OnePassManager;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.PlayerManager;
 import eu.mcone.gameapi.api.replay.exception.GameModuleNotActiveException;
-import eu.mcone.gameapi.api.replay.session.ReplayManager;
-import eu.mcone.gameapi.api.replay.session.ReplayRecord;
+import eu.mcone.gameapi.api.replay.ReplayManager;
+import eu.mcone.gameapi.api.replay.ReplayRecord;
 import eu.mcone.gameapi.api.team.TeamManager;
 import eu.mcone.gameapi.api.utils.GameConfig;
 import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public abstract class GamePlugin extends CorePlugin {
 
@@ -32,7 +30,7 @@ public abstract class GamePlugin extends CorePlugin {
     private static GamePlugin gamePlugin;
 
     private final List<Module> modules;
-    private final Option[] options;
+    private final List<Option> options;
 
     private MapManager mapManager;
     private BackpackManager backpackManager;
@@ -45,6 +43,7 @@ public abstract class GamePlugin extends CorePlugin {
     private ReplayRecord replay;
     private DamageLogger damageLogger;
     private OnePassManager onePassManager;
+    private GameHistoryManager gameHistoryManager;
 
     @Getter
     private CoreJsonConfig<GameConfig> gameConfig;
@@ -58,7 +57,7 @@ public abstract class GamePlugin extends CorePlugin {
         gamePlugin = this;
 
         this.modules = new ArrayList<>();
-        this.options = options;
+        this.options = Arrays.asList(options);
     }
 
     protected GamePlugin(Gamemode pluginGamemode, String prefixTranslation, Option... options) {
@@ -70,7 +69,7 @@ public abstract class GamePlugin extends CorePlugin {
         gamePlugin = this;
 
         this.modules = new ArrayList<>();
-        this.options = options;
+        this.options = Arrays.asList(options);
     }
 
     @Override
@@ -86,6 +85,10 @@ public abstract class GamePlugin extends CorePlugin {
     @Override
     public void onDisable() {
         GameAPI.getInstance().withErrorLogging(() -> {
+            if (modules.contains(Module.GAME_HISTORY_MANAGER)) {
+                gameHistoryManager.saveHistory();
+            }
+
             if (modules.contains(Module.REPLAY_MANAGER)
                     && modules.contains(Module.TEAM_MANAGER)
                     && modules.contains(Module.PLAYER_MANAGER)) {
@@ -116,22 +119,22 @@ public abstract class GamePlugin extends CorePlugin {
 
     public BackpackManager getBackpackManager() {
         modules.add(Module.BACKPACK_MANAGER);
-        return backpackManager != null ? backpackManager : (backpackManager = GameAPI.getInstance().constructBackpackManager(this, options));
+        return backpackManager != null ? backpackManager : (backpackManager = GameAPI.getInstance().constructBackpackManager(this));
     }
 
     public KitManager getKitManager() {
         modules.add(Module.KIT_MANAGER);
-        return kitManager != null ? kitManager : (kitManager = GameAPI.getInstance().constructKitManager(this, options));
+        return kitManager != null ? kitManager : (kitManager = GameAPI.getInstance().constructKitManager(this));
     }
 
     public AchievementManager getAchievementManager() {
         modules.add(Module.ACHIEVEMENT_MANAGER);
-        return achievementManager != null ? achievementManager : (achievementManager = GameAPI.getInstance().constructAchievementManager(this, options));
+        return achievementManager != null ? achievementManager : (achievementManager = GameAPI.getInstance().constructAchievementManager(this));
     }
 
     public ReplayManager getReplayManager() {
         modules.add(Module.REPLAY_MANAGER);
-        return replayManager != null ? replayManager : (replayManager = GameAPI.getInstance().constructReplayManager(options));
+        return replayManager != null ? replayManager : (replayManager = GameAPI.getInstance().constructReplayManager());
     }
 
     public GameStateManager getGameStateManager() {
@@ -143,11 +146,12 @@ public abstract class GamePlugin extends CorePlugin {
         try {
             if (modules.contains(Module.REPLAY_MANAGER)
                     && modules.contains(Module.TEAM_MANAGER)
-                    && modules.contains(Module.PLAYER_MANAGER)) {
+                    && modules.contains(Module.PLAYER_MANAGER)
+                    && modules.contains(Module.GAME_HISTORY_MANAGER)) {
                 modules.add(Module.REPLAY);
-                return replay != null ? replay : (replay = replayManager.createReplay(getGamemode(), options));
+                return replay != null ? replay : (replay = replayManager.createReplay(gameHistoryManager.getGameID()));
             } else {
-                throw new GameModuleNotActiveException("The game module ReplaysessionManager isn`t active!");
+                throw new GameModuleNotActiveException("A module is required that was not activated! Needed Modules: REPLAY_MANAGER, TEAM_MANAGER, PLAYER_MANAGER, GAME_HISTORY_MANAGER.");
             }
         } catch (GameModuleNotActiveException e) {
             e.printStackTrace();
@@ -158,7 +162,7 @@ public abstract class GamePlugin extends CorePlugin {
 
     public TeamManager getTeamManager() {
         modules.add(Module.TEAM_MANAGER);
-        return teamManager != null ? teamManager : (teamManager = GameAPI.getInstance().constructTeamManager(this, options));
+        return teamManager != null ? teamManager : (teamManager = GameAPI.getInstance().constructTeamManager(this));
     }
 
     public PlayerManager getPlayerManager() {
@@ -174,8 +178,17 @@ public abstract class GamePlugin extends CorePlugin {
         return onePassManager != null ? onePassManager : (onePassManager = GameAPI.getInstance().constructOnePassManager());
     }
 
+    public GameHistoryManager getGameHistoryManager() {
+        modules.add(Module.GAME_HISTORY_MANAGER);
+        return gameHistoryManager != null ? gameHistoryManager : (gameHistoryManager = GameAPI.getInstance().constructGameHistoryManager());
+    }
+
     public boolean hasModule(Module module) {
         return modules.contains(module);
+    }
+
+    public boolean hasOption(Option option) {
+        return this.options.contains(option);
     }
 
     public GamePlayer getGamePlayer(final UUID uuid) {

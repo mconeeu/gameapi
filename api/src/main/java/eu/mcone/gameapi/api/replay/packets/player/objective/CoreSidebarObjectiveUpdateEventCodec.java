@@ -3,8 +3,10 @@ package eu.mcone.gameapi.api.replay.packets.player.objective;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.codec.Codec;
 import eu.mcone.coresystem.api.bukkit.event.objectiv.CoreSidebarObjectiveUpdateEvent;
+import eu.mcone.gameapi.api.replay.event.ReplayScoreboardUpdateEvent;
 import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.io.*;
@@ -14,10 +16,12 @@ import java.util.Map;
 @Getter
 public class CoreSidebarObjectiveUpdateEventCodec extends Codec<CoreSidebarObjectiveUpdateEvent, ReplayPlayer> {
 
+    public static final byte CODEC_VERSION = 1;
+
     private Map<Integer, String> scores;
 
     public CoreSidebarObjectiveUpdateEventCodec() {
-        super((byte) 0, (byte) 0);
+        super((byte) 19, (byte) 4);
     }
 
     @Override
@@ -30,6 +34,8 @@ public class CoreSidebarObjectiveUpdateEventCodec extends Codec<CoreSidebarObjec
     public void encode(ReplayPlayer replayPlayer) {
         replayPlayer.getScoreboard().setCachedScores(scores);
         replayPlayer.getScoreboard().reload();
+
+        Bukkit.getPluginManager().callEvent(new ReplayScoreboardUpdateEvent(scores));
     }
 
     @Override

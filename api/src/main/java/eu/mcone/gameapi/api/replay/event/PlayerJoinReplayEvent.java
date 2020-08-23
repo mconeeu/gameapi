@@ -11,7 +11,7 @@ import org.bukkit.event.HandlerList;
 public class PlayerJoinReplayEvent extends Event {
 
     @Getter
-    private Player player;
+    private final Player player;
 
     @Getter
     private static final HandlerList handlerList = new HandlerList();

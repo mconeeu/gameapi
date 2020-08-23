@@ -2,17 +2,21 @@ package eu.mcone.gameapi.api.replay.packets.player.block;
 
 import eu.mcone.coresystem.api.bukkit.codec.Codec;
 import eu.mcone.gameapi.api.replay.runner.PlayerRunner;
+import lombok.Getter;
 import net.minecraft.server.v1_8_R3.PacketPlayInBlockDig;
 import org.bukkit.entity.Player;
 
 import java.io.*;
 
+@Getter
 public class PacketPlayInBlockDigCodec extends Codec<PacketPlayInBlockDig, PlayerRunner> {
+
+    public static final byte CODEC_VERSION = 1;
 
     private EnumPlayerDigType action;
 
     public PacketPlayInBlockDigCodec() {
-        super((byte) 0, (byte) 0);
+        super((byte) 29, (byte) 3);
     }
 
     @Override

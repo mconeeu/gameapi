@@ -15,8 +15,6 @@ import java.util.Set;
 
 public interface BackpackManager {
 
-    List<Option> getGameOptions();
-
     HashSet<String> getDisabledItems();
 
     boolean isUseRankBoots();

@@ -4,6 +4,7 @@ import eu.mcone.coresystem.api.bukkit.codec.Codec;
 import eu.mcone.coresystem.api.bukkit.util.ReflectionManager;
 import eu.mcone.coresystem.api.bukkit.util.SoundUtils;
 import eu.mcone.coresystem.api.bukkit.world.CoreLocation;
+import eu.mcone.gameapi.api.replay.runner.AsyncPlayerRunner;
 import eu.mcone.gameapi.api.replay.runner.PlayerRunner;
 import lombok.Getter;
 import net.minecraft.server.v1_8_R3.PacketPlayOutNamedSoundEffect;
@@ -14,13 +15,15 @@ import java.io.*;
 @Getter
 public class PacketPlayOutNamedSoundEffectCodec extends Codec<PacketPlayOutNamedSoundEffect, PlayerRunner> {
 
+    public static final byte CODEC_VERSION = 1;
+
     private String id;
     private double x;
     private double y;
     private double z;
 
     public PacketPlayOutNamedSoundEffectCodec() {
-        super((byte) 0, (byte) 0);
+        super((byte) 27, (byte) 3);
     }
 
     @Override
@@ -40,7 +43,7 @@ public class PacketPlayOutNamedSoundEffectCodec extends Codec<PacketPlayOutNamed
         location.setY(y);
         location.setZ(z);
 
-        SoundUtils.playSound(id, location.bukkit(), runner.getWatchers().toArray(new Player[0]));
+        SoundUtils.playSound(id, location.bukkit(), runner.getViewers().toArray(new Player[0]));
     }
 
     @Override

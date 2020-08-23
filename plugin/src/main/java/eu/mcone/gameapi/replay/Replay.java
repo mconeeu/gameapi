@@ -1,67 +1,80 @@
-package eu.mcone.gameapi.replay.session;
+package eu.mcone.gameapi.replay;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
-import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
-import eu.mcone.gameapi.GameAPIPlugin;
+import eu.mcone.gameapi.api.GamePlugin;
+import eu.mcone.gameapi.api.game.GameHistory;
+import eu.mcone.gameapi.api.replay.ReplayRecord;
+import eu.mcone.gameapi.api.replay.container.ReplayContainer;
 import eu.mcone.gameapi.api.replay.event.ReplayWorldUnloadedEvent;
 import eu.mcone.gameapi.api.replay.event.container.ReplayContainerCreatedEvent;
 import eu.mcone.gameapi.api.replay.event.container.ReplayContainerRemovedEvent;
 import eu.mcone.gameapi.api.replay.packets.server.MessageWrapper;
 import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
-import eu.mcone.gameapi.api.replay.session.ReplayRecord;
-import eu.mcone.gameapi.replay.chunk.ChunkHandler;
-import eu.mcone.gameapi.replay.container.ReplayContainer;
 import eu.mcone.gameapi.replay.inventory.ReplayInformationInventory;
 import lombok.Getter;
+import org.bson.codecs.pojo.annotations.BsonCreator;
+import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
+import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.io.Serializable;
 import java.util.*;
 
-@Getter
-public class Replay implements eu.mcone.gameapi.api.replay.session.Replay, Serializable {
+@BsonDiscriminator
+public class Replay implements eu.mcone.gameapi.api.replay.Replay, Serializable {
 
+    @Getter
     private final String ID;
-    private final long started;
-    private final long stopped;
-    private final String winnerTeam;
+    @Getter
+    private final String gameID;
+
+    @Getter
     private final String world;
-    private final Gamemode gamemode;
+    @Getter
     private final int lastTick;
 
     //Contains Broadcast messages !
+    @Getter
     private final Map<String, List<MessageWrapper>> messages;
+    @Getter
     private final Map<String, ReplayPlayer> replayPlayers;
 
-    @BsonIgnore
-    private transient final ChunkHandler chunkHandler;
-    @BsonIgnore
-    private transient final Map<UUID, eu.mcone.gameapi.api.replay.container.ReplayContainer> containers;
-    @BsonIgnore
-    private transient final Map<UUID, UUID> watchers;
+    private final transient Map<UUID, eu.mcone.gameapi.api.replay.container.ReplayContainer> containers;
 
     public Replay(final ReplayRecord replayRecord) {
         this.ID = replayRecord.getID();
-        this.started = replayRecord.getRecorder().getStarted();
-        this.stopped = replayRecord.getRecorder().getStopped();
-        this.winnerTeam = replayRecord.getRecorder().getWinnerTeam();
+        this.gameID = replayRecord.getGameID();
         this.world = replayRecord.getRecorder().getWorld();
-        this.gamemode = replayRecord.getGamemode();
         this.lastTick = replayRecord.getRecorder().getLastTick();
 
-        messages = replayRecord.getRecorder().getMessages();
+        messages = replayRecord.getGameHistory().getMessages();
         replayPlayers = replayRecord.getPlayers();
 
-        chunkHandler = new ChunkHandler(this, replayRecord.getRecorder().getChunks());
         containers = new HashMap<>();
-        watchers = new HashMap<>();
+    }
+
+    @BsonCreator
+    public Replay(@BsonProperty("iD") String ID, @BsonProperty("gameID") String gameID, @BsonProperty("world") String world, @BsonProperty("lastTick") int lastTick,
+                  @BsonProperty("messages") Map<String, List<MessageWrapper>> messages, @BsonProperty("replayPlayers") Map<String, ReplayPlayer> replayPlayers) {
+        this.ID = ID;
+        this.gameID = gameID;
+        this.world = world;
+        this.lastTick = lastTick;
+        this.messages = messages;
+        this.replayPlayers = replayPlayers;
+
+        containers = new HashMap<>();
+    }
+
+    public GameHistory getGameHistory() {
+        return GamePlugin.getGamePlugin().getGameHistoryManager().getGameHistory(gameID);
     }
 
     @BsonIgnore
     public ReplayContainer createContainer() {
-        ReplayContainer container = new ReplayContainer(this);
+        ReplayContainer container = new eu.mcone.gameapi.replay.container.ReplayContainer(this);
         containers.put(container.getContainerUUID(), container);
         Bukkit.getPluginManager().callEvent(new ReplayContainerCreatedEvent(container.getContainerUUID()));
         return container;
@@ -75,7 +88,7 @@ public class Replay implements eu.mcone.gameapi.api.replay.session.Replay, Seria
     @BsonIgnore
     public void removeContainer(UUID uuid) {
         if (containers.containsKey(uuid)) {
-            GameAPIPlugin.getInstance().sendConsoleMessage("§aRemoving Container §f" + uuid);
+            GamePlugin.getGamePlugin().sendConsoleMessage("§aRemoving Container §f" + uuid);
             for (ReplayPlayer player : getPlayers()) {
                 if (player.getNpc() != null) {
                     CoreSystem.getInstance().getNpcManager().removeNPC(player.getNpc());
@@ -87,7 +100,7 @@ public class Replay implements eu.mcone.gameapi.api.replay.session.Replay, Seria
 
             if (containers.size() == 0) {
                 Bukkit.unloadWorld(world, false);
-                GameAPIPlugin.getInstance().sendConsoleMessage("§aReplay world unloaded!");
+                GamePlugin.getGamePlugin().sendConsoleMessage("§aReplay world unloaded!");
                 Bukkit.getPluginManager().callEvent(new ReplayWorldUnloadedEvent(ID, getWorld()));
             }
         }
@@ -101,7 +114,7 @@ public class Replay implements eu.mcone.gameapi.api.replay.session.Replay, Seria
     @BsonIgnore
     public eu.mcone.gameapi.api.replay.container.ReplayContainer getContainer(Player player) {
         for (eu.mcone.gameapi.api.replay.container.ReplayContainer container : containers.values()) {
-            if (container.getWatchers().contains(player)) {
+            if (container.getViewers().contains(player)) {
                 return container;
             }
         }
@@ -110,22 +123,17 @@ public class Replay implements eu.mcone.gameapi.api.replay.session.Replay, Seria
     }
 
     @BsonIgnore
-    public eu.mcone.gameapi.api.replay.player.ReplayPlayer getReplayPlayer(final UUID uuid) {
+    public ReplayPlayer getReplayPlayer(final UUID uuid) {
         return replayPlayers.getOrDefault(uuid.toString(), null);
     }
 
     @BsonIgnore
-    public eu.mcone.gameapi.api.replay.player.ReplayPlayer getReplayPlayer(final Player player) {
+    public ReplayPlayer getReplayPlayer(final Player player) {
         return getReplayPlayer(player.getUniqueId());
     }
 
     @BsonIgnore
-    public Collection<eu.mcone.gameapi.api.replay.player.ReplayPlayer> getPlayers() {
-        return new ArrayList<>(replayPlayers.values());
-    }
-
-    @BsonIgnore
-    public Collection<eu.mcone.gameapi.api.replay.player.ReplayPlayer> getPlayersAsObject() {
+    public Collection<ReplayPlayer> getPlayers() {
         return new ArrayList<>(replayPlayers.values());
     }
 

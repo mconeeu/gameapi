@@ -1,23 +1,23 @@
-package eu.mcone.gameapi.api.replay.session;
+package eu.mcone.gameapi.api.replay;
 
-import eu.mcone.coresystem.api.bukkit.codec.CodecRegistry;
-import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
-import eu.mcone.gameapi.api.Option;
+import eu.mcone.gameapi.api.game.GameHistory;
 import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
-import eu.mcone.gameapi.api.utils.ReplayRecorder;
+import eu.mcone.gameapi.api.replay.utils.ReplayRecorder;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.UUID;
 
 public interface ReplayRecord {
 
     String getID();
 
-    Gamemode getGamemode();
-
-    List<Option> getOptions();
+    String getGameID();
 
     ReplayRecorder getRecorder();
+
+    GameHistory getGameHistory();
 
     void recordSession();
 

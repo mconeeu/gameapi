@@ -3,6 +3,7 @@ package eu.mcone.gameapi.api.replay.packets.player;
 import eu.mcone.coresystem.api.bukkit.codec.Codec;
 import eu.mcone.coresystem.api.bukkit.spawnable.ListMode;
 import eu.mcone.coresystem.api.bukkit.world.CoreLocation;
+import eu.mcone.gameapi.api.replay.runner.AsyncPlayerRunner;
 import eu.mcone.gameapi.api.replay.runner.PlayerRunner;
 import lombok.Getter;
 import org.bukkit.entity.Player;
@@ -13,12 +14,14 @@ import java.io.*;
 @Getter
 public class EntityRespawnEventCodec extends Codec<PlayerRespawnEvent, PlayerRunner> {
 
+    public static final byte CODEC_VERSION = 1;
+
     private double x;
     private double y;
     private double z;
 
     public EntityRespawnEventCodec() {
-        super((byte) 0, (byte) 0);
+        super((byte) 14, (byte) 3);
     }
 
     @Override
@@ -32,7 +35,7 @@ public class EntityRespawnEventCodec extends Codec<PlayerRespawnEvent, PlayerRun
     @Override
     public void encode(PlayerRunner runner) {
         runner.getPlayer().getNpc().setItemInHand(null);
-        runner.getPlayer().getNpc().togglePlayerVisibility(ListMode.WHITELIST, runner.getWatchers().toArray(new Player[0]));
+        runner.getPlayer().getNpc().togglePlayerVisibility(ListMode.WHITELIST, runner.getViewers().toArray(new Player[0]));
         CoreLocation location = new CoreLocation(runner.getPlayer().getNpc().getLocation());
         location.setX(x);
         location.setY(y);

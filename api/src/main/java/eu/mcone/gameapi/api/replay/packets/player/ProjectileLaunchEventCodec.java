@@ -15,10 +15,12 @@ import java.io.*;
 @Getter
 public class ProjectileLaunchEventCodec extends Codec<ProjectileLaunchEvent, PlayerNpc> {
 
+    public static final byte CODEC_VERSION = 1;
+
     private int id;
 
     public ProjectileLaunchEventCodec() {
-        super((byte) 0, (byte) 0);
+        super((byte) 22, (byte) 2);
     }
 
     @Override
@@ -30,7 +32,6 @@ public class ProjectileLaunchEventCodec extends Codec<ProjectileLaunchEvent, Pla
             if (snowball.getShooter() instanceof Player) {
                 Player shooter = (Player) snowball.getShooter();
                 id = EntityProjectile.SNOWBALL.getId();
-
                 return new Object[]{shooter};
             }
         } else if (projectile instanceof Egg) {

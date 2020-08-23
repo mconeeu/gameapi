@@ -6,10 +6,10 @@ import eu.mcone.coresystem.api.bukkit.codec.CodecListener;
 import eu.mcone.coresystem.api.bukkit.codec.CodecRegistry;
 import eu.mcone.coresystem.api.bukkit.npc.capture.Recorder;
 import eu.mcone.gameapi.api.GamePlugin;
+import eu.mcone.gameapi.api.replay.ReplayRecord;
 import eu.mcone.gameapi.api.replay.packets.server.MessageWrapper;
 import eu.mcone.gameapi.api.utils.IDUtils;
 import eu.mcone.gameapi.replay.chunk.ReplayChunk;
-import eu.mcone.gameapi.replay.session.ReplayRecord;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -20,10 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 
 @Getter
-public class ReplayRecorder extends Recorder implements eu.mcone.gameapi.api.utils.ReplayRecorder {
+public class ReplayRecorder extends Recorder implements eu.mcone.gameapi.api.replay.utils.ReplayRecorder {
 
-    private String winnerTeam;
-    private final HashMap<String, List<MessageWrapper>> messages;
     private final HashMap<Integer, eu.mcone.gameapi.api.replay.chunk.ReplayChunk> chunks;
     private int lastTick;
 
@@ -36,7 +34,6 @@ public class ReplayRecorder extends Recorder implements eu.mcone.gameapi.api.uti
     public ReplayRecorder(ReplayRecord replayRecord, CodecRegistry registry) {
         super(IDUtils.generateID(), GamePlugin.getGamePlugin().getGameConfig().parseConfig().getGameWorld());
         this.replayRecord = replayRecord;
-        messages = new HashMap<>();
         chunks = new HashMap<>();
         this.registry = registry;
     }
@@ -48,8 +45,9 @@ public class ReplayRecorder extends Recorder implements eu.mcone.gameapi.api.uti
         task = Bukkit.getScheduler().runTaskTimerAsynchronously(CoreSystem.getInstance(), () -> ticks++, 1L, 1L);
 
         Bukkit.getScheduler().runTaskAsynchronously(GamePlugin.getGamePlugin(), () -> {
-            registry.registerCodecListener(codecListener = (codec, objects) -> {
+            this.codecListener = (codec, objects) -> {
                 if (objects != null) {
+                    System.out.println(codec.getClass().getSimpleName());
                     Class<?> trigger = registry.getTriggerClass(codec.getCodecID());
                     if (trigger != null) {
                         if (registry.getTriggerClass(codec.getCodecID()).equals(PlayerMoveEvent.class)) {
@@ -63,7 +61,9 @@ public class ReplayRecorder extends Recorder implements eu.mcone.gameapi.api.uti
                 } else {
                     addServerCodec(codec);
                 }
-            });
+            };
+
+            registry.registerCodecListener(codecListener);
         });
     }
 
@@ -86,8 +86,10 @@ public class ReplayRecorder extends Recorder implements eu.mcone.gameapi.api.uti
             lastTick = ticks;
 
             if (chunks.containsKey(chunkID)) {
+                System.out.println("ADD CODEC " + codec.getClass().getSimpleName());
                 chunks.get(chunkID).addPacket(player.getUniqueId(), ticks, codec);
             } else {
+                System.out.println("NEW REPLAY CHUNK");
                 ReplayChunk chunk = new ReplayChunk(chunkID);
                 chunk.addPacket(player.getUniqueId(), ticks, codec);
                 chunks.put(chunkID, chunk);
@@ -98,8 +100,14 @@ public class ReplayRecorder extends Recorder implements eu.mcone.gameapi.api.uti
     public void stop() {
         stopped = System.currentTimeMillis() / 1000;
         stop = true;
-        task.cancel();
+        if (task != null) {
+            task.cancel();
+        }
         registry.listeningForCodecs(false);
         registry.unregisterCodecListener(codecListener);
+    }
+
+    public void addMessage(MessageWrapper wrapper) {
+        this.getReplayRecord().getGameHistory().addMessage(ticks, wrapper);
     }
 }

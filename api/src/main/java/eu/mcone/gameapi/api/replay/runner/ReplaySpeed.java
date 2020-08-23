@@ -4,37 +4,46 @@ import lombok.Getter;
 
 @Getter
 public enum ReplaySpeed {
-    _0_5X(false, 2, 150), //3 Bukkit ticks
-    _0_75X(false, 4, 100), //2 Bukkit ticks
-    _1X(true, 3, 50), //1 Bukkit tick
+    _0_5X(5, false, 2, "§70.5x"),
+    _0_75X(6, false, 4, "§70.75x"),
+    _1X(1, true, -1, "§71x"),
 
-    _1_25X(true, 3, 35),
-    _1_5X(true, 2, 25),
-    _2X(true, 0, 15);
+    _1_25X(2, true, 3, "§71.25x"),
+    _1_5X(3, true, 2, "§71.50x"),
+    _2X(4, true, 0, "§72x");
 
-    private boolean add;
-    private int wait;
-    private int speed;
+    private final int id;
+    private final boolean add;
+    private final int wait;
+    private final String prefix;
 
     /**
-     *
-     * @param add
-     * @param wait
-     * @param speed Milliseconds
+     * @param id   ID
+     * @param add  Should codecs be added?
+     * @param wait Should codecs be skipped?
      */
-    ReplaySpeed(boolean add, int wait, int speed) {
+    ReplaySpeed(int id, boolean add, int wait, String prefix) {
+        this.id = id;
         this.add = add;
         this.wait = wait;
-        this.speed = speed;
+        this.prefix = prefix;
     }
 
-    public static ReplaySpeed getWhereSpeed(double speed) {
+    public static ReplaySpeed getWhereID(int id) {
         for (ReplaySpeed replaySpeed : values()) {
-            if (replaySpeed.speed == speed) {
+            if (replaySpeed.getId() == id) {
                 return replaySpeed;
             }
         }
 
         return null;
+    }
+
+    public ReplaySpeed getNextSpeed() {
+        if (id == 6) {
+            return _1X;
+        } else {
+            return getWhereID(id + 1);
+        }
     }
 }

@@ -1,33 +1,38 @@
 package eu.mcone.gameapi.replay.container;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
+import eu.mcone.coresystem.api.bukkit.npc.entity.PlayerNpc;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
+import eu.mcone.gameapi.api.Option;
+import eu.mcone.gameapi.api.replay.event.PlayerJoinReplayCameraEvent;
+import eu.mcone.gameapi.api.replay.event.PlayerLeaveReplayCameraEvent;
 import eu.mcone.gameapi.api.replay.event.runner.*;
 import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
+import eu.mcone.gameapi.api.replay.runner.AsyncPlayerRunner;
+import eu.mcone.gameapi.api.replay.runner.PlayerRunner;
+import eu.mcone.gameapi.api.replay.runner.ReplayRunner;
 import eu.mcone.gameapi.api.replay.runner.ReplaySpeed;
+import eu.mcone.gameapi.api.replay.utils.SkipUnit;
+import eu.mcone.gameapi.replay.Replay;
 import eu.mcone.gameapi.replay.chunk.ChunkHandler;
 import eu.mcone.gameapi.replay.inventory.ReplayInformationInventory;
 import eu.mcone.gameapi.replay.inventory.ReplaySpectatorInventory;
 import eu.mcone.gameapi.replay.listener.NPCInteractListener;
 import eu.mcone.gameapi.replay.npc.NpcUtils;
-import eu.mcone.gameapi.replay.runner.ServerRunner;
-import eu.mcone.gameapi.replay.session.Replay;
+import eu.mcone.gameapi.replay.runner.player.SyncPlayerRunner;
+import eu.mcone.gameapi.replay.runner.server.SyncServerRunner;
 import lombok.Getter;
-import lombok.Setter;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.*;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class ReplayContainer implements eu.mcone.gameapi.api.replay.container.ReplayContainer {
 
@@ -37,25 +42,26 @@ public class ReplayContainer implements eu.mcone.gameapi.api.replay.container.Re
     @Getter
     private final UUID containerUUID;
     @Getter
-    private boolean playing = false;
+    private int tick;
     @Getter
-    private AtomicInteger currentTick;
+    private boolean playing = false;
     @Getter
     private boolean forward = true;
     @Getter
-    private boolean backward = false;
-    @Setter
     private boolean showProgress = true;
     @Getter
-    private ReplaySpeed replaySpeed = null;
+    private ReplaySpeed speed = ReplaySpeed._1X;
+
     private int skipped;
 
     @Getter
-    private final HashSet<Player> watchers;
-    private final ServerRunner serverRunner;
-    private final HashMap<UUID, eu.mcone.gameapi.replay.runner.PlayerRunner> running;
-
-    private BukkitTask progressTask;
+    private final HashSet<Player> viewers;
+    @Getter
+    private final HashMap<Player, PlayerNpc> inCamera;
+    private final SyncServerRunner serverRunner;
+    private final HashMap<UUID, AsyncPlayerRunner> asyncRunner;
+    private final HashMap<UUID, PlayerRunner> running;
+    private final HashSet<ReplayRunner> idling;
 
     @Getter
     private NPCInteractListener npcListener;
@@ -65,80 +71,105 @@ public class ReplayContainer implements eu.mcone.gameapi.api.replay.container.Re
 
     @Getter
     private final HashMap<Integer, Integer> entities;
+    private final ReplayContainerListener replayContainerListener;
+
+    private BukkitTask progressTask;
 
     public ReplayContainer(final Replay replay) {
         this.replay = replay;
         this.containerUUID = UUID.randomUUID();
-        currentTick = new AtomicInteger();
+//        tick = new AtomicInteger();
         chunkHandler = new ChunkHandler(replay);
-        watchers = new HashSet<>();
-        serverRunner = new ServerRunner(this);
+        viewers = new HashSet<>();
+        inCamera = new HashMap<>();
+        serverRunner = new SyncServerRunner(this);
+        asyncRunner = new HashMap<>();
         running = new HashMap<>();
+        idling = new HashSet<>();
         entities = new HashMap<>();
+        replayContainerListener = new ReplayContainerListener(this);
+        CoreSystem.getInstance().registerEvents(replayContainerListener);
     }
 
-    public void addWatcher(final Player... players) {
-        //Check if the loading is to slow
-        chunkHandler.preLoad();
-
-        running.forEach((key, value) -> value.addWatcher(players));
+    public void addViewers(final Player... players) {
+        if (!playing) {
+            //Check if the loading is to slow
+            chunkHandler.preLoad();
+        }
 
         for (Player player : players) {
-            Bukkit.getPluginManager().callEvent(new ReplayWatcherJoinEvent(player, this));
+            viewers.add(player);
 
-            watchers.add(player);
-            serverRunner.addWatcher(player);
+            Bukkit.getPluginManager().callEvent(new ReplayJoinEvent(player, this));
+
+            if (GamePlugin.getGamePlugin().hasOption(Option.USE_REPLAY_VIEW_MANAGER)) {
+                GamePlugin.getGamePlugin().getReplayManager().getReplayViewManager().joinReplay(player, replay);
+            }
 
             for (Player all : Bukkit.getOnlinePlayers()) {
                 player.hidePlayer(all);
                 all.hidePlayer(player);
             }
 
-            for (Player watcher : watchers) {
+            for (Player watcher : viewers) {
                 player.showPlayer(watcher);
                 watcher.showPlayer(player);
             }
 
-            for (eu.mcone.gameapi.replay.runner.PlayerRunner runner : running.values()) {
-                runner.addWatcher(player);
+            for (PlayerRunner runner : running.values()) {
                 runner.getPlayer().getNpc().toggleVisibility(player, false);
             }
         }
     }
 
-    private void removeAllWatchers() {
-        for (Player player : watchers) {
-            removeWatcher(player);
-        }
-    }
-
-    public void removeWatcher(final Player... players) {
-        running.forEach((key, value) -> value.removeWatcher(players));
-
+    public void removeViewers(final Player... players) {
         for (Player player : players) {
-            watchers.remove(player);
-            serverRunner.removeWatcher(player);
+            if (GamePlugin.getGamePlugin().hasOption(Option.USE_REPLAY_VIEW_MANAGER)) {
+                GamePlugin.getGamePlugin().getReplayManager().getReplayViewManager().leaveReplay(player);
+            }
 
-            for (eu.mcone.gameapi.replay.runner.PlayerRunner runner : running.values()) {
-                runner.removeWatcher(player);
+            viewers.remove(player);
+
+            for (Map.Entry<Player, PlayerNpc> inCamera : inCamera.entrySet()) {
+                inCamera.getValue().setCamera(inCamera.getKey(), false);
+            }
+
+            inCamera.clear();
+
+            for (PlayerRunner runner : running.values()) {
                 runner.getPlayer().getNpc().toggleVisibility(player, true);
             }
 
-            for (Player watcher : watchers) {
+            for (Player watcher : viewers) {
                 watcher.hidePlayer(player);
                 player.hidePlayer(watcher);
             }
 
             for (Player all : Bukkit.getOnlinePlayers()) {
-                if (!watchers.contains(all)) {
+                if (!viewers.contains(all)) {
                     player.showPlayer(all);
                     all.showPlayer(all);
                 }
             }
 
-            Bukkit.getPluginManager().callEvent(new ReplayWatcherQuitEvent(player, this));
-            if (playing && watchers.isEmpty()) {
-                stop();
+            Bukkit.getPluginManager().callEvent(new ReplayQuitEvent(player, this));
+
+            if (viewers.isEmpty()) {
+                if (playing && running.size() > 0) {
+                    serverRunner.stop();
+                    serverRunner.setSpeed(null);
+
+                    forward = true;
+                    speed = null;
+                    playing = false;
+
+                    npcListener.setUnregister(true);
+                    running.clear();
+                    Bukkit.getScheduler().cancelTask(progressTask.getTaskId());
+                    Bukkit.getPluginManager().callEvent(new ReplayStopEvent(replay.getID(), getContainerUUID(), tick));
+                    tick = 0;
+                }
+
                 replay.removeContainer(containerUUID);
             }
         }
@@ -146,57 +177,48 @@ public class ReplayContainer implements eu.mcone.gameapi.api.replay.container.Re
 
     private void progress() {
         progressTask = Bukkit.getScheduler().runTaskTimer(GameAPI.getInstance(), () -> {
-            for (Player watcher : watchers) {
-                if (playing && showProgress) {
-                    if (currentTick.get() == replay.getLastTick()) {
-                        stop();
-                    } else {
+            if (playing && showProgress) {
+                if (tick > replay.getLastTick()) {
+                    stop();
+                } else {
+                    if (idling.size() == 0) {
                         int repeat;
-                        if (replaySpeed != null && skipped == replaySpeed.getWait()) {
-                            repeat = (replaySpeed.isAdd() ? 2 : 0);
+                        if (speed != null && skipped == speed.getWait()) {
+                            repeat = (speed.isAdd() ? 2 : 0);
                             skipped = 0;
                         } else {
                             repeat = 1;
                         }
 
                         for (int i = 0; i < repeat; i++) {
-                            int tick;
                             if (forward) {
-                                tick = currentTick.getAndIncrement();
+                                tick++;
                             } else {
-                                tick = currentTick.getAndDecrement();
+                                tick--;
                             }
 
-                            CoreSystem.getInstance().createActionBar().message(ReplayInformationInventory.getLength(tick)).send(watcher);
+                            for (Player viewer : viewers) {
+                                CoreSystem.getInstance().createActionBar().message(ReplayInformationInventory.getLength(tick)).send(viewer);
+                            }
                         }
                     }
-                } else {
-                    CoreSystem.getInstance().createActionBar().message("§7Paussiert");
+                }
+            } else {
+                for (Player viewer : viewers) {
+                    CoreSystem.getInstance().createActionBar().message("§7Paussiert").send(viewer);
                 }
             }
         }, 1L, 1L);
     }
 
-    public void restart() {
-        if (this.playing) {
-            this.replaySpeed = null;
-            this.currentTick = new AtomicInteger(0);
-        } else {
-            this.forward = true;
-            this.backward = false;
-            this.play();
-        }
-    }
-
     public void play() {
-        if (!playing && running.size() == 0 && watchers.size() > 0) {
+        if (!playing && running.size() == 0 && viewers.size() > 0) {
             playing = true;
 
-            for (ReplayPlayer player : replay.getPlayersAsObject()) {
+            for (ReplayPlayer player : replay.getPlayers()) {
                 if (!(running.containsKey(player.getUuid()))) {
-                    player.setNpc(NpcUtils.constructNpcForPlayer(player, containerUUID));
-                    eu.mcone.gameapi.replay.runner.PlayerRunner runner = new eu.mcone.gameapi.replay.runner.PlayerRunner(player, this);
-                    runner.addWatcher(watchers.toArray(new Player[0]));
+                    player.setNpc(NpcUtils.constructNpcForPlayer(player, containerUUID, viewers.toArray(new Player[viewers.size() - 1])));
+                    PlayerRunner runner = new SyncPlayerRunner(player, this);
                     runner.play();
                     running.put(player.getUuid(), runner);
                 }
@@ -209,113 +231,144 @@ public class ReplayContainer implements eu.mcone.gameapi.api.replay.container.Re
         }
     }
 
+    public void restart() {
+        if (this.playing) {
+            this.speed = null;
+            this.tick = 0;
+        } else {
+            this.forward = true;
+            this.play();
+        }
+    }
+
     public void stop() {
         if (playing && running.size() > 0) {
-            for (eu.mcone.gameapi.replay.runner.PlayerRunner runner : running.values()) {
-                runner.stop();
-                runner.setReplaySpeed(null);
-            }
-
             serverRunner.stop();
-            serverRunner.setReplaySpeed(null);
+            serverRunner.setSpeed(null);
 
             forward = true;
-            replaySpeed = null;
-            backward = false;
+            speed = null;
             playing = false;
 
             npcListener.setUnregister(true);
             running.clear();
             Bukkit.getScheduler().cancelTask(progressTask.getTaskId());
-            Bukkit.getPluginManager().callEvent(new ReplayStopEvent(getContainerUUID(), currentTick.get()));
-            removeAllWatchers();
-            currentTick.set(0);
+            Bukkit.getPluginManager().callEvent(new ReplayStopEvent(replay.getID(), getContainerUUID(), tick));
+            tick = 0;
+            removeViewers(viewers.toArray(new Player[0]));
         }
     }
 
-    public void startPlaying() {
-        if (!playing) {
-            playing = true;
-            for (eu.mcone.gameapi.replay.runner.PlayerRunner runner : running.values()) {
-                runner.startPlaying();
-            }
-
-            serverRunner.stopPlaying();
-
-            Bukkit.getPluginManager().callEvent(new ReplayStartPlayingEvent(this, currentTick.get()));
-        }
-    }
-
-    public void stopPlaying() {
+    public void playing(boolean playing) {
+        this.playing = playing;
         if (playing) {
-            playing = false;
-            for (eu.mcone.gameapi.replay.runner.PlayerRunner runner : running.values()) {
-                runner.stopPlaying();
+            for (PlayerRunner runner : running.values()) {
+                runner.play();
             }
 
-            serverRunner.stopPlaying();
+            serverRunner.play();
+            Bukkit.getPluginManager().callEvent(new ReplayStartPlayingEvent(this, tick));
+        } else {
+            for (PlayerRunner runner : running.values()) {
+                runner.stop();
+            }
 
-            Bukkit.getPluginManager().callEvent(new ReplayStopPlayingEvent(this, currentTick.get()));
+            serverRunner.stop();
+            Bukkit.getPluginManager().callEvent(new ReplayStopPlayingEvent(this, tick));
         }
     }
 
-    public void forward() {
-        if (playing && backward) {
-            forward = true;
-            backward = false;
-
-            for (eu.mcone.gameapi.replay.runner.PlayerRunner runner : running.values()) {
-                runner.forward();
-            }
-
-            serverRunner.forward();
-        }
+    public void forward(boolean forward) {
+        this.forward = forward;
     }
 
-    public void backward() {
-        if (playing && forward) {
-            backward = true;
-            forward = false;
+    public void nextSpeed() {
+        if (playing) {
+            ReplaySpeed next = speed.getNextSpeed();
+            ReplayChangeSpeedEvent changeSpeedEvent = new ReplayChangeSpeedEvent(replay.getID(), this, this.speed, next);
+            Bukkit.getPluginManager().callEvent(changeSpeedEvent);
 
-            for (eu.mcone.gameapi.replay.runner.PlayerRunner runner : running.values()) {
-                runner.backward();
+            if (!changeSpeedEvent.isCancelled()) {
+                this.speed = next;
+                serverRunner.setSpeed(speed);
             }
-
-            serverRunner.backward();
         }
     }
 
     public void setSpeed(ReplaySpeed speed) {
         if (playing) {
-            ReplayChangeSpeedEvent changeSpeedEvent = new ReplayChangeSpeedEvent(replay.getID(), this, replaySpeed, speed);
+            ReplayChangeSpeedEvent changeSpeedEvent = new ReplayChangeSpeedEvent(replay.getID(), this, this.speed, speed);
             Bukkit.getPluginManager().callEvent(changeSpeedEvent);
 
             if (!changeSpeedEvent.isCancelled()) {
-                this.replaySpeed = speed;
+                this.speed = speed;
 
-                for (eu.mcone.gameapi.replay.runner.PlayerRunner runner : running.values()) {
-                    runner.setReplaySpeed(speed);
-                }
-
-                serverRunner.setReplaySpeed(speed);
+                serverRunner.setSpeed(speed);
             }
         }
     }
 
-    public void skip(int ticks) {
+    public void skip(SkipUnit unit, int amount) {
         if (playing) {
+            int converted = ReplayRunner.convertToTicks(unit, amount);
+            boolean isNegative = converted < 0;
+            int lastTick = (isNegative ? tick - converted : tick + converted);
             ReplaySkipEvent skipEvent = new ReplaySkipEvent(replay.getID(), containerUUID);
             Bukkit.getPluginManager().callEvent(skipEvent);
 
             if (!skipEvent.isCancelled()) {
-                for (eu.mcone.gameapi.replay.runner.PlayerRunner runner : running.values()) {
-                    runner.skip(ticks);
+                for (PlayerRunner runner : running.values()) {
+                    runner.skip(unit, amount);
                 }
 
-                currentTick.set(Math.max(currentTick.get() + ticks, 0));
-                serverRunner.skip(ticks);
+                serverRunner.skip(unit, amount);
+
+                if (lastTick < replay.getLastTick() && lastTick > 0) {
+                    tick = lastTick;
+                } else {
+                    tick = 0;
+                }
             }
         }
+    }
+
+    public void addIdling(ReplayRunner playerRunner) {
+        idling.add(playerRunner);
+    }
+
+    public void removeIdling(ReplayRunner playerRunner) {
+        idling.remove(playerRunner);
+    }
+
+    public boolean isInCamera(Player player) {
+        return inCamera.containsKey(player);
+    }
+
+    public void joinCamera(Player player, PlayerNpc playerNpc) {
+        Bukkit.getPluginManager().callEvent(new PlayerJoinReplayCameraEvent(this, player, playerNpc));
+        playerNpc.setCamera(player, true);
+        inCamera.put(player, playerNpc);
+    }
+
+    public void leaveCamera(Player player) {
+        Bukkit.getPluginManager().callEvent(new PlayerLeaveReplayCameraEvent(this, player, inCamera.get(player)));
+        inCamera.get(player).setCamera(player, false);
+        inCamera.remove(player);
+    }
+
+
+    public AsyncPlayerRunner createAsyncRunner(final ReplayPlayer player) {
+        if (!asyncRunner.containsKey(player.getUuid())) {
+            AsyncPlayerRunner runner = new eu.mcone.gameapi.replay.runner.player.AsyncPlayerRunner(player, this);
+            asyncRunner.put(player.getUuid(), runner);
+            return runner;
+        } else {
+            return asyncRunner.get(player.getUuid());
+        }
+    }
+
+    public AsyncPlayerRunner getAsyncRunner(ReplayPlayer player) {
+        return asyncRunner.get(player.getUuid());
     }
 
     public void invite(final Player sender, final Player target) {
@@ -323,7 +376,7 @@ public class ReplayContainer implements eu.mcone.gameapi.api.replay.container.Re
         CorePlayer targetCorePlayer = CoreSystem.getInstance().getCorePlayer(target);
 
         if (corePlayer != null && targetCorePlayer != null) {
-            if (watchers.contains(sender) && !watchers.contains(target)) {
+            if (viewers.contains(sender) && !viewers.contains(target)) {
                 ReplayInvitePlayerEvent invitePlayerEvent = new ReplayInvitePlayerEvent(corePlayer, targetCorePlayer, replay.getID(), this);
                 Bukkit.getPluginManager().callEvent(invitePlayerEvent);
 
@@ -332,7 +385,7 @@ public class ReplayContainer implements eu.mcone.gameapi.api.replay.container.Re
                     tp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§7§lReplay beitreten \n§7§oLinksklick zum beitreten").create()));
                     tp.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/replay join " + sender.getName()));
 
-                    GamePlugin.getGamePlugin().getMessenger().send(target, tp);
+                    GamePlugin.getGamePlugin().getMessenger().send(target, new BaseComponent[]{tp});
                     GamePlugin.getGamePlugin().getMessenger().send(sender, "§aDu hast den Spieler §e" + target.getName() + " §aerfolgreich eingeladen.");
                 }
             } else {
@@ -341,16 +394,12 @@ public class ReplayContainer implements eu.mcone.gameapi.api.replay.container.Re
         }
     }
 
-    public eu.mcone.gameapi.api.replay.runner.PlayerRunner createSingleRunner(final ReplayPlayer replayPlayer) {
-        if (!running.containsKey(replayPlayer.getUuid())) {
-            return new eu.mcone.gameapi.replay.runner.PlayerRunner(replayPlayer, this);
-        } else {
-            return null;
-        }
+    public void openSpectatorInventory(Player player) {
+        if (viewers.contains(player))
+            new ReplaySpectatorInventory(replay, player);
     }
 
-    public void openSpectatorInventory(Player player) {
-        if (watchers.contains(player))
-            new ReplaySpectatorInventory(replay, player);
+    public void showProgress(boolean show) {
+        this.showProgress = show;
     }
 }

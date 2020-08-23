@@ -10,13 +10,14 @@ import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.gameapi.api.achievement.AchievementManager;
 import eu.mcone.gameapi.api.backpack.BackpackManager;
 import eu.mcone.gameapi.api.damage.DamageLogger;
+import eu.mcone.gameapi.api.game.GameHistoryManager;
 import eu.mcone.gameapi.api.gamestate.GameStateManager;
 import eu.mcone.gameapi.api.kit.KitManager;
 import eu.mcone.gameapi.api.map.MapManager;
 import eu.mcone.gameapi.api.onepass.OnePassManager;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.PlayerManager;
-import eu.mcone.gameapi.api.replay.session.ReplayManager;
+import eu.mcone.gameapi.api.replay.ReplayManager;
 import eu.mcone.gameapi.api.team.TeamManager;
 import lombok.Getter;
 import org.bukkit.ChatColor;
@@ -51,21 +52,23 @@ public abstract class GameAPI extends CorePlugin {
 
     public abstract MapManager constructMapManager();
 
-    public abstract ReplayManager constructReplayManager(Option... options);
+    public abstract ReplayManager constructReplayManager();
 
-    public abstract TeamManager constructTeamManager(GamePlugin gamePlugin, Option[] options);
+    public abstract TeamManager constructTeamManager(GamePlugin gamePlugin);
 
     public abstract PlayerManager constructPlayerManager(GamePlugin gamePlugin);
 
-    public abstract BackpackManager constructBackpackManager(GamePlugin gamePlugin, Option... options);
+    public abstract BackpackManager constructBackpackManager(GamePlugin gamePlugin);
 
-    public abstract KitManager constructKitManager(GamePlugin plugin, Option... option);
+    public abstract KitManager constructKitManager(GamePlugin plugin);
 
-    public abstract AchievementManager constructAchievementManager(GamePlugin gamePlugin, Option... options);
+    public abstract AchievementManager constructAchievementManager(GamePlugin gamePlugin);
 
     public abstract DamageLogger constructDamageLogger();
 
     public abstract OnePassManager constructOnePassManager();
+
+    public abstract GameHistoryManager constructGameHistoryManager();
 
     public abstract GamePlayer getGamePlayer(CorePlayer cp);
 

@@ -5,10 +5,8 @@ import eu.mcone.coresystem.api.bukkit.inventory.InventoryOption;
 import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
 import eu.mcone.coresystem.api.bukkit.item.Skull;
 import eu.mcone.gameapi.api.GamePlugin;
+import eu.mcone.gameapi.api.replay.Replay;
 import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
-import eu.mcone.gameapi.replay.session.Replay;
-import eu.mcone.gameapi.replay.session.ReplayRecord;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class ReplaySpectatorInventory extends CoreInventory {

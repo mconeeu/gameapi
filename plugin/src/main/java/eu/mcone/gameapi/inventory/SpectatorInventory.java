@@ -26,12 +26,12 @@ public class SpectatorInventory extends CoreInventory {
             GamePlayer gamePlayer = GamePlugin.getGamePlugin().getGamePlayer(playing.getUniqueId());
 
             setItem(slot, new Skull(playing.getName()).setDisplayName("§7" + playing.getName()).lore(
-                    "§8» §7§oRanking Platz: §f§l" + gamePlayer.getStats().getUserRanking(),
+//                    "§8» §7§oRanking Platz: §f§l" + gamePlayer.getStats().getUserRanking(),
                     "§8» §7§oKD: §f§l" + gamePlayer.getStats().getKD(),
-                    "§8» §7§oKills: §f§l" + gamePlayer.getStats().getKill(),
-                    "§8» §7§oTode: §f§l" + gamePlayer.getStats().getDeath(),
-                    "§8» §7§oGewonnen: §f§l" + gamePlayer.getStats().getWin(),
-                    "§8» §7§oVerloren: §f§l" + gamePlayer.getStats().getLose()
+                    "§8» §7§oKills: §f§l" + gamePlayer.getStats().getKills(),
+                    "§8» §7§oTode: §f§l" + gamePlayer.getStats().getDeaths(),
+                    "§8» §7§oGewonnen: §f§l" + gamePlayer.getStats().getGoals(),
+                    "§8» §7§oVerloren: §f§l" + gamePlayer.getStats().getLosses()
             ).getItemStack(), e -> {
                 player.teleport(gamePlayer.getCorePlayer().bukkit().getLocation());
                 player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 1);

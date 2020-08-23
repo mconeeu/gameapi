@@ -38,7 +38,6 @@ public class GameStateListener implements Listener {
         if (GamePlugin.getGamePlugin().getGameStateManager().getRunning() instanceof LobbyGameState) {
             if (GamePlugin.getGamePlugin().hasModule(Module.REPLAY)) {
                 GamePlugin.getGamePlugin().getReplay().addPlayer(player);
-                GamePlugin.getGamePlugin().getReplay().getReplayPlayer(player).setJoined(System.currentTimeMillis() / 1000);
             }
 
             if (GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)) {

@@ -12,10 +12,12 @@ import java.io.*;
 @Getter
 public class CoreObjectiveCreateEventCodec extends Codec<CoreObjectiveCreateEvent, ReplayPlayer> {
 
+    public static final byte CODEC_VERSION = 1;
+
     private String name;
 
     public CoreObjectiveCreateEventCodec() {
-        super((byte) 0, (byte) 0);
+        super((byte) 18, (byte) 4);
     }
 
     @Override

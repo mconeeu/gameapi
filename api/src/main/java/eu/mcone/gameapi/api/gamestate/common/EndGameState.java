@@ -7,6 +7,7 @@ import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.coresystem.api.bukkit.scoreboard.MainScoreboard;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Module;
+import eu.mcone.gameapi.api.Option;
 import eu.mcone.gameapi.api.event.gamestate.GameStateStartEvent;
 import eu.mcone.gameapi.api.gamestate.GameState;
 import eu.mcone.gameapi.api.player.GamePlayer;
@@ -22,7 +23,8 @@ import org.bukkit.inventory.ItemStack;
 
 public class EndGameState extends GameState {
 
-    @Setter @Getter
+    @Setter
+    @Getter
     private static Class<? extends LobbyObjective> objective;
 
     public EndGameState() {
@@ -85,6 +87,12 @@ public class EndGameState extends GameState {
             CoreSystem.getInstance().getWorldManager().getWorld(GamePlugin.getGamePlugin().getGameConfig().parseConfig().getLobby()).teleport(p, "spawn");
         }
 
+        if (GamePlugin.getGamePlugin().hasModule(Module.GAME_HISTORY_MANAGER)) {
+            if (GamePlugin.getGamePlugin().hasOption(Option.GAME_HISTORY_HISTORY_MODE)) {
+                GamePlugin.getGamePlugin().getGameHistoryManager().saveHistory();
+            }
+        }
+
         if (GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)) {
             try {
                 if (objective == null) {
@@ -97,11 +105,6 @@ public class EndGameState extends GameState {
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }
-        }
-
-
-        if (GamePlugin.getGamePlugin().hasModule(Module.REPLAY)) {
-            GamePlugin.getGamePlugin().getReplay().save();
         }
     }
 }

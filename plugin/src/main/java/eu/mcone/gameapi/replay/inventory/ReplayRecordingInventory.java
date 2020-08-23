@@ -4,7 +4,7 @@ import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.coresystem.api.bukkit.inventory.InventoryOption;
 import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
 import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
-import eu.mcone.gameapi.api.replay.session.ReplayRecord;
+import eu.mcone.gameapi.api.replay.ReplayRecord;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -20,9 +20,9 @@ public class ReplayRecordingInventory extends CoreInventory {
 
         if (replayRecord != null) {
             setItem(InventorySlot.ROW_3_SLOT_5,
-                    new ItemBuilder(replayRecord.getGamemode().getItem(), 1)
+                    new ItemBuilder(replayRecord.getGameHistory().getGamemode().getItem(), 1)
                             .displayName("")
-                            .lore(replayRecord.getGamemode().getColor() + replayRecord.getGamemode().getName(),
+                            .lore(replayRecord.getGameHistory().getGamemode().getColor() + replayRecord.getGameHistory().getGamemode().getName(),
                                     "§l§e" + replayRecord.getRecorder().getRecorderID(),
                                     "§7" + new SimpleDateFormat("yy.MM.dd HH:mm").format(new Date(replayRecord.getRecorder().getStarted() * 1000)),
                                     "",

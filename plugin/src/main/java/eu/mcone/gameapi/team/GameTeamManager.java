@@ -35,7 +35,8 @@ public class GameTeamManager implements TeamManager {
     private final Set<GameTeam> teams;
     private final GamePlugin gamePlugin;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private TeamChatListener teamChatListener;
 
     @Getter
@@ -43,7 +44,7 @@ public class GameTeamManager implements TeamManager {
     @Getter
     private boolean teamsFinallySet;
 
-    public GameTeamManager(GamePlugin plugin, GameAPIPlugin system, Option[] options) {
+    public GameTeamManager(GamePlugin plugin, GameAPIPlugin system) {
         this.gamePlugin = plugin;
 
         //Chat System
@@ -59,10 +60,8 @@ public class GameTeamManager implements TeamManager {
         playersPerTeam = config.getPlayersPerTeam();
         teams = new HashSet<>();
 
-        List<Option> optionList = Arrays.asList(options);
-
-        disableRespawn = optionList.contains(Option.TEAM_MANAGER_DISABLE_RESPAWN);
-        disableWinMethod = optionList.contains(Option.TEAM_MANAGER_DISABLE_WIN_METHOD);
+        disableRespawn = GamePlugin.getGamePlugin().hasOption(Option.TEAM_MANAGER_DISABLE_RESPAWN);
+        disableWinMethod = GamePlugin.getGamePlugin().hasOption(Option.TEAM_MANAGER_DISABLE_WIN_METHOD);
 
         if (config.getMaxPlayers() != 0 && config.getPlayersPerTeam() != 0) {
             this.teamCount = config.getMaxPlayers() / config.getPlayersPerTeam();
@@ -84,9 +83,9 @@ public class GameTeamManager implements TeamManager {
             if (i < teamCount) {
                 GameTeam gameTeam = (GameTeam) team.getTeam();
                 gameTeam.setSize(playersPerTeam);
-                gameTeam.setSpawnLocation("team."+team.name().toLowerCase()+".spawn");
-                gameTeam.setNpcLocation("team."+team.name().toLowerCase()+".npc");
-                gameTeam.setRespawnBlockLocation("team."+team.name().toLowerCase()+".respawnblock");
+                gameTeam.setSpawnLocation("team." + team.name().toLowerCase() + ".spawn");
+                gameTeam.setNpcLocation("team." + team.name().toLowerCase() + ".npc");
+                gameTeam.setRespawnBlockLocation("team." + team.name().toLowerCase() + ".respawnblock");
 
                 this.teams.add((GameTeam) team.getTeam());
                 i++;
@@ -102,7 +101,7 @@ public class GameTeamManager implements TeamManager {
         team.setSize(playersPerTeam);
         teams.add(team);
 
-        GameAPI.getInstance().sendConsoleMessage("§2Registering Team "+name);
+        GameAPI.getInstance().sendConsoleMessage("§2Registering Team " + name);
         return team;
     }
 
@@ -127,7 +126,7 @@ public class GameTeamManager implements TeamManager {
             ((GameTeam) gp.getTeam()).removePlayer(gp);
         }
 
-        System.out.println("set team "+team.getName()+" for player "+gp.bukkit().getName());
+        System.out.println("set team " + team.getName() + " for player " + gp.bukkit().getName());
         ((GameTeam) team).addPlayer(gp);
         gp.setTeam(team);
     }
@@ -141,14 +140,14 @@ public class GameTeamManager implements TeamManager {
                 team.setAlive(false);
             }
 
-            System.out.println("remove from team, all teams: "+teams);
+            System.out.println("remove from team, all teams: " + teams);
         } else {
             System.err.println("gp.geTeam = null");
         }
 
         if (!disableWinMethod) {
             Team team = GamePlugin.getGamePlugin().getTeamManager().getWinnerTeamIfLastSurvived();
-            System.out.println("calculated winner: "+team+" current teams "+teams);
+            System.out.println("calculated winner: " + team + " current teams " + teams);
 
             if (team != null) {
                 stopGameWithWinner(team, false);
@@ -162,7 +161,11 @@ public class GameTeamManager implements TeamManager {
     }
 
     private void stopGameWithWinner(Team team, boolean manually) {
-        GameAPI.getInstance().sendConsoleMessage("§aTeam §f"+team.getName()+"§a has won! "+ (manually ? "Game has been stopped manually." : "Players from all other teams are dead."));
+        GameAPI.getInstance().sendConsoleMessage("§aTeam §f" + team.getName() + "§a has won! " + (manually ? "Game has been stopped manually." : "Players from all other teams are dead."));
+        if (GamePlugin.getGamePlugin().hasModule(Module.GAME_HISTORY_MANAGER)) {
+            GamePlugin.getGamePlugin().getGameHistoryManager().getCurrentGameHistory().setWinner(team.getName());
+        }
+
         Bukkit.getPluginManager().callEvent(new TeamWonEvent(team));
     }
 
@@ -194,7 +197,8 @@ public class GameTeamManager implements TeamManager {
             }
 
             teamsFinallySet = true;
-        } else throw new IllegalStateException("Could not set Teams for remaining players. Teams already finally set before!");
+        } else
+            throw new IllegalStateException("Could not set Teams for remaining players. Teams already finally set before!");
     }
 
     @Override
@@ -220,12 +224,13 @@ public class GameTeamManager implements TeamManager {
                         p.changeTeamTo(teamPlayers.keySet().iterator().next());
                     }
                 } else {
-                    throw new IllegalStateException("Could not automatically set team for player "+p.getCorePlayer().getName()+"! No teams with free slots available!");
+                    throw new IllegalStateException("Could not automatically set team for player " + p.getCorePlayer().getName() + "! No teams with free slots available!");
                 }
             }
 
             teamsFinallySet = true;
-        } else throw new IllegalStateException("Could not set Teams for remaining players. Teams already finally set before!");
+        } else
+            throw new IllegalStateException("Could not set Teams for remaining players. Teams already finally set before!");
     }
 
     @Override

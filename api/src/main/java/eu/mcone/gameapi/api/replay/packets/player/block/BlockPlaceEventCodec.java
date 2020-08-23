@@ -3,7 +3,9 @@ package eu.mcone.gameapi.api.replay.packets.player.block;
 import eu.mcone.coresystem.api.bukkit.codec.Codec;
 import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
 import eu.mcone.coresystem.api.bukkit.world.CoreLocation;
+import eu.mcone.gameapi.api.replay.runner.AsyncPlayerRunner;
 import eu.mcone.gameapi.api.replay.runner.PlayerRunner;
+import eu.mcone.gameapi.api.replay.runner.ReplayRunner;
 import lombok.Getter;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bukkit.Material;
@@ -17,6 +19,8 @@ import java.io.*;
 @Getter
 public class BlockPlaceEventCodec extends Codec<BlockPlaceEvent, PlayerRunner> {
 
+    public static final byte CODEC_VERSION = 1;
+
     private int id;
     private byte subID;
 
@@ -26,7 +30,7 @@ public class BlockPlaceEventCodec extends Codec<BlockPlaceEvent, PlayerRunner> {
     private String world;
 
     public BlockPlaceEventCodec() {
-        super((byte) 0, (byte) 0);
+        super((byte) 10, (byte) 3);
     }
 
     @BsonIgnore
@@ -50,7 +54,7 @@ public class BlockPlaceEventCodec extends Codec<BlockPlaceEvent, PlayerRunner> {
 
     @Override
     public void encode(PlayerRunner runner) {
-        for (Player player : runner.getWatchers()) {
+        for (Player player : runner.getViewers()) {
             if (player.getLocation().getWorld().getName().equalsIgnoreCase(world)) {
                 player.sendBlockChange(getLocation().bukkit(), Material.getMaterial(id), subID);
             }

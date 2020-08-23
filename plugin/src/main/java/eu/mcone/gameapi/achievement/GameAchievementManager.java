@@ -35,8 +35,8 @@ public class GameAchievementManager implements AchievementManager {
     private final GamePlugin plugin;
     private final Map<Gamemode, List<Achievement>> achievements;
 
-    public GameAchievementManager(GamePlugin plugin, GameAPIPlugin system, Option... options) {
-        this.loadAllAchievements = Arrays.asList(options).contains(Option.ACHIEVEMENT_MANAGER_LOAD_ALL_ACHIEVEMENTS);
+    public GameAchievementManager(GamePlugin plugin, GameAPIPlugin system) {
+        this.loadAllAchievements = GamePlugin.getGamePlugin().hasOption(Option.ACHIEVEMENT_MANAGER_LOAD_ALL_ACHIEVEMENTS);
         this.plugin = plugin;
         this.achievements = new HashMap<>();
 
@@ -83,7 +83,7 @@ public class GameAchievementManager implements AchievementManager {
         }
 
         if (achievements.containsKey(gamemode)) {
-            throw new IllegalArgumentException("Could not get achievement with name "+name+" from gamemode "+gamemode+". Gamemode is loaded but achievement does not exist!");
+            throw new IllegalArgumentException("Could not get achievement with name " + name + " from gamemode " + gamemode + ". Gamemode is loaded but achievement does not exist!");
         } else {
             return null;
         }

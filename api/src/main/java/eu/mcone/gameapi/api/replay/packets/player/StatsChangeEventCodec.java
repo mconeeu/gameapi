@@ -11,12 +11,14 @@ import java.io.*;
 @Getter
 public class StatsChangeEventCodec extends Codec<PlayerRoundStatsChangeEvent, ReplayPlayer> {
 
+    public static final byte CODEC_VERSION = 1;
+
     private int kills;
     private int deaths;
     private int goals;
 
     public StatsChangeEventCodec() {
-        super((byte) 0, (byte) 0);
+        super((byte) 24, (byte) 4);
     }
 
     @Override
@@ -38,7 +40,7 @@ public class StatsChangeEventCodec extends Codec<PlayerRoundStatsChangeEvent, Re
     @Override
     protected void onWriteObject(DataOutputStream out) throws IOException {
         out.writeInt(kills);
-        out.write(deaths);
+        out.writeInt(deaths);
         out.writeInt(goals);
     }
 

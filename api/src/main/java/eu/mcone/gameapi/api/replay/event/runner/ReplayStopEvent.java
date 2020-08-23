@@ -13,6 +13,7 @@ public class ReplayStopEvent extends Event {
 
     @Getter
     private static final HandlerList handlerList = new HandlerList();
+    private final String replayID;
     private final UUID containerID;
     private final int lastTick;
 

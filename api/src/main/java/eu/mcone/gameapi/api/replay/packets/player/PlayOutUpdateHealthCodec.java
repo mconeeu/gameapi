@@ -12,11 +12,13 @@ import java.io.*;
 @Getter
 public class PlayOutUpdateHealthCodec extends Codec<PacketPlayOutUpdateHealth, ReplayPlayer> {
 
+    public static final byte CODEC_VERSION = 1;
+
     private float health;
     private int food;
 
     public PlayOutUpdateHealthCodec() {
-        super((byte) 0, (byte) 0);
+        super((byte) 26, (byte) 4);
     }
 
     @Override
