@@ -113,7 +113,7 @@ public class GameAPIPlugin extends GameAPI {
     }
 
     @Override
-    public GameHistoryManager constructGameHistoryManager() {
+    public GameHistoryManager constructGameHistoryManager() throws NoSuchFieldException, IllegalAccessException {
         return new GameHistoryManager();
     }
 

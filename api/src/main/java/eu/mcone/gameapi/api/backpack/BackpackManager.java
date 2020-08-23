@@ -69,4 +69,6 @@ public interface BackpackManager {
     GadgetHandler getGadgetHandler();
 
     void setRankBoots(Player p);
+
+    void unsetRankBoots(Player p);
 }

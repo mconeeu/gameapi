@@ -180,7 +180,13 @@ public abstract class GamePlugin extends CorePlugin {
 
     public GameHistoryManager getGameHistoryManager() {
         modules.add(Module.GAME_HISTORY_MANAGER);
-        return gameHistoryManager != null ? gameHistoryManager : (gameHistoryManager = GameAPI.getInstance().constructGameHistoryManager());
+
+        try {
+            return gameHistoryManager != null ? gameHistoryManager : (gameHistoryManager = GameAPI.getInstance().constructGameHistoryManager());
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public boolean hasModule(Module module) {

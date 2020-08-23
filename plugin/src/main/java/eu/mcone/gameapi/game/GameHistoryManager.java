@@ -5,7 +5,6 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
-import eu.mcone.coresystem.core.CoreModuleCoreSystem;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Option;
@@ -14,8 +13,10 @@ import eu.mcone.gameapi.api.game.PlayerHistory;
 import eu.mcone.gameapi.api.replay.exception.GameOptionNotActiveException;
 import eu.mcone.gameapi.api.utils.IDUtils;
 import group.onegaming.networkmanager.core.api.database.Database;
+import group.onegaming.networkmanager.core.database.MongoConnection;
 import lombok.Getter;
 
+import java.lang.reflect.Field;
 import java.util.UUID;
 
 import static com.mongodb.client.model.Filters.*;
@@ -31,9 +32,14 @@ public class GameHistoryManager implements eu.mcone.gameapi.api.game.GameHistory
 
     private boolean saved = false;
 
-    public GameHistoryManager() {
-        historyDatabase = ((CoreModuleCoreSystem) CoreSystem.getInstance()).getMongoDB(Database.GAME);
-        gameHistoryCollection = historyDatabase.getCollection(GamePlugin.getGamePlugin().getGamemode().toString(), GameHistory.class);
+    public GameHistoryManager() throws NoSuchFieldException, IllegalAccessException {
+        Field f = CoreSystem.getInstance().getClass().getDeclaredField("mongoConnection");
+        f.setAccessible(true);
+        MongoConnection connection = (MongoConnection) f.get(CoreSystem.getInstance());
+        f.setAccessible(false);
+
+        this.historyDatabase = connection.getDatabase(Database.GAME);
+        this.gameHistoryCollection = historyDatabase.getCollection(GamePlugin.getGamePlugin().getGamemode().toString(), GameHistory.class);
 
         this.currentGamemode = GameAPIPlugin.getSystem().getGamemode();
         this.gameID = IDUtils.generateID();

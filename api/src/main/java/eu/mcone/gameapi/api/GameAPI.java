@@ -68,7 +68,7 @@ public abstract class GameAPI extends CorePlugin {
 
     public abstract OnePassManager constructOnePassManager();
 
-    public abstract GameHistoryManager constructGameHistoryManager();
+    public abstract GameHistoryManager constructGameHistoryManager() throws NoSuchFieldException, IllegalAccessException;
 
     public abstract GamePlayer getGamePlayer(CorePlayer cp);
 

@@ -433,6 +433,18 @@ public class GameBackpackManager implements BackpackManager {
         }
     }
 
+    @Override
+    public void unsetRankBoots(Player p) {
+        if (p.getInventory().getBoots() != null) {
+            for (RankBoots boots : RankBoots.values()) {
+                if (boots.getItem().equals(p.getInventory().getBoots())) {
+                    p.getInventory().setBoots(null);
+                    return;
+                }
+            }
+        }
+    }
+
     private BackpackInventoryListener getDefaultInventoryListener(DefaultCategory category) {
         switch (category) {
             case HAT:
