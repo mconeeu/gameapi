@@ -65,6 +65,13 @@
         </resources>
     </build>
 
+    <repositories>
+        <repository>
+            <id>onegaming-gitlab-applications</id>
+            <url>https://gitlab.onegaming.group/api/v4/groups/applications/-/packages/maven</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>eu.mcone.gameapi</groupId>

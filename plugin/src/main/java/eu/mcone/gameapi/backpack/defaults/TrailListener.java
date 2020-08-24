@@ -30,7 +30,7 @@ public class TrailListener extends BackpackInventoryListener {
     public void setBackpackItems(CategoryInventory inv, Category category, Set<BackpackItem> categoryItems, GamePlayer gamePlayer, Player p) {
         super.setBackpackItems(inv, category, categoryItems, gamePlayer, p);
 
-        inv.setItem(InventorySlot.ROW_6_SLOT_8, new ItemBuilder(Material.BARRIER, 1, 0).displayName("§c§lTrail deaktivieren").lore("§7§oFalls du einen deiner Trails", "§7§oaktiviert hast, kannst Du ihn", "§7§ohiermit deaktivieren.").create(), e -> {
+        inv.addCustomPlacedItem(InventorySlot.ROW_6_SLOT_8, new ItemBuilder(Material.BARRIER, 1, 0).displayName("§c§lTrail deaktivieren").lore("§7§oFalls du einen deiner Trails", "§7§oaktiviert hast, kannst Du ihn", "§7§ohiermit deaktivieren.").create(), e -> {
             handler.removeTrail(p);
             plugin.getMessenger().send(p, "§cDu hast dein aktuellen Trail erfolgreich deaktiviert!");
         });

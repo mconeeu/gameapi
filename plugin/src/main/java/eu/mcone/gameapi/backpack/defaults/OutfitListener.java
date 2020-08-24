@@ -31,7 +31,7 @@ public class OutfitListener extends BackpackInventoryListener {
     public void setBackpackItems(CategoryInventory inv, Category category, Set<BackpackItem> categoryItems, GamePlayer gamePlayer, Player p) {
         super.setBackpackItems(inv, category, categoryItems, gamePlayer, p);
 
-        inv.setItem(InventorySlot.ROW_6_SLOT_8, new ItemBuilder(Material.BARRIER).displayName("§c§lOutfit ausziehen").lore("§7§oFalls du eines deiner Outfits", "§7§oangezogen hast, kannst Du es", "§7§ohiermit ausziehen.").create(), e -> {
+        inv.addCustomPlacedItem(InventorySlot.ROW_6_SLOT_8, new ItemBuilder(Material.BARRIER).displayName("§c§lOutfit ausziehen").lore("§7§oFalls du eines deiner Outfits", "§7§oangezogen hast, kannst Du es", "§7§ohiermit ausziehen.").create(), e -> {
             p.getInventory().setArmorContents(null);
             plugin.getMessenger().send(p, "§7Du hast dein Outfit erfolgreich ausgezogen!");
             p.closeInventory();

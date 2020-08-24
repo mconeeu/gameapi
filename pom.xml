@@ -86,10 +86,6 @@
 
     <repositories>
         <repository>
-            <id>onegaming-gitlab-applications</id>
-            <url>https://gitlab.onegaming.group/api/v4/groups/applications/-/packages/maven</url>
-        </repository>
-        <repository>
             <id>onegaming-gitlab-systems</id>
             <url>https://gitlab.onegaming.group/api/v4/groups/systems/-/packages/maven</url>
         </repository>
@@ -112,7 +108,7 @@
         <dependency> <!-- MCONE CoreSystem (This includes the Bukkit-API) -->
             <groupId>eu.mcone.coresystem</groupId>
             <artifactId>bukkit-api</artifactId>
-            <version>10.8.8-SNAPSHOT</version>
+            <version>10.8.9-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency> <!-- Spigot (this includes Spigot API, Bukkit API, Craftbukkit and NMS) -->
