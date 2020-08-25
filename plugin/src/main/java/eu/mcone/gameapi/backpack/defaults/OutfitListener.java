@@ -6,6 +6,7 @@ import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
 import eu.mcone.gameapi.api.backpack.BackpackInventoryListener;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
 import eu.mcone.gameapi.api.backpack.Category;
+import eu.mcone.gameapi.api.backpack.defaults.DefaultCategory;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.backpack.handler.GameOutfitHandler;
 import lombok.Getter;
@@ -21,6 +22,9 @@ public class OutfitListener extends BackpackInventoryListener {
 
     @Override
     public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player p) {
+
+        gamePlayer.setLastUsedBackPackItem(item, DefaultCategory.OUTFIT.getName());
+
         handler.setOutfit(p, item);
         p.closeInventory();
         plugin.getMessenger().send(p, "§7Du hast das §f" + item.getName() + "§7 angezogen!");
@@ -31,12 +35,14 @@ public class OutfitListener extends BackpackInventoryListener {
     public void setBackpackItems(CategoryInventory inv, Category category, Set<BackpackItem> categoryItems, GamePlayer gamePlayer, Player p) {
         super.setBackpackItems(inv, category, categoryItems, gamePlayer, p);
 
-        inv.addCustomPlacedItem(InventorySlot.ROW_6_SLOT_8, new ItemBuilder(Material.BARRIER).displayName("§c§lOutfit ausziehen").lore("§7§oFalls du eines deiner Outfits", "§7§oangezogen hast, kannst Du es", "§7§ohiermit ausziehen.").create(), e -> {
-            p.getInventory().setArmorContents(null);
-            plugin.getMessenger().send(p, "§7Du hast dein Outfit erfolgreich ausgezogen!");
-            p.closeInventory();
-            p.setWalkSpeed(0.20F);
-        });
+        if (gamePlayer.getLastUsedBackPackItem() != null && gamePlayer.getLastUsedBackPackItem().getCategory().equals(DefaultCategory.OUTFIT.getName())) {
+            inv.addCustomPlacedItem(InventorySlot.ROW_6_SLOT_8, new ItemBuilder(Material.BARRIER).displayName("§c§lOutfit ausziehen").lore("§7§oFalls du eines deiner Outfits", "§7§oangezogen hast, kannst Du es", "§7§ohiermit ausziehen.").create(), e -> {
+                p.getInventory().setArmorContents(null);
+                plugin.getMessenger().send(p, "§7Du hast dein Outfit erfolgreich ausgezogen!");
+                p.closeInventory();
+                p.setWalkSpeed(0.20F);
+                gamePlayer.removeLastUsedBackPackItem();
+            });
+        }
     }
-
 }

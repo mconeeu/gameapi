@@ -17,11 +17,11 @@ public enum Level {
     MYSTICAL("§c§lMystisch", ChatColor.RED,14);
 
     @Getter
-    private String displayname;
+    private final String displayname;
     @Getter
-    private ChatColor chatColor;
+    private final ChatColor chatColor;
     @Getter
-    private int glasSubId;
+    private final int glasSubId;
 
     Level(String displayname, ChatColor chatcolor, int glasSubID) {
         this.displayname = displayname;

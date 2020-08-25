@@ -6,6 +6,7 @@ import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Module;
 import eu.mcone.gameapi.api.achievement.Achievement;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
+import eu.mcone.gameapi.api.backpack.BackpackSimpleItem;
 import eu.mcone.gameapi.api.kit.ModifiedKit;
 import eu.mcone.gameapi.api.player.GamePlayerSettings;
 import lombok.Getter;
@@ -24,17 +25,19 @@ public class GameAPIPlayerProfile extends GameProfile {
     private Map<String, Map<String, Long>> achievements = new HashMap<>();
     private List<ModifiedKit> customKits = new ArrayList<>();
     private GamePlayerSettings settings = new GamePlayerSettings();
+    private BackpackSimpleItem usedBackPackItem;
     private int oneLevel, oneXp;
     private boolean onePass;
 
     private transient Map<String, Set<BackpackItem>> itemMap = new HashMap<>();
     private transient Map<Gamemode, Map<Achievement, Long>> achievementMap = new HashMap<>();
 
-    GameAPIPlayerProfile(final Player p, final Map<String, Set<BackpackItem>> playerItems, Map<Gamemode, Map<Achievement, Long>> achievements, int oneLevel, int oneXp, boolean onePass) {
+    GameAPIPlayerProfile(final Player p, final Map<String, Set<BackpackItem>> playerItems, Map<Gamemode, Map<Achievement, Long>> achievements, BackpackSimpleItem usedBackPackItem, int oneLevel, int oneXp, boolean onePass) {
         super(p);
         this.oneLevel = oneLevel;
         this.oneXp = oneXp;
         this.onePass = onePass;
+        this.usedBackPackItem = usedBackPackItem;
 
         for (Map.Entry<String, Set<BackpackItem>> entry : playerItems.entrySet()) {
             List<Integer> itemIds = new ArrayList<>();

@@ -20,8 +20,9 @@ public enum DefaultCategory {
     PET("Tiere", "", new ItemBuilder(Material.MONSTER_EGG, 1, 55).displayName("§a§lTiere").lore("§7§oHaustiere folgen Dir wohin", "§7§oDu gehst", "", "§8» §f§nLinksklick§8 | §7§oÖffnen").create()),
     EXCLUSIVE("Exklusive Items", "", new ItemBuilder(Material.GOLD_HOE, 1, 0).displayName("§c§lExklusive Items").lore("§7§oHier befindet sich deine Exklusiven Items", "§7§owie Event oder Rang Items", "", "§8» §f§nLinksklick§8 | §7§oÖffnen").create()),;
 
-    private String name, description;
-    private ItemStack item;
+    private final String name;
+    private final String description;
+    private final ItemStack item;
 
     DefaultCategory(String name, String description, ItemStack item) {
         this.name = name;

@@ -23,7 +23,17 @@ public class GameOutfitHandler implements OutfitHandler {
     @Override
     public void setOutfit(Player p, BackpackItem item) {
         DefaultItem choosed = DefaultItem.getItemByID(DefaultCategory.OUTFIT, item.getId());
+        setOutfitsInventory(p, choosed, item);
+    }
 
+    @Override
+    public void setOutfit(Player p, DefaultItem item) {
+        DefaultItem choosed = DefaultItem.getItemByID(DefaultCategory.OUTFIT, item.getId());
+        setOutfitsInventory(p, choosed, null);
+    }
+
+
+    private void setOutfitsInventory(Player p, DefaultItem choosed, BackpackItem item) {
         if (choosed != null) {
             switch (choosed) {
                 case OUTFIT_RABBIT: {
@@ -135,5 +145,4 @@ public class GameOutfitHandler implements OutfitHandler {
             throw new IllegalStateException("Could not set Outfit from item " + item.getName() + ". Item is not a outfit!");
         }
     }
-
 }

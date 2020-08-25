@@ -6,6 +6,7 @@ import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
 import eu.mcone.gameapi.api.backpack.BackpackInventoryListener;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
 import eu.mcone.gameapi.api.backpack.Category;
+import eu.mcone.gameapi.api.backpack.defaults.DefaultCategory;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import org.bukkit.Material;
@@ -17,6 +18,9 @@ public class HatListener extends BackpackInventoryListener {
 
     @Override
     public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player p) {
+
+        gamePlayer.setLastUsedBackPackItem(item, DefaultCategory.HAT.getName());
+
         if (item.getId() == DefaultItem.HEAD_SECRET_STRIPCLUB.getId()) {
             p.getInventory().setHelmet(item.getItem());
             p.closeInventory();
@@ -34,11 +38,19 @@ public class HatListener extends BackpackInventoryListener {
     public void setBackpackItems(CategoryInventory inv, Category category, Set<BackpackItem> categoryItems, GamePlayer gamePlayer, Player p) {
         super.setBackpackItems(inv, category, categoryItems, gamePlayer, p);
 
-        inv.addCustomPlacedItem(InventorySlot.ROW_6_SLOT_8, new ItemBuilder(Material.BARRIER).displayName("§c§lKopf absetzen").lore("§7§oFalls du einen deiner Köpfe", "§7§oaufgesetzt hast, kannst Du ihn", "§7§ohiermit absetzen.").create(), e -> {
-            p.getInventory().setHelmet(null);
-            plugin.getMessenger().send(p, "§7Du hast deinen Kopf erfolgreich abgesetzt!");
-            p.setWalkSpeed(0.20F);
-        });
-    }
 
+        if (p.getInventory().getHelmet() != null) {
+            if (gamePlayer.getLastUsedBackPackItem() != null && gamePlayer.getLastUsedBackPackItem().getCategory().equalsIgnoreCase(DefaultCategory.HAT.getName())) {
+                inv.addCustomPlacedItem(InventorySlot.ROW_6_SLOT_8, new ItemBuilder(Material.BARRIER).displayName("§c§lKopf absetzen").lore("§7§oFalls du einen deiner Köpfe", "§7§oaufgesetzt hast, kannst Du ihn", "§7§ohiermit absetzen.").create(), e -> {
+
+                    p.getInventory().setHelmet(null);
+                    plugin.getMessenger().send(p, "§7Du hast deinen Kopf erfolgreich abgesetzt!");
+                    p.setWalkSpeed(0.20F);
+
+                    gamePlayer.removeLastUsedBackPackItem();
+
+                });
+            }
+        }
+    }
 }

@@ -5,7 +5,6 @@
 
 package eu.mcone.gameapi.player;
 
-import com.sun.org.apache.xpath.internal.operations.Mod;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
@@ -16,6 +15,8 @@ import eu.mcone.gameapi.api.Module;
 import eu.mcone.gameapi.api.Option;
 import eu.mcone.gameapi.api.achievement.Achievement;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
+import eu.mcone.gameapi.api.backpack.BackpackSimpleItem;
+import eu.mcone.gameapi.api.backpack.defaults.DefaultCategory;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.api.event.onepass.LevelChangeEvent;
 import eu.mcone.gameapi.api.event.onepass.XpChangeEvent;
@@ -28,6 +29,7 @@ import eu.mcone.gameapi.api.player.GamePlayerSettings;
 import eu.mcone.gameapi.api.player.GamePlayerState;
 import eu.mcone.gameapi.api.stats.StatsHistory;
 import eu.mcone.gameapi.api.team.Team;
+import eu.mcone.gameapi.backpack.handler.GameOutfitHandler;
 import eu.mcone.gameapi.kit.GameKitManager;
 import eu.mcone.gameapi.team.GameTeamManager;
 import lombok.Getter;
@@ -54,6 +56,8 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
 
     @Getter
     private GamePlayerState state = GamePlayerState.PLAYING;
+    @Getter
+    private BackpackSimpleItem lastUsedBackPackItem;
     @Getter
     @Setter
     private boolean effectsVisible = true;
@@ -89,6 +93,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
         this.customKits = systemProfile.getCustomKits();
         this.achievements = systemProfile.getAchievementMap();
         this.settings = systemProfile.getSettings();
+        this.lastUsedBackPackItem = systemProfile.getUsedBackPackItem();
         this.effectsVisible = systemProfile.getSettings().isEnableGadgets();
         this.oneLevel = systemProfile.getOneLevel();
         this.oneXp = systemProfile.getOneXp();
@@ -112,12 +117,59 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
             }
         }
 
-        system.saveGameProfile(new GameAPIPlayerProfile(corePlayer.bukkit(), backpackItems, achievements, oneLevel, oneXp, onePass));
+        system.saveGameProfile(new GameAPIPlayerProfile(corePlayer.bukkit(), backpackItems, achievements, lastUsedBackPackItem, oneLevel, oneXp, onePass));
     }
 
     /*
      * Backpack System
      */
+
+    @Override
+    public void setLastUsedBackPackItemInventar() {
+
+        if (getLastUsedBackPackItem() == null) {
+            return;
+        }
+
+        if (getLastUsedBackPackItem().getCategory().equalsIgnoreCase(DefaultCategory.GADGET.getName())) {
+            DefaultItem item = DefaultItem.getItemByID(DefaultCategory.GADGET, getLastUsedBackPackItem().getId());
+            assert item != null;
+            assert hasDefaultItem(item);
+
+            if (player.hasPermission("lobby.silenthub")) {
+                player.getInventory().setItem(GamePlugin.getGamePlugin().getBackpackManager().getItemSlot(), item.getItemStack());
+            } else {
+                player.getInventory().setItem(GamePlugin.getGamePlugin().getBackpackManager().getFallbackSlot(), item.getItemStack());
+            }
+        } else if (getLastUsedBackPackItem().getCategory().equalsIgnoreCase(DefaultCategory.OUTFIT.getName())) {
+            DefaultItem item = DefaultItem.getItemByID(DefaultCategory.OUTFIT, getLastUsedBackPackItem().getId());
+            assert item != null;
+            assert hasDefaultItem(item);
+
+            GameOutfitHandler handler = new GameOutfitHandler();
+            handler.setOutfit(player, item);
+        } else if (getLastUsedBackPackItem().getCategory().equalsIgnoreCase(DefaultCategory.HAT.getName())) {
+            DefaultItem item = DefaultItem.getItemByID(DefaultCategory.HAT, getLastUsedBackPackItem().getId());
+            assert item != null;
+            assert hasDefaultItem(item);
+
+            player.getInventory().setHelmet(item.getItemStack());
+        }
+    }
+
+
+    @Override
+    public void setLastUsedBackPackItem(BackpackItem item, String category) {
+        lastUsedBackPackItem = new BackpackSimpleItem(category, item);
+        saveData();
+    }
+
+    @Override
+    public void removeLastUsedBackPackItem() {
+        lastUsedBackPackItem = null;
+        saveData();
+    }
+
     @Override
     public void addBackpackItem(String category, BackpackItem item) throws IllegalArgumentException {
         if (GamePlugin.getGamePlugin().getBackpackManager().categoryExists(category)) {
@@ -135,7 +187,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
                 throw new IllegalArgumentException("Backpack item " + item + " could not be added. Item is not registered in any Category!");
             }
         } else {
-            throw new IllegalArgumentException("Backpack item " + item + " could not be added. Category " + category + " does not exist!");
+            throw new IllegalArgumentException("Backpack item " + item + " couer().itemExild not be added. Category " + category + " does not exist!");
         }
     }
 
@@ -499,7 +551,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
 
     @Override
     public ModifiedKit getModifiedKit(String name) {
-        return ((GameKitManager) GamePlugin.getGamePlugin().getKitManager()).getModifiedKit(bukkit(), name);
+        return GamePlugin.getGamePlugin().getKitManager().getModifiedKit(bukkit(), name);
     }
 
 

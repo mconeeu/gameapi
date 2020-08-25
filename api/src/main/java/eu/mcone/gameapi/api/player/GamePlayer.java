@@ -2,10 +2,10 @@ package eu.mcone.gameapi.api.player;
 
 import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
-import eu.mcone.coresystem.api.bukkit.player.Stats;
 import eu.mcone.coresystem.api.bukkit.stats.CoreStats;
 import eu.mcone.gameapi.api.achievement.Achievement;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
+import eu.mcone.gameapi.api.backpack.BackpackSimpleItem;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.api.kit.Kit;
 import eu.mcone.gameapi.api.kit.ModifiedKit;
@@ -37,6 +37,17 @@ public interface GamePlayer {
     CorePlayer getCorePlayer();
 
     GamePlayerSettings getSettings();
+
+    /*
+     * Backpack System
+     */
+    BackpackSimpleItem getLastUsedBackPackItem();
+
+    void setLastUsedBackPackItemInventar();
+
+    void setLastUsedBackPackItem(BackpackItem item, String category);
+
+    void removeLastUsedBackPackItem();
 
     void addBackpackItem(String category, BackpackItem item) throws IllegalArgumentException;
 

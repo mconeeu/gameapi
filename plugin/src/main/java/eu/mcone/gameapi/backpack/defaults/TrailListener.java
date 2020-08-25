@@ -32,7 +32,7 @@ public class TrailListener extends BackpackInventoryListener {
 
         inv.addCustomPlacedItem(InventorySlot.ROW_6_SLOT_8, new ItemBuilder(Material.BARRIER, 1, 0).displayName("§c§lTrail deaktivieren").lore("§7§oFalls du einen deiner Trails", "§7§oaktiviert hast, kannst Du ihn", "§7§ohiermit deaktivieren.").create(), e -> {
             handler.removeTrail(p);
-            plugin.getMessenger().send(p, "§cDu hast dein aktuellen Trail erfolgreich deaktiviert!");
+            plugin.getMessenger().send(p, "§7Du hast dein aktuellen Trail erfolgreich deaktiviert!");
         });
     }
 
