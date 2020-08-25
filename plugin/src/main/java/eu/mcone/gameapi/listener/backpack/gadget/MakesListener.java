@@ -135,9 +135,9 @@ public class MakesListener extends GadgetListener {
                         GameAPI.getInstance().getMessenger().send(player, "§4Es ist kein anderer §cSpieler§4 Online!");
                     }
                 }
+            } else {
+                GameAPI.getInstance().getMessenger().send(player, "§4Es ist kein anderer §cSpieler§4 Online!");
             }
-        } else {
-            GameAPI.getInstance().getMessenger().send(player, "§4Es ist kein anderer §cSpieler§4 Online!");
         }
     }
 }
