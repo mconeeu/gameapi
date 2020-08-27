@@ -2,7 +2,6 @@ package eu.mcone.gameapi.player;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.inventory.PlayerInventorySlot;
-import eu.mcone.coresystem.api.bukkit.vanish.VanishRule;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
@@ -25,22 +24,6 @@ import java.util.Set;
 
 public class GamePlayerManager implements PlayerManager {
 
-    private static final VanishRule SPECTATOR_VANISH_RULE = (p, canSeePlayer) -> {
-        GamePlayer gp = GameAPI.getInstance().getGamePlayer(p);
-
-        if (gp.getState().equals(GamePlayerState.SPECTATING)) {
-            Set<Player> playing = GamePlugin.getGamePlugin().getPlayerManager().getPlayers(GamePlayerState.PLAYING);
-
-            for (int i = 0; i < canSeePlayer.size(); i++) {
-                Player player = canSeePlayer.get(i);
-
-                if (playing.contains(player)) {
-                    canSeePlayer.remove(player);
-                }
-            }
-        }
-    };
-
     @Getter
     private final int minPlayers, maxPlayers;
     private final Set<GamePlayer> cameraPlayers;
@@ -54,7 +37,14 @@ public class GamePlayerManager implements PlayerManager {
                 new SpectatorListener(this),
                 new GamePlayerListener(this)
         );
-        CoreSystem.getInstance().getVanishManager().registerVanishRule(Integer.MAX_VALUE-10, SPECTATOR_VANISH_RULE);
+
+        CoreSystem.getInstance().getVanishManager().registerVanishRule(Integer.MAX_VALUE-10, (player, playerCanSee) -> {
+            GamePlayer gp = GameAPI.getInstance().getGamePlayer(player);
+
+            if (gp.getState().equals(GamePlayerState.PLAYING)) {
+                playerCanSee.removeIf(p -> GameAPIPlugin.getSystem().getGamePlayer(p).getState().equals(GamePlayerState.SPECTATING));
+            }
+        });
 
         system.sendConsoleMessage("§aLoading PlayerManager...");
     }
