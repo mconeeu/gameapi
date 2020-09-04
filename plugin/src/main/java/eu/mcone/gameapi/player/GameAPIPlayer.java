@@ -126,7 +126,6 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
 
     @Override
     public void setLastUsedBackPackItemInventar() {
-
         if (getLastUsedBackPackItem() == null) {
             return;
         }

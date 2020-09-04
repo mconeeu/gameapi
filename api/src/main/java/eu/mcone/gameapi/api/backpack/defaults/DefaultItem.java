@@ -32,6 +32,7 @@ public enum DefaultItem {
     FLY_CARPET(10, "Fliegender One Teppich", DefaultCategory.GADGET, Level.MYSTICAL, 185, 105, new ItemBuilder(Material.BANNER, 1, 0).displayName("§c§lFliegender One Teppich").lore("§7Kategorie: §bGadget", "§7Seltenheit: §cMythisch", "", "", "§7Springe auf deinem One Teppich", "§7und fliege durch die Insel!").create()),
     BOAT(11, "Boot", DefaultCategory.GADGET, Level.EPIC, 125, 75, new ItemBuilder(Material.BOAT, 1, 0).displayName("§5§lBoot").lore("§7Kategorie: §bGadget", "§7Seltenheit: §5Episch", "", "", "§7Schipper um die OneIsland", "§7Insel und hupe laut!").create()),
     MAKES(12, "Macht", DefaultCategory.GADGET, Level.LEGENDARY, 135, 90, new ItemBuilder(Material.LEVER, 1, 0).displayName("§6§lMacht").lore("§7Kategorie: §bGadget", "§7Seltenheit: §6Legendär", "", "", "§7Benuzte die Macht und", "§7schleuder Spieler hoch!").create()),
+    DOUBLEJUMP(13, "Doppel Sprung", DefaultCategory.GADGET, Level.EPIC, 120, 80, new ItemBuilder(Material.FEATHER, 1, 0).displayName("§5§lSprung").lore("§7Kategorie: §bGadget", "§7Seltenheit: §5Episch", "", "", "§7Hopp Hopp ich springe", "§7herum wie der Osterhase").create()),
 
 
     //Heads
