@@ -42,8 +42,6 @@ public class DoubleJumpListener extends GadgetListener {
             isJumping = true;
             p.getInventory().remove(p.getItemInHand());
 
-            p.setAllowFlight(false);
-            p.setFlying(false);
 
             Vector vec = p.getLocation().getDirection().normalize();
             vec = vec.setY(Math.max(0.4000000059604645D, vec.getY())).multiply(1.7F);
@@ -58,6 +56,8 @@ public class DoubleJumpListener extends GadgetListener {
                 public BukkitTask register() {
                     return Bukkit.getScheduler().runTaskLater(plugin, () -> {
                         p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
+
+
 
                         handler.register(new GadgetScheduler() {
                             @Override
