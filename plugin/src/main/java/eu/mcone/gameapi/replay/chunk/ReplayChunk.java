@@ -5,8 +5,8 @@ import eu.mcone.coresystem.api.bukkit.codec.CodecInputStream;
 import eu.mcone.coresystem.api.bukkit.codec.CodecOutputStream;
 import eu.mcone.coresystem.api.bukkit.codec.MultipleCodecCallback;
 import eu.mcone.coresystem.api.bukkit.packets.Chunk;
-import eu.mcone.coresystem.api.core.util.UUIDUtils;
 import eu.mcone.gameapi.api.GamePlugin;
+import group.onegaming.networkmanager.core.api.util.UUIDUtils;
 import lombok.Getter;
 
 import java.io.*;

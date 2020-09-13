@@ -32,10 +32,15 @@ public class WorldDownloader implements eu.mcone.gameapi.api.replay.world.WorldD
                 if (!downloaded.contains(world)) {
                     if (!CoreSystem.getInstance().getWorldManager().existWorld(world)) {
                         GameAPI.getInstance().sendConsoleMessage("§aDownloading World " + world + " from database...");
-                        CoreSystem.getInstance().getWorldManager().download(world);
-                        CoreWorld downloadedWorld = CoreSystem.getInstance().getWorldManager().getWorld(world);
-                        downloadedWorld.setLoadOnStartup(false);
-                        downloadedWorld.save();
+                        CoreSystem.getInstance().getWorldManager().download(world, (succeeded) -> {
+                            if (succeeded) {
+                                CoreWorld downloadedWorld = CoreSystem.getInstance().getWorldManager().getWorld(world);
+                                downloadedWorld.setLoadOnStartup(false);
+                                downloadedWorld.save();
+                            } else {
+                                GameAPI.getInstance().sendConsoleMessage("§cDie Welt " + world + " konnte nicht heruntergeladen werden.");
+                            }
+                        });
                     }
                 }
             }

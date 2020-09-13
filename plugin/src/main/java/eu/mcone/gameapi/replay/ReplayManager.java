@@ -304,10 +304,13 @@ public class ReplayManager implements eu.mcone.gameapi.api.replay.ReplayManager 
                 worldDownloader.getDownloaded().add(world);
             }
 
-            CoreSystem.getInstance().getWorldManager().download(world);
-            CoreWorld downloadedWorld = CoreSystem.getInstance().getWorldManager().getWorld(world);
-            downloadedWorld.setLoadOnStartup(false);
-            downloadedWorld.save();
+            CoreSystem.getInstance().getWorldManager().download(world, (succeeded) -> {
+                if (succeeded) {
+                    CoreWorld downloadedWorld = CoreSystem.getInstance().getWorldManager().getWorld(world);
+                    downloadedWorld.setLoadOnStartup(false);
+                    downloadedWorld.save();
+                }
+            });
         }
     }
 }

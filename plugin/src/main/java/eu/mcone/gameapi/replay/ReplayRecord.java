@@ -54,21 +54,20 @@ public class ReplayRecord implements eu.mcone.gameapi.api.replay.ReplayRecord {
     }
 
     public void recordSession() {
-        boolean succeed = true;
         if (!CoreSystem.getInstance().getWorldManager().existsWorldInDatabase(recorder.getWorld())) {
-            succeed = CoreSystem.getInstance().getWorldManager().upload(CoreSystem.getInstance().getWorldManager().getWorld(recorder.getWorld()));
-        }
+            CoreSystem.getInstance().getWorldManager().upload(CoreSystem.getInstance().getWorldManager().getWorld(recorder.getWorld()), (uploaded) -> {
+                if (uploaded) {
+                    recorder.record();
 
-        if (succeed) {
-            recorder.record();
-
-            //Adds the world entity spawn packet
-            for (eu.mcone.gameapi.api.replay.player.ReplayPlayer player : players.values()) {
-                Player bukkitPlayer = Bukkit.getPlayer(player.getUuid());
-                Bukkit.getServer().getPluginManager().callEvent(new PlayerJoinReplayEvent(bukkitPlayer));
-            }
-        } else {
-            throw new IllegalStateException("[REPLAY] Could not upload World " + recorder.getWorld() + " to database!");
+                    //Adds the world entity spawn packet
+                    for (eu.mcone.gameapi.api.replay.player.ReplayPlayer player : players.values()) {
+                        Player bukkitPlayer = Bukkit.getPlayer(player.getUuid());
+                        Bukkit.getServer().getPluginManager().callEvent(new PlayerJoinReplayEvent(bukkitPlayer));
+                    }
+                } else {
+                    throw new IllegalStateException("[REPLAY] Could not upload World " + recorder.getWorld() + " to database!");
+                }
+            });
         }
     }
 

@@ -120,34 +120,34 @@ public class ChunkHandler implements eu.mcone.gameapi.api.replay.chunk.ReplayChu
     }
 
     public File save() {
-        boolean succeed = true;
         if (!CoreSystem.getInstance().getWorldManager().existsWorldInDatabase(replay.getWorld())) {
-            succeed = CoreSystem.getInstance().getWorldManager().upload(CoreSystem.getInstance().getWorldManager().getWorld(replay.getWorld()));
-        }
-
-        if (succeed) {
-            System.out.println("World upload Succeeded, create and save now the replay file...");
-            Bukkit.getScheduler().runTaskAsynchronously(GamePlugin.getGamePlugin(), () -> {
-                try {
-                    ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(replayFile));
-                    for (Map.Entry<Integer, eu.mcone.gameapi.api.replay.chunk.ReplayChunk> entry : chunks.entrySet()) {
+            CoreSystem.getInstance().getWorldManager().upload(CoreSystem.getInstance().getWorldManager().getWorld(replay.getWorld()), (uploaded) -> {
+                if (uploaded) {
+                    System.out.println("World upload Succeeded, create and save now the replay file...");
+                    Bukkit.getScheduler().runTaskAsynchronously(GamePlugin.getGamePlugin(), () -> {
                         try {
-                            ZipEntry zipEntry = new ZipEntry("CHUNK:" + entry.getKey());
-                            zipOut.putNextEntry(zipEntry);
-                            zipOut.write(entry.getValue().getChunkData().serialize());
+                            ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(replayFile));
+                            for (Map.Entry<Integer, eu.mcone.gameapi.api.replay.chunk.ReplayChunk> entry : chunks.entrySet()) {
+                                try {
+                                    ZipEntry zipEntry = new ZipEntry("CHUNK:" + entry.getKey());
+                                    zipOut.putNextEntry(zipEntry);
+                                    zipOut.write(entry.getValue().getChunkData().serialize());
 
-                            zipOut.closeEntry();
+                                    zipOut.closeEntry();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            zipOut.close();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                    }
-
-                    zipOut.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    });
                 }
             });
         }
+
 
         return replayFile;
     }
