@@ -17,7 +17,7 @@ import static com.mongodb.client.model.Projections.include;
 public class WorldDownloader implements eu.mcone.gameapi.api.replay.world.WorldDownloader {
 
     @Getter
-    private List<String> downloaded;
+    private final List<String> downloaded;
     private BukkitTask task;
 
     public WorldDownloader() {

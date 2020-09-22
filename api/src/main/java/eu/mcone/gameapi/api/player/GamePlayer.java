@@ -45,6 +45,8 @@ public interface GamePlayer {
 
     void setLastUsedBackPackItemInventar();
 
+    void setLastUsedBackPackItemInventar(int slot1, int slot2);
+
     void setLastUsedBackPackItem(BackpackItem item, String category);
 
     void removeLastUsedBackPackItem();

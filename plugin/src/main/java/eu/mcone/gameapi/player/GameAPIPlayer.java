@@ -156,6 +156,38 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
         }
     }
 
+    @Override
+    public void setLastUsedBackPackItemInventar(int slot1, int slot2) {
+        if (getLastUsedBackPackItem() == null) {
+            return;
+        }
+
+        if (getLastUsedBackPackItem().getCategory().equalsIgnoreCase(DefaultCategory.GADGET.getName())) {
+            DefaultItem item = DefaultItem.getItemByID(DefaultCategory.GADGET, getLastUsedBackPackItem().getId());
+            assert item != null;
+            assert hasDefaultItem(item);
+
+            if (player.hasPermission("lobby.silenthub")) {
+                player.getInventory().setItem(slot1, item.getItemStack());
+            } else {
+                player.getInventory().setItem(slot2, item.getItemStack());
+            }
+        } else if (getLastUsedBackPackItem().getCategory().equalsIgnoreCase(DefaultCategory.OUTFIT.getName())) {
+            DefaultItem item = DefaultItem.getItemByID(DefaultCategory.OUTFIT, getLastUsedBackPackItem().getId());
+            assert item != null;
+            assert hasDefaultItem(item);
+
+            GameOutfitHandler handler = new GameOutfitHandler();
+            handler.setOutfit(player, item);
+        } else if (getLastUsedBackPackItem().getCategory().equalsIgnoreCase(DefaultCategory.HAT.getName())) {
+            DefaultItem item = DefaultItem.getItemByID(DefaultCategory.HAT, getLastUsedBackPackItem().getId());
+            assert item != null;
+            assert hasDefaultItem(item);
+
+            player.getInventory().setHelmet(item.getItemStack());
+        }
+    }
+
 
     @Override
     public void setLastUsedBackPackItem(BackpackItem item, String category) {
