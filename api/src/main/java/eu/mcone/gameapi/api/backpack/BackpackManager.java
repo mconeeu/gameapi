@@ -7,6 +7,7 @@ import eu.mcone.gameapi.api.backpack.handler.OutfitHandler;
 import eu.mcone.gameapi.api.backpack.handler.PetHandler;
 import eu.mcone.gameapi.api.backpack.handler.TrailHandler;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.HashSet;
 import java.util.List;
@@ -24,6 +25,10 @@ public interface BackpackManager {
     void setItemSlot(int slot);
 
     int getFallbackSlot();
+
+    int getBackpackSlot();
+
+    ItemStack getBackPackItem();
 
     void setFallbackSlot(int slot);
 

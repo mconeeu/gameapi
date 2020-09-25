@@ -11,7 +11,9 @@ import java.util.List;
 
 public interface TeamManager {
 
-    ItemStack TEAM = new ItemBuilder(Material.BED, 1, 0).displayName("§c§lTeam §8» §7§owähle dein Team aus.").create();
+    ItemStack getKitsChooseItem();
+
+    int getTeamChooseItemSlot();
 
     void loadDefaultTeams();
 

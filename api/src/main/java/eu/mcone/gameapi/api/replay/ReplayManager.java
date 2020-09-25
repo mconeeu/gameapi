@@ -3,7 +3,6 @@ package eu.mcone.gameapi.api.replay;
 import com.mongodb.client.FindIterable;
 import eu.mcone.coresystem.api.bukkit.codec.CodecRegistry;
 import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
-import eu.mcone.gameapi.api.Option;
 import org.bukkit.entity.Player;
 
 import java.util.List;

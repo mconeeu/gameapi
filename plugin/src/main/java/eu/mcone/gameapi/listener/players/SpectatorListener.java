@@ -76,7 +76,7 @@ public class SpectatorListener implements Listener {
 
             if (i.equals(PlayerManager.SPECTATOR)) {
                 GamePlugin.getGamePlugin().getPlayerManager().openSpectatorInventory(p);
-            } else if (i.equals(GameTeamManager.TEAM)) {
+            } else if (i.equals(GamePlugin.getGamePlugin().getKitManager().getKitChooserItem())) {
                 if (!GamePlugin.getGamePlugin().getTeamManager().isTeamsFinallySet()) {
                     GamePlugin.getGamePlugin().getTeamManager().openTeamInventory(p);
                 } else {

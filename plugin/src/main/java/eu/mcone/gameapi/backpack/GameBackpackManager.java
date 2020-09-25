@@ -8,6 +8,7 @@ import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.config.typeadapter.bson.ItemStackCodecProvider;
 import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import eu.mcone.coresystem.api.bukkit.inventory.category.CategoryInventory;
+import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GamePlugin;
@@ -36,7 +37,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.conversions.Bson;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
@@ -73,6 +76,14 @@ public class GameBackpackManager implements BackpackManager {
     @Getter
     @Setter
     private int fallbackSlot = 2;
+    @Getter
+    @Setter
+    private int backpackSlot = 1;
+    @Getter
+    private final ItemStack QUIT_ITEM = new ItemBuilder(Material.SLIME_BALL, 1, 0).displayName("§c§lLobby §8» §7§osendet dich zu Lobby zurück").create();
+    @Getter
+    private final ItemStack backPackItem = new ItemBuilder(Material.STORAGE_MINECART, 1, 0).displayName("§3§lRucksack §8» §7§oZeige deine gesammelten Items an").create();
+
 
     public GameBackpackManager(GameAPIPlugin system, GamePlugin gamePlugin) {
         this.gamePlugin = gamePlugin;

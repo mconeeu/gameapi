@@ -17,6 +17,7 @@ import eu.mcone.gameapi.game.GameHistoryManager;
 import eu.mcone.gameapi.gamestate.GameStateManager;
 import eu.mcone.gameapi.kit.GameKitManager;
 import eu.mcone.gameapi.listener.GamePlayerListener;
+import eu.mcone.gameapi.listener.hotbar.LobbyTriggerListener;
 import eu.mcone.gameapi.map.GameMapManager;
 import eu.mcone.gameapi.onepass.GameOnePassManager;
 import eu.mcone.gameapi.player.GameAPIPlayer;
@@ -49,7 +50,8 @@ public class GameAPIPlugin extends GameAPI {
             this.players = new ArrayList<>();
 
             registerEvents(
-                    new GamePlayerListener()
+                    new GamePlayerListener(),
+                    new LobbyTriggerListener()
             );
 
             sendConsoleMessage("§aVersion §f" + this.getDescription().getVersion() + "§a enabled...");

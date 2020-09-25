@@ -9,6 +9,10 @@ import java.util.UUID;
 
 public interface KitManager {
 
+    int getKitsChooserItemSlot();
+
+    ItemStack getKitChooserItem();
+
     void reload();
 
     void registerKits(Kit... kit);

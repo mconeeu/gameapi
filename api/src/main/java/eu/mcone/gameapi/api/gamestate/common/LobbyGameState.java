@@ -69,6 +69,7 @@ public class LobbyGameState extends GameState {
 
                 for (GamePlayer gp : GamePlugin.getGamePlugin().getPlayerManager().getGamePlayers(GamePlayerState.PLAYING)) {
                     gp.getCorePlayer().getScoreboard().setNewObjective(objective.newInstance());
+
                 }
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
