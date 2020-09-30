@@ -21,15 +21,13 @@ public class ItemCMD extends CoreCommand {
     }
 
     @Override
-    public boolean onCommand(CommandSender commandSender, String[] args) {
-        Player p = (Player) commandSender;
-
+    public boolean onCommand(CommandSender sender, String[] args) {
         if (args.length == 4) {
             if (args[0].equalsIgnoreCase("add")) {
                 Player t = Bukkit.getServer().getPlayer(args[1]);
 
                 if (t == null) {
-                    GameAPIPlugin.getInstance().getMessenger().send(p, "§4Der Spieler " + args[1] + " ist offline!");
+                    GameAPIPlugin.getInstance().getMessenger().sendSender(sender, "§4Der Spieler " + args[1] + " ist offline!");
                     return false;
                 } else {
                     GamePlayer gp = GameAPIPlugin.getSystem().getGamePlayer(t);
@@ -42,29 +40,29 @@ public class ItemCMD extends CoreCommand {
                                     if (!gp.hasBackpackItem(args[2], Integer.parseInt(args[3]))) {
                                         gp.addBackpackItem(args[2], item);
 
-                                        if (p.equals(t)) {
-                                            GameAPIPlugin.getInstance().getMessenger().send(p, "§2Du hast dir das Item §a" + item.getName() + "§2 hinzugefügt");
+                                        if (sender instanceof Player && sender.equals(t)) {
+                                            GameAPIPlugin.getInstance().getMessenger().sendSender(sender, "§2Du hast dir das Item §a" + item.getName() + "§2 hinzugefügt");
                                         } else {
-                                            GameAPIPlugin.getInstance().getMessenger().send(p, "§2Du hast das Item §a" + item.getName() + " §2vom Spieler §a" + t.getName() + " §2hinzugefügt");
-                                            GameAPIPlugin.getInstance().getMessenger().send(t, "§2Du hast das Item §a" + item.getName() + " §2vom Spieler §a" + p.getName() + " §2bekommen!");
+                                            GameAPIPlugin.getInstance().getMessenger().sendSender(sender, "§2Du hast das Item §a" + item.getName() + " §2vom Spieler §a" + t.getName() + " §2hinzugefügt");
+                                            GameAPIPlugin.getInstance().getMessenger().send(t, "§2Du hast das Item §a" + item.getName() + " §2vom Spieler §a" + sender.getName() + " §2bekommen!");
                                         }
 
                                         return true;
                                     } else {
-                                        GameAPIPlugin.getInstance().getMessenger().send(p, "§4Der Spieler besitzt dieses Item bereits!");
+                                        GameAPIPlugin.getInstance().getMessenger().sendSender(sender, "§4Der Spieler besitzt dieses Item bereits!");
                                         return false;
                                     }
                                 }
                             }
                         } catch (NumberFormatException e) {
-                            GameAPIPlugin.getInstance().getMessenger().send(p, "§c" + args[3] + "§4 ist keine Item ID!");
+                            GameAPIPlugin.getInstance().getMessenger().sendSender(sender, "§c" + args[3] + "§4 ist keine Item ID!");
                             return false;
                         }
 
-                        GameAPIPlugin.getInstance().getMessenger().send(p, "§4Das Item mit der ID §c" + args[2] + "§4 existiert nicht!");
+                        GameAPIPlugin.getInstance().getMessenger().sendSender(sender, "§4Das Item mit der ID §c" + args[2] + "§4 existiert nicht!");
                         return false;
                     } else {
-                        GameAPIPlugin.getInstance().getMessenger().send(p, "§4Die Kategorie " + args[2] + " existiert nicht!");
+                        GameAPIPlugin.getInstance().getMessenger().sendSender(sender, "§4Die Kategorie " + args[2] + " existiert nicht!");
                         return false;
                     }
                 }
@@ -72,7 +70,7 @@ public class ItemCMD extends CoreCommand {
                 Player t = Bukkit.getServer().getPlayer(args[1]);
 
                 if (t == null) {
-                    GameAPIPlugin.getInstance().getMessenger().send(p, "§4Der Spieler " + args[1] + " ist Offline!");
+                    GameAPIPlugin.getInstance().getMessenger().sendSender(sender, "§4Der Spieler " + args[1] + " ist Offline!");
                     return false;
                 } else {
                     GamePlayer gp = GameAPIPlugin.getSystem().getGamePlayer(t);
@@ -85,39 +83,39 @@ public class ItemCMD extends CoreCommand {
                                     if (gp.hasBackpackItem(args[2], Integer.parseInt(args[3]))) {
                                         gp.removeBackpackItem(args[2], item);
 
-                                        if (p.equals(t)) {
-                                            GameAPIPlugin.getInstance().getMessenger().send(p, "§2Du hast dir das Item §a" + item.getName() + "§2 entfernt");
+                                        if (sender instanceof Player && sender.equals(t)) {
+                                            GameAPIPlugin.getInstance().getMessenger().sendSender(sender, "§2Du hast dir das Item §a" + item.getName() + "§2 entfernt");
                                         } else {
-                                            GameAPIPlugin.getInstance().getMessenger().send(p, "§2Du hast das Item §a" + item.getName() + " §2vom Spieler §a" + t.getName() + " §2gelöscht");
+                                            GameAPIPlugin.getInstance().getMessenger().sendSender(sender, "§2Du hast das Item §a" + item.getName() + " §2vom Spieler §a" + t.getName() + " §2gelöscht");
                                         }
 
                                         return true;
                                     } else {
-                                        GameAPIPlugin.getInstance().getMessenger().send(p, "§4Der Spieler besitzt dieses Item nicht!");
+                                        GameAPIPlugin.getInstance().getMessenger().sendSender(sender, "§4Der Spieler besitzt dieses Item nicht!");
                                         return false;
                                     }
                                 }
                             }
                         } catch (NumberFormatException e) {
-                            GameAPIPlugin.getInstance().getMessenger().send(p, "§c" + args[3] + "§4 ist keine Item ID!");
+                            GameAPIPlugin.getInstance().getMessenger().sendSender(sender, "§c" + args[3] + "§4 ist keine Item ID!");
                             return false;
                         }
 
-                        GameAPIPlugin.getInstance().getMessenger().send(p, "§4Das Item mit der ID §c" + args[2] + "§4 existiert nicht!");
+                        GameAPIPlugin.getInstance().getMessenger().sendSender(sender, "§4Das Item mit der ID §c" + args[2] + "§4 existiert nicht!");
                         return false;
                     } else {
-                        GameAPIPlugin.getInstance().getMessenger().send(p, "§4Die Kategorie " + args[2] + " existiert nicht!");
+                        GameAPIPlugin.getInstance().getMessenger().sendSender(sender, "§4Die Kategorie " + args[2] + " existiert nicht!");
                         return false;
                     }
                 }
             }
         } else if (args.length == 1 && args[0].equalsIgnoreCase("list")) {
-            GameAPIPlugin.getInstance().getMessenger().send(p, "https://systems.gitlab.onegaming.group/gamesystem/eu/mcone/gameapi/api/backpack/defaults/DefaultItem.html");
-            GameAPIPlugin.getInstance().getMessenger().send(p, "https://systems.gitlab.onegaming.group/lobby/eu/mcone/lobby/api/enums/Item.html");
+            GameAPIPlugin.getInstance().getMessenger().sendSender(sender, "https://systems.gitlab.onegaming.group/gamesystem/eu/mcone/gameapi/api/backpack/defaults/DefaultItem.html");
+            GameAPIPlugin.getInstance().getMessenger().sendSender(sender, "https://systems.gitlab.onegaming.group/lobby/eu/mcone/lobby/api/enums/Item.html");
             return true;
         }
 
-        GameAPIPlugin.getInstance().getMessenger().send(p, "§4Bitte benutze: §c/item <add|remove|list> [<Spieler>] [<Kategorie>] [<Item-name>]");
+        GameAPIPlugin.getInstance().getMessenger().sendSender(sender, "§4Bitte benutze: §c/item <add|remove|list> [<Spieler>] [<Kategorie>] [<Item-name>]");
         return false;
     }
 }
