@@ -1,16 +1,14 @@
 package eu.mcone.gameapi.api.backpack;
 
-import eu.mcone.gameapi.api.Option;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.api.backpack.handler.GadgetHandler;
 import eu.mcone.gameapi.api.backpack.handler.OutfitHandler;
 import eu.mcone.gameapi.api.backpack.handler.PetHandler;
 import eu.mcone.gameapi.api.backpack.handler.TrailHandler;
+import eu.mcone.gameapi.api.player.GamePlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,17 +18,9 @@ public interface BackpackManager {
 
     boolean isUseRankBoots();
 
-    int getItemSlot();
+    int getGadgetSlot(Player player);
 
-    void setItemSlot(int slot);
-
-    int getFallbackSlot();
-
-    int getBackpackSlot();
-
-    ItemStack getBackPackItem();
-
-    void setFallbackSlot(int slot);
+    void setGadgetSlotProvider(GadgetSlotProvider gadgetSlotProvider);
 
     void setUseRankBoots(boolean use);
 
@@ -51,6 +41,8 @@ public interface BackpackManager {
     void openBackpackInventory(String category, Player player);
 
     void openBackpackSellInventory(String name, Player p) throws IllegalArgumentException;
+
+    void setCurrentBackpackItem(GamePlayer gp);
 
     BackpackTradeManager getTradeManager();
 

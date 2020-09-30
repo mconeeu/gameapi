@@ -4,7 +4,6 @@ import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.api.player.GamePlayer;
-import eu.mcone.gameapi.listener.backpack.handler.GadgetScheduler;
 import eu.mcone.gameapi.listener.backpack.handler.GameGadgetHandler;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -13,7 +12,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -35,13 +33,11 @@ public class CobwebGunListener extends GadgetListener {
         if (e.hasItem() && e.getItem().equals(DefaultItem.COBWEBGUN.getItemStack()) && (e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_AIR))) {
             Player p = e.getPlayer();
 
-            org.bukkit.entity.Item item = p.getLocation().getWorld().dropItem(p.getEyeLocation(),
-                    new ItemStack(Material.FIREWORK_CHARGE));
-            if (p.hasPermission("lobby.silenthub")) {
-                p.getInventory().setItem(plugin.getBackpackManager().getItemSlot(), null);
-            } else {
-                p.getInventory().setItem(plugin.getBackpackManager().getFallbackSlot(), null);
-            }
+            org.bukkit.entity.Item item = p.getLocation().getWorld().dropItem(
+                    p.getEyeLocation(),
+                    new ItemStack(Material.FIREWORK_CHARGE)
+            );
+            p.getInventory().setItem(plugin.getBackpackManager().getGadgetSlot(p), null);
 
             Vector v = p.getLocation().getDirection().multiply(1);
             item.setVelocity(v);
@@ -51,39 +47,36 @@ public class CobwebGunListener extends GadgetListener {
 
 
 //            if ((oldItemDown.getType().equals(Material.GRASS) || oldItemDown.getType().equals(Material.AIR)) && oldItemUp.getType().equals(Material.AIR)) {
-            handler.register(new GadgetScheduler() {
-                @Override
-                public BukkitTask register() {
-                    return Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                        item.getWorld().createExplosion(item.getLocation().getX(), item.getLocation().getY(),
-                                item.getLocation().getZ(), 3, false, false);
+            handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                item.getWorld().createExplosion(item.getLocation().getX(), item.getLocation().getY(),
+                        item.getLocation().getZ(), 3, false, false);
 
-                /*Block yplus1 = item.getLocation().getWorld().getBlockAt(new Location(item.getWorld(), item.getLocation().getBlockX(), item.getLocation().getBlockY() + 1, item.getLocation().getBlockZ()));
-                Block startair = item.getLocation().getWorld().getBlockAt(new Location(item.getWorld(), item.getLocation().getBlockX(), item.getLocation().getBlockY(), item.getLocation().getBlockZ()));
-                 */
+        /*Block yplus1 = item.getLocation().getWorld().getBlockAt(new Location(item.getWorld(), item.getLocation().getBlockX(), item.getLocation().getBlockY() + 1, item.getLocation().getBlockZ()));
+        Block startair = item.getLocation().getWorld().getBlockAt(new Location(item.getWorld(), item.getLocation().getBlockX(), item.getLocation().getBlockY(), item.getLocation().getBlockZ()));
+         */
 
-                        for (int i = 0; i <= 5; i++) {
-                            int x;
-                            int y;
-                            int z;
+                for (int i = 0; i <= 5; i++) {
+                    int x;
+                    int y;
+                    int z;
 
-                            Random random = new Random();
-                            x = random.nextInt(3);
-                            y = random.nextInt(3);
-                            z = random.nextInt(3);
-                            locations.add(item.getLocation().add(x, y, z));
-                        }
+                    Random random = new Random();
+                    x = random.nextInt(3);
+                    y = random.nextInt(3);
+                    z = random.nextInt(3);
+                    locations.add(item.getLocation().add(x, y, z));
+                }
 
-                        for (Location location : locations) {
-                            if (item.getLocation().getWorld().getBlockAt(location).getType().equals(Material.AIR)) {
-                                for (GamePlayer gp : GameAPI.getInstance().getOnlineGamePlayers()) {
-                                    if (gp.getSettings().isEnableGadgets() && gp.isEffectsVisible()) {
-                                        gp.bukkit().sendBlockChange(location, Material.WEB, (byte) 0);
-                                        cobwebLocations.add(location);
-                                    }
-                                }
+                for (Location location : locations) {
+                    if (item.getLocation().getWorld().getBlockAt(location).getType().equals(Material.AIR)) {
+                        for (GamePlayer gp : GameAPI.getInstance().getOnlineGamePlayers()) {
+                            if (gp.getSettings().isEnableGadgets() && gp.isEffectsVisible()) {
+                                gp.bukkit().sendBlockChange(location, Material.WEB, (byte) 0);
+                                cobwebLocations.add(location);
                             }
                         }
+                    }
+                }
 
 
 //                    Location loc1 = item.getLocation();
@@ -98,82 +91,43 @@ public class CobwebGunListener extends GadgetListener {
 //                                .setType(Material.WEB);
 //                    }
 
-                        item.getWorld().playEffect(item.getLocation(), Effect.FIREWORKS_SPARK, 1);
-                        item.getWorld().playSound(item.getLocation(), Sound.GLASS, 1, 1);
-                        handler.register(new GadgetScheduler() {
-                            @Override
-                            public BukkitTask register() {
-                                return Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                                    item.getWorld().playSound(item.getLocation(), Sound.FIREWORK_TWINKLE, 1, 1);
-                                    handler.remove(this);
-                                }, 3);
-                            }
-                        });
+                item.getWorld().playEffect(item.getLocation(), Effect.FIREWORKS_SPARK, 1);
+                item.getWorld().playSound(item.getLocation(), Sound.GLASS, 1, 1);
 
-                        handler.remove(this);
-                    }, 20);
-                }
-            });
+                handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    item.getWorld().playSound(item.getLocation(), Sound.FIREWORK_TWINKLE, 1, 1);
+                }, 3));
+            }, 20));
 
             p.playSound(p.getLocation(), Sound.CHICKEN_EGG_POP, 1, 1);
-            handler.register(new GadgetScheduler() {
-                @Override
-                public BukkitTask register() {
-                    return Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                        p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
+            handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
 
-                        handler.register(new GadgetScheduler() {
-                            @Override
-                            public BukkitTask register() {
-                                return Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                                    p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
+                handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
 
-                                    handler.register(new GadgetScheduler() {
-                                        @Override
-                                        public BukkitTask register() {
-                                            return Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                                                p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
-                                                locations.clear();
+                    handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                        p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
+                        locations.clear();
 
-                                                for (Location location : cobwebLocations) {
-                                                    for (GamePlayer gp : GameAPI.getInstance().getOnlineGamePlayers()) {
-                                                        if (gp.getSettings().isEnableGadgets() && gp.isEffectsVisible()) {
-                                                            gp.bukkit().sendBlockChange(location, Material.AIR, (byte) 0);
-                                                        }
-                                                    }
-                                                }
-                                                cobwebLocations.clear();
-
-                                                handler.register(new GadgetScheduler() {
-                                                    @Override
-                                                    public BukkitTask register() {
-                                                        return Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                                                            p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
-                                                            if (p.hasPermission("lobby.silenthub")) {
-                                                                p.getInventory().setItem(plugin.getBackpackManager().getItemSlot(), DefaultItem.COBWEBGUN.getItemStack());
-                                                            } else {
-                                                                p.getInventory().setItem(plugin.getBackpackManager().getFallbackSlot(), DefaultItem.COBWEBGUN.getItemStack());
-                                                            }
-
-                                                            handler.remove(this);
-                                                        }, 33);
-                                                    }
-                                                });
-
-                                                handler.remove(this);
-                                            }, 18);
-                                        }
-                                    });
-
-                                    handler.remove(this);
-                                }, 10);
+                        for (Location location : cobwebLocations) {
+                            for (GamePlayer gp : GameAPI.getInstance().getOnlineGamePlayers()) {
+                                if (gp.getSettings().isEnableGadgets() && gp.isEffectsVisible()) {
+                                    gp.bukkit().sendBlockChange(location, Material.AIR, (byte) 0);
+                                }
                             }
-                        });
+                        }
+                        cobwebLocations.clear();
 
-                        handler.remove(this);
-                    }, 10);
-                }
-            });
+                        handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                            p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
+                            p.getInventory().setItem(plugin.getBackpackManager().getGadgetSlot(p), DefaultItem.COBWEBGUN.getItemStack());
+
+                            handler.cleanup(e);
+                        }, 33));
+                    }, 18));
+                }, 10));
+            }, 10));
 //            } else {
 //                LobbyPlugin.getInstance().getMessenger().send(p, "§4Die Cobweb gun funktioniert hier nicht (Block im Weg!)");
 //                p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);

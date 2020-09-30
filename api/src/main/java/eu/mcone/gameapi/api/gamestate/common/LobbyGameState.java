@@ -1,7 +1,6 @@
 package eu.mcone.gameapi.api.gamestate.common;
 
 import eu.mcone.coresystem.api.bukkit.CorePlugin;
-import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Module;
 import eu.mcone.gameapi.api.Option;
@@ -15,14 +14,11 @@ import eu.mcone.gameapi.api.scoreboard.LobbyObjectiveImpl;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class LobbyGameState extends GameState {
 
-    public static final ItemStack QUIT_ITEM = new ItemBuilder(Material.IRON_DOOR, 1, 0).displayName("§4§lVerlassen §8» §7§overlasse die Runde.").create();
     private static final int FORCE_START_TIME = 10;
 
     @Setter

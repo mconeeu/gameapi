@@ -6,6 +6,7 @@ import eu.mcone.coresystem.api.bukkit.inventory.PlayerInventorySlot;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.coresystem.api.bukkit.scoreboard.MainScoreboard;
 import eu.mcone.gameapi.api.GamePlugin;
+import eu.mcone.gameapi.api.HotbarItem;
 import eu.mcone.gameapi.api.Module;
 import eu.mcone.gameapi.api.Option;
 import eu.mcone.gameapi.api.event.gamestate.GameStateStartEvent;
@@ -83,7 +84,7 @@ public class EndGameState extends GameState {
             p.getInventory().setArmorContents(null);
             p.setGameMode(GameMode.SURVIVAL);
 
-            p.getInventory().setItem(PlayerInventorySlot.HOTBAR_SLOT_9, LobbyGameState.QUIT_ITEM);
+            p.getInventory().setItem(PlayerInventorySlot.HOTBAR_SLOT_9, HotbarItem.QUIT);
             CoreSystem.getInstance().getWorldManager().getWorld(GamePlugin.getGamePlugin().getGameConfig().parseConfig().getLobby()).teleport(p, "spawn");
         }
 

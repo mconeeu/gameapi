@@ -3,7 +3,6 @@ package eu.mcone.gameapi.kit;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.UpdateOptions;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
-import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Option;
@@ -40,17 +39,10 @@ public class GameKitManager implements KitManager {
     @Getter
     private final List<Kit> kits;
     private final Map<UUID, String> currentKits;
-    private Map<UUID, List<String>> playerKits;
+    private final Map<UUID, List<String>> playerKits;
     private final Map<UUID, List<ModifiedKit>> customKits;
 
-    @Getter
-    private final int kitsChooserItemSlot = 7;
-    @Getter
-    private final ItemStack kitChooserItem = new ItemBuilder(Material.CHEST, 1, 0).displayName("§c§lTemporärekits §8» §7§okaufe dir hier dein Temporäres Ingame Kit.").create();
-
-
-    @Setter
-    @Getter
+    @Setter @Getter
     private Kit defaultKit;
 
     public GameKitManager(GameAPIPlugin system, GamePlugin plugin) {

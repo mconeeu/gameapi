@@ -17,14 +17,14 @@ import eu.mcone.gameapi.api.scoreboard.LobbyObjective;
 import eu.mcone.gameapi.backpack.defaults.GadgetListener;
 import eu.mcone.gameapi.gamestate.GameStateManager;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.DisplaySlot;
-
-import java.lang.reflect.InvocationTargetException;
 
 @RequiredArgsConstructor
 public class GameStateListener implements Listener {
@@ -33,25 +33,35 @@ public class GameStateListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void on(GamePlayerLoadedEvent e) {
-        Player player = e.getPlayer().getCorePlayer().bukkit();
+        Player p = e.getPlayer().getCorePlayer().bukkit();
 
         if (GamePlugin.getGamePlugin().getGameStateManager().getRunning() instanceof LobbyGameState) {
+            p.setGameMode(GameMode.SURVIVAL);
+
+            p.getInventory().clear();
+            p.getInventory().setArmorContents(null);
+            p.setHealth(20);
+            p.setFoodLevel(20);
+            p.setLevel(0);
+            p.setExp(0);
+            p.removePotionEffect(PotionEffectType.SLOW);
+
             if (GamePlugin.getGamePlugin().hasModule(Module.REPLAY)) {
-                GamePlugin.getGamePlugin().getReplay().addPlayer(player);
+                GamePlugin.getGamePlugin().getReplay().addPlayer(p);
             }
 
             if (GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)) {
                 PlayerManager playerManager = GamePlugin.getGamePlugin().getPlayerManager();
 
                 for (CorePlayer cps : CoreSystem.getInstance().getOnlineCorePlayers()) {
-                    GamePlugin.getGamePlugin().getMessenger().sendTransl(cps.bukkit(), "game.join", player.getName(), playerManager.getPlayers(GamePlayerState.PLAYING).size(), playerManager.getMaxPlayers());
+                    GamePlugin.getGamePlugin().getMessenger().sendTransl(cps.bukkit(), "game.join", p.getName(), playerManager.getPlayers(GamePlayerState.PLAYING).size(), playerManager.getMaxPlayers());
 
                     CoreSystem.getInstance().createTitle()
                             .stay(5)
                             .fadeIn(2)
                             .fadeOut(2)
                             .title(GamePlugin.getGamePlugin().getGamemode() != null ? GamePlugin.getGamePlugin().getGamemode().getLabel() : null)
-                            .subTitle(CoreSystem.getInstance().getTranslationManager().get("game.join.title", cps, player.getName(), playerManager.getPlayers(GamePlayerState.PLAYING).size(), playerManager.getMaxPlayers()))
+                            .subTitle(CoreSystem.getInstance().getTranslationManager().get("game.join.title", cps, p.getName(), playerManager.getPlayers(GamePlayerState.PLAYING).size(), playerManager.getMaxPlayers()))
                             .send(cps.bukkit());
                 }
 

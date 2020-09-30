@@ -386,10 +386,10 @@ public class ReplayContainer implements eu.mcone.gameapi.api.replay.container.Re
                     tp.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/replay join " + sender.getName()));
 
                     GamePlugin.getGamePlugin().getMessenger().send(target, new BaseComponent[]{tp});
-                    GamePlugin.getGamePlugin().getMessenger().send(sender, "§aDu hast den Spieler §e" + target.getName() + " §aerfolgreich eingeladen.");
+                    GamePlugin.getGamePlugin().getMessenger().sendSender(sender, "§aDu hast den Spieler §e" + target.getName() + " §aerfolgreich eingeladen.");
                 }
             } else {
-                GamePlugin.getGamePlugin().getMessenger().send(sender, "§cDer Spieler ist bereits in deiner Session.");
+                GamePlugin.getGamePlugin().getMessenger().sendSender(sender, "§cDer Spieler ist bereits in deiner Session.");
             }
         }
     }

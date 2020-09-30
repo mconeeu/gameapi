@@ -1,13 +1,15 @@
 package eu.mcone.gameapi.api.replay.packets.player.objective;
 
 import eu.mcone.coresystem.api.bukkit.codec.Codec;
-import eu.mcone.coresystem.api.bukkit.event.objectiv.CoreObjectiveCreateEvent;
+import eu.mcone.coresystem.api.bukkit.event.objective.CoreObjectiveCreateEvent;
 import eu.mcone.gameapi.api.replay.objectives.ReplayPlayerSidebarObjective;
 import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 @Getter
 public class CoreObjectiveCreateEventCodec extends Codec<CoreObjectiveCreateEvent, ReplayPlayer> {

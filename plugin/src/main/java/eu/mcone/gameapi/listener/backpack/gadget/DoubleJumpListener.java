@@ -5,13 +5,10 @@
 
 package eu.mcone.gameapi.listener.backpack.gadget;
 
-import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
-import eu.mcone.gameapi.listener.backpack.handler.GadgetScheduler;
 import eu.mcone.gameapi.listener.backpack.handler.GameGadgetHandler;
-import eu.mcone.gameapi.player.GameAPIPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Sound;
@@ -19,7 +16,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 public class DoubleJumpListener extends GadgetListener {
@@ -51,51 +47,24 @@ public class DoubleJumpListener extends GadgetListener {
             p.playEffect(p.getLocation(), Effect.BLAZE_SHOOT, 10);
 
 
-            handler.register(new GadgetScheduler() {
-                @Override
-                public BukkitTask register() {
-                    return Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                        p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
+            handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
 
+                handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
 
+                    handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                        p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
 
-                        handler.register(new GadgetScheduler() {
-                            @Override
-                            public BukkitTask register() {
-                                return Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                                    p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
+                        isJumping = false;
 
-                                    handler.register(new GadgetScheduler() {
-                                        @Override
-                                        public BukkitTask register() {
-                                            return Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                                                p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
-
-                                                isJumping = false;
-
-                                                if (p.hasPermission("lobby.silenthub")) {
-                                                    p.getInventory().setItem(plugin.getBackpackManager().getItemSlot(), DefaultItem.DOUBLEJUMP.getItemStack());
-                                                    p.getWorld().playEffect(p.getLocation(), Effect.LARGE_SMOKE, 10);
-                                                    p.spigot().playEffect(p.getLocation(), Effect.FLAME, 1, 1, 1, 1, 1, 2, 100, 100);
-                                                } else {
-                                                    p.getInventory().setItem(plugin.getBackpackManager().getFallbackSlot(), DefaultItem.DOUBLEJUMP.getItemStack());
-                                                    p.getWorld().playEffect(p.getLocation(), Effect.LARGE_SMOKE, 10);
-                                                    p.spigot().playEffect(p.getLocation(), Effect.FLAME, 1, 1, 1, 1, 1, 3, 100, 100);
-                                                }
-                                                handler.remove(this);
-                                            }, 15);
-                                        }
-                                    });
-
-                                    handler.remove(this);
-                                }, 10);
-                            }
-                        });
-
-                        handler.remove(this);
-                    }, 40);
-                }
-            });
+                        p.getInventory().setItem(plugin.getBackpackManager().getGadgetSlot(p), DefaultItem.DOUBLEJUMP.getItemStack());
+                        p.getWorld().playEffect(p.getLocation(), Effect.LARGE_SMOKE, 10);
+                        p.spigot().playEffect(p.getLocation(), Effect.FLAME, 1, 1, 1, 1, 1, 2, 100, 100);
+                        handler.cleanup(e);
+                    }, 15));
+                }, 10));
+            }, 40));
 
         }
     }

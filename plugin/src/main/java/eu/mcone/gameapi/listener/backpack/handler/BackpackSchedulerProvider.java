@@ -2,7 +2,8 @@ package eu.mcone.gameapi.listener.backpack.handler;
 
 import org.bukkit.scheduler.BukkitTask;
 
-public abstract class GadgetScheduler {
+public interface BackpackSchedulerProvider {
 
-    public abstract BukkitTask register();
+    BukkitTask register();
+
 }

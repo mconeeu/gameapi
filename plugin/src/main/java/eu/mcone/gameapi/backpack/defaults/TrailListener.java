@@ -6,6 +6,7 @@ import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
 import eu.mcone.gameapi.api.backpack.BackpackInventoryListener;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
 import eu.mcone.gameapi.api.backpack.Category;
+import eu.mcone.gameapi.api.backpack.defaults.DefaultCategory;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.backpack.handler.GameTrailHandler;
 import lombok.Getter;
@@ -21,6 +22,8 @@ public class TrailListener extends BackpackInventoryListener {
 
     @Override
     public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player p) {
+        gamePlayer.setCurrentBackpackItem(item, DefaultCategory.TRAIL);
+
         handler.setTrail(p, item);
         p.closeInventory();
         plugin.getMessenger().send(p, "§7Du hast den §f" + item.getName() + "§7 aktiviert!");

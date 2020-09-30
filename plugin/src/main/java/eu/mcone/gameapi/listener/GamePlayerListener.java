@@ -1,7 +1,7 @@
 package eu.mcone.gameapi.listener;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
-import eu.mcone.coresystem.api.bukkit.event.CorePlayerLoadedEvent;
+import eu.mcone.coresystem.api.bukkit.event.player.CorePlayerLoadedEvent;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GameAPI;
@@ -9,7 +9,6 @@ import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Module;
 import eu.mcone.gameapi.api.Option;
 import eu.mcone.gameapi.api.event.player.GamePlayerLoadedEvent;
-import eu.mcone.gameapi.api.event.player.GamePlayerUnloadEvent;
 import eu.mcone.gameapi.api.player.GamePlayerState;
 import eu.mcone.gameapi.api.replay.container.ReplayContainer;
 import eu.mcone.gameapi.player.GameAPIPlayer;
@@ -65,8 +64,6 @@ public class GamePlayerListener implements Listener {
     public void onLeave(PlayerQuitEvent e) {
         GameAPIPlayer gp = GameAPIPlugin.getSystem().getGamePlayer(e.getPlayer());
         gp.saveData();
-
-        Bukkit.getPluginManager().callEvent(new GamePlayerUnloadEvent(e.getPlayer(), gp.getCorePlayer(), gp));
 
         GameAPIPlugin.getSystem().unregisterGamePlayer(gp);
     }

@@ -1,10 +1,12 @@
 package eu.mcone.gameapi.backpack.handler;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
+import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultCategory;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.api.backpack.handler.PetHandler;
+import eu.mcone.gameapi.listener.backpack.PetTrackListener;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftCreature;
@@ -19,10 +21,13 @@ import java.util.UUID;
 
 public class GamePetHandler implements PetHandler {
 
-    private HashMap<UUID, Entity> pets;
+    private final HashMap<UUID, Entity> pets;
 
-    public GamePetHandler() {
+    public GamePetHandler(GamePlugin plugin) {
         pets = new HashMap<>();
+        plugin.registerEvents(
+                new PetTrackListener(this)
+        );
     }
 
     @Override

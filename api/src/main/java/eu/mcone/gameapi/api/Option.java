@@ -2,6 +2,9 @@ package eu.mcone.gameapi.api;
 
 public enum Option {
 
+    //GameAPI Hotbar default items
+    HOTBAR_SET_ITEMS,
+
     //BackpackManager
     BACKPACK_MANAGER_REGISTER_ALL_DEFAULT_CATEGORIES,
     BACKPACK_MANAGER_REGISTER_PET_CATEGORY,
@@ -12,10 +15,11 @@ public enum Option {
     BACKPACK_MANAGER_REGISTER_EXCLUSIVE_CATEGORY,
     BACKPACK_MANAGER_USE_RANK_BOOTS,
 
-    NORMAL_HOTBAR_WAITING_ITEMS,
-
     //KitManager
     KIT_MANAGER_CLEAR_INVENTORY_ON_KIT_SET,
+    /*
+     * The kit must be buyed anytime after loose
+     */
     KIT_MANAGER_APPLY_KITS_ONCE,
     KIT_MANAGER_CHOOSE_KITS_FOR_SERVER_LIFETIME,
 

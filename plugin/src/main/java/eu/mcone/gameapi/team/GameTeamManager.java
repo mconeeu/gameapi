@@ -1,7 +1,6 @@
 package eu.mcone.gameapi.team;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
-import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GameAPI;
@@ -23,7 +22,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -45,11 +43,6 @@ public class GameTeamManager implements TeamManager {
     private final boolean disableRespawn, disableWinMethod;
     @Getter
     private boolean teamsFinallySet;
-
-    @Getter
-    private final ItemStack KitsChooseItem = new ItemBuilder(Material.BED, 1, 0).displayName("§c§lTeam §8» §7§owähle dein Team aus.").create();
-    @Getter
-    private final int TeamChooseItemSlot = 6;
 
     public GameTeamManager(GamePlugin plugin, GameAPIPlugin system) {
         this.gamePlugin = plugin;

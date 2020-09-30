@@ -23,4 +23,5 @@ public interface AchievementManager {
     void openAchievementInventory(Player p);
 
     void openAchievementInventory(Player p, Gamemode gamemode);
+
 }

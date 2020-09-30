@@ -1,6 +1,6 @@
 package eu.mcone.gameapi.api.event.player;
 
-import eu.mcone.coresystem.api.bukkit.event.CorePlayerLoadedEvent;
+import eu.mcone.coresystem.api.bukkit.event.player.CorePlayerLoadedEvent;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import lombok.Getter;

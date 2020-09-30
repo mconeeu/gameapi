@@ -8,9 +8,7 @@ import eu.mcone.gameapi.api.backpack.BackpackInventoryListener;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
 import eu.mcone.gameapi.api.backpack.Category;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultCategory;
-import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.api.player.GamePlayer;
-import eu.mcone.gameapi.backpack.BackpackItemCategory;
 import eu.mcone.gameapi.listener.backpack.gadget.*;
 import eu.mcone.gameapi.listener.backpack.handler.GameGadgetHandler;
 import lombok.Getter;
@@ -50,13 +48,8 @@ public class GadgetListener extends BackpackInventoryListener {
     @Override
     public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player p) {
         if (gamePlayer.getSettings().isEnableGadgets()) {
-            if (p.hasPermission("lobby.silenthub")) {
-                p.getInventory().setItem(plugin.getBackpackManager().getItemSlot(), item.getItem());
-            } else {
-                p.getInventory().setItem(plugin.getBackpackManager().getFallbackSlot(), item.getItem());
-            }
-
-            gamePlayer.setLastUsedBackPackItem(item, DefaultCategory.GADGET.getName());
+            p.getInventory().setItem(plugin.getBackpackManager().getGadgetSlot(p), item.getItem());
+            gamePlayer.setCurrentBackpackItem(item, DefaultCategory.GADGET);
         } else {
             p.closeInventory();
             GameAPI.getInstance().getMessenger().send(p, "Du kannst keine Gadgets benutzen, da du sie deaktiviert hast. Aktiviere sie wieder in den §fEinstellungen§7!");
@@ -67,20 +60,14 @@ public class GadgetListener extends BackpackInventoryListener {
     public void setBackpackItems(CategoryInventory inv, Category category, Set<BackpackItem> categoryItems, GamePlayer gamePlayer, Player p) {
         super.setBackpackItems(inv, category, categoryItems, gamePlayer, p);
 
-            if (gamePlayer.getLastUsedBackPackItem() != null && gamePlayer.getLastUsedBackPackItem().getCategory().equalsIgnoreCase(DefaultCategory.GADGET.getName())) {
-                inv.addCustomPlacedItem(InventorySlot.ROW_6_SLOT_8, new ItemBuilder(Material.BARRIER).displayName("§c§lGadget entfernen").lore("§7§oFalls du einen der Gadgets", "§7§oimmer noch im Inventar", "§7§omit dir trägst.").create(), e -> {
+        if (gamePlayer.getCurrentBackpackItem() != null && gamePlayer.getCurrentBackpackItem().getCategory().equals(DefaultCategory.GADGET)) {
+            inv.addCustomPlacedItem(InventorySlot.ROW_6_SLOT_8, new ItemBuilder(Material.BARRIER).displayName("§c§lGadget entfernen").lore("§7§oFalls du einen der Gadgets", "§7§oimmer noch im Inventar", "§7§omit dir trägst.").create(), e -> {
+                p.getInventory().setItem(plugin.getBackpackManager().getGadgetSlot(p), null);
 
-                    if (p.hasPermission("lobby.silenthub")) {
-                        p.getInventory().setItem(plugin.getBackpackManager().getItemSlot(), null);
-                    } else {
-                        p.getInventory().setItem(plugin.getBackpackManager().getFallbackSlot(), null);
-                    }
-
-                    plugin.getMessenger().send(p, "§7Du hast dein Gadget erfolgreich zurück in deinem Rucksack gelegt!");
-                    gamePlayer.removeLastUsedBackPackItem();
-
-                });
-            }
+                plugin.getMessenger().send(p, "§7Du hast dein Gadget erfolgreich zurück in deinem Rucksack gelegt!");
+                gamePlayer.resetCurrentBackpackItem();
+            });
+        }
     }
 
 }

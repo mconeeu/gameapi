@@ -22,8 +22,7 @@ public class OutfitListener extends BackpackInventoryListener {
 
     @Override
     public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player p) {
-
-        gamePlayer.setLastUsedBackPackItem(item, DefaultCategory.OUTFIT.getName());
+        gamePlayer.setCurrentBackpackItem(item, DefaultCategory.OUTFIT);
 
         handler.setOutfit(p, item);
         p.closeInventory();
@@ -35,13 +34,14 @@ public class OutfitListener extends BackpackInventoryListener {
     public void setBackpackItems(CategoryInventory inv, Category category, Set<BackpackItem> categoryItems, GamePlayer gamePlayer, Player p) {
         super.setBackpackItems(inv, category, categoryItems, gamePlayer, p);
 
-        if (gamePlayer.getLastUsedBackPackItem() != null && gamePlayer.getLastUsedBackPackItem().getCategory().equals(DefaultCategory.OUTFIT.getName())) {
+        System.out.println("open outfits, current: "+gamePlayer.getCurrentBackpackItem());
+        if (gamePlayer.getCurrentBackpackItem() != null && gamePlayer.getCurrentBackpackItem().getCategory().equals(DefaultCategory.OUTFIT)) {
             inv.addCustomPlacedItem(InventorySlot.ROW_6_SLOT_8, new ItemBuilder(Material.BARRIER).displayName("§c§lOutfit ausziehen").lore("§7§oFalls du eines deiner Outfits", "§7§oangezogen hast, kannst Du es", "§7§ohiermit ausziehen.").create(), e -> {
                 p.getInventory().setArmorContents(null);
                 plugin.getMessenger().send(p, "§7Du hast dein Outfit erfolgreich ausgezogen!");
                 p.closeInventory();
                 p.setWalkSpeed(0.20F);
-                gamePlayer.removeLastUsedBackPackItem();
+                gamePlayer.resetCurrentBackpackItem();
             });
         }
     }

@@ -1,5 +1,7 @@
 package eu.mcone.gameapi.replay.runner.server;
 
+import eu.mcone.coresystem.api.bukkit.broadcast.Broadcast;
+import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.replay.packets.server.MessageWrapper;
 import eu.mcone.gameapi.api.replay.runner.ReplayRunner;
@@ -30,9 +32,7 @@ public class SyncServerRunner extends ReplayRunner implements ServerRunner {
         String sTick = String.valueOf(currentTick.get());
         if (getContainer().getReplay().getMessages().containsKey(sTick)) {
             for (MessageWrapper wrapper : getContainer().getReplay().getMessages().get(sTick)) {
-                for (Player viewer : getContainer().getViewers()) {
-                    viewer.sendMessage(wrapper.getMessage());
-                }
+                resendBroadcast(wrapper.getBroadcast(), getContainer().getViewers());
             }
         }
     }
@@ -65,9 +65,7 @@ public class SyncServerRunner extends ReplayRunner implements ServerRunner {
                         sTick = String.valueOf(tick);
                         if (getContainer().getReplay().getMessages().containsKey(sTick)) {
                             for (MessageWrapper wrapper : getContainer().getReplay().getMessages().get(sTick)) {
-                                for (Player watcher : getContainer().getViewers()) {
-                                    watcher.sendMessage(wrapper.getMessage());
-                                }
+                                resendBroadcast(wrapper.getBroadcast(), getContainer().getViewers());
                             }
                         }
 
@@ -108,4 +106,22 @@ public class SyncServerRunner extends ReplayRunner implements ServerRunner {
     public Collection<Player> getViewers() {
         return container.getViewers();
     }
+
+    static void resendBroadcast(Broadcast broadcast, Collection<Player> viewers) {
+        for (Player viewer : viewers) {
+            if (broadcast.getPlayers() != null && broadcast.getPlayers().length > 0) {
+                GameAPI.getInstance().getMessenger().sendSimpleTransl(
+                        viewer,
+                        broadcast.getMessageKey(),
+                        broadcast.getTranslationReplacements()
+                );
+            } else {
+                GameAPI.getInstance().getMessenger().sendSimpleTransl(
+                        viewer,
+                        broadcast.getMessageKey()
+                );
+            }
+        }
+    }
+
 }

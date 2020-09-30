@@ -6,6 +6,7 @@ import eu.mcone.coresystem.api.bukkit.stats.CoreStats;
 import eu.mcone.gameapi.api.achievement.Achievement;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
 import eu.mcone.gameapi.api.backpack.BackpackSimpleItem;
+import eu.mcone.gameapi.api.backpack.defaults.DefaultCategory;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.api.kit.Kit;
 import eu.mcone.gameapi.api.kit.ModifiedKit;
@@ -41,15 +42,11 @@ public interface GamePlayer {
     /*
      * Backpack System
      */
-    BackpackSimpleItem getLastUsedBackPackItem();
+    BackpackSimpleItem getCurrentBackpackItem();
 
-    void setLastUsedBackPackItemInventar();
+    void resetCurrentBackpackItem();
 
-    void setLastUsedBackPackItemInventar(int slot1, int slot2);
-
-    void setLastUsedBackPackItem(BackpackItem item, String category);
-
-    void removeLastUsedBackPackItem();
+    void setCurrentBackpackItem(BackpackItem item, DefaultCategory category);
 
     void addBackpackItem(String category, BackpackItem item) throws IllegalArgumentException;
 

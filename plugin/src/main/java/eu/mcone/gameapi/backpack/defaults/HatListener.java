@@ -18,8 +18,7 @@ public class HatListener extends BackpackInventoryListener {
 
     @Override
     public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player p) {
-
-        gamePlayer.setLastUsedBackPackItem(item, DefaultCategory.HAT.getName());
+        gamePlayer.setCurrentBackpackItem(item, DefaultCategory.HAT);
 
         if (item.getId() == DefaultItem.HEAD_SECRET_STRIPCLUB.getId()) {
             p.getInventory().setHelmet(item.getItem());
@@ -38,17 +37,14 @@ public class HatListener extends BackpackInventoryListener {
     public void setBackpackItems(CategoryInventory inv, Category category, Set<BackpackItem> categoryItems, GamePlayer gamePlayer, Player p) {
         super.setBackpackItems(inv, category, categoryItems, gamePlayer, p);
 
-
         if (p.getInventory().getHelmet() != null) {
-            if (gamePlayer.getLastUsedBackPackItem() != null && gamePlayer.getLastUsedBackPackItem().getCategory().equalsIgnoreCase(DefaultCategory.HAT.getName())) {
+            if (gamePlayer.getCurrentBackpackItem() != null && gamePlayer.getCurrentBackpackItem().getCategory().equals(DefaultCategory.HAT)) {
                 inv.addCustomPlacedItem(InventorySlot.ROW_6_SLOT_8, new ItemBuilder(Material.BARRIER).displayName("§c§lKopf absetzen").lore("§7§oFalls du einen deiner Köpfe", "§7§oaufgesetzt hast, kannst Du ihn", "§7§ohiermit absetzen.").create(), e -> {
-
                     p.getInventory().setHelmet(null);
                     plugin.getMessenger().send(p, "§7Du hast deinen Kopf erfolgreich abgesetzt!");
                     p.setWalkSpeed(0.20F);
 
-                    gamePlayer.removeLastUsedBackPackItem();
-
+                    gamePlayer.resetCurrentBackpackItem();
                 });
             }
         }

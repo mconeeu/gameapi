@@ -10,7 +10,7 @@ import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.api.player.GamePlayer;
-import eu.mcone.gameapi.listener.backpack.handler.GadgetScheduler;
+import eu.mcone.gameapi.listener.backpack.handler.BackpackSchedulerProvider;
 import eu.mcone.gameapi.listener.backpack.handler.GameGadgetHandler;
 import eu.mcone.gameapi.player.GameAPIPlayer;
 import org.bukkit.*;
@@ -58,19 +58,17 @@ public class CoinBombListener extends GadgetListener {
             for (GamePlayer all : GameAPI.getInstance().getOnlineGamePlayers()) {
                 Set<Location> locations = new HashSet<>();
 
-                org.bukkit.entity.Item item = p.getLocation().getWorld().dropItem(p.getEyeLocation(),
-                        new ItemStack(Material.TNT, 1));
-                if (p.hasPermission("lobby.silenthub")) {
-                    p.getInventory().setItem(plugin.getBackpackManager().getItemSlot(), null);
-                } else {
-                    p.getInventory().setItem(plugin.getBackpackManager().getFallbackSlot(), null);
-                }
+                org.bukkit.entity.Item item = p.getLocation().getWorld().dropItem(
+                        p.getEyeLocation(),
+                        new ItemStack(Material.TNT, 1)
+                );
+                    p.getInventory().setItem(plugin.getBackpackManager().getGadgetSlot(p), null);
 
                 Vector v = p.getLocation().getDirection().multiply(0.7);
                 item.setVelocity(v);
 
 
-                handler.register(new GadgetScheduler() {
+                handler.register(e, new BackpackSchedulerProvider() {
                     @Override
                     public BukkitTask register() {
                         return Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -85,51 +83,27 @@ public class CoinBombListener extends GadgetListener {
                                 TNTPrimed tnt = item.getWorld().spawn(location, TNTPrimed.class);
                                 tnt.setFuseTicks(68);
 
-                                handler.register(new GadgetScheduler() {
-                                    @Override
-                                    public BukkitTask register() {
-                                        return Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
-                                            all.bukkit().sendMessage("§8[§7§l!§8] §fServer §8» §7Eine Coin Bombe wurde von §f" + p.getName() + " §7gezündet sie explodiert in §f3 Sekunden");
-                                            handler.remove(this);
-                                        }, 20L);
-                                    }
-                                });
+                                handler.register(e, () -> Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
+                                    all.bukkit().sendMessage("§8[§7§l!§8] §fServer §8» §7Eine Coin Bombe wurde von §f" + p.getName() + " §7gezündet sie explodiert in §f3 Sekunden");
+                                }, 20L));
 
-                                handler.register(new GadgetScheduler() {
-                                    @Override
-                                    public BukkitTask register() {
-                                        return Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
-                                            all.bukkit().sendMessage("§8[§7§l!§8] §fServer §8» §7Sie startet in §f2 Sekunden");
-                                            handler.remove(this);
-                                        }, 40L);
-                                    }
-                                });
+                                handler.register(e, () -> Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
+                                    all.bukkit().sendMessage("§8[§7§l!§8] §fServer §8» §7Sie startet in §f2 Sekunden");
+                                }, 40L));
 
                                 all.bukkit().spigot().playEffect(item.getLocation(), Effect.SPLASH, 1, 1, 1, 1, 1, 1, 100, 10);
 
-                                handler.register(new GadgetScheduler() {
-                                    @Override
-                                    public BukkitTask register() {
-                                        return Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
-                                            all.bukkit().sendMessage("§8[§7§l!§8] §fServer §8» §7Die Coinbome von §f" + p.getName() + " §7wird in §f1 Sekunde §7gezündet!");
+                                handler.register(e, () -> Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
+                                    all.bukkit().sendMessage("§8[§7§l!§8] §fServer §8» §7Die Coinbome von §f" + p.getName() + " §7wird in §f1 Sekunde §7gezündet!");
 
-                                            all.bukkit().spigot().playEffect(item.getLocation(), Effect.WITCH_MAGIC, 1, 1, 1, 1, 1, 3, 35, 7);
+                                    all.bukkit().spigot().playEffect(item.getLocation(), Effect.WITCH_MAGIC, 1, 1, 1, 1, 1, 3, 35, 7);
 
 
-                                            handler.register(new GadgetScheduler() {
-                                                @Override
-                                                public BukkitTask register() {
-                                                    return Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
-                                                        all.bukkit().sendMessage("§8[§7§l!§8] §fServer §8» §7Die §fCoin Bombe§7 ist §f§lexplodiert§7 hebe die Items auf!");
-                                                        handler.remove(this);
-                                                    }, 12L);
-                                                }
-                                            });
-
-                                            handler.remove(this);
-                                        }, 60L);
-                                    }
-                                });
+                                    handler.register(e, () -> Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
+                                        all.bukkit().sendMessage("§8[§7§l!§8] §fServer §8» §7Die §fCoin Bombe§7 ist §f§lexplodiert§7 hebe die Items auf!");
+                                        handler.cleanup(e);
+                                    }, 12L));
+                                }, 60L));
                             }
                         }, 40L);
                     }
@@ -200,23 +174,18 @@ public class CoinBombListener extends GadgetListener {
 
         item3.setVelocity(v6);
 
-        handler.register(new GadgetScheduler() {
-            @Override
-            public BukkitTask register() {
-                return Bukkit.getScheduler().runTaskLater(GameAPI.getInstance(), () -> {
-                    for (Entity e1 : item1.getWorld().getEntities()) {
-                        if (e1.getType().equals(EntityType.DROPPED_ITEM)) {
-                            e1.remove();
+        handler.register(e, () -> Bukkit.getScheduler().runTaskLater(GameAPI.getInstance(), () -> {
+            for (Entity e1 : item1.getWorld().getEntities()) {
+                if (e1.getType().equals(EntityType.DROPPED_ITEM)) {
+                    e1.remove();
 
-                            isExploding = false;
+                    isExploding = false;
 
-                        }
-                    }
-
-                    handler.remove(this);
-                }, 205L);
+                }
             }
-        });
+
+            handler.cleanup(e);
+        }, 205L));
 
     }
 

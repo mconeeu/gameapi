@@ -46,11 +46,7 @@ public class FlyOneCarpetListener extends GadgetListener {
             if (!p.isSprinting()) {
                 if (p.isOnGround()) {
                     if (!isRiding.contains(p)) {
-                        if (p.hasPermission("lobby.silenthub")) {
-                            p.getInventory().setItem(plugin.getBackpackManager().getItemSlot(), null);
-                        } else {
-                            p.getInventory().setItem(plugin.getBackpackManager().getFallbackSlot(), null);
-                        }
+                        p.getInventory().setItem(plugin.getBackpackManager().getGadgetSlot(p), null);
 
 
                         isRiding.add(p);
@@ -114,16 +110,10 @@ public class FlyOneCarpetListener extends GadgetListener {
                     }
                 }
 
-                if (p.hasPermission("lobby.silenthub")) {
-                    p.getInventory().setItem(plugin.getBackpackManager().getItemSlot(), DefaultItem.FLY_CARPET.getItemStack());
-                } else {
-                    p.getInventory().setItem(plugin.getBackpackManager().getFallbackSlot(), DefaultItem.FLY_CARPET.getItemStack());
-                }
+                p.getInventory().setItem(plugin.getBackpackManager().getGadgetSlot(p), DefaultItem.FLY_CARPET.getItemStack());
             }
         }
-
     }
-
 
     @EventHandler
     public void onReload(PluginDisableEvent e) {

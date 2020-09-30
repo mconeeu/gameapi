@@ -6,7 +6,6 @@ import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.GamePlayerState;
 import eu.mcone.gameapi.api.player.PlayerManager;
 import eu.mcone.gameapi.player.GamePlayerManager;
-import eu.mcone.gameapi.team.GameTeamManager;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -76,12 +75,6 @@ public class SpectatorListener implements Listener {
 
             if (i.equals(PlayerManager.SPECTATOR)) {
                 GamePlugin.getGamePlugin().getPlayerManager().openSpectatorInventory(p);
-            } else if (i.equals(GamePlugin.getGamePlugin().getKitManager().getKitChooserItem())) {
-                if (!GamePlugin.getGamePlugin().getTeamManager().isTeamsFinallySet()) {
-                    GamePlugin.getGamePlugin().getTeamManager().openTeamInventory(p);
-                } else {
-                    GameAPI.getInstance().getMessenger().send(p, "§4Du kannst dein Team nicht mehr ändern!");
-                }
             }
         }
 

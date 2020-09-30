@@ -3,7 +3,6 @@ package eu.mcone.gameapi.listener.backpack.gadget;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
-import eu.mcone.gameapi.listener.backpack.handler.GadgetScheduler;
 import eu.mcone.gameapi.listener.backpack.handler.GameGadgetHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -21,7 +20,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.vehicle.VehicleBlockCollisionEvent;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
-import org.bukkit.scheduler.BukkitTask;
 import org.spigotmc.event.entity.EntityDismountEvent;
 
 import java.util.HashMap;
@@ -36,35 +34,26 @@ public class BoatListener extends GadgetListener {
     public static HashMap<Player, Integer> boatId = new HashMap<>();
     public static HashSet<Integer> boatlist = new HashSet<>();
 
-
     @EventHandler
     public void onBlock(PlayerInteractEvent e) {
         Player p = e.getPlayer();
         if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
             if (p.getItemInHand().getType().equals(Material.BOAT)) {
-                if (p.hasPermission("lobby.silenthub")) {
-                    p.getInventory().setItem(plugin.getBackpackManager().getItemSlot(), null);
-                } else {
-                    p.getInventory().setItem(plugin.getBackpackManager().getFallbackSlot(), null);
-                }
+                p.getInventory().setItem(plugin.getBackpackManager().getGadgetSlot(p), null);
+
                 if (e.getClickedBlock().getType().equals(Material.STATIONARY_WATER) || e.getClickedBlock().getType().equals(Material.WATER)) {
                     Boat boat = (Boat) p.getWorld().spawnEntity(e.getClickedBlock().getLocation(), EntityType.BOAT);
                     p.playSound(p.getLocation(), Sound.FIREWORK_TWINKLE, 1, 1);
                     boatId.put(p, boat.getEntityId());
                     boatlist.add(boat.getEntityId());
-                    handler.register(new GadgetScheduler() {
-                        @Override
-                        public BukkitTask register() {
-                            return Bukkit.getScheduler().runTaskLater(GameAPI.getInstance(), () -> {
-                                boat.setPassenger(p);
-                                CoreSystem.getInstance().createActionBar()
-                                        .message("§f§oBenutze LSHIFT um auszusteigen")
-                                        .send(p);
+                    handler.register(e, () -> Bukkit.getScheduler().runTaskLater(GameAPI.getInstance(), () -> {
+                        boat.setPassenger(p);
+                        CoreSystem.getInstance().createActionBar()
+                                .message("§f§oBenutze LSHIFT um auszusteigen")
+                                .send(p);
 
-                                handler.remove(this);
-                            }, 1L);
-                        }
-                    });
+                        handler.cleanup(e);
+                    }, 1L));
                 } else {
                     GameAPI.getInstance().getMessenger().send(p, "§4Du kannst das §cGadget§4 nur im §cWasser §4benutzen!");
                 }
@@ -82,18 +71,13 @@ public class BoatListener extends GadgetListener {
 
     @EventHandler
     public void onBoatSpawn(VehicleCreateEvent e) {
-        handler.register(new GadgetScheduler() {
-            @Override
-            public BukkitTask register() {
-                return Bukkit.getScheduler().runTaskLater(GameAPI.getInstance(), () -> {
-                    if (!boatId.containsValue(e.getVehicle().getEntityId())) {
-                        e.getVehicle().remove();
-                    }
-
-                    handler.remove(this);
-                }, 1L);
+        handler.register(e, () -> Bukkit.getScheduler().runTaskLater(GameAPI.getInstance(), () -> {
+            if (!boatId.containsValue(e.getVehicle().getEntityId())) {
+                e.getVehicle().remove();
             }
-        });
+
+            handler.cleanup(e);
+        }, 1L));
     }
 
     @EventHandler

@@ -13,7 +13,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 @RequiredArgsConstructor
-public class GamePlayerListener implements Listener {
+public class PlayerManagerListener implements Listener {
 
     private final GamePlayerManager manager;
 

@@ -1,5 +1,6 @@
 package eu.mcone.gameapi.command;
 
+import eu.mcone.coresystem.api.bukkit.broadcast.SimpleBroadcast;
 import eu.mcone.coresystem.api.bukkit.command.CoreCommand;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.map.GameAPIMap;
@@ -25,29 +26,29 @@ public class MapCMD extends CoreCommand {
             }
             sb.append("\n");
 
-            GameAPI.getInstance().getMessenger().send(sender, sb.toString());
+            GameAPI.getInstance().getMessenger().sendSender(sender, sb.toString());
 
-            GameAPI.getInstance().getMessenger().send(sender, "§7MapRotationHandler: "+(manager.isRotationHandlerLoaded() ? "§2aktiv" : "§4nicht aktiv"));
+            GameAPI.getInstance().getMessenger().sendSender(sender, "§7MapRotationHandler: "+(manager.isRotationHandlerLoaded() ? "§2aktiv" : "§4nicht aktiv"));
             if (manager.isRotationHandlerLoaded()){
-                GameAPI.getInstance().getMessenger().send(sender, "§7Aktuelle Rotation Map: "+manager.getMapRotationHandler().getCurrentMap());
-                GameAPI.getInstance().getMessenger().send(sender, "§7Nächste Rotation: "+manager.getMapRotationHandler().getFormattedTimeUntilNextRotation()+"\n");
+                GameAPI.getInstance().getMessenger().sendSender(sender, "§7Aktuelle Rotation Map: "+manager.getMapRotationHandler().getCurrentMap());
+                GameAPI.getInstance().getMessenger().sendSender(sender, "§7Nächste Rotation: "+manager.getMapRotationHandler().getFormattedTimeUntilNextRotation()+"\n");
             }
 
-            GameAPI.getInstance().getMessenger().send(sender, "§7MapVotingHandler: "+(manager.isVotingHandlerLoaded() ? "§2aktiv" : "§4nicht aktiv"));
+            GameAPI.getInstance().getMessenger().sendSender(sender, "§7MapVotingHandler: "+(manager.isVotingHandlerLoaded() ? "§2aktiv" : "§4nicht aktiv"));
             return true;
         } else if (args.length == 1 && args[0].equalsIgnoreCase("rotate")) {
             if (manager.isRotationHandlerLoaded()) {
                 ((GameMapRotationHandler) manager.getMapRotationHandler()).rotate();
-                GameAPI.getInstance().getMessenger().broadcast("§fDie Map wird gewechselt!");
-                GameAPI.getInstance().getMessenger().send(sender, "§2Du hast die Map erfolgreich rotiert!");
+                GameAPI.getInstance().getMessenger().broadcast(new SimpleBroadcast("§fDie Map wird gewechselt!"));
+                GameAPI.getInstance().getMessenger().sendSender(sender, "§2Du hast die Map erfolgreich rotiert!");
                 return true;
             } else {
-                GameAPI.getInstance().getMessenger().send(sender, "§4Der RotationHandler wurde nicht initialisiert!");
+                GameAPI.getInstance().getMessenger().sendSender(sender, "§4Der RotationHandler wurde nicht initialisiert!");
                 return false;
             }
         }
 
-        GameAPI.getInstance().getMessenger().send(sender, "§4Bitte benutze:§c /map [<rotate>]");
+        GameAPI.getInstance().getMessenger().sendSender(sender, "§4Bitte benutze:§c /map [<rotate>]");
         return false;
     }
 

@@ -2,27 +2,23 @@ package eu.mcone.gameapi.backpack;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.ReplaceOptions;
-import com.mongodb.client.model.UpdateOptions;
 import eu.mcone.coresystem.api.bukkit.CorePlugin;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.config.typeadapter.bson.ItemStackCodecProvider;
 import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import eu.mcone.coresystem.api.bukkit.inventory.category.CategoryInventory;
-import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Option;
-import eu.mcone.gameapi.api.backpack.BackpackInventoryListener;
-import eu.mcone.gameapi.api.backpack.BackpackItem;
-import eu.mcone.gameapi.api.backpack.BackpackManager;
-import eu.mcone.gameapi.api.backpack.Category;
+import eu.mcone.gameapi.api.backpack.*;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultCategory;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.api.backpack.handler.GadgetHandler;
 import eu.mcone.gameapi.api.backpack.handler.OutfitHandler;
 import eu.mcone.gameapi.api.backpack.handler.PetHandler;
 import eu.mcone.gameapi.api.backpack.handler.TrailHandler;
+import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.backpack.defaults.*;
 import eu.mcone.gameapi.command.ItemCMD;
 import eu.mcone.gameapi.command.OnePassCMD;
@@ -31,22 +27,18 @@ import eu.mcone.gameapi.inventory.backpack.BackpackInventory;
 import eu.mcone.gameapi.inventory.backpack.BackpackSellInventory;
 import eu.mcone.gameapi.inventory.backpack.trade.TradeChooseInventory;
 import eu.mcone.gameapi.listener.backpack.BackpackListener;
-import eu.mcone.gameapi.listener.backpack.handler.GameGadgetHandler;
 import eu.mcone.gameapi.player.GameAPIPlayer;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.conversions.Bson;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
 import static com.mongodb.MongoClientSettings.getDefaultCodecRegistry;
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Updates.combine;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
@@ -61,29 +53,13 @@ public class GameBackpackManager implements BackpackManager {
     @Getter
     private final HashSet<String> disabledItems;
     private final Map<String, BackpackInventoryListener> clickListeners;
-
     private final List<String> additionalCategories;
 
     private GameBackpackTradeManager tradeManager;
-
-    @Getter
-    @Setter
+    @Getter @Setter
     private boolean useRankBoots = false;
-
-    @Getter
-    @Setter
-    private int itemSlot = 3;
-    @Getter
-    @Setter
-    private int fallbackSlot = 2;
-    @Getter
-    @Setter
-    private int backpackSlot = 1;
-    @Getter
-    private final ItemStack QUIT_ITEM = new ItemBuilder(Material.SLIME_BALL, 1, 0).displayName("§c§lLobby §8» §7§osendet dich zu Lobby zurück").create();
-    @Getter
-    private final ItemStack backPackItem = new ItemBuilder(Material.STORAGE_MINECART, 1, 0).displayName("§3§lRucksack §8» §7§oZeige deine gesammelten Items an").create();
-
+    @Getter @Setter
+    private GadgetSlotProvider gadgetSlotProvider = player -> 3;
 
     public GameBackpackManager(GameAPIPlugin system, GamePlugin gamePlugin) {
         this.gamePlugin = gamePlugin;
@@ -109,6 +85,11 @@ public class GameBackpackManager implements BackpackManager {
         DefaultItem.setManager(this);
 
         reload();
+    }
+
+    @Override
+    public int getGadgetSlot(Player player) {
+        return gadgetSlotProvider.getGadgetSlotFor(player);
     }
 
     public void disableItem(DefaultItem item) {
@@ -301,6 +282,21 @@ public class GameBackpackManager implements BackpackManager {
             new BackpackSellInventory(p, category);
         } else {
             throw new IllegalArgumentException("Could not open BackpackSellInventory for Category " + name + ". Category does not exist!");
+        }
+    }
+
+    @Override
+    public void setCurrentBackpackItem(GamePlayer gp) {
+        BackpackSimpleItem currentItem = gp.getCurrentBackpackItem();
+
+        if (currentItem != null) {
+            DefaultItem item = DefaultItem.getItemByID(currentItem.getCategory(), currentItem.getId());
+
+            if (item != null) {
+                clickListeners.get(currentItem.getCategory().name()).onBackpackInventoryClick(currentItem.getBackpackItem(), gp, gp.bukkit());
+            } else {
+                gp.resetCurrentBackpackItem();
+            }
         }
     }
 

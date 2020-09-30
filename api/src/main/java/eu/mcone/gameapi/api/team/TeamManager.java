@@ -1,8 +1,6 @@
 package eu.mcone.gameapi.api.team;
 
-import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -10,10 +8,6 @@ import java.util.Collection;
 import java.util.List;
 
 public interface TeamManager {
-
-    ItemStack getKitsChooseItem();
-
-    int getTeamChooseItemSlot();
 
     void loadDefaultTeams();
 

@@ -42,9 +42,7 @@ public class AsyncServerRunner extends ReplayRunner implements eu.mcone.gameapi.
             String sTick = String.valueOf(currentTick.get());
             if (getContainer().getReplay().getMessages().containsKey(sTick)) {
                 for (MessageWrapper wrapper : getContainer().getReplay().getMessages().get(sTick)) {
-                    for (Player viewer : getContainer().getViewers()) {
-                        viewer.sendMessage(wrapper.getMessage());
-                    }
+                    SyncServerRunner.resendBroadcast(wrapper.getBroadcast(), getContainer().getViewers());
 
                     skipped++;
                 }
@@ -81,9 +79,7 @@ public class AsyncServerRunner extends ReplayRunner implements eu.mcone.gameapi.
                         sTick = String.valueOf(tick);
                         if (getContainer().getReplay().getMessages().containsKey(sTick)) {
                             for (MessageWrapper wrapper : getContainer().getReplay().getMessages().get(sTick)) {
-                                for (Player watcher : getContainer().getViewers()) {
-                                    watcher.sendMessage(wrapper.getMessage());
-                                }
+                                SyncServerRunner.resendBroadcast(wrapper.getBroadcast(), getContainer().getViewers());
                             }
                         }
 

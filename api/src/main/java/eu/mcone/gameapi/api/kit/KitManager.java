@@ -1,17 +1,11 @@
 package eu.mcone.gameapi.api.kit;
 
-import eu.mcone.gameapi.api.player.GamePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
-import java.util.UUID;
 
 public interface KitManager {
-
-    int getKitsChooserItemSlot();
-
-    ItemStack getKitChooserItem();
 
     void reload();
 

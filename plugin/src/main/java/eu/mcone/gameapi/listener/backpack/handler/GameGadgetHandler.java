@@ -1,29 +1,37 @@
 package eu.mcone.gameapi.listener.backpack.handler;
 
 import eu.mcone.gameapi.api.backpack.handler.GadgetHandler;
+import org.bukkit.event.Event;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.HashMap;
+import java.util.*;
 
 public class GameGadgetHandler implements GadgetHandler {
 
-    private final HashMap<GadgetScheduler, BukkitTask> schedulers;
+    private final Map<Event, Set<BukkitTask>> schedulers;
 
     public GameGadgetHandler() {
         schedulers = new HashMap<>();
     }
 
-    public void register(GadgetScheduler scheduler) {
-        this.schedulers.put(scheduler, scheduler.register());
+    public void register(Event event, BackpackSchedulerProvider provider) {
+        if (schedulers.containsKey(event)) {
+            schedulers.get(event).add(provider.register());
+        } else {
+            schedulers.put(event, new HashSet<>(Collections.singleton(provider.register())));
+        }
     }
 
-    public void remove(GadgetScheduler scheduler) {
-        this.schedulers.remove(scheduler);
+    public void cleanup(Event event) {
+        schedulers.remove(event);
     }
 
     public void stop() {
-        for (BukkitTask task : schedulers.values()) {
-            task.cancel();
+        for (Set<BukkitTask> schedulers : schedulers.values()) {
+            for (BukkitTask task : schedulers) {
+                task.cancel();
+            }
         }
+        schedulers.clear();
     }
 }

@@ -2,14 +2,16 @@ package eu.mcone.gameapi.api.replay.packets.player.objective;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.codec.Codec;
-import eu.mcone.coresystem.api.bukkit.event.objectiv.CoreSidebarObjectiveUpdateEvent;
+import eu.mcone.coresystem.api.bukkit.event.objective.CoreSidebarObjectiveUpdateEvent;
 import eu.mcone.gameapi.api.replay.event.ReplayScoreboardUpdateEvent;
 import eu.mcone.gameapi.api.replay.player.ReplayPlayer;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 

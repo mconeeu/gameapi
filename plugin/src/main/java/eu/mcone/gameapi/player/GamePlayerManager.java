@@ -9,7 +9,7 @@ import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.GamePlayerState;
 import eu.mcone.gameapi.api.player.PlayerManager;
 import eu.mcone.gameapi.inventory.SpectatorInventory;
-import eu.mcone.gameapi.listener.players.GamePlayerListener;
+import eu.mcone.gameapi.listener.players.PlayerManagerListener;
 import eu.mcone.gameapi.listener.players.SpectatorListener;
 import lombok.Getter;
 import net.minecraft.server.v1_8_R3.PacketPlayOutCamera;
@@ -35,7 +35,7 @@ public class GamePlayerManager implements PlayerManager {
 
         plugin.registerEvents(
                 new SpectatorListener(this),
-                new GamePlayerListener(this)
+                new PlayerManagerListener(this)
         );
 
         CoreSystem.getInstance().getVanishManager().registerVanishRule(Integer.MAX_VALUE-10, (player, playerCanSee) -> {
