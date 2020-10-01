@@ -42,7 +42,6 @@ public class GameDamageLogger implements DamageLogger {
 
     @Override
     public Player getKiller(Player p) {
-        System.out.println(damageLog);
         if (damageLog.containsKey(p.getUniqueId()) && damageLog.get(p.getUniqueId()).size() > 0) {
             HashMap.Entry<UUID, Long> entry = null;
             for (HashMap.Entry<UUID, Long> e : damageLog.get(p.getUniqueId()).entrySet()) {
@@ -50,7 +49,6 @@ public class GameDamageLogger implements DamageLogger {
             }
 
             if ((entry != null) && (entry.getValue() > (System.currentTimeMillis() / 1000) - damageCooldown)) {
-                System.out.println(entry.getKey());
                 return Bukkit.getPlayer(entry.getKey());
             }
         }

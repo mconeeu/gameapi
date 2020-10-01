@@ -339,14 +339,14 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
     }
 
     @Override
-    public void removeFromGame() {
+    public void removeFromGame(boolean quitted) {
         //TODO: Add team stage integration
 
         if (GamePlugin.getGamePlugin().hasModule(Module.TEAM_MANAGER)) {
             ((GameTeamManager) GamePlugin.getGamePlugin().getTeamManager()).removeFromGame(this);
         }
 
-        if (GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)) {
+        if (!quitted && GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)) {
             setState(GamePlayerState.SPECTATING);
         }
     }

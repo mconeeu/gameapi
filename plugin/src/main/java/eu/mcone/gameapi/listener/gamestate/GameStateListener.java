@@ -10,7 +10,6 @@ import eu.mcone.gameapi.api.gamestate.GameState;
 import eu.mcone.gameapi.api.gamestate.common.EndGameState;
 import eu.mcone.gameapi.api.gamestate.common.InGameState;
 import eu.mcone.gameapi.api.gamestate.common.LobbyGameState;
-import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.GamePlayerState;
 import eu.mcone.gameapi.api.player.PlayerManager;
 import eu.mcone.gameapi.api.scoreboard.LobbyObjective;
@@ -99,8 +98,6 @@ public class GameStateListener implements Listener {
 
         if (GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)) {
             PlayerManager playerManager = GamePlugin.getGamePlugin().getPlayerManager();
-            GamePlayer gamePlayer = GamePlugin.getGamePlugin().getGamePlayer(e.getPlayer());
-            gamePlayer.removeFromGame();
 
             if (manager.getRunning() instanceof LobbyGameState) {
                 if (manager.isCountdownRunning() && playerManager.getPlayers(GamePlayerState.PLAYING).size() < playerManager.getMinPlayers()) {

@@ -42,7 +42,7 @@ public class GamePlayerListener implements Listener {
         Player player = e.getPlayer();
 
         if (GamePlugin.isGamePluginInitialized()) {
-            GameAPI.getInstance().getGamePlayer(e.getPlayer()).removeFromGame();
+            GameAPI.getInstance().getGamePlayer(e.getPlayer()).removeFromGame(true);
         }
         if (GamePlugin.getGamePlugin().hasModule(Module.GAME_HISTORY_MANAGER)) {
             if (GamePlugin.getGamePlugin().hasOption(Option.GAME_HISTORY_HISTORY_MODE)) {

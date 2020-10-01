@@ -94,7 +94,7 @@ public interface GamePlayer {
 
     void changeTeamTo(Team team);
 
-    void removeFromGame();
+    void removeFromGame(boolean quitted);
 
     boolean isOnePass();
 

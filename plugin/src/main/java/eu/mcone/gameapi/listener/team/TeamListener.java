@@ -24,7 +24,7 @@ public class TeamListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void on(PlayerDeathEvent e) {
         if (manager.isDisableRespawn()) {
-            GameAPI.getInstance().getGamePlayer(e.getEntity()).removeFromGame();
+            GameAPI.getInstance().getGamePlayer(e.getEntity()).removeFromGame(false);
         }
     }
 
