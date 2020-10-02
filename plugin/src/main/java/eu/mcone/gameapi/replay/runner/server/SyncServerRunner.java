@@ -1,6 +1,7 @@
 package eu.mcone.gameapi.replay.runner.server;
 
 import eu.mcone.coresystem.api.bukkit.broadcast.Broadcast;
+import eu.mcone.coresystem.api.bukkit.broadcast.BroadcastMessage;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.replay.packets.server.MessageWrapper;
@@ -108,17 +109,19 @@ public class SyncServerRunner extends ReplayRunner implements ServerRunner {
     }
 
     static void resendBroadcast(Broadcast broadcast, Collection<Player> viewers) {
+        BroadcastMessage message = broadcast.getMainMessage();
+
         for (Player viewer : viewers) {
-            if (broadcast.getPlayers() != null && broadcast.getPlayers().length > 0) {
+            if (message.getTranslationReplacements() != null && message.getTranslationReplacements().length > 0) {
                 GameAPI.getInstance().getMessenger().sendSimpleTransl(
                         viewer,
-                        broadcast.getMessageKey(),
-                        broadcast.getTranslationReplacements()
+                        message.getMessageKey(),
+                        message.getTranslationReplacements()
                 );
             } else {
                 GameAPI.getInstance().getMessenger().sendSimpleTransl(
                         viewer,
-                        broadcast.getMessageKey()
+                        message.getMessageKey()
                 );
             }
         }

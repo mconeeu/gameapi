@@ -38,4 +38,9 @@ public interface Team {
 
     List<GamePlayer> getPlayers();
 
+    int getKills();
+
+    int getDeaths();
+
+    int getGoals();
 }

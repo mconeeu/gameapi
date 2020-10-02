@@ -12,6 +12,7 @@ import eu.mcone.gameapi.api.kit.Kit;
 import eu.mcone.gameapi.api.kit.ModifiedKit;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.kit.GameKitManager;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -37,7 +38,7 @@ public class KitSortInventory extends CoreInventory {
             setItem(i, PLACEHOLDER_ITEM);
         }
 
-        setItem(InventorySlot.ROW_3_SLOT_1, new ItemBuilder(Material.IRON_DOOR).displayName("§a§lZurück und Speichern").create(), e -> {
+        setItem(InventorySlot.ROW_3_SLOT_1, new ItemBuilder(Material.INK_SACK, 1, DyeColor.LIME.getDyeData()).displayName("§a§lZurück und Speichern").create(), e -> {
             Map<ItemStack, Integer> changedItems = new HashMap<>();
             for (int i = 0; i < 9; i++) {
                 changedItems.put(getInventory().getItem(i), i);

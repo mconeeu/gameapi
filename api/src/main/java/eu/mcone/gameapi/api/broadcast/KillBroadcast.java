@@ -1,0 +1,80 @@
+package eu.mcone.gameapi.api.broadcast;
+
+import eu.mcone.coresystem.api.bukkit.broadcast.Broadcast;
+import eu.mcone.coresystem.api.bukkit.broadcast.BroadcastMessage;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
+import java.util.Arrays;
+import java.util.UUID;
+
+@NoArgsConstructor
+@Getter
+@Setter
+public class KillBroadcast extends Broadcast {
+
+    private UUID killer, victim;
+
+    public KillBroadcast(Player killer, Player victim) {
+        this(killer, victim, 0, 0);
+    }
+
+    public KillBroadcast(Player killer, Player victim, int coinsKiller, int coinsVictim) {
+        super(new BroadcastMessage(
+                "game.kill.msg",
+                new Object[]{victim.getName(), killer.getName()},
+                getRestOfPlayers(killer, victim)
+        ));
+
+        this.killer = killer.getUniqueId();
+        this.victim = victim.getUniqueId();
+
+        if (coinsVictim != 0) {
+            addAdditionalMessage(
+                    "game.kill.msg.died.coins",
+                    new Object[]{killer.getName(), coinsVictim},
+                    victim
+            );
+        } else {
+            addAdditionalMessage(
+                    "game.kill.msg.died",
+                    new Object[]{killer.getName()},
+                    victim
+            );
+        }
+
+        if (coinsKiller != 0) {
+            addAdditionalMessage(
+                    "game.kill.msg.killed.coins",
+                    new Object[]{victim.getName(), coinsKiller},
+                    killer
+            );
+        } else {
+            addAdditionalMessage(
+                    "game.kill.msg.killed",
+                    new Object[]{victim.getName()},
+                    killer
+            );
+        }
+    }
+
+    static Player[] getRestOfPlayers(Player... players) {
+        Player[] result = new Player[Bukkit.getOnlinePlayers().size()-2];
+
+        if (result.length > 0) {
+            int i = 0;
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (!Arrays.asList(players).contains(player)) {
+                    result[i] = player;
+                    i++;
+                }
+            }
+        }
+
+        return result;
+    }
+
+}

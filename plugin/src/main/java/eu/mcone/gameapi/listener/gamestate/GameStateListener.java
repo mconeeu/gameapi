@@ -4,11 +4,11 @@ import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Module;
+import eu.mcone.gameapi.api.event.gamestate.GameStateStopEvent;
 import eu.mcone.gameapi.api.event.player.GamePlayerLoadedEvent;
 import eu.mcone.gameapi.api.event.team.TeamWonEvent;
 import eu.mcone.gameapi.api.gamestate.GameState;
 import eu.mcone.gameapi.api.gamestate.common.EndGameState;
-import eu.mcone.gameapi.api.gamestate.common.InGameState;
 import eu.mcone.gameapi.api.gamestate.common.LobbyGameState;
 import eu.mcone.gameapi.api.player.GamePlayerState;
 import eu.mcone.gameapi.api.player.PlayerManager;
@@ -82,9 +82,17 @@ public class GameStateListener implements Listener {
                 if (!manager.isCountdownRunning() && playerManager.getPlayers(GamePlayerState.PLAYING).size() >= playerManager.getMinPlayers()) {
                     manager.startCountdown(false, 60);
                 }
-            } else if (GamePlugin.getGamePlugin().getGameStateManager().getRunning() instanceof InGameState) {
-                GadgetListener.getHandler().stop();
+                if (playerManager.getPlayers(GamePlayerState.PLAYING).size() == playerManager.getMaxPlayers()) {
+                    manager.updateCountdownCounter(10);
+                }
             }
+        }
+    }
+
+    @EventHandler
+    public void onLobbyStop(GameStateStopEvent e) {
+        if (e.getCurrent() instanceof LobbyGameState) {
+            GadgetListener.getHandler().stop();
         }
     }
 

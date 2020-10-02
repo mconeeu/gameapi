@@ -77,6 +77,36 @@ public class GameTeam implements Team {
     }
 
     @Override
+    public int getKills() {
+        int kills = 0;
+        for (GamePlayer gp : players) {
+            kills += gp.getRoundKills();
+        }
+
+        return kills;
+    }
+
+    @Override
+    public int getDeaths() {
+        int deaths = 0;
+        for (GamePlayer gp : players) {
+            deaths += gp.getRoundDeaths();
+        }
+
+        return deaths;
+    }
+
+    @Override
+    public int getGoals() {
+        int goals = 0;
+        for (GamePlayer gp : players) {
+            goals += gp.getRoundGoals();
+        }
+
+        return goals;
+    }
+
+    @Override
     public String toString() {
         return "GameTeam{" +
                 "name='" + name + '\'' +

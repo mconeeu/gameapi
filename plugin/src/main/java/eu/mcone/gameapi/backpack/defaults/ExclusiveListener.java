@@ -12,12 +12,16 @@ import java.util.Set;
 
 public class ExclusiveListener extends BackpackInventoryListener {
 
+    public ExclusiveListener() {
+        super("Exklusives Item");
+    }
+
     @Override
     public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player p) {}
 
     @Override
-    public void setBackpackItems(CategoryInventory inv, Category category, Set<BackpackItem> categoryItems, GamePlayer gamePlayer, Player p) {
-        RankBoots boots = RankBoots.getBootsByGroup(gamePlayer.getCorePlayer().getMainGroup());
+    public void setBackpackItems(CategoryInventory inv, Category category, Set<BackpackItem> categoryItems, GamePlayer gp, Player p) {
+        RankBoots boots = RankBoots.getBootsByGroup(gp.getCorePlayer().getMainGroup());
 
         if (boots != null) {
             inv.addItem(boots.getItem());

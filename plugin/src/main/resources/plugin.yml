@@ -17,10 +17,15 @@ permissions:
 
 translations:
   # death
+  - game.kill.msg
+  - game.kill.msg.killed
+  - game.kill.msg.killed.coins
+  - game.kill.msg.died
+  - game.kill.msg.died.coins
   - game.death.msg
-  - game.death.msg.killed
+  - game.death.msg.died
+  - game.death.msg.died.coins
   - game.death.bar
-  - game.death.normal
   - game.death.normal.bar
   # gamestate
   - game.gamestate.lobby.countdown.msg
