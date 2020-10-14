@@ -1,7 +1,6 @@
 package eu.mcone.gameapi.team;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
-import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
@@ -284,46 +283,6 @@ public class GameTeamManager implements TeamManager {
         }
 
         return Collections.max(teams.entrySet(), Map.Entry.comparingByValue()).getKey();
-    }
-
-    @Override
-    public void sendKillMessage(Player receiver, Player victim, Player killer) {
-        CorePlayer receiverCP = CoreSystem.getInstance().getCorePlayer(receiver);
-        String message = "";
-
-        if (receiver != victim) {
-            if (killer == null) {
-                message = CoreSystem.getInstance().getTranslationManager().get("game.death.normal", receiverCP, "§" + gamePlugin.getGamePlayer(victim.getUniqueId()).getTeam().getColor() + victim.getName());
-            } else {
-                if (receiver != killer) {
-                    message = CoreSystem.getInstance().getTranslationManager().get("game.death.msg", receiverCP,
-                            gamePlugin.getGamePlayer(victim.getUniqueId()).getTeam().getColor() + victim.getName(),
-                            gamePlugin.getGamePlayer(killer.getUniqueId()).getTeam().getColor() + killer.getName());
-                } else {
-                    GamePlugin.getGamePlugin().getMessenger().send(killer, "§7Du hast " + GamePlugin.getGamePlugin().getGamePlayer(victim).getTeam().getColor() + victim.getName() + " §7getötet.");
-                }
-            }
-
-            if (!message.isEmpty())
-                gamePlugin.getMessenger().send(receiver, message);
-        } else {
-            GamePlayer gamePlayer = GamePlugin.getGamePlugin().getGamePlayer(victim);
-
-            if (gamePlayer.getTeam() != null) {
-                if (gamePlayer.getTeam().isAlive()) {
-                    if (killer == null) {
-                        message = "§7Du bist gestorben";
-                    } else {
-                        message = CoreSystem.getInstance().getTranslationManager().get("game.death.msg.killed", receiverCP, gamePlugin.getGamePlayer(killer.getUniqueId()).getTeam().getColor() + killer.getName());
-                    }
-                } else {
-                    message = "§7Du bist gestorben und somit aus dem Spiel ausgeschieden!";
-                }
-            }
-
-            if (!message.isEmpty())
-                gamePlugin.getMessenger().send(victim, message);
-        }
     }
 
     @Override

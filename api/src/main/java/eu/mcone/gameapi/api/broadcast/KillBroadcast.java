@@ -19,14 +19,22 @@ public class KillBroadcast extends Broadcast {
     private UUID killer, victim;
 
     public KillBroadcast(Player killer, Player victim) {
-        this(killer, victim, 0, 0);
+        this(killer, victim, true);
+    }
+
+    public KillBroadcast(Player killer, Player victim, boolean notifyAllPlayers) {
+        this(killer, victim, 0, 0, notifyAllPlayers);
     }
 
     public KillBroadcast(Player killer, Player victim, int coinsKiller, int coinsVictim) {
+        this(killer, victim, coinsKiller, coinsVictim, true);
+    }
+
+    public KillBroadcast(Player killer, Player victim, int coinsKiller, int coinsVictim, boolean notifyAll) {
         super(new BroadcastMessage(
                 "game.kill.msg",
                 new Object[]{victim.getName(), killer.getName()},
-                getRestOfPlayers(killer, victim)
+                notifyAll ? getRestOfPlayers(killer, victim) : new Player[]{killer}
         ));
 
         this.killer = killer.getUniqueId();
@@ -62,7 +70,7 @@ public class KillBroadcast extends Broadcast {
     }
 
     static Player[] getRestOfPlayers(Player... players) {
-        Player[] result = new Player[Bukkit.getOnlinePlayers().size()-2];
+        Player[] result = new Player[Bukkit.getOnlinePlayers().size()-players.length];
 
         if (result.length > 0) {
             int i = 0;

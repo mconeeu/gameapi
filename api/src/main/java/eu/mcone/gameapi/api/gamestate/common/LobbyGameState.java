@@ -1,6 +1,7 @@
 package eu.mcone.gameapi.api.gamestate.common;
 
 import eu.mcone.coresystem.api.bukkit.CorePlugin;
+import eu.mcone.coresystem.api.bukkit.broadcast.SimpleBroadcast;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Module;
 import eu.mcone.gameapi.api.Option;
@@ -35,6 +36,14 @@ public class LobbyGameState extends GameState {
 
     @Override
     public void onCountdownSecond(CorePlugin plugin, int second) {
+        if (GamePlugin.getGamePlugin().hasModule(Module.TEAM_MANAGER)
+                && second <= 5
+                && !GamePlugin.getGamePlugin().getTeamManager().isTeamsFinallySet()
+        ) {
+            GamePlugin.getGamePlugin().getTeamManager().setTeamsForRemainigPlayersByPriority();
+            plugin.getMessenger().broadcast(new SimpleBroadcast("§2Die Teams wurden gesetzt"));
+        }
+
         switch (second) {
             case 60:
             case 30:

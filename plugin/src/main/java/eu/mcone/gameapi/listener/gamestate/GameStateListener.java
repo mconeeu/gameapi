@@ -1,6 +1,7 @@
 package eu.mcone.gameapi.listener.gamestate;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
+import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Module;
@@ -19,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffectType;
@@ -30,7 +30,7 @@ public class GameStateListener implements Listener {
 
     private final GameStateManager manager;
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler
     public void on(GamePlayerLoadedEvent e) {
         Player p = e.getPlayer().getCorePlayer().bukkit();
 
@@ -59,7 +59,7 @@ public class GameStateListener implements Listener {
                             .stay(5)
                             .fadeIn(2)
                             .fadeOut(2)
-                            .title(GamePlugin.getGamePlugin().getGamemode() != null ? GamePlugin.getGamePlugin().getGamemode().getLabel() : null)
+                            .title(!GamePlugin.getGamePlugin().getGamemode().equals(Gamemode.UNDEFINED) ? GamePlugin.getGamePlugin().getGamemode().getLabel() : GamePlugin.getGamePlugin().getPluginColor()+GamePlugin.getGamePlugin().getPluginName())
                             .subTitle(CoreSystem.getInstance().getTranslationManager().get("game.join.title", cps, p.getName(), playerManager.getPlayers(GamePlayerState.PLAYING).size(), playerManager.getMaxPlayers()))
                             .send(cps.bukkit());
                 }

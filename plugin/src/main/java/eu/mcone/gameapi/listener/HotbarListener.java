@@ -9,6 +9,7 @@ import eu.mcone.gameapi.api.event.player.GamePlayerLoadedEvent;
 import eu.mcone.gameapi.api.gamestate.common.LobbyGameState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -16,7 +17,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class HotbarListener implements Listener {
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onJoin(GamePlayerLoadedEvent e) {
         if (GamePlugin.getGamePlugin().hasModule(Module.GAME_STATE_MANAGER) && GamePlugin.getGamePlugin().getGameStateManager().getRunning() instanceof LobbyGameState) {
             if (GamePlugin.getGamePlugin().hasOption(Option.HOTBAR_SET_ITEMS)) {

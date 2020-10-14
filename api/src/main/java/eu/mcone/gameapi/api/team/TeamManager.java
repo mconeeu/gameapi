@@ -29,8 +29,6 @@ public interface TeamManager {
 
     Team calculateWinnerByKills();
 
-    void sendKillMessage(Player receiver, Player victim, Player killer);
-
     List<Team> getTeams();
 
     Collection<Team> getAliveTeams();
