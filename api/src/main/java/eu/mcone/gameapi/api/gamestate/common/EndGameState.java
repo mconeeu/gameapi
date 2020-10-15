@@ -9,11 +9,15 @@ import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.HotbarItem;
 import eu.mcone.gameapi.api.Module;
 import eu.mcone.gameapi.api.Option;
+import eu.mcone.gameapi.api.broadcast.WinBroadcast;
 import eu.mcone.gameapi.api.event.gamestate.GameStateStartEvent;
+import eu.mcone.gameapi.api.event.gamestate.GameStateStopEvent;
 import eu.mcone.gameapi.api.gamestate.GameState;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.GamePlayerState;
 import eu.mcone.gameapi.api.scoreboard.LobbyObjective;
+import eu.mcone.gameapi.api.scoreboard.LobbyObjectiveImpl;
+import eu.mcone.gameapi.api.team.Team;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -27,6 +31,9 @@ public class EndGameState extends GameState {
     @Setter
     @Getter
     private static Class<? extends LobbyObjective> objective;
+    @Setter
+    @Getter
+    protected Team winnerTeam;
 
     public EndGameState() {
         this(30);
@@ -97,7 +104,7 @@ public class EndGameState extends GameState {
         if (GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)) {
             try {
                 if (objective == null) {
-                    objective = LobbyObjective.class;
+                    objective = LobbyObjectiveImpl.class;
                 }
 
                 for (GamePlayer gp : GamePlugin.getGamePlugin().getPlayerManager().getGamePlayers(GamePlayerState.PLAYING)) {
@@ -107,5 +114,17 @@ public class EndGameState extends GameState {
                 e.printStackTrace();
             }
         }
+
+        if (GamePlugin.getGamePlugin().hasModule(Module.TEAM_MANAGER) && winnerTeam != null) {
+            GamePlugin.getGamePlugin().getMessenger().broadcast(
+                    new WinBroadcast(winnerTeam)
+            );
+        }
     }
+
+    @Override
+    public void onStop(GameStateStopEvent event) {
+         Bukkit.shutdown();
+    }
+
 }

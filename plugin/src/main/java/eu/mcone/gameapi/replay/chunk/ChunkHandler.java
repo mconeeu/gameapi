@@ -34,13 +34,7 @@ public class ChunkHandler implements eu.mcone.gameapi.api.replay.chunk.ReplayChu
     private final HashMap<Integer, byte[]> toMigrate;
 
     public ChunkHandler(final Replay replay) {
-        this.replay = replay;
-        this.chunkLength = 600;
-        chunks = new HashMap<>();
-        lastChunkID = replay.getLastTick() / 600;
-        replayFile = new File("./plugins/" + GamePlugin.getGamePlugin().getPluginName() + "/", replay.getID() + ".replay");
-
-        toMigrate = new HashMap<>();
+        this(replay, new HashMap<>());
     }
 
     public ChunkHandler(final Replay replay, Map<Integer, eu.mcone.gameapi.api.replay.chunk.ReplayChunk> chunks) {
@@ -48,7 +42,7 @@ public class ChunkHandler implements eu.mcone.gameapi.api.replay.chunk.ReplayChu
         this.chunkLength = 600;
         this.chunks = chunks;
         lastChunkID = replay.getLastTick() / 600;
-        replayFile = new File("./plugins/" + GamePlugin.getGamePlugin().getPluginName() + "/", replay.getID() + ".replay");
+        replayFile = new File(GamePlugin.getGamePlugin().getDataFolder(), replay.getID() + ".replay");
 
         toMigrate = new HashMap<>();
     }
@@ -279,7 +273,7 @@ public class ChunkHandler implements eu.mcone.gameapi.api.replay.chunk.ReplayChu
                     //Write new file
                     GamePlugin.getGamePlugin().sendConsoleMessage("§aWriting migrated chunks to file...");
 
-                    replayFile = new File("./plugins/" + GamePlugin.getGamePlugin().getPluginName() + "/" + replay.getID() + ".replay");
+                    replayFile = new File(GamePlugin.getGamePlugin().getDataFolder(), replay.getID() + ".replay");
 
                     if (replayFile.exists()) {
                         if (replayFile.delete()) {
@@ -316,7 +310,7 @@ public class ChunkHandler implements eu.mcone.gameapi.api.replay.chunk.ReplayChu
 
     private void set() {
         if (replayFile == null) {
-            replayFile = new File("./plugins/" + GamePlugin.getGamePlugin().getPluginName() + "/", replay.getID() + ".replay");
+            replayFile = new File(GamePlugin.getGamePlugin().getDataFolder(), replay.getID() + ".replay");
             lastChunkID = replay.getLastTick() / 1200;
         }
     }

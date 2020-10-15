@@ -1,7 +1,9 @@
 package eu.mcone.gameapi.api.gamestate.common;
 
 import eu.mcone.coresystem.api.bukkit.CorePlugin;
+import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.broadcast.SimpleBroadcast;
+import eu.mcone.coresystem.api.bukkit.world.CoreWorld;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Module;
 import eu.mcone.gameapi.api.Option;
@@ -67,6 +69,15 @@ public class LobbyGameState extends GameState {
     @Override
     public void onStart(GameStateStartEvent event) {
         if (GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)) {
+            CoreWorld lobbyWorld = CoreSystem.getInstance().getWorldManager().getWorld(
+                    GamePlugin.getGamePlugin().getGameConfig().parseConfig().getLobby()
+            );
+            if (lobbyWorld != null) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    lobbyWorld.teleportSilently(p, "spawn");
+                }
+            }
+
             try {
                 if (objective == null) {
                     objective = LobbyObjectiveImpl.class;

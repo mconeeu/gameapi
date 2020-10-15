@@ -59,7 +59,7 @@ public class GameBackpackManager implements BackpackManager {
     @Getter @Setter
     private boolean useRankBoots = false;
     @Getter @Setter
-    private GadgetSlotProvider gadgetSlotProvider = player -> 3;
+    private GadgetSlotProvider gadgetSlotProvider = player -> 2;
 
     public GameBackpackManager(GameAPIPlugin system, GamePlugin gamePlugin) {
         this.gamePlugin = gamePlugin;

@@ -217,4 +217,16 @@ public abstract class GamePlugin extends CorePlugin {
         return gamePlugin != null;
     }
 
+    public String getGameName() {
+        return !getGamemode().equals(Gamemode.UNDEFINED)
+                ? getGamemode().getName()
+                : getPluginName();
+    }
+
+    public String getGameLabel() {
+        return !getGamemode().equals(Gamemode.UNDEFINED)
+                ? getGamemode().getLabel()
+                : getPluginColor() + getPluginName();
+    }
+
 }

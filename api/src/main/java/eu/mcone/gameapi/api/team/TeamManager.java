@@ -17,6 +17,8 @@ public interface TeamManager {
 
     Team getTeam(String name);
 
+    Team getWinner();
+
     void stopGameWithWinner(Team team);
 
     void setTeamsForRemainingPlayersBalanced();

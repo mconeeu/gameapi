@@ -3,7 +3,7 @@ package eu.mcone.gameapi.api.scoreboard;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.coresystem.api.bukkit.scoreboard.CoreSidebarObjective;
 import eu.mcone.coresystem.api.bukkit.scoreboard.CoreSidebarObjectiveEntry;
-import lombok.NoArgsConstructor;
+import eu.mcone.gameapi.api.GamePlugin;
 
 public abstract class LobbyObjective extends CoreSidebarObjective {
 
@@ -20,12 +20,11 @@ public abstract class LobbyObjective extends CoreSidebarObjective {
         CoreSidebarObjectiveEntry lobbyEntry = new CoreSidebarObjectiveEntry();
         onLobbyRegister(player, lobbyEntry);
 
-        entry.setTitle(lobbyEntry.getTitle());
+        entry.setTitle(lobbyEntry.getTitle() != null ? lobbyEntry.getTitle() : "§7§l⚔ "+ GamePlugin.getGamePlugin().getPluginColor()+"§l§n"+GamePlugin.getGamePlugin().getGameName());
+        lobbyEntry.getScores().forEach((score, value) -> entry.setScore(score + 2, value));
 
-        lobbyEntry.getScores().forEach((score, value) -> entry.setScore((score == 0 ? score + 3 : score + 2), value));
-
-        entry.setScore(2, "");
-        entry.setScore(1, "§f§lMCONE.EU");
+        entry.setScore(1, "");
+        entry.setScore(0, "§f§lMCONE.EU");
     }
 
     protected abstract void onLobbyRegister(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry);
@@ -35,11 +34,11 @@ public abstract class LobbyObjective extends CoreSidebarObjective {
         CoreSidebarObjectiveEntry lobbyEntry = new CoreSidebarObjectiveEntry();
         onLobbyReload(player, lobbyEntry);
 
-        entry.setTitle(lobbyEntry.getTitle());
+        if (lobbyEntry.getTitle() != null) {
+            entry.setTitle(lobbyEntry.getTitle());
+        }
 
-        lobbyEntry.getScores().forEach((score, value) -> {
-            entry.setScore((score == 0 ? score + 3 : score + 2), value);
-        });
+        lobbyEntry.getScores().forEach((score, value) -> entry.setScore(score + 2, value));
     }
 
     protected abstract void onLobbyReload(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry);

@@ -1,8 +1,8 @@
 package eu.mcone.gameapi.listener.gamestate;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
-import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
+import eu.mcone.coresystem.api.bukkit.world.CoreWorld;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Module;
 import eu.mcone.gameapi.api.event.gamestate.GameStateStopEvent;
@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffectType;
@@ -45,6 +46,13 @@ public class GameStateListener implements Listener {
             p.setExp(0);
             p.removePotionEffect(PotionEffectType.SLOW);
 
+            CoreWorld lobbyWorld = CoreSystem.getInstance().getWorldManager().getWorld(
+                    GamePlugin.getGamePlugin().getGameConfig().parseConfig().getLobby()
+            );
+            if (lobbyWorld != null) {
+                lobbyWorld.teleportSilently(p, "spawn");
+            }
+
             if (GamePlugin.getGamePlugin().hasModule(Module.REPLAY)) {
                 GamePlugin.getGamePlugin().getReplay().addPlayer(p);
             }
@@ -59,7 +67,7 @@ public class GameStateListener implements Listener {
                             .stay(5)
                             .fadeIn(2)
                             .fadeOut(2)
-                            .title(!GamePlugin.getGamePlugin().getGamemode().equals(Gamemode.UNDEFINED) ? GamePlugin.getGamePlugin().getGamemode().getLabel() : GamePlugin.getGamePlugin().getPluginColor()+GamePlugin.getGamePlugin().getPluginName())
+                            .title(GamePlugin.getGamePlugin().getGameLabel())
                             .subTitle(CoreSystem.getInstance().getTranslationManager().get("game.join.title", cps, p.getName(), playerManager.getPlayers(GamePlayerState.PLAYING).size(), playerManager.getMaxPlayers()))
                             .send(cps.bukkit());
                 }
@@ -81,6 +89,10 @@ public class GameStateListener implements Listener {
 
                 if (!manager.isCountdownRunning() && playerManager.getPlayers(GamePlayerState.PLAYING).size() >= playerManager.getMinPlayers()) {
                     manager.startCountdown(false, 60);
+
+                    GamePlugin.getGamePlugin().getPlayerManager().getPlayers(GamePlayerState.PLAYING).forEach(
+                            player -> GamePlugin.getGamePlugin().getMessenger().send(player, "§2Das Spieler-Minimum wurde erreicht. Der Countdown startet!")
+                    );
                 }
                 if (playerManager.getPlayers(GamePlayerState.PLAYING).size() == playerManager.getMaxPlayers()) {
                     manager.updateCountdownCounter(10);
@@ -108,21 +120,27 @@ public class GameStateListener implements Listener {
             PlayerManager playerManager = GamePlugin.getGamePlugin().getPlayerManager();
 
             if (manager.getRunning() instanceof LobbyGameState) {
-                if (manager.isCountdownRunning() && playerManager.getPlayers(GamePlayerState.PLAYING).size() < playerManager.getMinPlayers()) {
+                if (manager.isCountdownRunning() && (playerManager.getPlayers(GamePlayerState.PLAYING).size()-1) < playerManager.getMinPlayers()) {
                     manager.cancelCountdown();
-                    playerManager.getPlayers(GamePlayerState.PLAYING).forEach((player) -> player.setLevel(GamePlugin.getGamePlugin().getGameStateManager().getCountdownCounter()));
+                    playerManager.getPlayers(GamePlayerState.PLAYING).forEach((player) -> {
+                        GamePlugin.getGamePlugin().getMessenger().send(player, "§4Der Countdown wurde abgebrochen, da zu wenig Spieler online sind!");
+                        player.setLevel(0);
+                    });
                 }
             }
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onWin(TeamWonEvent e) {
-        //Starting EndGamestate
-        for (GameState gameState : manager.getPipeline()) {
-            if (gameState instanceof EndGameState) {
-                manager.setGameState(gameState, true);
-                return;
+        if (!e.isCancelled()) {
+            //Starting EndGamestate
+            for (GameState gameState : manager.getPipeline()) {
+                if (gameState instanceof EndGameState) {
+                    ((EndGameState) gameState).setWinnerTeam(e.getTeam());
+                    manager.setGameState(gameState, true);
+                    return;
+                }
             }
         }
     }

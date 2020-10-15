@@ -7,6 +7,7 @@ import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Module;
 import eu.mcone.gameapi.api.Option;
 import eu.mcone.gameapi.api.event.team.TeamWonEvent;
+import eu.mcone.gameapi.api.gamestate.common.InGameState;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.GamePlayerState;
 import eu.mcone.gameapi.api.team.DefaultTeam;
@@ -32,7 +33,6 @@ public class GameTeamManager implements TeamManager {
     private final int playersPerTeam, teamCount;
 
     private final Set<GameTeam> teams;
-    private final GamePlugin gamePlugin;
 
     @Getter
     @Setter
@@ -42,10 +42,10 @@ public class GameTeamManager implements TeamManager {
     private final boolean disableRespawn, disableWinMethod;
     @Getter
     private boolean teamsFinallySet;
+    @Getter
+    private Team winner;
 
     public GameTeamManager(GamePlugin plugin, GameAPIPlugin system) {
-        this.gamePlugin = plugin;
-
         //Chat System
         teamChatListener = new DefaultTeamChat();
 
@@ -125,7 +125,6 @@ public class GameTeamManager implements TeamManager {
             ((GameTeam) gp.getTeam()).removePlayer(gp);
         }
 
-        System.out.println("set team " + team.getName() + " for player " + gp.bukkit().getName());
         ((GameTeam) team).addPlayer(gp);
         gp.setTeam(team);
     }
@@ -141,15 +140,17 @@ public class GameTeamManager implements TeamManager {
 
             System.out.println("remove from team, all teams: " + teams);
         } else {
-            System.err.println("gp.geTeam = null");
+            System.err.println("gp.getTeam = null");
         }
 
         if (!disableWinMethod) {
-            Team team = GamePlugin.getGamePlugin().getTeamManager().getWinnerTeamIfLastSurvived();
-            System.out.println("calculated winner: " + team + " current teams " + teams);
+            if (!GamePlugin.getGamePlugin().hasModule(Module.GAME_STATE_MANAGER) || GamePlugin.getGamePlugin().getGameStateManager().getRunning() instanceof InGameState) {
+                Team team = GamePlugin.getGamePlugin().getTeamManager().getWinnerTeamIfLastSurvived();
+                System.out.println("calculated winner: " + team + " current teams " + teams);
 
-            if (team != null) {
-                stopGameWithWinner(team, false);
+                if (team != null) {
+                    stopGameWithWinner(team, false);
+                }
             }
         }
     }
@@ -165,7 +166,12 @@ public class GameTeamManager implements TeamManager {
             GamePlugin.getGamePlugin().getGameHistoryManager().getCurrentGameHistory().setWinner(team.getName());
         }
 
-        Bukkit.getPluginManager().callEvent(new TeamWonEvent(team));
+        TeamWonEvent event = new TeamWonEvent(team);
+        Bukkit.getPluginManager().callEvent(event);
+
+        if (!event.isCancelled()) {
+            winner = team;
+        }
     }
 
     @Override
@@ -195,9 +201,44 @@ public class GameTeamManager implements TeamManager {
                 }
             }
 
+            /*
+             * Validate that a minimum of two teams exist
+             */
+            Set<Team> teams = new HashSet<>();
+            for (GameTeam team : this.teams) {
+                if (team.getPlayers().size() > 0) {
+                    teams.add(team);
+                }
+            }
+            // If only one team exist
+            if (teams.size() == 1) {
+                // Current only set team
+                Team team = teams.iterator().next();
+
+                if (team.getPlayers().size() > 1) {
+                    // Calculate new free team
+                    Team newTeam = null;
+                    for (GameTeam gameTeam : this.teams) {
+                        if (!teams.contains(gameTeam)) {
+                            newTeam = gameTeam;
+                            break;
+                        }
+                    }
+
+                    if (newTeam != null) {
+                        // Move the half players from current team to the new team
+                        for (int i = 0; i < team.getPlayers().size() / 2; i++) {
+                            GamePlayer p = team.getPlayers().get((team.getPlayers().size()-1) - i);
+
+                            GameAPIPlugin.getSystem().sendConsoleMessage("Move Player "+p.bukkit().getName()+" to Team "+newTeam.getName()+" to have a minimum of 2 teams!");
+                            p.changeTeamTo(newTeam);
+                        }
+                    } else throw new IllegalStateException("Could net set Teams for remaining players balanced. There is no second available team!");
+                } else throw new IllegalStateException("Could net set Teams for remaining players balanced. Only one player is eligible for team setting!");
+            }
+
             teamsFinallySet = true;
-        } else
-            throw new IllegalStateException("Could not set Teams for remaining players. Teams already finally set before!");
+        } else throw new IllegalStateException("Could not set Teams for remaining players. Teams already finally set before!");
     }
 
     @Override
@@ -206,6 +247,12 @@ public class GameTeamManager implements TeamManager {
             Collection<GamePlayer> players = GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)
                     ? GamePlugin.getGamePlugin().getPlayerManager().getGamePlayers(GamePlayerState.PLAYING)
                     : GameAPI.getInstance().getOnlineGamePlayers();
+
+            if (players.size() <= playersPerTeam) {
+                setTeamsForRemainingPlayersBalanced();
+                return;
+            }
+
             players.removeIf(player -> player.getTeam() != null);
 
             for (GamePlayer p : players) {
@@ -228,8 +275,7 @@ public class GameTeamManager implements TeamManager {
             }
 
             teamsFinallySet = true;
-        } else
-            throw new IllegalStateException("Could not set Teams for remaining players. Teams already finally set before!");
+        } else throw new IllegalStateException("Could not set Teams for remaining players. Teams already finally set before!");
     }
 
     @Override

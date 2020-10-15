@@ -8,12 +8,9 @@ import lombok.NoArgsConstructor;
 public class LobbyObjectiveImpl extends LobbyObjective {
 
     @Override
-    protected void onLobbyRegister(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry) {
-
-    }
+    protected void onLobbyRegister(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry) {}
 
     @Override
-    protected void onLobbyReload(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry) {
+    protected void onLobbyReload(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry) {}
 
-    }
 }

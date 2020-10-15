@@ -60,12 +60,10 @@ public class TeamInventory extends CoreInventory {
                             //Update all opened Team Inventories
                             for (Player player : Bukkit.getOnlinePlayers()) {
                                 CoreInventory inv = CoreSystem.getInstance().getPluginManager().getCurrentCoreInventory(player);
-                                System.out.println("check inventory for: "+player+": "+inv.getInventory().getTitle());
 
                                 if (inv instanceof TeamInventory) {
                                     ((TeamInventory) inv).update(player);
                                     player.updateInventory();
-                                    System.out.println("setting");
                                 }
                             }
                         } else {
