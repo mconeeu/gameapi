@@ -1,7 +1,6 @@
 package eu.mcone.gameapi.api.game;
 
 import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
-import eu.mcone.gameapi.api.replay.packets.server.MessageWrapper;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

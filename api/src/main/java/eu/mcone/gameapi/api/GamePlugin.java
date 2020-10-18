@@ -13,9 +13,6 @@ import eu.mcone.gameapi.api.map.MapManager;
 import eu.mcone.gameapi.api.onepass.OnePassManager;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.PlayerManager;
-import eu.mcone.gameapi.api.replay.exception.GameModuleNotActiveException;
-import eu.mcone.gameapi.api.replay.ReplayManager;
-import eu.mcone.gameapi.api.replay.ReplayRecord;
 import eu.mcone.gameapi.api.team.TeamManager;
 import eu.mcone.gameapi.api.utils.GameConfig;
 import lombok.Getter;
@@ -36,11 +33,9 @@ public abstract class GamePlugin extends CorePlugin {
     private BackpackManager backpackManager;
     private AchievementManager achievementManager;
     private KitManager kitManager;
-    private ReplayManager replayManager;
     private GameStateManager gameStateManager;
     private TeamManager teamManager;
     private PlayerManager playerManager;
-    private ReplayRecord replay;
     private DamageLogger damageLogger;
     private OnePassManager onePassManager;
     private GameHistoryManager gameHistoryManager;
@@ -88,21 +83,6 @@ public abstract class GamePlugin extends CorePlugin {
             if (modules.contains(Module.GAME_HISTORY_MANAGER)) {
                 gameHistoryManager.saveHistory();
             }
-
-            if (modules.contains(Module.REPLAY_MANAGER)
-                    && modules.contains(Module.TEAM_MANAGER)
-                    && modules.contains(Module.PLAYER_MANAGER)) {
-                //Stop date
-                getReplay().getRecorder().stop();
-                getReplayManager().saveReplay(getReplay());
-//            getSessionManager().getChannelHandler().createUnregisterRequest();
-            }
-
-            if (modules.contains(Module.REPLAY_MANAGER)) {
-                if (getReplayManager().getWorldDownloader() != null) {
-                    getReplayManager().getWorldDownloader().stop();
-                }
-            }
         });
 
         withErrorLogging(this::onGameDisable);
@@ -132,32 +112,9 @@ public abstract class GamePlugin extends CorePlugin {
         return achievementManager != null ? achievementManager : (achievementManager = GameAPI.getInstance().constructAchievementManager(this));
     }
 
-    public ReplayManager getReplayManager() {
-        modules.add(Module.REPLAY_MANAGER);
-        return replayManager != null ? replayManager : (replayManager = GameAPI.getInstance().constructReplayManager());
-    }
-
     public GameStateManager getGameStateManager() {
         modules.add(Module.GAME_STATE_MANAGER);
         return gameStateManager != null ? gameStateManager : (gameStateManager = GameAPI.getInstance().constructGameStateManager(this));
-    }
-
-    public ReplayRecord getReplay() {
-        try {
-            if (modules.contains(Module.REPLAY_MANAGER)
-                    && modules.contains(Module.TEAM_MANAGER)
-                    && modules.contains(Module.PLAYER_MANAGER)
-                    && modules.contains(Module.GAME_HISTORY_MANAGER)) {
-                modules.add(Module.REPLAY);
-                return replay != null ? replay : (replay = replayManager.createReplay(gameHistoryManager.getGameID()));
-            } else {
-                throw new GameModuleNotActiveException("A module is required that was not activated! Needed Modules: REPLAY_MANAGER, TEAM_MANAGER, PLAYER_MANAGER, GAME_HISTORY_MANAGER.");
-            }
-        } catch (GameModuleNotActiveException e) {
-            e.printStackTrace();
-        }
-
-        return null;
     }
 
     public TeamManager getTeamManager() {

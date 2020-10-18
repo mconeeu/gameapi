@@ -54,7 +54,7 @@ public class GameStateListener implements Listener {
             }
 
             if (GamePlugin.getGamePlugin().hasModule(Module.REPLAY)) {
-                GamePlugin.getGamePlugin().getReplay().addPlayer(p);
+                // TODO: implement new replay recorder
             }
 
             if (GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)) {
@@ -111,9 +111,7 @@ public class GameStateListener implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
         if (GamePlugin.getGamePlugin().hasModule(Module.REPLAY)) {
-            if (!GamePlugin.getGamePlugin().getReplayManager().getRecording().isEmpty()) {
-                GamePlugin.getGamePlugin().getReplay().removePlayer(e.getPlayer());
-            }
+            // TODO: implement new replay recorder
         }
 
         if (GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)) {

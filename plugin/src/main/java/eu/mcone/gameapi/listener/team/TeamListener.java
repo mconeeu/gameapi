@@ -27,5 +27,4 @@ public class TeamListener implements Listener {
             GameAPI.getInstance().getGamePlayer(e.getEntity()).removeFromGame(false);
         }
     }
-
 }

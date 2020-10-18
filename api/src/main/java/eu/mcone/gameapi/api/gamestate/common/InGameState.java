@@ -91,16 +91,9 @@ public class InGameState extends GameState {
                 e.printStackTrace();
             }
         }
-
-        if (GamePlugin.getGamePlugin().hasModule(Module.REPLAY)) {
-            GamePlugin.getGamePlugin().getReplay().recordSession();
-        }
     }
 
     @Override
     public void onStop(GameStateStopEvent event) {
-        if (GamePlugin.getGamePlugin().hasModule(Module.REPLAY)) {
-            GamePlugin.getGamePlugin().getReplay().save();
-        }
     }
 }

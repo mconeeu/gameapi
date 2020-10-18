@@ -10,7 +10,6 @@ import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Option;
 import eu.mcone.gameapi.api.game.GameHistory;
 import eu.mcone.gameapi.api.game.PlayerHistory;
-import eu.mcone.gameapi.api.replay.exception.GameOptionNotActiveException;
 import eu.mcone.gameapi.api.utils.IDUtils;
 import group.onegaming.networkmanager.core.api.database.Database;
 import group.onegaming.networkmanager.core.database.MongoConnection;
@@ -55,17 +54,17 @@ public class GameHistoryManager implements eu.mcone.gameapi.api.game.GameHistory
                 saved = true;
                 gameHistory.setStopped(System.currentTimeMillis() / 1000);
                 for (PlayerHistory playerHistory : gameHistory.getPlayers().values()) {
-                    if (playerHistory.getLeaved() == 0) {
-                        playerHistory.setLeaved(System.currentTimeMillis() / 1000);
+                    if (playerHistory.getLeft() == 0) {
+                        playerHistory.setLeft(System.currentTimeMillis() / 1000);
                     }
                 }
 
                 gameHistoryCollection.insertOne(gameHistory);
                 return true;
             } else {
-                throw new GameOptionNotActiveException("The option GAME_HISTORY_HISTORY_MODE isnt active!");
+                throw new IllegalArgumentException("The option GAME_HISTORY_HISTORY_MODE isn't active!");
             }
-        } catch (GameOptionNotActiveException e) {
+        } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
 
@@ -122,9 +121,9 @@ public class GameHistoryManager implements eu.mcone.gameapi.api.game.GameHistory
             if (gameHistory != null) {
                 return gameHistory;
             } else {
-                throw new GameOptionNotActiveException("The option GAME_HISTORY_HISTORY_MODE isnt active!");
+                throw new IllegalArgumentException("The option GAME_HISTORY_HISTORY_MODE isn't active!");
             }
-        } catch (GameOptionNotActiveException e) {
+        } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
 

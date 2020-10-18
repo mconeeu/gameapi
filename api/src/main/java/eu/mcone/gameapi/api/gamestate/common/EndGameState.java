@@ -50,6 +50,7 @@ public class EndGameState extends GameState {
             case 15:
             case 10:
             case 5:
+            case 4:
             case 3:
             case 2:
             case 1:

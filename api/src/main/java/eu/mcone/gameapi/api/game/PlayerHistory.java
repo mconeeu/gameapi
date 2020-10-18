@@ -18,7 +18,7 @@ public class PlayerHistory {
     @Setter
     private long joined;
     @Setter
-    private long leaved;
+    private long left;
     @Setter
     private String team;
     @Setter
@@ -34,6 +34,6 @@ public class PlayerHistory {
 
     @BsonIgnore
     public long getPlayTime() {
-        return leaved - joined;
+        return left - joined;
     }
 }
