@@ -1,4 +1,4 @@
-package eu.mcone.gameapi.api.replay.packets.server;
+package eu.mcone.gameapi.api.game;
 
 import eu.mcone.coresystem.api.bukkit.broadcast.Broadcast;
 import lombok.Getter;

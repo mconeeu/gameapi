@@ -17,7 +17,6 @@ import eu.mcone.gameapi.api.map.MapManager;
 import eu.mcone.gameapi.api.onepass.OnePassManager;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.PlayerManager;
-import eu.mcone.gameapi.api.replay.ReplayManager;
 import eu.mcone.gameapi.api.team.TeamManager;
 import lombok.Getter;
 import org.bukkit.ChatColor;
@@ -51,8 +50,6 @@ public abstract class GameAPI extends CorePlugin {
     public abstract GameStateManager constructGameStateManager(GamePlugin gamePlugin);
 
     public abstract MapManager constructMapManager();
-
-    public abstract ReplayManager constructReplayManager();
 
     public abstract TeamManager constructTeamManager(GamePlugin gamePlugin);
 

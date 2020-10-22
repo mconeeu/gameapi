@@ -10,7 +10,6 @@ import eu.mcone.gameapi.api.Module;
 import eu.mcone.gameapi.api.Option;
 import eu.mcone.gameapi.api.event.player.GamePlayerLoadedEvent;
 import eu.mcone.gameapi.api.player.GamePlayerState;
-import eu.mcone.gameapi.api.replay.container.ReplayContainer;
 import eu.mcone.gameapi.player.GameAPIPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -46,16 +45,13 @@ public class GamePlayerListener implements Listener {
         }
         if (GamePlugin.getGamePlugin().hasModule(Module.GAME_HISTORY_MANAGER)) {
             if (GamePlugin.getGamePlugin().hasOption(Option.GAME_HISTORY_HISTORY_MODE)) {
-                GamePlugin.getGamePlugin().getGameHistoryManager().getCurrentGameHistory().getPlayer(player).setLeaved(System.currentTimeMillis() / 1000);
+                GamePlugin.getGamePlugin().getGameHistoryManager().getCurrentGameHistory().getPlayer(player).setLeft(System.currentTimeMillis() / 1000);
             }
         }
 
         if (GamePlugin.getGamePlugin().hasModule(Module.REPLAY_MANAGER)) {
             if (GamePlugin.getGamePlugin().hasOption(Option.USE_REPLAY_VIEW_MANAGER)) {
-                ReplayContainer replayContainer = GamePlugin.getGamePlugin().getReplayManager().getReplayViewManager().getContainer(player);
-                if (replayContainer != null) {
-                    replayContainer.removeViewers(player);
-                }
+                // TODO: implement replay recorder
             }
         }
     }

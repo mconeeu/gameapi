@@ -22,7 +22,6 @@ import eu.mcone.gameapi.map.GameMapManager;
 import eu.mcone.gameapi.onepass.GameOnePassManager;
 import eu.mcone.gameapi.player.GameAPIPlayer;
 import eu.mcone.gameapi.player.GamePlayerManager;
-import eu.mcone.gameapi.replay.ReplayManager;
 import eu.mcone.gameapi.team.GameTeamManager;
 import lombok.Getter;
 import org.bukkit.entity.Player;
@@ -92,11 +91,6 @@ public class GameAPIPlugin extends GameAPI {
     @Override
     public AchievementManager constructAchievementManager(GamePlugin gamePlugin) {
         return new GameAchievementManager(gamePlugin, this);
-    }
-
-    @Override
-    public ReplayManager constructReplayManager() {
-        return new ReplayManager();
     }
 
     @Override
