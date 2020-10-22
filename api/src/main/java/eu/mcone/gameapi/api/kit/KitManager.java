@@ -25,8 +25,6 @@ public interface KitManager {
 
     boolean hasKitModified(Player p, String name);
 
-    void modifyKit(Player player, Kit kit, Map<ItemStack, Integer> items);
-
     Map<Integer, ItemStack> calculateItems(Kit kit, Player player);
 
 }

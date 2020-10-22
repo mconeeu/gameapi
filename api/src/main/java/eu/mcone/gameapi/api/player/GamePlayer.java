@@ -13,7 +13,6 @@ import eu.mcone.gameapi.api.kit.ModifiedKit;
 import eu.mcone.gameapi.api.stats.StatsHistory;
 import eu.mcone.gameapi.api.team.Team;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
 
@@ -98,6 +97,12 @@ public interface GamePlayer {
 
     boolean isOnePass();
 
+    ModifiedKit getModifiedKit(Kit kit);
+
+    ModifiedKit getModifiedKit(String name);
+
+    boolean hasKitModified(Kit kit);
+
     void buyOnePass(boolean premium);
 
     int getOneLevel();
@@ -127,32 +132,80 @@ public interface GamePlayer {
     double getRoundKD();
 
     //Kit
-    void modifyKit(Kit kit, Map<ItemStack, Integer> items);
-
-    boolean hasKitModified(String name);
-
-    boolean setKit(Kit kit);
+    default boolean setKit(Kit kit) {
+        return setKit(kit, false);
+    }
 
     /**
-     * sets the kit, that the player has buyed. If no Kit was buyed set the default kit (given as argument)
+     * sets the Kit items in a players inventory.
+     * this does not check if the player already buyed the kit when using {@link eu.mcone.gameapi.api.Option#KIT_MANAGER_CHOOSE_KITS_FOR_SERVER_LIFETIME}
+     * to buy the kit for the user use {@link this#buyKit(Kit)}
      *
-     * @param defaultKit the default Kit that will be set for free if the player didnt choose any kit
+     * @param kit the kit that should be set
+     * @param force if the kit should be set even if the player already uses this kit currently
+     * @return true if the kit was set (only if he has another kit or no kit before or force == true). false otherwise
      */
-    void setChoosedKit(Kit defaultKit);
+    boolean setKit(Kit kit, boolean force);
 
+    /**
+     * sets the kit, that the player used before again.
+     *
+     * @param defaultKit the default Kit that will be set for free if the player did not choosed a kit before (might be null)
+     */
+    void setCurrentKitAgain(Kit defaultKit);
+
+    /**
+     * checks if the player has buyed this kit
+     *
+     * @param kit target kit
+     * @return
+     */
     boolean hasKit(Kit kit);
 
+    /**
+     * get the kit this player is currently using
+     *
+     * @return current kit of the player, null if he does not has a kit equipped
+     */
     Kit getCurrentKit();
 
+    /**
+     * buys a kit for the player if he has enough coins.
+     * if {@link eu.mcone.gameapi.api.Option#KIT_MANAGER_CHOOSE_KITS_FOR_SERVER_LIFETIME} is used and the player already buyed this kit
+     * or the kit was added to the player via {@link this#addKit(Kit)}}, no coins will be removed.
+     *
+     * @param kit the kit that should get buyed
+     * @return true if the kit was buyed, false if the player had not enough coins
+     */
     boolean buyKit(Kit kit);
 
+    /**
+     * saves a kit purchase for this player. This means if {@link this#buyKit(Kit)} is used and the target kit was added, no coins will be removed.
+     * <b>NOTE</b>: This will only be saved in memory for server lifetime. After restart all added kits will be reset.
+     * this is exactly how {@link eu.mcone.gameapi.api.Option#KIT_MANAGER_CHOOSE_KITS_FOR_SERVER_LIFETIME} works. (adds a kit via this method on the first purchase)
+     *
+     * @param kit the kit that should be added
+     * @return true if the kit was added, false if the kit was already added to the player before
+     */
     boolean addKit(Kit kit);
 
+    /**
+     * removes a kit from the internal list. (Does only work if this kit was added before via {@link this#addKit(Kit)} or {@link eu.mcone.gameapi.api.Option#KIT_MANAGER_CHOOSE_KITS_FOR_SERVER_LIFETIME} is used)
+     * if a kit is removed the player loses coins if he buys this kit next time.
+     * you can use this i.e. to customize the behavior of {@link eu.mcone.gameapi.api.Option#KIT_MANAGER_CHOOSE_KITS_FOR_SERVER_LIFETIME}
+     *
+     * @param kit the kit that should be removed
+     * @return true if the kit was removed from internal list, false if the kit was not added before
+     */
     boolean removeKit(Kit kit);
 
+    /**
+     * Opens the Kit choose inventory.
+     * Here players can buy new kits or arrange the slots of the items in their current kit.
+     * if {@link eu.mcone.gameapi.api.Option#KIT_MANAGER_CHOOSE_KITS_FOR_SERVER_LIFETIME} is used players only have to pay coins on the first purchase of a kit
+     *
+     * @param onBackClick runnable that will be called if the player clicks on the {@link eu.mcone.coresystem.api.bukkit.inventory.CoreInventory#BACK_ITEM} back item
+     */
     void openKitInventory(Runnable onBackClick);
 
-    ModifiedKit getModifiedKit(Kit kit);
-
-    ModifiedKit getModifiedKit(String name);
 }

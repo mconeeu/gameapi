@@ -25,7 +25,7 @@ import static com.mongodb.client.model.Filters.eq;
 public class GameAchievementManager implements AchievementManager {
 
     private static final MongoCollection<GamemodeAchievement> ACHIEVEMENT_COLLECTION = CoreSystem.getInstance().getMongoDB().getCollection(
-            "gamesystem_achievements",
+            "gameapi_achievements",
             GamemodeAchievement.class
     );
 

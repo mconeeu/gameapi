@@ -3,6 +3,7 @@ package eu.mcone.gameapi.kit;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.UpdateOptions;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
+import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Option;
@@ -13,6 +14,7 @@ import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.inventory.kit.KitsInventory;
 import eu.mcone.gameapi.listener.kit.KitListener;
 import eu.mcone.gameapi.listener.kit.KitSortListener;
+import eu.mcone.gameapi.player.GameAPIPlayer;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.Document;
@@ -28,86 +30,52 @@ import static com.mongodb.client.model.Updates.set;
 
 public class GameKitManager implements KitManager {
 
-    private static final MongoCollection<Document> PLAYER_KITS_COLLECTION = CoreSystem.getInstance().getMongoDB().getCollection("kits");
-    private static final MongoCollection<Document> KIT_COLLECTION = CoreSystem.getInstance().getMongoDB().getCollection("custom_kits");
+    private static final MongoCollection<Document> MODIFIED_KITS_COLLECTION = CoreSystem.getInstance().getMongoDB().getCollection("gameapi_modified_kits");
 
     @Getter
-    private final boolean clearInvOnKitSet, applyKitsOnce, chooseKitsForServerLifetime;
+    private final boolean clearInvOnKitSet, chooseKitsForServerLifetime;
     private final GameAPIPlugin system;
-    private final GamePlugin plugin;
 
     @Getter
     private final List<Kit> kits;
-    private final Map<UUID, String> currentKits;
-    private final Map<UUID, List<String>> playerKits;
-    private final Map<UUID, List<ModifiedKit>> customKits;
+    private final Map<UUID, List<ModifiedKit>> modifiedKits;
+    private final Map<UUID, Set<Kit>> playerKits;
 
-    @Setter @Getter
+    @Setter
+    @Getter
     private Kit defaultKit;
 
     public GameKitManager(GameAPIPlugin system, GamePlugin plugin) {
-
-        this.clearInvOnKitSet = GamePlugin.getGamePlugin().hasOption(Option.KIT_MANAGER_CLEAR_INVENTORY_ON_KIT_SET);
-        this.applyKitsOnce = GamePlugin.getGamePlugin().hasOption(Option.KIT_MANAGER_APPLY_KITS_ONCE);
-        this.chooseKitsForServerLifetime = GamePlugin.getGamePlugin().hasOption(Option.KIT_MANAGER_CHOOSE_KITS_FOR_SERVER_LIFETIME);
+        this.clearInvOnKitSet = plugin.hasOption(Option.KIT_MANAGER_CLEAR_INVENTORY_ON_KIT_SET);
+        this.chooseKitsForServerLifetime = plugin.hasOption(Option.KIT_MANAGER_CHOOSE_KITS_FOR_SERVER_LIFETIME);
 
         this.system = system;
-        this.plugin = plugin;
-
         this.kits = new ArrayList<>();
-        this.currentKits = new HashMap<>();
+        this.modifiedKits = new HashMap<>();
         this.playerKits = new HashMap<>();
-//        if (!applyKitsOnce && !chooseKitsForServerLifetime) {
-//            this.playerKits = new HashMap<>();
-//        }
-        this.customKits = new HashMap<>();
+
+        reload();
 
         system.sendConsoleMessage("§aLoading KitManager...");
         system.registerEvents(new KitSortListener(this), new KitListener(this));
-        reload();
     }
 
     @Override
     public void reload() {
-        if (playerKits != null) {
-            playerKits.clear();
-        }
-        customKits.clear();
+        modifiedKits.clear();
 
-        for (Document kit : KIT_COLLECTION.find()) {
-            if (kit.getString("gamemode").equals(plugin.getGamemode().name())) {
-                UUID uuid = UUID.fromString(kit.getString("uuid"));
-                ModifiedKit customkit = new ModifiedKit(
-                        kit.getLong("lastUpdated"),
-                        kit.getString("name"),
-                        calculateReplacedItemSlots(kit.get("items", Document.class))
-                );
+        for (Document kit : MODIFIED_KITS_COLLECTION.find(eq("gamemode", getPluginKey()))) {
+            UUID uuid = UUID.fromString(kit.getString("uuid"));
+            ModifiedKit customkit = new ModifiedKit(
+                    kit.getLong("lastUpdated"),
+                    kit.getString("name"),
+                    calculateReplacedItemSlots(kit.get("items", Document.class))
+            );
 
-                if (customKits.containsKey(uuid)) {
-                    customKits.get(uuid).add(customkit);
-                } else {
-                    customKits.put(uuid, new ArrayList<>(Collections.singleton(customkit)));
-                }
-            }
-        }
-
-        for (Document playerEntry : PLAYER_KITS_COLLECTION.find()) {
-            UUID uuid = UUID.fromString(playerEntry.getString("uuid"));
-
-            if (playerEntry.get(plugin.getGamemode().toString()) != null) {
-                String currentKit = playerEntry.get(plugin.getGamemode().toString(), Document.class).getString("currentKit");
-                if (currentKit != null) {
-                    currentKits.put(uuid, currentKit);
-                }
-
-                if (!applyKitsOnce && !chooseKitsForServerLifetime) {
-                    List<String> kits = playerEntry.get(plugin.getGamemode().toString(), Document.class).getList("kits", String.class);
-
-                    playerKits.put(
-                            uuid,
-                            kits != null ? kits : new ArrayList<>()
-                    );
-                }
+            if (modifiedKits.containsKey(uuid)) {
+                modifiedKits.get(uuid).add(customkit);
+            } else {
+                modifiedKits.put(uuid, new ArrayList<>(Collections.singleton(customkit)));
             }
         }
     }
@@ -132,80 +100,55 @@ public class GameKitManager implements KitManager {
         return null;
     }
 
-    public boolean hasKit(UUID uuid, Kit kit) {
-        return hasKit(uuid, kit.getName());
-    }
-
     public boolean hasKit(UUID uuid, String name) {
-        return playerKits.containsKey(uuid) && playerKits.get(uuid).contains(name);
+        return hasKit(uuid, getKit(name));
     }
 
-    public void addKit(GamePlayer gp, Kit kit) {
-        if (!applyKitsOnce && !chooseKitsForServerLifetime) {
-            Player p = gp.bukkit();
+    public boolean hasKit(UUID uuid, Kit kit) {
+        return playerKits.containsKey(uuid) && playerKits.get(uuid).contains(kit);
+    }
 
-            if (playerKits.containsKey(p.getUniqueId())) {
-                playerKits.get(p.getUniqueId()).add(kit.getName());
-            } else {
-                playerKits.put(p.getUniqueId(), new ArrayList<>(Collections.singleton(kit.getName())));
-            }
+    public boolean addKit(GamePlayer gp, Kit kit) {
+        UUID uuid = gp.getCorePlayer().getUuid();
 
-            savePlayerKits(p);
-        }
-
-        if (chooseKitsForServerLifetime) {
-            currentKits.put(gp.getCorePlayer().getUuid(), kit.getName());
+        if (playerKits.containsKey(uuid)) {
+            return playerKits.get(uuid).add(kit);
+        } else {
+            playerKits.put(uuid, new HashSet<>(Collections.singleton(kit)));
+            return true;
         }
     }
 
-    public void removeKit(GamePlayer player, Kit kit) {
-        if (!applyKitsOnce && !chooseKitsForServerLifetime) {
-            Player p = player.bukkit();
-
-            playerKits.getOrDefault(p.getUniqueId(), Collections.emptyList()).remove(kit.getName());
-            savePlayerKits(p);
-        }
+    public boolean removeKit(GamePlayer gp, Kit kit) {
+        return playerKits.getOrDefault(gp.getCorePlayer().getUuid(), Collections.emptySet()).remove(kit);
     }
 
     public void setKit(Kit kit, Player p) {
-        if (clearInvOnKitSet && currentKits.containsKey(p.getUniqueId())) {
-            Kit oldKit = getKit(currentKits.get(p.getUniqueId()));
+        GameAPIPlayer gp = system.getGamePlayer(p);
+        Kit currentKit = gp.getCurrentKit();
 
-            if (oldKit != null) {
-                for (ItemStack item : oldKit.getKitItems().values()) {
-                    p.getInventory().remove(item);
-                }
-
-                p.getInventory().setArmorContents(null);
+        if (clearInvOnKitSet && currentKit != null) {
+            for (ItemStack item : currentKit.getKitItems().values()) {
+                p.getInventory().remove(item);
             }
+
+            p.getInventory().setArmorContents(null);
         }
 
-        currentKits.put(p.getUniqueId(), kit.getName());
-        system.getServer().getScheduler().runTaskAsynchronously(
-                system,
-                () -> PLAYER_KITS_COLLECTION.updateOne(
-                        eq("uuid", p.getUniqueId().toString()),
-                        set(plugin.getGamemode().toString() + ".currentKit", kit.getName()),
-                        new UpdateOptions().upsert(true)
-                )
-        );
+        gp.saveCurrentKit(kit);
 
         Map<Integer, ItemStack> items = calculateItems(kit, p);
         List<ItemStack> addLater = new ArrayList<>();
 
         for (Map.Entry<Integer, ItemStack> item : items.entrySet()) {
             if (p.getInventory().getItem(item.getKey()) != null && !p.getInventory().getItem(item.getKey()).getType().equals(Material.AIR)) {
-                addLater.add(item.getValue());
-            } else {
-                p.getInventory().setItem(item.getKey(), item.getValue());
+                addLater.add(p.getInventory().getItem(item.getKey()));
             }
+
+            p.getInventory().setItem(item.getKey(), item.getValue());
         }
 
         p.getInventory().addItem(addLater.toArray(new ItemStack[0]));
-    }
-
-    public Kit getCurrentKit(Player p) {
-        return getKit(currentKits.getOrDefault(p.getUniqueId(), null));
     }
 
     @Override
@@ -215,7 +158,7 @@ public class GameKitManager implements KitManager {
 
     @Override
     public ModifiedKit getModifiedKit(Player p, String name) {
-        return getModifiedKit(name, customKits.getOrDefault(p.getUniqueId(), Collections.emptyList()));
+        return getModifiedKit(name, modifiedKits.getOrDefault(p.getUniqueId(), Collections.emptyList()));
     }
 
     @Override
@@ -223,8 +166,7 @@ public class GameKitManager implements KitManager {
         return getModifiedKit(p, name) != null;
     }
 
-    @Override
-    public void modifyKit(Player player, Kit kit, Map<ItemStack, Integer> items) {
+    public void modifyKit(Player p, Kit kit, Map<ItemStack, Integer> items) {
         Map<Integer, Integer> customItems = new HashMap<>();
 
         for (Map.Entry<Integer, ItemStack> kitItem : kit.getKitItems().entrySet()) {
@@ -233,28 +175,27 @@ public class GameKitManager implements KitManager {
             }
         }
 
-        ModifiedKit customKit = new ModifiedKit(System.currentTimeMillis() / 1000, kit.getName(), customItems);
-
-        if (customKits.containsKey(player.getUniqueId())) {
-            ModifiedKit old = getModifiedKit(kit.getName(), customKits.get(player.getUniqueId()));
+        ModifiedKit modifiedKit = new ModifiedKit(System.currentTimeMillis() / 1000, kit.getName(), customItems);
+        if (modifiedKits.containsKey(p.getUniqueId())) {
+            ModifiedKit old = getModifiedKit(kit.getName(), modifiedKits.get(p.getUniqueId()));
             if (old != null) {
-                customKits.get(player.getUniqueId()).remove(old);
+                modifiedKits.get(p.getUniqueId()).remove(old);
             }
 
-            customKits.get(player.getUniqueId()).add(customKit);
+            modifiedKits.get(p.getUniqueId()).add(modifiedKit);
         } else {
-            customKits.put(player.getUniqueId(), new ArrayList<>(Collections.singleton(customKit)));
+            modifiedKits.put(p.getUniqueId(), new ArrayList<>(Collections.singleton(modifiedKit)));
         }
 
-        KIT_COLLECTION.updateOne(
+        MODIFIED_KITS_COLLECTION.updateOne(
                 combine(
-                        eq("uuid", player.getUniqueId().toString()),
-                        eq("gamemode", plugin.getGamemode().name()),
-                        eq("name", customKit.getName())
+                        eq("uuid", p.getUniqueId().toString()),
+                        eq("gamemode", getPluginKey()),
+                        eq("name", modifiedKit.getName())
                 ),
                 combine(
-                        set("lastUpdated", customKit.getLastUpdated()),
-                        set("items", customKit.getCustomItems())
+                        set("lastUpdated", modifiedKit.getLastUpdated()),
+                        set("items", modifiedKit.getCustomItems())
                 ),
                 new UpdateOptions().upsert(true)
         );
@@ -262,31 +203,21 @@ public class GameKitManager implements KitManager {
 
     @Override
     public Map<Integer, ItemStack> calculateItems(Kit kit, Player player) {
-        if (customKits.containsKey(player.getUniqueId())) {
-            ModifiedKit modifiedKit = getModifiedKit(kit.getName(), customKits.get(player.getUniqueId()));
+        ModifiedKit modifiedKit = system.getGamePlayer(player).getModifiedKit(kit);
 
-            if (modifiedKit != null) {
-                Map<Integer, ItemStack> items = new HashMap<>();
+        if (modifiedKit != null) {
+            Map<Integer, ItemStack> items = new HashMap<>();
 
-                for (Map.Entry<Integer, ItemStack> entry : kit.getKitItems().entrySet()) {
-                    if (modifiedKit.calculateCustomItems().containsKey(entry.getKey())) {
-                        items.put(modifiedKit.calculateCustomItems().get(entry.getKey()), entry.getValue());
-                    }
+            for (Map.Entry<Integer, ItemStack> entry : kit.getKitItems().entrySet()) {
+                if (modifiedKit.calculateCustomItems().containsKey(entry.getKey())) {
+                    items.put(modifiedKit.calculateCustomItems().get(entry.getKey()), entry.getValue());
                 }
-
-                return items;
             }
+
+            return items;
         }
 
         return kit.getKitItems();
-    }
-
-    private void savePlayerKits(Player p) {
-        PLAYER_KITS_COLLECTION.updateOne(
-                eq("uuid", p.getUniqueId().toString()),
-                set(plugin.getGamemode().toString() + ".kits", playerKits.get(p.getUniqueId())),
-                new UpdateOptions().upsert(true)
-        );
     }
 
     private static ModifiedKit getModifiedKit(String name, List<ModifiedKit> customKitList) {
@@ -306,6 +237,12 @@ public class GameKitManager implements KitManager {
         }
 
         return result;
+    }
+
+    public String getPluginKey() {
+        return !GamePlugin.getGamePlugin().getGamemode().equals(Gamemode.UNDEFINED)
+                ? GamePlugin.getGamePlugin().getGamemode().toString()
+                : GamePlugin.getGamePlugin().getPluginName();
     }
 
 }

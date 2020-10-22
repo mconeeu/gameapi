@@ -2,6 +2,7 @@ package eu.mcone.gameapi.api.gamestate.common;
 
 import eu.mcone.coresystem.api.bukkit.CorePlugin;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
+import eu.mcone.coresystem.api.bukkit.broadcast.SimpleBroadcast;
 import eu.mcone.coresystem.api.bukkit.scoreboard.CoreObjective;
 import eu.mcone.coresystem.api.bukkit.scoreboard.CoreScoreboard;
 import eu.mcone.gameapi.api.GamePlugin;
@@ -14,7 +15,6 @@ import eu.mcone.gameapi.api.gamestate.GameState;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.GamePlayerState;
 import eu.mcone.gameapi.api.scoreboard.InGameObjective;
-import eu.mcone.gameapi.api.scoreboard.InGameObjectiveImpl;
 import eu.mcone.gameapi.api.scoreboard.TeamTablist;
 import lombok.Getter;
 import lombok.Setter;
@@ -45,6 +45,15 @@ public class InGameState extends GameState {
 
     @Override
     public void onTimeoutSecond(CorePlugin plugin, long second) {
+        switch ((int) (getTimeout()-second)) {
+            case 60*10:
+            case 60*5:
+            case 60*2:
+            case 60: {
+                GamePlugin.getGamePlugin().getMessenger().broadcast(new SimpleBroadcast("§7Das Spiel stoppt in §f"+((getTimeout()-second) / 60)+" Minuten§7!"));
+            }
+        }
+
         //Update IngameObjective scoreboard automatically
         if (GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)) {
             for (Player player : GamePlugin.getGamePlugin().getPlayerManager().getPlayers(GamePlayerState.PLAYING)) {
@@ -81,7 +90,7 @@ public class InGameState extends GameState {
                 }
 
                 if (objective == null) {
-                    objective = InGameObjectiveImpl.class;
+                    objective = InGameObjective.class;
                 }
 
                 for (GamePlayer gp : GamePlugin.getGamePlugin().getPlayerManager().getGamePlayers(GamePlayerState.PLAYING)) {

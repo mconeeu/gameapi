@@ -7,7 +7,6 @@ import eu.mcone.gameapi.api.Module;
 import eu.mcone.gameapi.api.achievement.Achievement;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
 import eu.mcone.gameapi.api.backpack.BackpackSimpleItem;
-import eu.mcone.gameapi.api.kit.ModifiedKit;
 import eu.mcone.gameapi.api.player.GamePlayerSettings;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,7 +22,7 @@ public class GameAPIPlayerProfile extends GameProfile {
 
     private Map<String, List<Integer>> items = new HashMap<>();
     private Map<String, Map<String, Long>> achievements = new HashMap<>();
-    private List<ModifiedKit> customKits = new ArrayList<>();
+    private Map<String, String> currentKits = new HashMap<>();
     private GamePlayerSettings settings = new GamePlayerSettings();
     private BackpackSimpleItem currentBackpackItem;
     private int oneLevel, oneXp;
@@ -32,12 +31,13 @@ public class GameAPIPlayerProfile extends GameProfile {
     private transient Map<String, Set<BackpackItem>> itemMap = new HashMap<>();
     private transient Map<Gamemode, Map<Achievement, Long>> achievementMap = new HashMap<>();
 
-    GameAPIPlayerProfile(final Player p, final Map<String, Set<BackpackItem>> playerItems, Map<Gamemode, Map<Achievement, Long>> achievements, BackpackSimpleItem currentBackpackItem, int oneLevel, int oneXp, boolean onePass) {
+    GameAPIPlayerProfile(final Player p, final Map<String, Set<BackpackItem>> playerItems, Map<Gamemode, Map<Achievement, Long>> achievements, Map<String, String> currentKits, BackpackSimpleItem currentBackpackItem, int oneLevel, int oneXp, boolean onePass) {
         super(p);
         this.oneLevel = oneLevel;
         this.oneXp = oneXp;
         this.onePass = onePass;
         this.currentBackpackItem = currentBackpackItem;
+        this.currentKits = currentKits;
 
         for (Map.Entry<String, Set<BackpackItem>> entry : playerItems.entrySet()) {
             List<Integer> itemIds = new ArrayList<>();
@@ -46,7 +46,7 @@ public class GameAPIPlayerProfile extends GameProfile {
                 itemIds.add(item.getId());
             }
 
-            items.put(entry.getKey(), itemIds);
+            this.items.put(entry.getKey(), itemIds);
         }
 
         for (Map.Entry<Gamemode, Map<Achievement, Long>> entry : achievements.entrySet()) {
@@ -95,5 +95,21 @@ public class GameAPIPlayerProfile extends GameProfile {
                 }
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        return "GameAPIPlayerProfile{" +
+                "items=" + items +
+                ", achievements=" + achievements +
+                ", currentKits=" + currentKits +
+                ", settings=" + settings +
+                ", currentBackpackItem=" + currentBackpackItem +
+                ", oneLevel=" + oneLevel +
+                ", oneXp=" + oneXp +
+                ", onePass=" + onePass +
+                ", itemMap=" + itemMap +
+                ", achievementMap=" + achievementMap +
+                '}';
     }
 }

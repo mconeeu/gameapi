@@ -13,7 +13,6 @@ import eu.mcone.gameapi.api.gamestate.GameState;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.GamePlayerState;
 import eu.mcone.gameapi.api.scoreboard.LobbyObjective;
-import eu.mcone.gameapi.api.scoreboard.LobbyObjectiveImpl;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -52,6 +51,7 @@ public class LobbyGameState extends GameState {
             case 15:
             case 10:
             case 5:
+            case 4:
             case 3:
             case 2:
             case 1:
@@ -80,7 +80,7 @@ public class LobbyGameState extends GameState {
 
             try {
                 if (objective == null) {
-                    objective = LobbyObjectiveImpl.class;
+                    objective = LobbyObjective.class;
                 }
 
                 for (GamePlayer gp : GamePlugin.getGamePlugin().getPlayerManager().getGamePlayers(GamePlayerState.PLAYING)) {

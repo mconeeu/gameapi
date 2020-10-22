@@ -46,7 +46,7 @@ public class GameBackpackManager implements BackpackManager {
 
     private static final MongoCollection<BackpackItemCategory> BACKPACK_ITEM_GAMEMODE_COLLECTION = CoreSystem.getInstance().getMongoDB().withCodecRegistry(
             fromRegistries(getDefaultCodecRegistry(), fromProviders(new ItemStackCodecProvider(), PojoCodecProvider.builder().automatic(true).build()))
-    ).getCollection("gamesystem_backpack_items", BackpackItemCategory.class);
+    ).getCollection("gameapi_backpack_items", BackpackItemCategory.class);
 
     private final CorePlugin gamePlugin, system;
     private final List<BackpackItemCategory> backpackItems;

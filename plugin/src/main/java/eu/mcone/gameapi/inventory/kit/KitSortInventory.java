@@ -44,7 +44,7 @@ public class KitSortInventory extends CoreInventory {
                 changedItems.put(getInventory().getItem(i), i);
             }
 
-            gp.modifyKit(kit, changedItems);
+            manager.modifyKit(p, kit, changedItems);
             new KitsInventory(p, manager, onBackClick);
         });
 

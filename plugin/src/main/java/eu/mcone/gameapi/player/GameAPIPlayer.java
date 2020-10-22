@@ -36,11 +36,9 @@ import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-@Getter
 public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.GamePlayer<GameAPIPlayerProfile> implements GamePlayer {
 
     private static final int ONE_PASS_EMERALDS_PRICE = 150;
@@ -48,7 +46,8 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
 
     @Getter
     private Map<String, Set<BackpackItem>> backpackItems;
-    private List<ModifiedKit> customKits;
+    @Getter
+    private Map<String, String> currentKits;
     private Map<Gamemode, Map<Achievement, Long>> achievements;
     @Getter
     private GamePlayerSettings settings;
@@ -89,7 +88,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
     public GameAPIPlayerProfile reload() {
         GameAPIPlayerProfile systemProfile = super.reload();
         this.backpackItems = systemProfile.getItemMap();
-        this.customKits = systemProfile.getCustomKits();
+        this.currentKits = systemProfile.getCurrentKits();
         this.achievements = systemProfile.getAchievementMap();
         this.settings = systemProfile.getSettings();
         this.currentBackpackItem = systemProfile.getCurrentBackpackItem();
@@ -116,7 +115,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
             }
         }
 
-        system.saveGameProfile(new GameAPIPlayerProfile(corePlayer.bukkit(), backpackItems, achievements, currentBackpackItem, oneLevel, oneXp, onePass));
+        system.saveGameProfile(new GameAPIPlayerProfile(corePlayer.bukkit(), backpackItems, achievements, currentKits, currentBackpackItem, oneLevel, oneXp, onePass));
     }
 
     /*
@@ -351,6 +350,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
         }
     }
 
+
     /*
      * Stats System
      */
@@ -405,41 +405,40 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
         return statsHistory.getGoals();
     }
 
+
     /*
      * Kit System
      */
+
     @Override
-    public void modifyKit(final Kit kit, final Map<ItemStack, Integer> items) {
-        GamePlugin.getGamePlugin().getKitManager().modifyKit(bukkit(), kit, items);
+    public Kit getCurrentKit() {
+        return GamePlugin.getGamePlugin().getKitManager().getKit(
+                currentKits.getOrDefault(
+                        ((GameKitManager) GamePlugin.getGamePlugin().getKitManager()).getPluginKey(),
+                        null
+                )
+        );
+    }
+
+    public void saveCurrentKit(Kit kit) {
+        currentKits.put(((GameKitManager) GamePlugin.getGamePlugin().getKitManager()).getPluginKey(), kit.getName());
+        saveData();
     }
 
     @Override
-    public boolean hasKitModified(String name) {
-        return GamePlugin.getGamePlugin().getKitManager().hasKitModified(bukkit(), name);
-    }
-
-    @Override
-    public boolean setKit(Kit kit) {
-        if (hasKit(kit) || ((GameKitManager) GamePlugin.getGamePlugin().getKitManager()).isApplyKitsOnce()) {
+    public boolean setKit(Kit kit, boolean force) {
+        if (kit.equals(getCurrentKit()) || force) {
             ((GameKitManager) GamePlugin.getGamePlugin().getKitManager()).setKit(kit, bukkit());
             return true;
-        } else {
-            return false;
-        }
+        } else return false;
     }
 
     @Override
-    public void setChoosedKit(Kit defaultKit) {
-        if (((GameKitManager) GamePlugin.getGamePlugin().getKitManager()).isChooseKitsForServerLifetime()) {
-            Kit currentKit = getCurrentKit();
+    public void setCurrentKitAgain(Kit defaultKit) {
+        Kit currentKit = getCurrentKit();
 
-            if (currentKit != null) {
-                setKit(currentKit);
-            } else {
-                setKit(defaultKit);
-            }
-        } else {
-            throw new IllegalStateException("Can not set a choosed kit. You must enable GameAPI Option CHOOSE_KITS_FOR_SERVER_LIFETIME for this");
+        if (!setKit(currentKit != null ? currentKit : defaultKit, true)) {
+            throw new IllegalStateException("Could not set current kit again for player "+getCorePlayer().getName()+". setKit returns false with force == true");
         }
     }
 
@@ -449,58 +448,32 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
     }
 
     @Override
-    public Kit getCurrentKit() {
-        return ((GameKitManager) GamePlugin.getGamePlugin().getKitManager()).getCurrentKit(bukkit());
-    }
-
-    @Override
     public boolean buyKit(Kit kit) {
-        if (!hasKit(kit)) {
-            if (kit.getCoinsPrice() > 0) {
-                if ((getCorePlayer().getCoins() - kit.getCoinsPrice()) < 0) {
-                    GamePlugin.getGamePlugin().getMessenger().send(bukkit(), "§4Du hast nicht genügend Coins!");
-                    return false;
-                }
-
-                getCorePlayer().removeCoins(kit.getCoinsPrice());
+        if (!hasKit(kit) && kit.getCoinsPrice() > 0) {
+            if ((getCorePlayer().getCoins() - kit.getCoinsPrice()) < 0) {
+                GamePlugin.getGamePlugin().getMessenger().send(bukkit(), "§4Du hast nicht genügend Coins!");
+                return false;
             }
 
-            ((GameKitManager) GamePlugin.getGamePlugin().getKitManager()).addKit(this, kit);
-            if (!((GameKitManager) GamePlugin.getGamePlugin().getKitManager()).isChooseKitsForServerLifetime()) {
-                setKit(kit);
-            }
-            return true;
-        } else {
-            return false;
+            getCorePlayer().removeCoins(kit.getCoinsPrice());
         }
+
+        if (((GameKitManager) GamePlugin.getGamePlugin().getKitManager()).isChooseKitsForServerLifetime()) {
+            ((GameKitManager) GamePlugin.getGamePlugin().getKitManager()).addKit(this, kit);
+        }
+
+        setKit(kit, true);
+        return true;
     }
 
     @Override
     public boolean addKit(Kit kit) {
-        if (((GameKitManager) GamePlugin.getGamePlugin().getKitManager()).isApplyKitsOnce()) {
-            return true;
-        }
-
-        if (!hasKit(kit)) {
-            ((GameKitManager) GamePlugin.getGamePlugin().getKitManager()).addKit(this, kit);
-            return true;
-        } else {
-            return false;
-        }
+        return ((GameKitManager) GamePlugin.getGamePlugin().getKitManager()).addKit(this, kit);
     }
 
     @Override
     public boolean removeKit(Kit kit) {
-        if (((GameKitManager) GamePlugin.getGamePlugin().getKitManager()).isApplyKitsOnce()) {
-            return true;
-        }
-
-        if (hasKit(kit)) {
-            ((GameKitManager) GamePlugin.getGamePlugin().getKitManager()).removeKit(this, kit);
-            return true;
-        } else {
-            return false;
-        }
+        return ((GameKitManager) GamePlugin.getGamePlugin().getKitManager()).removeKit(this, kit);
     }
 
     @Override
@@ -516,6 +489,11 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
     @Override
     public ModifiedKit getModifiedKit(String name) {
         return GamePlugin.getGamePlugin().getKitManager().getModifiedKit(bukkit(), name);
+    }
+
+    @Override
+    public boolean hasKitModified(Kit kit) {
+        return getModifiedKit(kit) != null;
     }
 
 

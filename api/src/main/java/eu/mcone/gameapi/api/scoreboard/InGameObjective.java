@@ -7,14 +7,14 @@ import eu.mcone.gameapi.api.Module;
 import eu.mcone.gameapi.api.gamestate.GameState;
 import eu.mcone.gameapi.api.gamestate.common.InGameState;
 
-public abstract class InGameObjective extends LobbyObjective {
+public class InGameObjective extends GameObjective {
 
     public InGameObjective() {
         super("Ingame");
     }
 
     @Override
-    protected void onLobbyRegister(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry) {
+    protected void onGameObjectiveRegister(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry) {
         CoreSidebarObjectiveEntry inGameEntry = new CoreSidebarObjectiveEntry();
         onInGameRegister(player, inGameEntry);
 
@@ -23,13 +23,18 @@ public abstract class InGameObjective extends LobbyObjective {
         }
 
         boolean useTime = setTimeScores(entry);
+        if (useTime) {
+            entry.setScore(2, "");
+            entry.setScore(1, "§8» §7Zeit:");
+        }
+
         inGameEntry.getScores().forEach((score, value) -> entry.setScore(score + (useTime ? 3 : 0), value));
     }
 
-    protected abstract void onInGameRegister(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry);
+    protected void onInGameRegister(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry) {}
 
     @Override
-    protected void onLobbyReload(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry) {
+    protected void onGameObjectiveReload(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry) {
         CoreSidebarObjectiveEntry inGameEntry = new CoreSidebarObjectiveEntry();
         onInGameReload(player, inGameEntry);
 
@@ -41,7 +46,7 @@ public abstract class InGameObjective extends LobbyObjective {
         inGameEntry.getScores().forEach((score, value) -> entry.setScore(score + (useTime ? 3 : 0), value));
     }
 
-    protected abstract void onInGameReload(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry);
+    protected void onInGameReload(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry) {}
 
     private boolean setTimeScores(CoreSidebarObjectiveEntry entry) {
         GameState state;
@@ -51,8 +56,6 @@ public abstract class InGameObjective extends LobbyObjective {
                 && GamePlugin.getGamePlugin().getGameStateManager().isCountdownRunning();
 
         if (useTime) {
-            entry.setScore(2, "");
-            entry.setScore(1, "§8» §7Zeit:");
             entry.setScore(0, "   §f§l" + format(GamePlugin.getGamePlugin().getGameStateManager().getTimeoutCounter()));
         }
 

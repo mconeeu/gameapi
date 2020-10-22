@@ -1,12 +1,13 @@
 package eu.mcone.gameapi.api.kit;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@NoArgsConstructor
 @Getter @Setter
 public class ModifiedKit {
 

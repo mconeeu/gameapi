@@ -64,9 +64,9 @@ public class GameStateListener implements Listener {
                     GamePlugin.getGamePlugin().getMessenger().sendTransl(cps.bukkit(), "game.join", p.getName(), playerManager.getPlayers(GamePlayerState.PLAYING).size(), playerManager.getMaxPlayers());
 
                     CoreSystem.getInstance().createTitle()
-                            .stay(5)
-                            .fadeIn(2)
-                            .fadeOut(2)
+                            .stay(3)
+                            .fadeIn(1)
+                            .fadeOut(1)
                             .title(GamePlugin.getGamePlugin().getGameLabel())
                             .subTitle(CoreSystem.getInstance().getTranslationManager().get("game.join.title", cps, p.getName(), playerManager.getPlayers(GamePlayerState.PLAYING).size(), playerManager.getMaxPlayers()))
                             .send(cps.bukkit());
@@ -78,7 +78,7 @@ public class GameStateListener implements Listener {
 
                     for (CorePlayer cp : CoreSystem.getInstance().getOnlineCorePlayers()) {
                         if (cp.getScoreboard() != null) {
-                            if (cp.getScoreboard().getObjective(DisplaySlot.SIDEBAR) != null) {
+                            if (cp.getScoreboard().getObjective(DisplaySlot.SIDEBAR) instanceof LobbyObjective) {
                                 cp.getScoreboard().getObjective(DisplaySlot.SIDEBAR).reload();
                             }
                         }

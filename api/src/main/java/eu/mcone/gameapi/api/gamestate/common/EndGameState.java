@@ -15,8 +15,7 @@ import eu.mcone.gameapi.api.event.gamestate.GameStateStopEvent;
 import eu.mcone.gameapi.api.gamestate.GameState;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.GamePlayerState;
-import eu.mcone.gameapi.api.scoreboard.LobbyObjective;
-import eu.mcone.gameapi.api.scoreboard.LobbyObjectiveImpl;
+import eu.mcone.gameapi.api.scoreboard.GameObjective;
 import eu.mcone.gameapi.api.team.Team;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,7 +29,7 @@ public class EndGameState extends GameState {
 
     @Setter
     @Getter
-    private static Class<? extends LobbyObjective> objective;
+    private static Class<? extends GameObjective> objective;
     @Setter
     @Getter
     protected Team winnerTeam;
@@ -50,6 +49,7 @@ public class EndGameState extends GameState {
             case 15:
             case 10:
             case 5:
+            case 4:
             case 3:
             case 2:
             case 1:
@@ -104,7 +104,7 @@ public class EndGameState extends GameState {
         if (GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)) {
             try {
                 if (objective == null) {
-                    objective = LobbyObjectiveImpl.class;
+                    objective = GameObjective.class;
                 }
 
                 for (GamePlayer gp : GamePlugin.getGamePlugin().getPlayerManager().getGamePlayers(GamePlayerState.PLAYING)) {

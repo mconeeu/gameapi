@@ -1,45 +1,59 @@
 package eu.mcone.gameapi.api.scoreboard;
 
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
-import eu.mcone.coresystem.api.bukkit.scoreboard.CoreSidebarObjective;
 import eu.mcone.coresystem.api.bukkit.scoreboard.CoreSidebarObjectiveEntry;
 import eu.mcone.gameapi.api.GamePlugin;
+import eu.mcone.gameapi.api.Module;
+import eu.mcone.gameapi.api.player.GamePlayerState;
+import eu.mcone.gameapi.api.player.PlayerManager;
 
-public abstract class LobbyObjective extends CoreSidebarObjective {
+public class LobbyObjective extends GameObjective {
 
     public LobbyObjective() {
         super("Lobby");
     }
 
-    LobbyObjective(String name) {
-        super(name);
-    }
-
     @Override
-    protected void onRegister(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry) {
-        CoreSidebarObjectiveEntry lobbyEntry = new CoreSidebarObjectiveEntry();
-        onLobbyRegister(player, lobbyEntry);
+    protected void onGameObjectiveRegister(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry) {
+        CoreSidebarObjectiveEntry inGameEntry = new CoreSidebarObjectiveEntry();
+        onLobbyRegister(player, inGameEntry);
 
-        entry.setTitle(lobbyEntry.getTitle() != null ? lobbyEntry.getTitle() : "§7§l⚔ "+ GamePlugin.getGamePlugin().getPluginColor()+"§l§n"+GamePlugin.getGamePlugin().getGameName());
-        lobbyEntry.getScores().forEach((score, value) -> entry.setScore(score + 2, value));
-
-        entry.setScore(1, "");
-        entry.setScore(0, "§f§lMCONE.EU");
-    }
-
-    protected abstract void onLobbyRegister(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry);
-
-    @Override
-    protected void onReload(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry) {
-        CoreSidebarObjectiveEntry lobbyEntry = new CoreSidebarObjectiveEntry();
-        onLobbyReload(player, lobbyEntry);
-
-        if (lobbyEntry.getTitle() != null) {
-            entry.setTitle(lobbyEntry.getTitle());
+        if (inGameEntry.getTitle() != null) {
+            entry.setTitle(inGameEntry.getTitle());
         }
 
-        lobbyEntry.getScores().forEach((score, value) -> entry.setScore(score + 2, value));
+        boolean isPlayerManager = GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER);
+        if (isPlayerManager) {
+            PlayerManager playerManager = GamePlugin.getGamePlugin().getPlayerManager();
+
+            entry.setScore(0, "");
+            entry.setScore(0, "§8» §7Benötigte Spieler:");
+            entry.setScore(0, " §f"+playerManager.getPlayers(GamePlayerState.PLAYING)+"§7 von §f"+playerManager.getMinPlayers());
+        }
+
+        inGameEntry.getScores().forEach((score, value) -> entry.setScore(score + (isPlayerManager ? 3 : 0), value));
     }
 
-    protected abstract void onLobbyReload(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry);
+    protected void onLobbyRegister(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry) {}
+
+    @Override
+    protected void onGameObjectiveReload(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry) {
+        CoreSidebarObjectiveEntry inGameEntry = new CoreSidebarObjectiveEntry();
+        onLobbyReload(player, inGameEntry);
+
+        if (inGameEntry.getTitle() != null) {
+            entry.setTitle(inGameEntry.getTitle());
+        }
+
+        boolean isPlayerManager = GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER);
+        if (isPlayerManager) {
+            PlayerManager playerManager = GamePlugin.getGamePlugin().getPlayerManager();
+            entry.setScore(0, " §f"+playerManager.getPlayers(GamePlayerState.PLAYING)+"§7 von §f"+playerManager.getMinPlayers());
+        }
+
+        inGameEntry.getScores().forEach((score, value) -> entry.setScore(score + (isPlayerManager ? 3 : 0), value));
+    }
+
+    protected void onLobbyReload(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry) {}
+
 }
