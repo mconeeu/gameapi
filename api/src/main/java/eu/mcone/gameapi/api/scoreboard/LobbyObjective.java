@@ -26,15 +26,16 @@ public class LobbyObjective extends GameObjective {
         if (isPlayerManager) {
             PlayerManager playerManager = GamePlugin.getGamePlugin().getPlayerManager();
 
-            entry.setScore(0, "");
-            entry.setScore(0, "§8» §7Benötigte Spieler:");
-            entry.setScore(0, " §f"+playerManager.getPlayers(GamePlayerState.PLAYING)+"§7 von §f"+playerManager.getMinPlayers());
+            entry.setScore(2, "");
+            entry.setScore(1, "§8» §7Benötigte Spieler:");
+            entry.setScore(0, " §f" + playerManager.getPlayers(GamePlayerState.PLAYING).size() + "§7 von §f" + playerManager.getMinPlayers());
         }
 
         inGameEntry.getScores().forEach((score, value) -> entry.setScore(score + (isPlayerManager ? 3 : 0), value));
     }
 
-    protected void onLobbyRegister(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry) {}
+    protected void onLobbyRegister(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry) {
+    }
 
     @Override
     protected void onGameObjectiveReload(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry) {
@@ -48,12 +49,13 @@ public class LobbyObjective extends GameObjective {
         boolean isPlayerManager = GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER);
         if (isPlayerManager) {
             PlayerManager playerManager = GamePlugin.getGamePlugin().getPlayerManager();
-            entry.setScore(0, " §f"+playerManager.getPlayers(GamePlayerState.PLAYING)+"§7 von §f"+playerManager.getMinPlayers());
+            entry.setScore(0, " §f" + playerManager.getPlayers(GamePlayerState.PLAYING).size() + "§7 von §f" + playerManager.getMinPlayers());
         }
 
         inGameEntry.getScores().forEach((score, value) -> entry.setScore(score + (isPlayerManager ? 3 : 0), value));
     }
 
-    protected void onLobbyReload(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry) {}
+    protected void onLobbyReload(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry) {
+    }
 
 }
