@@ -3,7 +3,6 @@ package eu.mcone.gameapi.kit;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.UpdateOptions;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
-import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Option;
@@ -35,6 +34,7 @@ public class GameKitManager implements KitManager {
     @Getter
     private final boolean clearInvOnKitSet, chooseKitsForServerLifetime;
     private final GameAPIPlugin system;
+    private final GamePlugin plugin;
 
     @Getter
     private final List<Kit> kits;
@@ -50,6 +50,7 @@ public class GameKitManager implements KitManager {
         this.chooseKitsForServerLifetime = plugin.hasOption(Option.KIT_MANAGER_CHOOSE_KITS_FOR_SERVER_LIFETIME);
 
         this.system = system;
+        this.plugin = plugin;
         this.kits = new ArrayList<>();
         this.modifiedKits = new HashMap<>();
         this.playerKits = new HashMap<>();
@@ -64,7 +65,7 @@ public class GameKitManager implements KitManager {
     public void reload() {
         modifiedKits.clear();
 
-        for (Document kit : MODIFIED_KITS_COLLECTION.find(eq("gamemode", getPluginKey()))) {
+        for (Document kit : MODIFIED_KITS_COLLECTION.find(eq("gamemode", plugin.getPluginSlug()))) {
             UUID uuid = UUID.fromString(kit.getString("uuid"));
             ModifiedKit customkit = new ModifiedKit(
                     kit.getLong("lastUpdated"),
@@ -190,7 +191,7 @@ public class GameKitManager implements KitManager {
         MODIFIED_KITS_COLLECTION.updateOne(
                 combine(
                         eq("uuid", p.getUniqueId().toString()),
-                        eq("gamemode", getPluginKey()),
+                        eq("gamemode", plugin.getPluginSlug()),
                         eq("name", modifiedKit.getName())
                 ),
                 combine(
@@ -237,12 +238,6 @@ public class GameKitManager implements KitManager {
         }
 
         return result;
-    }
-
-    public String getPluginKey() {
-        return !GamePlugin.getGamePlugin().getGamemode().equals(Gamemode.UNDEFINED)
-                ? GamePlugin.getGamePlugin().getGamemode().toString()
-                : GamePlugin.getGamePlugin().getPluginName();
     }
 
 }

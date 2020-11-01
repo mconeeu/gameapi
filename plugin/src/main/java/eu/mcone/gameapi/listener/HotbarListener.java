@@ -19,27 +19,29 @@ public class HotbarListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onJoin(GamePlayerLoadedEvent e) {
-        if (GamePlugin.getGamePlugin().hasModule(Module.GAME_STATE_MANAGER) && GamePlugin.getGamePlugin().getGameStateManager().getRunning() instanceof LobbyGameState) {
-            if (GamePlugin.getGamePlugin().hasOption(Option.HOTBAR_SET_ITEMS)) {
-                CorePlayer cp = e.getCorePlayer();
-                Player player = cp.bukkit();
-                BackpackManager backpackManager = GamePlugin.getGamePlugin().getBackpackManager();
+        if (GamePlugin.isGamePluginInitialized()
+                && GamePlugin.getGamePlugin().hasModule(Module.GAME_STATE_MANAGER)
+                && GamePlugin.getGamePlugin().getGameStateManager().getRunning() instanceof LobbyGameState
+                && GamePlugin.getGamePlugin().hasOption(Option.HOTBAR_SET_ITEMS)
+        ) {
+            CorePlayer cp = e.getCorePlayer();
+            Player player = cp.bukkit();
+            BackpackManager backpackManager = GamePlugin.getGamePlugin().getBackpackManager();
 
-                player.getInventory().setItem(0, HotbarItem.CHOOSE_TEAM);
-                player.getInventory().setItem(1, HotbarItem.BACKPACK);
-                backpackManager.setCurrentBackpackItem(e.getPlayer());
+            player.getInventory().setItem(0, HotbarItem.CHOOSE_TEAM);
+            player.getInventory().setItem(1, HotbarItem.BACKPACK);
+            backpackManager.setCurrentBackpackItem(e.getPlayer());
 
-                if (GamePlugin.getGamePlugin().hasModule(Module.KIT_MANAGER)
-                        && GamePlugin.getGamePlugin().hasOption(Option.KIT_MANAGER_CHOOSE_KITS_FOR_SERVER_LIFETIME)
-                ) {
-                    player.getInventory().setItem(7, HotbarItem.CHOOSE_KIT);
-                }
-                player.getInventory().setItem(8, HotbarItem.QUIT);
+            if (GamePlugin.getGamePlugin().hasModule(Module.KIT_MANAGER)
+                    && GamePlugin.getGamePlugin().hasOption(Option.KIT_MANAGER_CHOOSE_KITS_FOR_SERVER_LIFETIME)
+            ) {
+                player.getInventory().setItem(7, HotbarItem.CHOOSE_KIT);
+            }
+            player.getInventory().setItem(8, HotbarItem.QUIT);
 
-                /* Set rank boots */
-                if (backpackManager.isUseRankBoots()) {
-                    backpackManager.setRankBoots(e.getPlayer().bukkit());
-                }
+            /* Set rank boots */
+            if (backpackManager.isUseRankBoots()) {
+                backpackManager.setRankBoots(e.getPlayer().bukkit());
             }
         }
     }
