@@ -23,7 +23,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class EndGameState extends GameState {
 
@@ -80,7 +79,7 @@ public class EndGameState extends GameState {
             cp.setScoreboard(new MainScoreboard());
 
             p.getInventory().clear();
-            p.getInventory().setArmorContents(new ItemStack[0]);
+            p.getInventory().setArmorContents(null);
             p.getActivePotionEffects().clear();
             p.playSound(p.getLocation(), Sound.FIREWORK_BLAST, 1, 1);
             p.playSound(p.getLocation(), Sound.ENDERDRAGON_DEATH, 1, 1);
@@ -88,7 +87,6 @@ public class EndGameState extends GameState {
             p.setFoodLevel(20);
             p.setLevel(0);
             p.setExp(0);
-            p.getInventory().setArmorContents(null);
             p.setGameMode(GameMode.SURVIVAL);
 
             p.getInventory().setItem(PlayerInventorySlot.HOTBAR_SLOT_9, HotbarItem.QUIT);

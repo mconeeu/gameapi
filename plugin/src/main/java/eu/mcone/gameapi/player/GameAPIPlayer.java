@@ -414,14 +414,14 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
     public Kit getCurrentKit() {
         return GamePlugin.getGamePlugin().getKitManager().getKit(
                 currentKits.getOrDefault(
-                        ((GameKitManager) GamePlugin.getGamePlugin().getKitManager()).getPluginKey(),
+                        GamePlugin.getGamePlugin().getPluginSlug(),
                         null
                 )
         );
     }
 
     public void saveCurrentKit(Kit kit) {
-        currentKits.put(((GameKitManager) GamePlugin.getGamePlugin().getKitManager()).getPluginKey(), kit.getName());
+        currentKits.put(GamePlugin.getGamePlugin().getPluginSlug(), kit.getName());
         saveData();
     }
 
