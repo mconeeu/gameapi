@@ -12,8 +12,8 @@ import java.util.Set;
 
 public class ExclusiveListener extends BackpackInventoryListener {
 
-    public ExclusiveListener() {
-        super("Exklusives Item");
+    public ExclusiveListener(Category category) {
+        super(category);
     }
 
     @Override

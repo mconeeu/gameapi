@@ -46,7 +46,7 @@ public enum Option {
     /**
      * Automattically sets any player boots in color of their main rank as shoes on join
      */
-    BACKPACK_MANAGER_USE_RANK_BOOTS,
+    BACKPACK_MANAGER_AUTO_SET_RANK_BOOTS,
 
     //KitManager
     /**
@@ -55,7 +55,7 @@ public enum Option {
     KIT_MANAGER_CLEAR_INVENTORY_ON_KIT_SET,
     /**
      * If a player buys a kit, he has access to it for the full server lifetime.
-     * (The {@link eu.mcone.gameapi.api.player.GamePlayer#buyKit(Kit, boolean)} method will not remove coins for a second purchase of the same kit while the server does not restart.)
+     * (The {@link eu.mcone.gameapi.api.player.GamePlayer#buyKit(Kit)} method will not remove coins for a second purchase of the same kit while the server does not restart.)
      */
     KIT_MANAGER_CHOOSE_KITS_FOR_SERVER_LIFETIME,
 

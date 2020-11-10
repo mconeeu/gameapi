@@ -38,11 +38,6 @@ public class HotbarListener implements Listener {
                 player.getInventory().setItem(7, HotbarItem.CHOOSE_KIT);
             }
             player.getInventory().setItem(8, HotbarItem.QUIT);
-
-            /* Set rank boots */
-            if (backpackManager.isUseRankBoots()) {
-                backpackManager.setRankBoots(e.getPlayer().bukkit());
-            }
         }
     }
 

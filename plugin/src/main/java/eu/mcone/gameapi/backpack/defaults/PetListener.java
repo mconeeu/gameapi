@@ -2,6 +2,7 @@ package eu.mcone.gameapi.backpack.defaults;
 
 import eu.mcone.gameapi.api.backpack.BackpackInventoryListener;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
+import eu.mcone.gameapi.api.backpack.Category;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultCategory;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.backpack.handler.GamePetHandler;
@@ -15,8 +16,8 @@ public class PetListener extends BackpackInventoryListener {
     @Getter
     private static final GamePetHandler handler = new GamePetHandler(plugin);
 
-    public PetListener() {
-        super("Tier");
+    public PetListener(Category category) {
+        super(category);
     }
 
     @Override

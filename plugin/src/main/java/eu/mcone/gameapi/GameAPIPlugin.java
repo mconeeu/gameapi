@@ -34,7 +34,6 @@ public class GameAPIPlugin extends GameAPI {
 
     @Getter
     private static GameAPIPlugin system;
-
     @Getter
     private List<GameAPIPlayer> players;
 

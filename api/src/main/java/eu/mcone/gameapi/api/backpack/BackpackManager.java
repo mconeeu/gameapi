@@ -16,13 +16,9 @@ public interface BackpackManager {
 
     HashSet<String> getDisabledItems();
 
-    boolean isUseRankBoots();
-
     int getGadgetSlot(Player player);
 
     void setGadgetSlotProvider(GadgetSlotProvider gadgetSlotProvider);
-
-    void setUseRankBoots(boolean use);
 
     void disableItem(DefaultItem item);
 
@@ -44,9 +40,13 @@ public interface BackpackManager {
 
     void setCurrentBackpackItem(GamePlayer gp);
 
+    void removeCurrentBackpackItem(GamePlayer gp);
+
     BackpackTradeManager getTradeManager();
 
     Map<Category, Set<BackpackItem>> getBackpackItems(String... categories);
+
+    Category getCategory(String name);
 
     boolean categoryExists(String category);
 

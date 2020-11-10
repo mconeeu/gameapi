@@ -57,8 +57,6 @@ public class GameBackpackManager implements BackpackManager {
 
     private GameBackpackTradeManager tradeManager;
     @Getter @Setter
-    private boolean useRankBoots = false;
-    @Getter @Setter
     private GadgetSlotProvider gadgetSlotProvider = player -> 2;
 
     public GameBackpackManager(GameAPIPlugin system, GamePlugin gamePlugin) {
@@ -73,10 +71,6 @@ public class GameBackpackManager implements BackpackManager {
 
         system.registerCommands(new ItemCMD(this), new OnePassCMD(), new TradeCMD());
         system.registerEvents(new BackpackListener(this));
-
-        if (gamePlugin.hasOption(Option.BACKPACK_MANAGER_USE_RANK_BOOTS)) {
-            useRankBoots = true;
-        }
 
         BackpackInventory.setPlugin(gamePlugin);
         BackpackSellInventory.setPlugin(gamePlugin);
@@ -165,7 +159,7 @@ public class GameBackpackManager implements BackpackManager {
 
             if (idsUnique(items)) {
                 backpackItems.add(new BackpackItemCategory(category, items));
-                clickListeners.put(category.getName(), getDefaultInventoryListener(defaultCategory));
+                clickListeners.put(category.getName(), getDefaultInventoryListener(defaultCategory, category));
             } else {
                 throw new IllegalArgumentException("Cannot register Category " + category.getName() + ". At least one id was registered twice! That would cause an error!");
             }
@@ -293,7 +287,22 @@ public class GameBackpackManager implements BackpackManager {
             DefaultItem item = DefaultItem.getItemByID(currentItem.getCategory(), currentItem.getId());
 
             if (item != null) {
-                clickListeners.get(currentItem.getCategory().name()).onBackpackInventoryClick(currentItem.getBackpackItem(), gp, gp.bukkit());
+                clickListeners.get(currentItem.getCategory().name()).click(currentItem.getBackpackItem(), gp, gp.bukkit());
+            } else {
+                gp.resetCurrentBackpackItem();
+            }
+        }
+    }
+
+    @Override
+    public void removeCurrentBackpackItem(GamePlayer gp) {
+        BackpackSimpleItem currentItem = gp.getCurrentBackpackItem();
+
+        if (currentItem != null) {
+            DefaultItem item = DefaultItem.getItemByID(currentItem.getCategory(), currentItem.getId());
+
+            if (item != null) {
+                clickListeners.get(currentItem.getCategory().name()).removeCurrentItem(currentItem.getBackpackItem(), gp, gp.bukkit());
             } else {
                 gp.resetCurrentBackpackItem();
             }
@@ -323,6 +332,11 @@ public class GameBackpackManager implements BackpackManager {
         }
 
         return result;
+    }
+
+    @Override
+    public Category getCategory(String name) {
+        return getItemCategory(name).getCategory();
     }
 
     public BackpackItemCategory getItemCategory(String category) {
@@ -427,7 +441,8 @@ public class GameBackpackManager implements BackpackManager {
     @Override
     public void setRankBoots(Player p) {
         CorePlayer cp = CoreSystem.getInstance().getCorePlayer(p);
-        RankBoots boots = RankBoots.getBootsByGroup(cp.getMainGroup());
+        RankBoots boots = RankBoots.getBootsByGroup(cp.isNicked() ? cp.getNick().getGroup() : cp.getMainGroup());
+
         if (boots != null) {
             p.getInventory().setBoots(boots.getItem());
         }
@@ -445,20 +460,20 @@ public class GameBackpackManager implements BackpackManager {
         }
     }
 
-    private BackpackInventoryListener getDefaultInventoryListener(DefaultCategory category) {
-        switch (category) {
+    private BackpackInventoryListener getDefaultInventoryListener(DefaultCategory defaultCategory, Category category) {
+        switch (defaultCategory) {
             case HAT:
-                return new HatListener();
+                return new HatListener(category);
             case PET:
-                return new PetListener();
+                return new PetListener(category);
             case TRAIL:
-                return new TrailListener();
+                return new TrailListener(category);
             case GADGET:
-                return new GadgetListener();
+                return new GadgetListener(category);
             case OUTFIT:
-                return new OutfitListener();
+                return new OutfitListener(category);
             case EXCLUSIVE:
-                return new ExclusiveListener();
+                return new ExclusiveListener(category);
             default:
                 return null;
         }

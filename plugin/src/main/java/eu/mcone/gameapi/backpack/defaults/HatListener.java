@@ -2,6 +2,7 @@ package eu.mcone.gameapi.backpack.defaults;
 
 import eu.mcone.gameapi.api.backpack.BackpackInventoryListener;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
+import eu.mcone.gameapi.api.backpack.Category;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultCategory;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.api.player.GamePlayer;
@@ -9,8 +10,8 @@ import org.bukkit.entity.Player;
 
 public class HatListener extends BackpackInventoryListener {
 
-    public HatListener() {
-        super("Kopf");
+    public HatListener(Category category) {
+        super(category);
     }
 
     @Override

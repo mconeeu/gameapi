@@ -2,6 +2,7 @@ package eu.mcone.gameapi.backpack.defaults;
 
 import eu.mcone.gameapi.api.backpack.BackpackInventoryListener;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
+import eu.mcone.gameapi.api.backpack.Category;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultCategory;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.backpack.handler.GameOutfitHandler;
@@ -13,8 +14,8 @@ public class OutfitListener extends BackpackInventoryListener {
     @Getter
     private static final GameOutfitHandler handler = new GameOutfitHandler();
 
-    public OutfitListener() {
-        super("Outfit");
+    public OutfitListener(Category category) {
+        super(category);
     }
 
     @Override

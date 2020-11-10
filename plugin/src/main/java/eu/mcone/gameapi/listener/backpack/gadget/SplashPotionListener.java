@@ -2,7 +2,6 @@ package eu.mcone.gameapi.listener.backpack.gadget;
 
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
-import eu.mcone.gameapi.backpack.GameBackpackManager;
 import eu.mcone.gameapi.listener.backpack.handler.GameGadgetHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
@@ -17,6 +16,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -37,6 +37,8 @@ public class SplashPotionListener extends GadgetListener {
             Player p = e.getPlayer();
 
             handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                ItemStack boots = p.getInventory().getBoots();
+
                 p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
                 p.playSound(p.getLocation(), Sound.GLASS, 1, 1);
                 p.playSound(p.getLocation(), Sound.SPLASH2, 2, 1);
@@ -64,9 +66,7 @@ public class SplashPotionListener extends GadgetListener {
                     handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
                         p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
 
-                        if (plugin.getBackpackManager().isUseRankBoots()) {
-                            ((GameBackpackManager) plugin.getBackpackManager()).setRankBoots(p);
-                        }
+                        p.getInventory().setBoots(boots);
 
                         if (p.hasPermission("lobby.silenthub")) {
                             p.getInventory().setItem(plugin.getBackpackManager().getGadgetSlot(p), DefaultItem.SPLASH_POTION.getItemStack());

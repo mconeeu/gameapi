@@ -3,6 +3,7 @@ package eu.mcone.gameapi.backpack.defaults;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.backpack.BackpackInventoryListener;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
+import eu.mcone.gameapi.api.backpack.Category;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultCategory;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.listener.backpack.gadget.*;
@@ -38,8 +39,8 @@ public class GadgetListener extends BackpackInventoryListener {
         );
     }
 
-    public GadgetListener() {
-        super("Gadget");
+    public GadgetListener(Category category) {
+        super(category);
     }
 
     @Override

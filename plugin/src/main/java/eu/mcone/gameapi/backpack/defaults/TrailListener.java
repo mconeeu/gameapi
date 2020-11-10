@@ -2,6 +2,7 @@ package eu.mcone.gameapi.backpack.defaults;
 
 import eu.mcone.gameapi.api.backpack.BackpackInventoryListener;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
+import eu.mcone.gameapi.api.backpack.Category;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultCategory;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.backpack.handler.GameTrailHandler;
@@ -13,8 +14,8 @@ public class TrailListener extends BackpackInventoryListener {
     @Getter
     private static final GameTrailHandler handler = new GameTrailHandler(plugin);
 
-    public TrailListener() {
-        super("Trail");
+    public TrailListener(Category category) {
+        super(category);
     }
 
     @Override
