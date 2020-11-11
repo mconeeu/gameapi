@@ -30,7 +30,7 @@ public class MapCMD extends CoreCommand {
 
             GameAPI.getInstance().getMessenger().sendSender(sender, "§7MapRotationHandler: "+(manager.isRotationHandlerLoaded() ? "§2aktiv" : "§4nicht aktiv"));
             if (manager.isRotationHandlerLoaded()){
-                GameAPI.getInstance().getMessenger().sendSender(sender, "§7Aktuelle Rotation Map: "+manager.getMapRotationHandler().getCurrentMap());
+                GameAPI.getInstance().getMessenger().sendSender(sender, "§7Aktuelle Rotation Map: "+manager.getMapRotationHandler().getCurrentMap().getName());
                 GameAPI.getInstance().getMessenger().sendSender(sender, "§7Nächste Rotation: "+manager.getMapRotationHandler().getFormattedTimeUntilNextRotation()+"\n");
             }
 

@@ -3,6 +3,8 @@ package eu.mcone.gameapi.command;
 import eu.mcone.coresystem.api.bukkit.command.CoreCommand;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
+import eu.mcone.gameapi.api.backpack.defaults.DefaultCategory;
+import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.backpack.GameBackpackManager;
 import org.bukkit.Bukkit;
@@ -32,6 +34,21 @@ public class ItemCMD extends CoreCommand {
                 } else {
                     GamePlayer gp = GameAPIPlugin.getSystem().getGamePlayer(t);
                     Set<BackpackItem> items = manager.getCategoryItems(args[2]);
+
+                    if (args[3].equalsIgnoreCase("*")) {
+                        for (BackpackItem item : items) {
+                            gp.addBackpackItem(args[2], item);
+                        }
+
+                        if (sender instanceof Player && sender.equals(t)) {
+                            GameAPIPlugin.getInstance().getMessenger().sendSender(sender, "§2Du hast dir alle Items der Category " + args[2] + "hinzugefügt");
+                        } else {
+                            GameAPIPlugin.getInstance().getMessenger().sendSender(sender, "§2Du hast alle Items der Category §a" + args[2] + " §2vom Spieler §a" + t.getName() + " §2hinzugefügt");
+                            GameAPIPlugin.getInstance().getMessenger().send(t, "§2Du hast alle Items der Category §a" + args[2] + " §2vom Spieler §a" + sender.getName() + " §2bekommen!");
+                        }
+
+                        return true;
+                    }
 
                     if (items != null) {
                         try {

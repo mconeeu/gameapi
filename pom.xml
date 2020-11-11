@@ -108,7 +108,7 @@
         <dependency> <!-- MCONE CoreSystem (This includes the Bukkit-API) -->
             <groupId>eu.mcone.coresystem</groupId>
             <artifactId>bukkit-api</artifactId>
-            <version>10.9.2-SNAPSHOT</version>
+            <version>10.9.3-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency> <!-- Spigot (this includes Spigot API, Bukkit API, Craftbukkit and NMS) -->

@@ -56,7 +56,8 @@ public class GameBackpackManager implements BackpackManager {
     private final List<String> additionalCategories;
 
     private GameBackpackTradeManager tradeManager;
-    @Getter @Setter
+    @Getter
+    @Setter
     private GadgetSlotProvider gadgetSlotProvider = player -> 2;
 
     public GameBackpackManager(GameAPIPlugin system, GamePlugin gamePlugin) {
@@ -302,7 +303,7 @@ public class GameBackpackManager implements BackpackManager {
             DefaultItem item = DefaultItem.getItemByID(currentItem.getCategory(), currentItem.getId());
 
             if (item != null) {
-                clickListeners.get(currentItem.getCategory().name()).removeCurrentItem(currentItem.getBackpackItem(), gp, gp.bukkit());
+                clickListeners.get(currentItem.getCategory().name()).removeCurrentItem(currentItem.getBackpackItem(), gp, gp.bukkit(), false);
             } else {
                 gp.resetCurrentBackpackItem();
             }
@@ -445,6 +446,8 @@ public class GameBackpackManager implements BackpackManager {
 
         if (boots != null) {
             p.getInventory().setBoots(boots.getItem());
+        } else {
+            p.getInventory().setBoots(null);
         }
     }
 

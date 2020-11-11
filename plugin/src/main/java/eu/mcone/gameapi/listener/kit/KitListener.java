@@ -34,7 +34,9 @@ public class KitListener implements Listener {
     @EventHandler
     public void on(PlayerRespawnEvent e) {
         if (manager.getDefaultKit() != null) {
-            Bukkit.getScheduler().runTaskLater(GameAPIPlugin.getSystem(), () -> manager.setKit(manager.getDefaultKit(), e.getPlayer()), 20);
+            Bukkit.getScheduler().runTaskLater(GameAPIPlugin.getSystem(), () -> {
+                manager.setKit(manager.getDefaultKit(), e.getPlayer());
+            }, 20);
         }
     }
 }

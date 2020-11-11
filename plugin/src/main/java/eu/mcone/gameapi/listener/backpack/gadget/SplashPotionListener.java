@@ -42,7 +42,11 @@ public class SplashPotionListener extends GadgetListener {
                 p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
                 p.playSound(p.getLocation(), Sound.GLASS, 1, 1);
                 p.playSound(p.getLocation(), Sound.SPLASH2, 2, 1);
-                p.getActivePotionEffects().clear();
+
+                for (PotionEffect effect : p.getActivePotionEffects()) {
+                    p.removePotionEffect(effect.getType());
+                }
+
                 p.removePotionEffect(PotionEffectType.INVISIBILITY);
                 p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 320, 1));
                 p.getInventory().setBoots(null);

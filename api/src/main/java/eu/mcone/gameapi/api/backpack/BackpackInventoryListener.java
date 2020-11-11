@@ -38,7 +38,8 @@ public abstract class BackpackInventoryListener {
         }
     }
 
-    public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player player) {}
+    public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player player) {
+    }
 
     public void setBackpackItems(CategoryInventory inv, Category category, Set<BackpackItem> categoryItems, GamePlayer gp, Player p) {
         for (BackpackItem item : categoryItems) {
@@ -60,15 +61,15 @@ public abstract class BackpackInventoryListener {
             inv.addCustomPlacedItem(
                     InventorySlot.ROW_6_SLOT_8,
                     new ItemBuilder(Material.BARRIER, 1, 0)
-                            .displayName("§c§l"+category.getName()+" Item deaktivieren")
+                            .displayName("§c§l" + category.getName() + " Item deaktivieren")
                             .lore("§7§oDeaktiviere dein", "§7§oaktuelles Rucksack", "§7§oItem.")
                             .create(),
-                    e -> removeCurrentItem(gp.getCurrentBackpackItem().getBackpackItem(), gp, p)
+                    e -> removeCurrentItem(gp.getCurrentBackpackItem().getBackpackItem(), gp, p, true)
             );
         }
     }
 
-    public void removeCurrentItem(BackpackItem item, GamePlayer gp, Player p) {
+    public void removeCurrentItem(BackpackItem item, GamePlayer gp, Player p, Boolean message) {
         BackpackItemRemoveEvent event = new BackpackItemRemoveEvent(
                 gp,
                 category,
@@ -81,14 +82,17 @@ public abstract class BackpackInventoryListener {
         p.closeInventory();
 
         onItemItemRemove(item, gp, p);
-        plugin.getMessenger().sendSuccess(p, "Du hast das "+getCategoryLabel()+" Item !["+item.getName()+"] erfolgreich deaktiviert!");
+        if (message) {
+            plugin.getMessenger().sendSuccess(p, "Du hast das " + getCategoryLabel() + " Item ![" + item.getName() + "] zurück in deinem Rucksack gelegt!");
+        }
 
         if (event.isApplyRankBoots()) {
             GamePlugin.getGamePlugin().getBackpackManager().setRankBoots(p);
         }
     }
 
-    public void onItemItemRemove(BackpackItem item, GamePlayer gp, Player p) {}
+    public void onItemItemRemove(BackpackItem item, GamePlayer gp, Player p) {
+    }
 
     private String getCategoryLabel() {
         return ChatColor.stripColor(category.getItemStack().getItemMeta().getDisplayName());

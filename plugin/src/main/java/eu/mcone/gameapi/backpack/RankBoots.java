@@ -29,8 +29,8 @@ public enum RankBoots {
     SR_CONTENT_BOOTS(Group.SRCONTENT, ItemBuilder.createLeatherArmorItem(Material.LEATHER_BOOTS, Color.NAVY).displayName("§c§lSenior Content Schuhe").lore("§7Kategorie: §bExklusives Item", "§7Seltenheit: §cMythisch", "", "§7Gucci x Supreme MH100-Loi").unbreakable(true).itemFlags(ItemFlag.HIDE_UNBREAKABLE).create()),
     ADMIN_BOOTS(Group.ADMIN, ItemBuilder.createLeatherArmorItem(Material.LEATHER_BOOTS, Color.RED).displayName("§c§lAdminstrator Schuhe").lore("§7Kategorie: §bExklusives Item", "§7Seltenheit: §cMythisch", "", "§7BAN BAN BAN. ICH BIN DER BOSS!!").unbreakable(true).itemFlags(ItemFlag.HIDE_UNBREAKABLE).create());
 
-    private Group group;
-    private ItemStack item;
+    private final Group group;
+    private final ItemStack item;
 
     RankBoots(Group group, ItemStack item) {
         this.group = group;

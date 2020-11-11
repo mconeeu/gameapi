@@ -125,31 +125,33 @@ public class GameKitManager implements KitManager {
     }
 
     public void setKit(Kit kit, Player p) {
-        GameAPIPlayer gp = system.getGamePlayer(p);
-        Kit currentKit = gp.getCurrentKit();
+        if (kit != null) {
+            GameAPIPlayer gp = system.getGamePlayer(p);
+            Kit currentKit = gp.getCurrentKit();
 
-        if (clearInvOnKitSet && currentKit != null) {
-            for (ItemStack item : currentKit.getKitItems().values()) {
-                p.getInventory().remove(item);
+            if (clearInvOnKitSet && currentKit != null) {
+                for (ItemStack item : currentKit.getKitItems().values()) {
+                    p.getInventory().remove(item);
+                }
+
+                p.getInventory().setArmorContents(null);
             }
 
-            p.getInventory().setArmorContents(null);
-        }
+            gp.saveCurrentKit(kit);
 
-        gp.saveCurrentKit(kit);
+            Map<Integer, ItemStack> items = calculateItems(kit, p);
+            List<ItemStack> addLater = new ArrayList<>();
 
-        Map<Integer, ItemStack> items = calculateItems(kit, p);
-        List<ItemStack> addLater = new ArrayList<>();
+            for (Map.Entry<Integer, ItemStack> item : items.entrySet()) {
+                if (p.getInventory().getItem(item.getKey()) != null && !p.getInventory().getItem(item.getKey()).getType().equals(Material.AIR)) {
+                    addLater.add(p.getInventory().getItem(item.getKey()));
+                }
 
-        for (Map.Entry<Integer, ItemStack> item : items.entrySet()) {
-            if (p.getInventory().getItem(item.getKey()) != null && !p.getInventory().getItem(item.getKey()).getType().equals(Material.AIR)) {
-                addLater.add(p.getInventory().getItem(item.getKey()));
+                p.getInventory().setItem(item.getKey(), item.getValue());
             }
 
-            p.getInventory().setItem(item.getKey(), item.getValue());
-        }
-
-        p.getInventory().addItem(addLater.toArray(new ItemStack[0]));
+            p.getInventory().addItem(addLater.toArray(new ItemStack[0]));
+        } else throw new IllegalArgumentException("Could not set kit for player "+p.getName()+". Kit is null!");
     }
 
     @Override
