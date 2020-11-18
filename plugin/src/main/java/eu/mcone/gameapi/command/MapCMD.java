@@ -1,12 +1,10 @@
 package eu.mcone.gameapi.command;
 
-import eu.mcone.coresystem.api.bukkit.broadcast.SimpleBroadcast;
 import eu.mcone.coresystem.api.bukkit.command.CoreCommand;
-import eu.mcone.gameapi.api.GameAPI;
-import eu.mcone.gameapi.api.map.GameAPIMap;
+import eu.mcone.gameapi.listener.map.MapInventory;
 import eu.mcone.gameapi.map.GameMapManager;
-import eu.mcone.gameapi.map.GameMapRotationHandler;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class MapCMD extends CoreCommand {
 
@@ -19,36 +17,9 @@ public class MapCMD extends CoreCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, String[] args) {
-        if (args.length == 0) {
-            StringBuilder sb = new StringBuilder("§7Folgende Welten sind geladen: ");
-            for (GameAPIMap map : manager.getMaps()) {
-                sb.append("§3").append(map.getName()).append("§7, ");
-            }
-            sb.append("\n");
-
-            GameAPI.getInstance().getMessenger().sendSender(sender, sb.toString());
-
-            GameAPI.getInstance().getMessenger().sendSender(sender, "§7MapRotationHandler: "+(manager.isRotationHandlerLoaded() ? "§2aktiv" : "§4nicht aktiv"));
-            if (manager.isRotationHandlerLoaded()){
-                GameAPI.getInstance().getMessenger().sendSender(sender, "§7Aktuelle Rotation Map: "+manager.getMapRotationHandler().getCurrentMap().getName());
-                GameAPI.getInstance().getMessenger().sendSender(sender, "§7Nächste Rotation: "+manager.getMapRotationHandler().getFormattedTimeUntilNextRotation()+"\n");
-            }
-
-            GameAPI.getInstance().getMessenger().sendSender(sender, "§7MapVotingHandler: "+(manager.isVotingHandlerLoaded() ? "§2aktiv" : "§4nicht aktiv"));
-            return true;
-        } else if (args.length == 1 && args[0].equalsIgnoreCase("rotate")) {
-            if (manager.isRotationHandlerLoaded()) {
-                ((GameMapRotationHandler) manager.getMapRotationHandler()).rotate();
-                GameAPI.getInstance().getMessenger().broadcast(new SimpleBroadcast("§fDie Map wird gewechselt!"));
-                GameAPI.getInstance().getMessenger().sendSender(sender, "§2Du hast die Map erfolgreich rotiert!");
-                return true;
-            } else {
-                GameAPI.getInstance().getMessenger().sendSender(sender, "§4Der RotationHandler wurde nicht initialisiert!");
-                return false;
-            }
+        if (sender instanceof Player) {
+            new MapInventory((Player) sender, manager);
         }
-
-        GameAPI.getInstance().getMessenger().sendSender(sender, "§4Bitte benutze:§c /map [<rotate>]");
         return false;
     }
 

@@ -33,6 +33,7 @@ public enum DefaultItem {
     BOAT(11, "Boot", DefaultCategory.GADGET, Level.EPIC, 125, 75, new ItemBuilder(Material.BOAT, 1, 0).displayName("§5§lBoot").lore("§7Kategorie: §bGadget", "§7Seltenheit: §5Episch", "", "", "§7Schipper um die OneIsland", "§7Insel und hupe laut!").create()),
     MAKES(12, "Macht", DefaultCategory.GADGET, Level.LEGENDARY, 135, 90, new ItemBuilder(Material.LEVER, 1, 0).displayName("§6§lMacht").lore("§7Kategorie: §bGadget", "§7Seltenheit: §6Legendär", "", "", "§7Benuzte die Macht und", "§7schleuder Spieler hoch!").create()),
     DOUBLEJUMP(13, "Doppel Sprung", DefaultCategory.GADGET, Level.EPIC, 120, 80, new ItemBuilder(Material.FEATHER, 1, 0).displayName("§5§lSprung").lore("§7Kategorie: §bGadget", "§7Seltenheit: §5Episch", "", "", "§7Hopp Hopp ich springe", "§7herum wie der Osterhase").create()),
+    FIREWORK(14, "Silvester Batterie", DefaultCategory.GADGET, Level.EPIC, 120, 80, Skull.fromUrl("http://textures.minecraft.net/texture/ba4e22d8165f8860accd61ae866d5e5b5ad4d86b6cd9edf788959bbb778dedab", 1).toItemBuilder().displayName("§5§lFeuerwerk").lore("§7Kategorie: §bGadget", "§7Seltenheit: §5Episch", "", "", "§7Frohes neues Jahr").create()),
 
 
     //Heads
@@ -131,15 +132,19 @@ public enum DefaultItem {
     private static BackpackManager manager;
 
     @Getter
-    private int id, buyemeralds, sellemeralds;
+    private final int id;
     @Getter
-    private DefaultCategory category;
+    private final int buyemeralds;
     @Getter
-    private Level level;
+    private final int sellemeralds;
     @Getter
-    private String name;
+    private final DefaultCategory category;
     @Getter
-    private ItemStack itemStack;
+    private final Level level;
+    @Getter
+    private final String name;
+    @Getter
+    private final ItemStack itemStack;
 
     DefaultItem(int id, String name, DefaultCategory category, Level level, int buyemeralds, int sellemeralds, ItemStack itemStack) {
         this.id = id;

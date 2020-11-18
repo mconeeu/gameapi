@@ -35,7 +35,8 @@ public class GadgetListener extends BackpackInventoryListener {
                 new FlyOneCarpetListener(plugin, handler),
                 new GrapplerListener(plugin, handler),
                 new EnderPearlListener(plugin, handler),
-                new SplashPotionListener(plugin, handler)
+                new SplashPotionListener(plugin, handler),
+                new FireWorkListener(plugin, handler)
         );
     }
 

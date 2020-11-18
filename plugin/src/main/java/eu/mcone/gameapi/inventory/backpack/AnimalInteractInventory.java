@@ -11,6 +11,8 @@ import eu.mcone.coresystem.api.bukkit.inventory.InventoryOption;
 import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
 import eu.mcone.coresystem.api.bukkit.inventory.anvil.AnvilSlot;
 import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
+import eu.mcone.gameapi.api.GameAPI;
+import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.backpack.handler.GamePetHandler;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -24,6 +26,9 @@ public class AnimalInteractInventory extends CoreInventory {
 
         setItem(InventorySlot.ROW_2_SLOT_3, new ItemBuilder(Material.BARRIER, 1, 0).displayName("§c§lTier in den Stall schicken").lore("§7§oDein Tier verschindet. Du kannst", "§7§oes jederzeit wieder über", "§7§odeinen Rucksack zurückholen.", "", "§8» §f§nLinksklick§8 | §7§oAusblenden").create(), e -> {
             handler.despawnPet(p);
+            GamePlayer gamePlayer = GameAPI.getInstance().getGamePlayer(p);
+            gamePlayer.resetCurrentBackpackItem();
+
             p.closeInventory();
         });
 
