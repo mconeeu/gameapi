@@ -1,6 +1,7 @@
 package eu.mcone.gameapi.listener.team;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
+import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.coresystem.api.core.player.Group;
 import eu.mcone.gameapi.api.GameAPI;
@@ -12,7 +13,6 @@ import eu.mcone.gameapi.team.GameTeamManager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -66,7 +66,7 @@ public class TeamChatListener implements Listener {
 
                             e.getRecipients().remove(receiver);
                             receiver.sendMessage((cp.isNicked() ? Group.SPIELER.getPrefix() : cp.getMainGroup().getPrefix()) + CoreSystem.getInstance().getTranslationManager().get("system.bukkit.chat").replaceAll("%Player%", player.getName()) + targetMessage);
-                            receiver.playSound(receiver.getLocation(), Sound.NOTE_BASS, 1.0F, 1.0F);
+                            Sound.error(receiver);
                         }
                     }
                 }

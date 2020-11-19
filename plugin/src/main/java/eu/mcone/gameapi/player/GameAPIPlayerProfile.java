@@ -8,6 +8,7 @@ import eu.mcone.gameapi.api.achievement.Achievement;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
 import eu.mcone.gameapi.api.backpack.BackpackSimpleItem;
 import eu.mcone.gameapi.api.player.GamePlayerSettings;
+import eu.mcone.gameapi.kit.KitSettings;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,7 +23,7 @@ public class GameAPIPlayerProfile extends GameProfile {
 
     private Map<String, List<Integer>> items = new HashMap<>();
     private Map<String, Map<String, Long>> achievements = new HashMap<>();
-    private Map<String, String> currentKits = new HashMap<>();
+    private Map<String, KitSettings> kitSettings = new HashMap<>();
     private GamePlayerSettings settings = new GamePlayerSettings();
     private BackpackSimpleItem currentBackpackItem;
     private int oneLevel, oneXp;
@@ -31,13 +32,13 @@ public class GameAPIPlayerProfile extends GameProfile {
     private transient Map<String, Set<BackpackItem>> itemMap = new HashMap<>();
     private transient Map<Gamemode, Map<Achievement, Long>> achievementMap = new HashMap<>();
 
-    GameAPIPlayerProfile(final Player p, final Map<String, Set<BackpackItem>> playerItems, Map<Gamemode, Map<Achievement, Long>> achievements, Map<String, String> currentKits, BackpackSimpleItem currentBackpackItem, int oneLevel, int oneXp, boolean onePass) {
+    GameAPIPlayerProfile(final Player p, final Map<String, Set<BackpackItem>> playerItems, Map<Gamemode, Map<Achievement, Long>> achievements, Map<String, KitSettings> kitSettings, BackpackSimpleItem currentBackpackItem, int oneLevel, int oneXp, boolean onePass) {
         super(p);
         this.oneLevel = oneLevel;
         this.oneXp = oneXp;
         this.onePass = onePass;
         this.currentBackpackItem = currentBackpackItem;
-        this.currentKits = currentKits;
+        this.kitSettings = kitSettings;
 
         for (Map.Entry<String, Set<BackpackItem>> entry : playerItems.entrySet()) {
             List<Integer> itemIds = new ArrayList<>();
@@ -102,7 +103,7 @@ public class GameAPIPlayerProfile extends GameProfile {
         return "GameAPIPlayerProfile{" +
                 "items=" + items +
                 ", achievements=" + achievements +
-                ", currentKits=" + currentKits +
+                ", currentKits=" + kitSettings +
                 ", settings=" + settings +
                 ", currentBackpackItem=" + currentBackpackItem +
                 ", oneLevel=" + oneLevel +

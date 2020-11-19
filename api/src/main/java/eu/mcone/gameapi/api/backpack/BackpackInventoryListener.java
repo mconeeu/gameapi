@@ -25,7 +25,7 @@ public abstract class BackpackInventoryListener {
     protected static GamePlugin plugin;
     protected final Category category;
 
-    public void click(BackpackItem item, GamePlayer gp, Player p) {
+    public void click(BackpackItem item, GamePlayer gp, Player p, boolean notify) {
         if (gp.getCurrentBackpackItem() != null) {
             GamePlugin.getGamePlugin().getBackpackManager().removeCurrentBackpackItem(gp);
         }
@@ -34,12 +34,11 @@ public abstract class BackpackInventoryListener {
         Bukkit.getPluginManager().callEvent(event);
 
         if (!event.isCancelled()) {
-            onBackpackInventoryClick(item, gp, p);
+            onBackpackInventoryClick(item, gp, p, notify);
         }
     }
 
-    public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player player) {
-    }
+    public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player player, boolean notify) {}
 
     public void setBackpackItems(CategoryInventory inv, Category category, Set<BackpackItem> categoryItems, GamePlayer gp, Player p) {
         for (BackpackItem item : categoryItems) {
@@ -47,7 +46,7 @@ public abstract class BackpackInventoryListener {
                 if (!plugin.getBackpackManager().getDisabledItems().contains(item.getName())) {
                     inv.addItem(item.getItem(), e -> {
                         if (gp.isEffectsVisible()) {
-                            click(item, gp, p);
+                            click(item, gp, p, true);
                         } else {
                             p.closeInventory();
                             GameAPI.getInstance().getMessenger().send(p, "§4Du kannst keine Effekte benutzen, da Effekte von anderen für dich unsichtbar sind");
@@ -69,7 +68,7 @@ public abstract class BackpackInventoryListener {
         }
     }
 
-    public void removeCurrentItem(BackpackItem item, GamePlayer gp, Player p, Boolean message) {
+    public void removeCurrentItem(BackpackItem item, GamePlayer gp, Player p, boolean message) {
         BackpackItemRemoveEvent event = new BackpackItemRemoveEvent(
                 gp,
                 category,
@@ -91,8 +90,7 @@ public abstract class BackpackInventoryListener {
         }
     }
 
-    public void onItemItemRemove(BackpackItem item, GamePlayer gp, Player p) {
-    }
+    public void onItemItemRemove(BackpackItem item, GamePlayer gp, Player p) {}
 
     private String getCategoryLabel() {
         return ChatColor.stripColor(category.getItemStack().getItemMeta().getDisplayName());

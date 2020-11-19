@@ -5,6 +5,7 @@
 
 package eu.mcone.gameapi.inventory.kit;
 
+import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.coresystem.api.bukkit.inventory.InventoryOption;
 import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
@@ -12,7 +13,6 @@ import eu.mcone.gameapi.api.kit.Kit;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.kit.GameKitManager;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 public class KitBuyInventory extends CoreInventory {
@@ -27,11 +27,11 @@ public class KitBuyInventory extends CoreInventory {
         });
         setItem(23, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 14).displayName("§c§lAbbrechen").lore("", "§8» §c§nRechtsklick§8 | §7§oAbbrechen").create(), e -> {
             new KitsInventory(p, manager, onBackClick);
-            p.playSound(p.getLocation(), Sound.NOTE_BASS, 1, 1);
+            Sound.error(p);
         });
 
         openInventory();
-        p.playSound(p.getLocation(), Sound.CHICKEN_EGG_POP, 1, 1);
+        Sound.click(p);
     }
 
 }

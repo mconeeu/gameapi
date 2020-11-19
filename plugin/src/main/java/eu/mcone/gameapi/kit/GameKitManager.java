@@ -12,11 +12,11 @@ import eu.mcone.gameapi.api.kit.ModifiedKit;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.inventory.kit.KitsInventory;
 import eu.mcone.gameapi.listener.kit.KitListener;
-import eu.mcone.gameapi.listener.kit.KitSortListener;
 import eu.mcone.gameapi.player.GameAPIPlayer;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.Document;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -58,7 +58,7 @@ public class GameKitManager implements KitManager {
         reload();
 
         system.sendConsoleMessage("§aLoading KitManager...");
-        system.registerEvents(new KitSortListener(this), new KitListener(this));
+        system.registerEvents(new KitListener(this));
     }
 
     @Override
@@ -93,11 +93,14 @@ public class GameKitManager implements KitManager {
 
     @Override
     public Kit getKit(String name) {
-        for (Kit kit : kits) {
-            if (kit.getName().equals(name)) {
-                return kit;
+        if (name != null) {
+            for (Kit kit : kits) {
+                if (kit.getName().equals(name)) {
+                    return kit;
+                }
             }
         }
+
         return null;
     }
 
@@ -151,7 +154,8 @@ public class GameKitManager implements KitManager {
             }
 
             p.getInventory().addItem(addLater.toArray(new ItemStack[0]));
-        } else throw new IllegalArgumentException("Could not set kit for player "+p.getName()+". Kit is null!");
+            GameAPIPlugin.getSystem().sendConsoleMessage("§fSet kit " + kit.getName() + " for " + p.getName());
+        } else throw new NullPointerException("Could not set kit for player " + p.getName() + ". Kit is null!");
     }
 
     @Override
@@ -172,9 +176,13 @@ public class GameKitManager implements KitManager {
     public void modifyKit(Player p, Kit kit, Map<ItemStack, Integer> items) {
         Map<Integer, Integer> customItems = new HashMap<>();
 
+        p.getInventory().clear();
         for (Map.Entry<Integer, ItemStack> kitItem : kit.getKitItems().entrySet()) {
             if (items.containsKey(kitItem.getValue())) {
-                customItems.put(kitItem.getKey(), items.get(kitItem.getValue()));
+                int newSlot = items.get(kitItem.getValue());
+
+                p.getInventory().setItem(newSlot, kitItem.getValue());
+                customItems.put(kitItem.getKey(), newSlot);
             }
         }
 
@@ -190,17 +198,20 @@ public class GameKitManager implements KitManager {
             modifiedKits.put(p.getUniqueId(), new ArrayList<>(Collections.singleton(modifiedKit)));
         }
 
-        MODIFIED_KITS_COLLECTION.updateOne(
-                combine(
-                        eq("uuid", p.getUniqueId().toString()),
-                        eq("gamemode", plugin.getPluginSlug()),
-                        eq("name", modifiedKit.getName())
-                ),
-                combine(
-                        set("lastUpdated", modifiedKit.getLastUpdated()),
-                        set("items", modifiedKit.getCustomItems())
-                ),
-                new UpdateOptions().upsert(true)
+        Bukkit.getScheduler().runTaskAsynchronously(
+                GamePlugin.getGamePlugin(),
+                () -> MODIFIED_KITS_COLLECTION.updateOne(
+                        combine(
+                                eq("uuid", p.getUniqueId().toString()),
+                                eq("gamemode", plugin.getPluginSlug()),
+                                eq("name", modifiedKit.getName())
+                        ),
+                        combine(
+                                set("lastUpdated", modifiedKit.getLastUpdated()),
+                                set("items", modifiedKit.getCustomItems())
+                        ),
+                        new UpdateOptions().upsert(true)
+                )
         );
     }
 

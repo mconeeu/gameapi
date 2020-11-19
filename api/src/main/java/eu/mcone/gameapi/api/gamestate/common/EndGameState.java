@@ -2,6 +2,7 @@ package eu.mcone.gameapi.api.gamestate.common;
 
 import eu.mcone.coresystem.api.bukkit.CorePlugin;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
+import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.coresystem.api.bukkit.inventory.PlayerInventorySlot;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.coresystem.api.bukkit.scoreboard.MainScoreboard;
@@ -21,7 +22,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 public class EndGameState extends GameState {
@@ -57,7 +57,7 @@ public class EndGameState extends GameState {
                             "game.countdown.restart",
                             CoreSystem.getInstance().getCorePlayer(p)
                     ).replace("%seconds%", Long.toString(second)));
-                    p.playSound(p.getLocation(), Sound.LEVEL_UP, 1, 1);
+                    Sound.done(p);
                 }
                 break;
             default:
@@ -81,8 +81,8 @@ public class EndGameState extends GameState {
             p.getInventory().clear();
             p.getInventory().setArmorContents(null);
             p.getActivePotionEffects().clear();
-            p.playSound(p.getLocation(), Sound.FIREWORK_BLAST, 1, 1);
-            p.playSound(p.getLocation(), Sound.ENDERDRAGON_DEATH, 1, 1);
+            Sound.play(p, org.bukkit.Sound.FIREWORK_BLAST);
+            Sound.play(p, org.bukkit.Sound.ENDERDRAGON_DEATH);
             p.setHealth(20);
             p.setFoodLevel(20);
             p.setLevel(0);

@@ -1,6 +1,5 @@
 package eu.mcone.gameapi.backpack.defaults;
 
-import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.backpack.BackpackInventoryListener;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
 import eu.mcone.gameapi.api.backpack.Category;
@@ -45,13 +44,13 @@ public class GadgetListener extends BackpackInventoryListener {
     }
 
     @Override
-    public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player p) {
+    public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player p, boolean notify) {
         if (gamePlayer.getSettings().isEnableGadgets()) {
             p.getInventory().setItem(plugin.getBackpackManager().getGadgetSlot(p), item.getItem());
             gamePlayer.setCurrentBackpackItem(item, DefaultCategory.GADGET);
         } else {
             p.closeInventory();
-            GameAPI.getInstance().getMessenger().send(p, "Du kannst keine Gadgets benutzen, da du sie deaktiviert hast. Aktiviere sie wieder in den §fEinstellungen§7!");
+            plugin.getMessenger().sendInfo(p, "Du kannst keine Gadgets benutzen, da du sie deaktiviert hast. Aktiviere sie wieder in den ![Einstellungen]!");
         }
     }
 

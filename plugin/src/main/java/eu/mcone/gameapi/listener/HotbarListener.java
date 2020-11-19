@@ -4,7 +4,6 @@ import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.gameapi.api.*;
 import eu.mcone.gameapi.api.backpack.BackpackManager;
-import eu.mcone.gameapi.api.backpack.defaults.DefaultCategory;
 import eu.mcone.gameapi.api.event.player.GamePlayerLoadedEvent;
 import eu.mcone.gameapi.api.gamestate.common.LobbyGameState;
 import org.bukkit.entity.Player;
@@ -30,7 +29,7 @@ public class HotbarListener implements Listener {
 
             player.getInventory().setItem(0, HotbarItem.CHOOSE_TEAM);
             player.getInventory().setItem(1, HotbarItem.BACKPACK);
-            backpackManager.setCurrentBackpackItem(e.getPlayer());
+            backpackManager.setCurrentBackpackItem(e.getPlayer(), false);
 
             if (GamePlugin.getGamePlugin().hasModule(Module.KIT_MANAGER)
                     && GamePlugin.getGamePlugin().hasOption(Option.KIT_MANAGER_CHOOSE_KITS_FOR_SERVER_LIFETIME)
@@ -45,7 +44,7 @@ public class HotbarListener implements Listener {
     public void onInteract(PlayerInteractEvent e) {
         Player p = e.getPlayer();
 
-        if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK) || e.getAction().equals(Action.RIGHT_CLICK_AIR)) {
+        if (GamePlugin.getGamePlugin().hasOption(Option.HOTBAR_SET_ITEMS) && e.getAction().equals(Action.RIGHT_CLICK_BLOCK) || e.getAction().equals(Action.RIGHT_CLICK_AIR)) {
             ItemStack i = e.getItem();
             if ((i == null) || (!i.hasItemMeta()) || (!i.getItemMeta().hasDisplayName())) {
                 return;
@@ -53,7 +52,7 @@ public class HotbarListener implements Listener {
 
             if (i.equals(HotbarItem.BACKPACK)) {
                 e.setCancelled(true);
-                GamePlugin.getGamePlugin().getBackpackManager().openBackpackInventory(DefaultCategory.GADGET.name(), p);
+                GamePlugin.getGamePlugin().getBackpackManager().openBackpackInventory(p);
             } else if (i.equals(HotbarItem.QUIT)) {
                 e.setCancelled(true);
                 CoreSystem.getInstance().getChannelHandler().createSetRequest(p, "CMD", "lobby");

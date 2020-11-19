@@ -1,6 +1,7 @@
 package eu.mcone.gameapi.listener.backpack.gadget;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
+import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
@@ -51,7 +52,7 @@ public class FlyOneCarpetListener extends GadgetListener {
 
                         isRiding.add(p);
                         spawnHorse(p);
-                        p.playSound(p.getLocation(), Sound.ANVIL_USE, 1, 1);
+                        Sound.save(p);
                     } else {
                         GameAPI.getInstance().getMessenger().send(p, "§4Bitte warte ein paar Sekunden...");
                     }
@@ -92,7 +93,7 @@ public class FlyOneCarpetListener extends GadgetListener {
                 }, 50);
                 e.getDismounted().remove();
 
-                p.playSound(p.getLocation(), Sound.ANVIL_BREAK, 1, 1);
+                Sound.cancel(p);
 
                 World world = p.getWorld();
                 for (ArmorStand armorStand : world.getEntitiesByClass(ArmorStand.class)) {

@@ -1,11 +1,11 @@
 package eu.mcone.gameapi.listener.backpack.gadget;
 
+import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.listener.backpack.handler.GameGadgetHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -39,9 +39,9 @@ public class SplashPotionListener extends GadgetListener {
             handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 ItemStack boots = p.getInventory().getBoots();
 
-                p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
-                p.playSound(p.getLocation(), Sound.GLASS, 1, 1);
-                p.playSound(p.getLocation(), Sound.SPLASH2, 2, 1);
+                Sound.tick(p);
+                Sound.play(p, org.bukkit.Sound.GLASS);
+                Sound.play(p, org.bukkit.Sound.SPLASH2);
 
                 for (PotionEffect effect : p.getActivePotionEffects()) {
                     p.removePotionEffect(effect.getType());
@@ -60,7 +60,7 @@ public class SplashPotionListener extends GadgetListener {
                 w.playEffect(p.getLocation(), Effect.WITCH_MAGIC, 5);
 
                 handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
+                    Sound.tick(p);
     /*if (p.hasPermission("lobby.silenthub")) {
         p.getInventory().setItem(3, Item.SPLASH_POTION.getItemStack());
     } else {
@@ -68,7 +68,7 @@ public class SplashPotionListener extends GadgetListener {
     }*/
 
                     handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                        p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
+                        Sound.done(p);
 
                         p.getInventory().setBoots(boots);
 

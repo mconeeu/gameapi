@@ -1,5 +1,6 @@
 package eu.mcone.gameapi.inventory.onepass;
 
+import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.coresystem.api.bukkit.inventory.InventoryOption;
 import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
@@ -10,7 +11,6 @@ import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 public class OnePassBuyInventory extends CoreInventory {
@@ -23,20 +23,20 @@ public class OnePassBuyInventory extends CoreInventory {
             gamePlayer.buyOnePass(false);
 
             Bukkit.getScheduler().runTaskLater(GameAPIPlugin.getSystem(), () -> {
-                p.playSound(p.getLocation(), Sound.HORSE_SADDLE, 1, 1);
+                Sound.equip(p);
                 GameAPI.getInstance().getMessenger().send(player, "§aDu hast den §3OnePass §agekauft!");
 
                 setItem(InventorySlot.ROW_3_SLOT_9, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 7).displayName("§8//§oMCONE§8//").create());
                 setItem(InventorySlot.ROW_2_SLOT_4, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 7).displayName("§8//§oMCONE§8//").create());
                 setItem(InventorySlot.ROW_2_SLOT_6, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 7).displayName("§8//§oMCONE§8//").create());
                 Bukkit.getScheduler().runTaskLater(GameAPIPlugin.getSystem(), () -> {
-                    p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
+                    Sound.done(p);
 
                     setItem(InventorySlot.ROW_3_SLOT_5, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 4).displayName("§8//§oMCONE§8//").create());
                     setItem(InventorySlot.ROW_2_SLOT_5, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 5).displayName("§aOnePass gekauft").create());
                     setItem(InventorySlot.ROW_1_SLOT_5, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 4).displayName("§8//§oMCONE§8//").create());
                     Bukkit.getScheduler().runTaskLater(GameAPIPlugin.getSystem(), () -> {
-                        p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
+                        Sound.done(p);
 
                         setItem(InventorySlot.ROW_2_SLOT_4, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 4).displayName("§8//§oMCONE§8//").create());
                         setItem(InventorySlot.ROW_2_SLOT_6, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 4).displayName("§8//§oMCONE§8//").create());
@@ -45,7 +45,7 @@ public class OnePassBuyInventory extends CoreInventory {
                         setItem(InventorySlot.ROW_1_SLOT_4, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 4).displayName("§8//§oMCONE§8//").create());
                         setItem(InventorySlot.ROW_1_SLOT_6, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 4).displayName("§8//§oMCONE§8//").create());
                         Bukkit.getScheduler().runTaskLater(GameAPIPlugin.getSystem(), () -> {
-                            p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
+                            Sound.done(p);
 
                             setItem(InventorySlot.ROW_2_SLOT_1, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 2).displayName("§8//§oMCONE§8//").create());
                             setItem(InventorySlot.ROW_1_SLOT_6, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 2).displayName("§8//§oMCONE§8//").create());
@@ -67,20 +67,20 @@ public class OnePassBuyInventory extends CoreInventory {
             gamePlayer.buyOnePass(true);
 
             Bukkit.getScheduler().runTaskLater(GameAPIPlugin.getSystem(), () -> {
-                p.playSound(p.getLocation(), Sound.HORSE_SADDLE, 1, 1);
+                Sound.equip(p);
                 GameAPI.getInstance().getMessenger().send(player, "§aDu hast den §3OnePass-Premium §agekauft!");
 
                 setItem(InventorySlot.ROW_3_SLOT_9, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 7).displayName("§8//§oMCONE§8//").create());
                 setItem(InventorySlot.ROW_2_SLOT_4, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 7).displayName("§8//§oMCONE§8//").create());
                 setItem(InventorySlot.ROW_2_SLOT_6, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 7).displayName("§8//§oMCONE§8//").create());
                 Bukkit.getScheduler().runTaskLater(GameAPIPlugin.getSystem(), () -> {
-                    p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
+                    Sound.done(p);
 
                     setItem(InventorySlot.ROW_3_SLOT_5, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 4).displayName("§8//§oMCONE§8//").create());
                     setItem(InventorySlot.ROW_2_SLOT_5, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 5).displayName("§aOnePass gekauft").create());
                     setItem(InventorySlot.ROW_1_SLOT_5, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 4).displayName("§8//§oMCONE§8//").create());
                     Bukkit.getScheduler().runTaskLater(GameAPIPlugin.getSystem(), () -> {
-                        p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
+                        Sound.done(p);
 
                         setItem(InventorySlot.ROW_2_SLOT_4, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 4).displayName("§8//§oMCONE§8//").create());
                         setItem(InventorySlot.ROW_2_SLOT_6, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 4).displayName("§8//§oMCONE§8//").create());
@@ -89,7 +89,7 @@ public class OnePassBuyInventory extends CoreInventory {
                         setItem(InventorySlot.ROW_1_SLOT_4, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 4).displayName("§8//§oMCONE§8//").create());
                         setItem(InventorySlot.ROW_1_SLOT_6, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 4).displayName("§8//§oMCONE§8//").create());
                         Bukkit.getScheduler().runTaskLater(GameAPIPlugin.getSystem(), () -> {
-                            p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
+                            Sound.done(p);
 
                             setItem(InventorySlot.ROW_2_SLOT_1, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 2).displayName("§8//§oMCONE§8//").create());
                             setItem(InventorySlot.ROW_1_SLOT_6, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 2).displayName("§8//§oMCONE§8//").create());

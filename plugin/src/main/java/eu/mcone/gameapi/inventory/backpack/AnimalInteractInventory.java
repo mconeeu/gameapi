@@ -6,6 +6,7 @@
 package eu.mcone.gameapi.inventory.backpack;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
+import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.coresystem.api.bukkit.inventory.InventoryOption;
 import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
@@ -15,7 +16,6 @@ import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.backpack.handler.GamePetHandler;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -41,7 +41,7 @@ public class AnimalInteractInventory extends CoreInventory {
                             handler.renamePet(p, e.getName());
                             p.closeInventory();
                         } else {
-                            p.playSound(p.getLocation(), Sound.NOTE_BASS, 1, 1);
+                            Sound.error(p);
                             e.getAnvilInventory().setItem(
                                     AnvilSlot.OUTPUT.getSlot(),
                                     new ItemBuilder(Material.BARRIER)

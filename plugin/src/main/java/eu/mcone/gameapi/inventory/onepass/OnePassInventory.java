@@ -1,5 +1,6 @@
 package eu.mcone.gameapi.inventory.onepass;
 
+import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
 import eu.mcone.coresystem.api.bukkit.inventory.category.CategoryInventory;
@@ -11,7 +12,6 @@ import eu.mcone.gameapi.api.onepass.OnePassManager;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import org.apache.commons.lang.text.StrBuilder;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -72,7 +72,7 @@ public class OnePassInventory extends CoreInventory {
                 setItem(
                         i,
                         item.create(),
-                        e -> p.playSound(p.getLocation(), Sound.NOTE_STICKS, 1, 1)
+                        e -> Sound.done(p)
                 );
 
             } else {
@@ -88,7 +88,7 @@ public class OnePassInventory extends CoreInventory {
                 setItem(
                         i,
                         item.create(),
-                        e -> p.playSound(p.getLocation(), Sound.NOTE_STICKS, 1, 1)
+                        e -> Sound.done(p)
                 );
             }
         }
@@ -125,7 +125,7 @@ public class OnePassInventory extends CoreInventory {
                     if ((page + 1) * 8 <= maxLevel - 1) {
                         new OnePassInventory(p, gp, page + 1);
                     } else {
-                        p.playSound(p.getLocation(), Sound.NOTE_BASS, 1, 1);
+                        Sound.error(p);
                     }
                 }
         );
@@ -136,7 +136,7 @@ public class OnePassInventory extends CoreInventory {
                     if (page - 1 >= 0) {
                         new OnePassInventory(p, gp, page - 1);
                     } else {
-                        p.playSound(p.getLocation(), Sound.NOTE_BASS, 1, 1);
+                        Sound.error(p);
                     }
                 }
         );
@@ -152,7 +152,7 @@ public class OnePassInventory extends CoreInventory {
                 "",
                 getXpProgess(gp.getOneXp())
         ).create(), e -> {
-            p.playSound(p.getLocation(), Sound.NOTE_PLING, 1, 1);
+            Sound.done(p);
         });
         setItem(InventorySlot.ROW_6_SLOT_9, new ItemBuilder(Material.EMERALD, 1).displayName("§aDeine Stufen:").lore(
                 "§3" + gp.getOneLevel() + " Stufen",
@@ -166,7 +166,7 @@ public class OnePassInventory extends CoreInventory {
                 GamePlugin.getGamePlugin().getOnePassManager().openOnePassInventory(p);
             }
 
-            p.playSound(p.getLocation(), Sound.NOTE_PLING, 1, 1);
+            Sound.done(p);
         });
 
         setItem(InventorySlot.ROW_6_SLOT_3, new ItemBuilder(Material.BOOK, 1).displayName("§eOnePass Quests").create(), e -> new QuestInventory(p));

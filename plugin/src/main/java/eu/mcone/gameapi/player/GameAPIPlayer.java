@@ -6,6 +6,7 @@
 package eu.mcone.gameapi.player;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
+import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
 import eu.mcone.coresystem.api.bukkit.stats.CoreStats;
@@ -30,11 +31,11 @@ import eu.mcone.gameapi.api.player.GamePlayerState;
 import eu.mcone.gameapi.api.stats.StatsHistory;
 import eu.mcone.gameapi.api.team.Team;
 import eu.mcone.gameapi.kit.GameKitManager;
+import eu.mcone.gameapi.kit.KitSettings;
 import eu.mcone.gameapi.team.GameTeamManager;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -47,7 +48,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
     @Getter
     private Map<String, Set<BackpackItem>> backpackItems;
     @Getter
-    private Map<String, String> currentKits;
+    private Map<String, KitSettings> kitSettings;
     private Map<Gamemode, Map<Achievement, Long>> achievements;
     @Getter
     private GamePlayerSettings settings;
@@ -88,7 +89,10 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
     public GameAPIPlayerProfile reload() {
         GameAPIPlayerProfile systemProfile = super.reload();
         this.backpackItems = systemProfile.getItemMap();
-        this.currentKits = systemProfile.getCurrentKits();
+        this.kitSettings = systemProfile.getKitSettings();
+        if (getGameKitSettings() == null) {
+            kitSettings.put(GamePlugin.getGamePlugin().getPluginSlug(), new KitSettings());
+        }
         this.achievements = systemProfile.getAchievementMap();
         this.settings = systemProfile.getSettings();
         this.currentBackpackItem = systemProfile.getCurrentBackpackItem();
@@ -115,7 +119,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
             }
         }
 
-        system.saveGameProfile(new GameAPIPlayerProfile(corePlayer.bukkit(), backpackItems, achievements, currentKits, currentBackpackItem, oneLevel, oneXp, onePass));
+        system.saveGameProfile(new GameAPIPlayerProfile(corePlayer.bukkit(), backpackItems, achievements, kitSettings, currentBackpackItem, oneLevel, oneXp, onePass));
     }
 
     /*
@@ -189,16 +193,16 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
 
                 p.closeInventory();
                 GamePlugin.getGamePlugin().getMessenger().send(p, "§2Du hast erfolgreich das Item " + item.getName() + "§2 gekauft!");
-                p.playSound(p.getLocation(), Sound.LEVEL_UP, 1, 1);
+                Sound.done(p);
             } else {
                 p.closeInventory();
                 GamePlugin.getGamePlugin().getMessenger().send(p, "§4Du hast nicht genügend Emeralds!");
-                p.playSound(p.getLocation(), Sound.NOTE_BASS, 1, 1);
+                Sound.error(p);
             }
         } else {
             p.closeInventory();
             GamePlugin.getGamePlugin().getMessenger().send(p, "§4Du besitzt dieses Item bereits!");
-            p.playSound(p.getLocation(), Sound.NOTE_BASS, 1, 1);
+            Sound.error(p);
         }
     }
 
@@ -413,15 +417,23 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
     @Override
     public Kit getCurrentKit() {
         return GamePlugin.getGamePlugin().getKitManager().getKit(
-                currentKits.getOrDefault(
-                        GamePlugin.getGamePlugin().getPluginSlug(),
-                        null
-                )
+                getGameKitSettings().getCurrentKit()
         );
     }
 
+    @Override
+    public boolean isAutoBuyKit() {
+        return GamePlugin.getGamePlugin().hasOption(Option.KIT_MANAGER_ALLOW_AUTO_BUY_KIT) && getGameKitSettings().isAutoBuyKit();
+    }
+
     public void saveCurrentKit(Kit kit) {
-        currentKits.put(GamePlugin.getGamePlugin().getPluginSlug(), kit.getName());
+        getGameKitSettings().setCurrentKit(kit.getName());
+        saveData();
+    }
+
+    @Override
+    public void setAutoBuyKit(boolean autoBuyKit) {
+        getGameKitSettings().setAutoBuyKit(GamePlugin.getGamePlugin().hasOption(Option.KIT_MANAGER_ALLOW_AUTO_BUY_KIT) && autoBuyKit);
         saveData();
     }
 
@@ -597,6 +609,10 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
         } else {
             throw new IllegalStateException("Cannot remove " + xp + " xp from player " + corePlayer.getName() + ". This player has just " + oneXp + " xp!");
         }
+    }
+
+    private KitSettings getGameKitSettings() {
+        return kitSettings.getOrDefault(GamePlugin.getGamePlugin().getPluginSlug(), null);
     }
 
 }

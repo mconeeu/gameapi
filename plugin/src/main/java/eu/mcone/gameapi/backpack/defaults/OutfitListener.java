@@ -19,21 +19,21 @@ public class OutfitListener extends BackpackInventoryListener {
     }
 
     @Override
-    public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player p) {
+    public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player p, boolean notify) {
         gamePlayer.setCurrentBackpackItem(item, DefaultCategory.OUTFIT);
 
         handler.setOutfit(p, item);
         p.closeInventory();
-        plugin.getMessenger().send(p, "§7Du hast das §f" + item.getName() + "§7 angezogen!");
-        p.setWalkSpeed(0.20F);
+
+        if (notify) {
+            plugin.getMessenger().send(p, "§7Du hast das §f" + item.getName() + "§7 angezogen!");
+        }
     }
 
     @Override
     public void onItemItemRemove(BackpackItem item, GamePlayer gp, Player p) {
         super.onItemItemRemove(item, gp, p);
-
         p.getInventory().setArmorContents(null);
-        p.setWalkSpeed(0.20F);
     }
 
 }

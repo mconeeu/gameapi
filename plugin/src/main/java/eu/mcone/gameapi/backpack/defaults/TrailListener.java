@@ -19,12 +19,15 @@ public class TrailListener extends BackpackInventoryListener {
     }
 
     @Override
-    public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player p) {
+    public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player p, boolean notify) {
         gamePlayer.setCurrentBackpackItem(item, DefaultCategory.TRAIL);
 
         handler.setTrail(p, item);
         p.closeInventory();
-        plugin.getMessenger().send(p, "§7Du hast den §f" + item.getName() + "§7 aktiviert!");
+
+        if (notify) {
+            plugin.getMessenger().send(p, "§7Du hast den §f" + item.getName() + "§7 aktiviert!");
+        }
     }
 
     @Override

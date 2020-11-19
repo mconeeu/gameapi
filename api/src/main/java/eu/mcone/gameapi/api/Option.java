@@ -58,6 +58,10 @@ public enum Option {
      * (The {@link eu.mcone.gameapi.api.player.GamePlayer#buyKit(Kit)} method will not remove coins for a second purchase of the same kit while the server does not restart.)
      */
     KIT_MANAGER_CHOOSE_KITS_FOR_SERVER_LIFETIME,
+    /**
+     * Enables auto buy kit function in Kits Inventory. This allows the player to enable automatic buying of the last kit that the player had before death on respawn.
+     */
+    KIT_MANAGER_ALLOW_AUTO_BUY_KIT,
 
     //AchievementManager
     /**

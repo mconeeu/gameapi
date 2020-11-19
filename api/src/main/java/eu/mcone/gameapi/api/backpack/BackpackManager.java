@@ -34,11 +34,13 @@ public interface BackpackManager {
 
     BackpackItem getBackpackItem(String category, int id);
 
+    void openBackpackInventory(Player player);
+
     void openBackpackInventory(String category, Player player);
 
     void openBackpackSellInventory(String name, Player p) throws IllegalArgumentException;
 
-    void setCurrentBackpackItem(GamePlayer gp);
+    void setCurrentBackpackItem(GamePlayer gp, boolean notify);
 
     void removeCurrentBackpackItem(GamePlayer gp);
 

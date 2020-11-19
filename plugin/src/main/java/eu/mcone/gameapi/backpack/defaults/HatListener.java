@@ -15,19 +15,17 @@ public class HatListener extends BackpackInventoryListener {
     }
 
     @Override
-    public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player p) {
+    public void onBackpackInventoryClick(BackpackItem item, GamePlayer gamePlayer, Player p, boolean notify) {
         gamePlayer.setCurrentBackpackItem(item, DefaultCategory.HAT);
+        p.getInventory().setHelmet(item.getItem());
+        p.closeInventory();
+
+        if (notify) {
+            plugin.getMessenger().send(p, "§7Du hast den §f" + item.getName() + "§7 aufgesetzt!");
+        }
 
         if (item.getId() == DefaultItem.HEAD_SECRET_STRIPCLUB.getId()) {
-            p.getInventory().setHelmet(item.getItem());
-            p.closeInventory();
-            plugin.getMessenger().send(p, "§7Du hast den §f" + item.getName() + "§7 aufgesetzt!");
             p.setWalkSpeed(0.25F);
-        } else {
-            p.getInventory().setHelmet(item.getItem());
-            p.closeInventory();
-            plugin.getMessenger().send(p, "§7Du hast den §f" + item.getName() + "§7 aufgesetzt!");
-            p.setWalkSpeed(0.20F);
         }
     }
 

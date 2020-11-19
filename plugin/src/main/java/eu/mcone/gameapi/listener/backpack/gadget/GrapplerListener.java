@@ -1,12 +1,12 @@
 package eu.mcone.gameapi.listener.backpack.gadget;
 
+import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.listener.backpack.handler.GameGadgetHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.Fish;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -43,7 +43,7 @@ public class GrapplerListener extends GadgetListener {
                 lc.setY(lc.getY() + 0.5D);
                 p.teleport(lc);
 
-                p.playSound(p.getLocation(), Sound.ENDERDRAGON_WINGS, 3, 3);
+                Sound.play(p, org.bukkit.Sound.ENDERDRAGON_WINGS);
                 double g = -0.08D;
                 double t = to.distance(lc);
                 double v_x = (1.0D + 0.07D * t) * (to.getX() - lc.getX()) / t;

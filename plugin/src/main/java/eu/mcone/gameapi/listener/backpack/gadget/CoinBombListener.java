@@ -5,6 +5,7 @@
 
 package eu.mcone.gameapi.listener.backpack.gadget;
 
+import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
@@ -13,7 +14,10 @@ import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.listener.backpack.handler.BackpackSchedulerProvider;
 import eu.mcone.gameapi.listener.backpack.handler.GameGadgetHandler;
 import eu.mcone.gameapi.player.GameAPIPlayer;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Effect;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
@@ -208,7 +212,7 @@ public class CoinBombListener extends GadgetListener {
                 gamePlayer.getCorePlayer().addCoins(150);
                 GameAPI.getInstance().getMessenger().send(player, "§7Du hast ein §fCoin Bomben§7 Item aufgesammelt §8[§a+150 Coins§8]");
             }
-            player.playSound(player.getLocation(), Sound.LEVEL_UP, 1, 1);
+            Sound.done(player);
             player.playEffect(player.getLocation(), Effect.FLAME, 5);
             item.remove();
         }

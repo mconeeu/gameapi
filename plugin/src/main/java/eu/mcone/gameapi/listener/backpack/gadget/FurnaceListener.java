@@ -1,11 +1,15 @@
 package eu.mcone.gameapi.listener.backpack.gadget;
 
+import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.listener.backpack.handler.GameGadgetHandler;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Effect;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
@@ -90,22 +94,22 @@ public class FurnaceListener extends GadgetListener {
 //                    }
 
                 item.getWorld().playEffect(item.getLocation(), Effect.FIREWORKS_SPARK, 1);
-                item.getWorld().playSound(item.getLocation(), Sound.GLASS, 1, 1);
-                Bukkit.getScheduler().runTaskLater(plugin, () -> item.getWorld().playSound(item.getLocation(), Sound.FIREWORK_TWINKLE, 1, 1), 3);
+                item.getWorld().playSound(item.getLocation(), org.bukkit.Sound.GLASS, 1, 1);
+                Bukkit.getScheduler().runTaskLater(plugin, () -> item.getWorld().playSound(item.getLocation(), org.bukkit.Sound.FIREWORK_TWINKLE, 1, 1), 3);
             }, 20));
 
-            p.playSound(p.getLocation(), Sound.CHICKEN_EGG_POP, 1, 1);
+            Sound.click(p);
             handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
+                Sound.tick(p);
 
                 handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
+                    Sound.tick(p);
 
                     handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                        p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
+                        Sound.done(p);
 
                         handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                            p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
+                            Sound.done(p);
                             for (Location location : furnaceLocations) {
                                 for (GamePlayer gp : GameAPI.getInstance().getOnlineGamePlayers()) {
                                     if (gp.getSettings().isEnableGadgets() && gp.isEffectsVisible()) {
@@ -122,7 +126,7 @@ public class FurnaceListener extends GadgetListener {
             }, 10));
 //            } else {
 //                LobbyPlugin.getInstance().getMessenger().send(p, "§4Die Cobweb gun funktioniert hier nicht (Block im Weg!)");
-//                p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
+//                Sound.done(p);
 //                if (p.hasPermission("lobby.silenthub")) {
 //                    p.getInventory().setItem(3, Item.COBWEBGUN.getItemStack());
 //                } else {

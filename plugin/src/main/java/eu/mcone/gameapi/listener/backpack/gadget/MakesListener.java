@@ -1,5 +1,6 @@
 package eu.mcone.gameapi.listener.backpack.gadget;
 
+import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
@@ -8,7 +9,6 @@ import eu.mcone.gameapi.listener.backpack.handler.GameGadgetHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
@@ -49,7 +49,7 @@ public class MakesListener extends GadgetListener {
                                     final float x = xdiff / average;
                                     final float z = zdiff / average;
                                     otherplayer.setVelocity(new Vector(x / 2.0f, 2.8f, z / 2.0f));
-                                    otherplayer.playSound(p.getLocation(), Sound.NOTE_BASS, 1, 1);
+                                    Sound.error(otherplayer);
 
                                     isUse.add(p);
 
@@ -68,7 +68,7 @@ public class MakesListener extends GadgetListener {
                                             handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
                                                 otherplayer.setVelocity(new Vector(x / 1.6f, 1.8f, z / 1.9f));
                                                 players.playEffect(otherplayer.getLocation(), Effect.EXPLOSION_LARGE, 5);
-                                                otherplayer.playSound(otherplayer.getLocation(), Sound.EXPLODE, 1, 1);
+                                                Sound.play(otherplayer, org.bukkit.Sound.EXPLODE);
 
                                                 handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
                                                     otherplayer.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 43, 1));
@@ -78,7 +78,7 @@ public class MakesListener extends GadgetListener {
                                                         if (playerLocation.containsKey(otherplayer)) {
                                                             otherplayer.teleport(playerLocation.get(otherplayer));
                                                             playerLocation.remove(otherplayer);
-                                                            otherplayer.playSound(otherplayer.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 1);
+                                                            Sound.teleport(otherplayer);
                                                         }
 
                                                         handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {

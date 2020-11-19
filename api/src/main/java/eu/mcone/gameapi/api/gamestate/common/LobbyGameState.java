@@ -3,6 +3,7 @@ package eu.mcone.gameapi.api.gamestate.common;
 import eu.mcone.coresystem.api.bukkit.CorePlugin;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.broadcast.SimpleBroadcast;
+import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.coresystem.api.bukkit.world.CoreWorld;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Module;
@@ -16,7 +17,6 @@ import eu.mcone.gameapi.api.scoreboard.LobbyObjective;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 public class LobbyGameState extends GameState {
@@ -57,7 +57,7 @@ public class LobbyGameState extends GameState {
             case 1:
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     plugin.getMessenger().sendTransl(p, "game.gamestate.lobby.countdown.idling", second);
-                    p.playSound(p.getLocation(), Sound.LEVEL_UP, 1, 1);
+                    Sound.done(p);
                 }
             default:
                 for (Player p : Bukkit.getOnlinePlayers()) {

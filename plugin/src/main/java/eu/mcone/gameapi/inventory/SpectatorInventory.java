@@ -1,5 +1,6 @@
 package eu.mcone.gameapi.inventory;
 
+import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.coresystem.api.bukkit.inventory.InventoryOption;
 import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
@@ -10,7 +11,6 @@ import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.GamePlayerState;
 import eu.mcone.gameapi.player.GamePlayerManager;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -34,7 +34,7 @@ public class SpectatorInventory extends CoreInventory {
                     "§8» §7§oVerloren: §f§l" + gamePlayer.getStats().getLosses()
             ).getItemStack(), e -> {
                 player.teleport(gamePlayer.getCorePlayer().bukkit().getLocation());
-                player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 1);
+                Sound.teleport(player);
                 GamePlugin.getGamePlugin().getMessenger().send(player, "§7Du wurdest zu dem Spieler " + GamePlugin.getGamePlugin().getPluginColor() + gamePlayer.getCorePlayer().getName() + " §7teleportiert");
             });
 

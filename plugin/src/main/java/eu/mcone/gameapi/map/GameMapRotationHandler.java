@@ -1,6 +1,7 @@
 package eu.mcone.gameapi.map;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
+import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.coresystem.api.bukkit.util.CoreActionBar;
 import eu.mcone.coresystem.api.bukkit.util.CoreTitle;
 import eu.mcone.coresystem.api.bukkit.world.CoreWorld;
@@ -10,7 +11,6 @@ import eu.mcone.gameapi.api.map.MapRotationHandler;
 import eu.mcone.gameapi.listener.map.MapRotationListener;
 import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -146,7 +146,7 @@ public class GameMapRotationHandler implements MapRotationHandler {
         for (Player player : Bukkit.getOnlinePlayers()) {
             title.send(player);
             coreWorld.teleportSilently(player, "spawn");
-            player.playSound(player.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 1);
+            Sound.teleport(player);
         }
 
         Bukkit.getPluginManager().callEvent(new MapRotationEvent(oldMap, currentMap));

@@ -11,7 +11,7 @@ import eu.mcone.gameapi.command.MapCMD;
 import lombok.Getter;
 import org.bukkit.Material;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -46,18 +46,14 @@ public class GameMapManager implements MapManager {
     }
 
     @Override
-    public GameMapManager addMap(CoreWorld world, List<String> lore, Material item) {
-        MapsConfig config = this.config.parseConfig();
-        config.addWorld(world, lore, item);
-
-        this.config.updateConfig(config);
-        return this;
+    public GameMapManager addMap(CoreWorld world, Material item) {
+       return addMap(world, Collections.emptyList(), item);
     }
 
     @Override
-    public GameMapManager addMap(CoreWorld world, Material item) {
+    public GameMapManager addMap(CoreWorld world, List<String> lore, Material item) {
         MapsConfig config = this.config.parseConfig();
-        config.addWorld(world, new ArrayList<>(), item);
+        config.addWorld(world, lore, item);
 
         this.config.updateConfig(config);
         return this;

@@ -30,8 +30,8 @@ public class ForceStartCMD extends CoreCommand {
                 }
             } else {
                 GameAPIPlugin.getSystem().getMessenger().sendSender(sender, "§4Es sind nicht genügend Spieler online, um das Spiel zu starten!");
-        }
-    } else {
+            }
+        } else {
             GameAPIPlugin.getSystem().getMessenger().sendSender(sender, "§4Du kannst den Start Befehl nur während der Lobby-Phase benutzen!");
         }
 

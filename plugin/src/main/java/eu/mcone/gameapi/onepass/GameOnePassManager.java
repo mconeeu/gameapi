@@ -1,5 +1,6 @@
 package eu.mcone.gameapi.onepass;
 
+import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
@@ -8,7 +9,6 @@ import eu.mcone.gameapi.api.onepass.OnePassManager;
 import eu.mcone.gameapi.api.onepass.Quests;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.inventory.onepass.OnePassInventory;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 public class GameOnePassManager implements OnePassManager {
@@ -25,7 +25,7 @@ public class GameOnePassManager implements OnePassManager {
                 if (newLevel > oldLevel) {
                     if (!gp.hasBackpackItem(award.getBackpackItemCategory(), award.getBackpackItem())) {
                         GameAPI.getInstance().getMessenger().send(gp.bukkit(), "§2Dir wurde das Item §a" + award.getBackpackItem().getName() + "§2 wegen deiner neuen §aOnePass Stufe " + newLevel + " §2hinzugefügt");
-                        gp.bukkit().playSound(gp.bukkit().getLocation(), Sound.NOTE_STICKS, 1, 1);
+                        Sound.done(gp.bukkit());
                         gp.addBackpackItem(
                                 award.getBackpackItemCategory(),
                                 item

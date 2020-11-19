@@ -5,6 +5,7 @@
 
 package eu.mcone.gameapi.listener.backpack.gadget;
 
+import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
@@ -13,7 +14,6 @@ import eu.mcone.gameapi.listener.backpack.handler.GameGadgetHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -68,7 +68,7 @@ public class BombListener extends GadgetListener {
 
                         Vector v1 = player.getLocation().getDirection().setY(0.8).multiply(1.1);
                         handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                            p.playSound(item.getLocation(), Sound.FIREWORK_TWINKLE, 1, 1);
+                            p.playSound(item.getLocation(), org.bukkit.Sound.FIREWORK_TWINKLE, 1, 1);
                         }, 3));
 
                         player.setVelocity(v1);
@@ -82,19 +82,19 @@ public class BombListener extends GadgetListener {
                 }
 
                 item.getWorld().playEffect(item.getLocation(), Effect.FIREWORKS_SPARK, 1);
-                item.getWorld().playSound(item.getLocation(), Sound.GLASS, 1, 1);
+                item.getWorld().playSound(item.getLocation(), org.bukkit.Sound.GLASS, 1, 1);
             }, 20));
 
-            p.playSound(p.getLocation(), Sound.CHICKEN_EGG_POP, 1, 1);
+            Sound.click(p);
 
             handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
+                Sound.tick(p);
 
                 handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
+                    Sound.tick(p);
 
                     handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                        p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
+                        Sound.done(p);
                         p.getInventory().setItem(plugin.getBackpackManager().getGadgetSlot(p), DefaultItem.BOMB.getItemStack());
 
                         handler.cleanup(e);

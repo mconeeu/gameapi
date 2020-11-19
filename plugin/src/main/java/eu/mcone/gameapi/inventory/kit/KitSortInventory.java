@@ -25,7 +25,7 @@ import java.util.TimeZone;
 public class KitSortInventory extends CoreInventory {
 
     KitSortInventory(Player p, GamePlayer gp, GameKitManager manager, Kit kit, Runnable onBackClick) {
-        super("§8» " + kit.getName()+" §8| §7Kit sortieren", p, InventorySlot.ROW_3);
+        super("§8» §c§lKits §8| §7Sortieren", p, InventorySlot.ROW_3);
 
         Map<Integer, ItemStack> items = manager.calculateItems(kit, p);
         for (Map.Entry<Integer, ItemStack> item : items.entrySet()) {
@@ -35,7 +35,7 @@ public class KitSortInventory extends CoreInventory {
         }
 
         for (int i = InventorySlot.ROW_2_SLOT_1; i <= InventorySlot.ROW_3_SLOT_9; i++) {
-            setItem(i, PLACEHOLDER_ITEM);
+            setItem(i, PLACEHOLDER_ITEM, e -> e.setCancelled(false));
         }
 
         setItem(InventorySlot.ROW_3_SLOT_1, new ItemBuilder(Material.INK_SACK, 1, DyeColor.LIME.getDyeData()).displayName("§a§lZurück und Speichern").create(), e -> {

@@ -1,6 +1,7 @@
 package eu.mcone.gameapi.inventory;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
+import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.coresystem.api.bukkit.inventory.InventoryOption;
 import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
@@ -12,7 +13,6 @@ import eu.mcone.gameapi.api.team.Team;
 import eu.mcone.gameapi.team.GameTeamManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -50,12 +50,12 @@ public class TeamInventory extends CoreInventory {
 
                     if (gp.getTeam() != null && gp.getTeam().equals(team)) {
                         gamePlugin.getMessenger().send(p, CoreSystem.getInstance().getTranslationManager().get("game.team.alreadyJoined"));
-                        p.playSound(p.getLocation(), Sound.ANVIL_BREAK, 1, 1);
+                        Sound.cancel(p);
                     } else {
                         if (team.getPlayers().size() < team.getSize()) {
                             gp.changeTeamTo(team);
                             gamePlugin.getMessenger().send(p, CoreSystem.getInstance().getTranslationManager().get("game.team.join", CoreSystem.getInstance().getGlobalCorePlayer(p.getUniqueId())).replace("%team%", team.getLabel()));
-                            p.playSound(p.getLocation(), Sound.HORSE_ARMOR, 1, 1);
+                            Sound.equip(p);
 
                             //Update all opened Team Inventories
                             for (Player player : Bukkit.getOnlinePlayers()) {
@@ -68,7 +68,7 @@ public class TeamInventory extends CoreInventory {
                             }
                         } else {
                             gamePlugin.getMessenger().send(p, CoreSystem.getInstance().getTranslationManager().get("game.team.maxSize").replace("%max%", Integer.toString(teamManager.getPlayersPerTeam())));
-                            p.playSound(p.getLocation(), Sound.ANVIL_BREAK, 1, 1);
+                            Sound.cancel(p);
                         }
                     }
                 } else {

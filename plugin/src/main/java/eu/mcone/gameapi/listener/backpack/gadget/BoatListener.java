@@ -1,12 +1,12 @@
 package eu.mcone.gameapi.listener.backpack.gadget;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
+import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.listener.backpack.handler.GameGadgetHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.EntityType;
@@ -43,7 +43,7 @@ public class BoatListener extends GadgetListener {
 
                 if (e.getClickedBlock().getType().equals(Material.STATIONARY_WATER) || e.getClickedBlock().getType().equals(Material.WATER)) {
                     Boat boat = (Boat) p.getWorld().spawnEntity(e.getClickedBlock().getLocation(), EntityType.BOAT);
-                    p.playSound(p.getLocation(), Sound.FIREWORK_TWINKLE, 1, 1);
+                    Sound.play(p, org.bukkit.Sound.FIREWORK_TWINKLE);
                     boatId.put(p, boat.getEntityId());
                     boatlist.add(boat.getEntityId());
                     handler.register(e, () -> Bukkit.getScheduler().runTaskLater(GameAPI.getInstance(), () -> {
@@ -102,7 +102,7 @@ public class BoatListener extends GadgetListener {
                 if (boatlist.contains(e.getDismounted().getEntityId())) {
                     e.getDismounted().remove();
 
-                    p.playSound(p.getLocation(), Sound.ANVIL_BREAK, 1, 1);
+                    Sound.cancel(p);
                     boatId.remove(p);
                     boatlist.remove(e.getDismounted().getEntityId());
                 }

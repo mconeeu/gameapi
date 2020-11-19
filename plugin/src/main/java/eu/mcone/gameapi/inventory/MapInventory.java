@@ -5,6 +5,7 @@
 
 package eu.mcone.gameapi.inventory;
 
+import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.coresystem.api.bukkit.inventory.InventoryOption;
 import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
@@ -12,7 +13,6 @@ import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
 import eu.mcone.gameapi.api.map.GameAPIMap;
 import eu.mcone.gameapi.map.GameMapVotingHandler;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -36,7 +36,7 @@ public class MapInventory extends CoreInventory {
                     e -> {
                         mapVotingHandler.vote(p, entry.getKey(), coreInventory);
 
-                        p.playSound(p.getLocation(), Sound.NOTE_BASS, 1, 1);
+                        Sound.error(p);
                         mapVotingHandler.getMapManager().getSystem().getMessenger().send(p, "§7Du hast für die Map §f§l" + entry.getKey().getName() + " §7 gevotet.");
                     });
             i++;
@@ -46,7 +46,7 @@ public class MapInventory extends CoreInventory {
             setItem(InventorySlot.ROW_2_SLOT_9, new ItemBuilder(Material.IRON_DOOR, 1).displayName("§c§l↩ Zurück").create(), e -> coreInventory.openInventory());
         }
 
-        player.playSound(player.getLocation(), Sound.LEVEL_UP, 1, 1);
+        Sound.done(p);
         openInventory();
     }
 

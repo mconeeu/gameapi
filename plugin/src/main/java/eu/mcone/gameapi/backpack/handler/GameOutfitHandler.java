@@ -5,6 +5,7 @@
 
 package eu.mcone.gameapi.backpack.handler;
 
+import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
 import eu.mcone.coresystem.api.bukkit.item.Skull;
 import eu.mcone.gameapi.api.GameAPI;
@@ -13,7 +14,10 @@ import eu.mcone.gameapi.api.backpack.defaults.DefaultCategory;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.api.backpack.handler.OutfitHandler;
 import eu.mcone.gameapi.listener.backpack.gadget.CoinBombListener;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -38,16 +42,14 @@ public class GameOutfitHandler implements OutfitHandler {
             switch (choosed) {
                 case OUTFIT_RABBIT: {
                     Location rabbit1 = p.getLocation().add(7, 6, 1);
-                    Location rabbit2 = p.getLocation().add(3, 4, 7);
-                    Location rabbit3 = p.getLocation().add(1, 1, 6);
-                    Location rabbit4 = p.getLocation().add(6, 2, 3);
+                    Location rabbit2 = p.getLocation().add(1, 1, 6);
+                    Location rabbit3 = p.getLocation().add(6, 2, 3);
 
-                    p.playSound(p.getLocation(), Sound.ANVIL_LAND, 1, 1);
+                    Sound.save(p);
 
-                    p.getLocation().getWorld().dropItem(rabbit1, new ItemBuilder(Material.CARROT, 9).create());
-                    p.getLocation().getWorld().dropItem(rabbit2, new ItemBuilder(Material.CARROT_ITEM, 5).create());
-                    p.getLocation().getWorld().dropItem(rabbit3, new ItemBuilder(Material.CARROT_STICK, 12).create());
-                    p.getLocation().getWorld().dropItem(rabbit4, new ItemBuilder(Material.GOLDEN_CARROT, 2).create());
+                    p.getLocation().getWorld().dropItem(rabbit1, new ItemBuilder(Material.CARROT_ITEM, 9).create());
+                    p.getLocation().getWorld().dropItem(rabbit2, new ItemBuilder(Material.CARROT_STICK, 12).create());
+                    p.getLocation().getWorld().dropItem(rabbit3, new ItemBuilder(Material.GOLDEN_CARROT, 2).create());
 
                     Bukkit.getScheduler().runTaskLater(GameAPI.getInstance(), () -> {
                         for (Entity e : p.getWorld().getEntities()) {
@@ -55,7 +57,7 @@ public class GameOutfitHandler implements OutfitHandler {
                                 if (!CoinBombListener.isExploding) {
                                     e.remove();
                                 }
-                                p.playSound(p.getLocation(), Sound.ANVIL_BREAK, 1, 1);
+                                Sound.cancel(p);
                             }
                         }
                     }, 60L);
@@ -83,7 +85,7 @@ public class GameOutfitHandler implements OutfitHandler {
                     Location snow3 = p.getLocation().add(1, 4, 6);
                     Location snow4 = p.getLocation().add(5, 1, 2);
 
-                    p.playSound(p.getLocation(), Sound.ANVIL_LAND, 1, 1);
+                    Sound.save(p);
 
                     p.getLocation().getWorld().dropItem(snow1, new ItemBuilder(Material.SNOW_BALL, 9).create());
                     p.getLocation().getWorld().dropItem(snow2, new ItemBuilder(Material.SNOW, 5).create());
@@ -96,7 +98,7 @@ public class GameOutfitHandler implements OutfitHandler {
                                 if (!CoinBombListener.isExploding) {
                                     e.remove();
                                 }
-                                p.playSound(p.getLocation(), Sound.ANVIL_BREAK, 1, 1);
+                                Sound.cancel(p);
                             }
                         }
                     }, 60L);
@@ -115,7 +117,7 @@ public class GameOutfitHandler implements OutfitHandler {
                     Location cookie3 = p.getLocation().add(1, 4, 6);
                     Location cookie4 = p.getLocation().add(0, 1, 0);
 
-                    p.playSound(p.getLocation(), Sound.ANVIL_LAND, 1, 1);
+                    Sound.save(p);
 
                     p.getLocation().getWorld().dropItem(cookie1, new ItemBuilder(Material.COOKIE, 9).create());
                     p.getLocation().getWorld().dropItem(cookie2, new ItemBuilder(Material.COOKIE, 5).create());
@@ -128,7 +130,7 @@ public class GameOutfitHandler implements OutfitHandler {
                                 if (!CoinBombListener.isExploding) {
                                     e.remove();
                                 }
-                                p.playSound(p.getLocation(), Sound.ANVIL_BREAK, 1, 1);
+                                Sound.cancel(p);
                             }
                         }
                     }, 60L);

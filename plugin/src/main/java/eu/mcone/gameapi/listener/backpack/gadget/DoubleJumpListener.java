@@ -5,13 +5,13 @@
 
 package eu.mcone.gameapi.listener.backpack.gadget;
 
+import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.listener.backpack.handler.GameGadgetHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
@@ -43,18 +43,18 @@ public class DoubleJumpListener extends GadgetListener {
             vec = vec.setY(Math.max(0.4000000059604645D, vec.getY())).multiply(1.7F);
             p.setVelocity(vec);
 
-            p.playSound(p.getLocation(), Sound.ENDERMAN_TELEPORT, 1, 1);
+            Sound.teleport(p);
             p.playEffect(p.getLocation(), Effect.BLAZE_SHOOT, 10);
 
 
             handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
+                Sound.tick(p);
 
                 handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
+                    Sound.tick(p);
 
                     handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                        p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
+                        Sound.done(p);
 
                         isJumping = false;
 

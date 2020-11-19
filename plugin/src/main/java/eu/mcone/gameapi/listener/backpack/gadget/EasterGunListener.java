@@ -5,12 +5,12 @@
 
 package eu.mcone.gameapi.listener.backpack.gadget;
 
+import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.listener.backpack.handler.GameGadgetHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
-import org.bukkit.Sound;
 import org.bukkit.entity.Egg;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -39,15 +39,15 @@ public class EasterGunListener extends GadgetListener {
             p.getWorld().playEffect(egg.getLocation(), Effect.LARGE_SMOKE, 10);
 
 
-            p.playSound(p.getLocation(), Sound.CHICKEN_EGG_POP, 1, 1);
+            Sound.click(p);
             handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
+                Sound.tick(p);
 
                 handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
+                    Sound.tick(p);
 
                     handler.register(e, () -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                        p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
+                        Sound.done(p);
                             p.getInventory().setItem(plugin.getBackpackManager().getGadgetSlot(p), DefaultItem.EASTERGUN.getItemStack());
 
                         handler.cleanup(e);

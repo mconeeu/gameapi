@@ -259,6 +259,11 @@ public class GameBackpackManager implements BackpackManager {
     }
 
     @Override
+    public void openBackpackInventory(Player p) throws IllegalArgumentException {
+        openBackpackInventory(backpackItems.iterator().next().getCategory().getName(), p);
+    }
+
+    @Override
     public void openBackpackInventory(String name, Player p) throws IllegalArgumentException {
         Category category = getItemCategory(name).getCategory();
 
@@ -281,14 +286,14 @@ public class GameBackpackManager implements BackpackManager {
     }
 
     @Override
-    public void setCurrentBackpackItem(GamePlayer gp) {
+    public void setCurrentBackpackItem(GamePlayer gp, boolean notify) {
         BackpackSimpleItem currentItem = gp.getCurrentBackpackItem();
 
         if (currentItem != null) {
             DefaultItem item = DefaultItem.getItemByID(currentItem.getCategory(), currentItem.getId());
 
             if (item != null) {
-                clickListeners.get(currentItem.getCategory().name()).click(currentItem.getBackpackItem(), gp, gp.bukkit());
+                clickListeners.get(currentItem.getCategory().name()).click(currentItem.getBackpackItem(), gp, gp.bukkit(), notify);
             } else {
                 gp.resetCurrentBackpackItem();
             }

@@ -136,6 +136,10 @@ public interface GamePlayer {
         return setKit(kit, false);
     }
 
+    boolean isAutoBuyKit();
+
+    void setAutoBuyKit(boolean autoBuyKit);
+
     /**
      * sets the Kit items in a players inventory.
      * this does not check if the player already buyed the kit when using {@link eu.mcone.gameapi.api.Option#KIT_MANAGER_CHOOSE_KITS_FOR_SERVER_LIFETIME}

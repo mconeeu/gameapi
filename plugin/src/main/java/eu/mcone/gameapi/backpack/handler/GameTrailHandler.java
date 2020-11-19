@@ -6,15 +6,15 @@
 
 package eu.mcone.gameapi.backpack.handler;
 
+import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
-import eu.mcone.gameapi.api.backpack.handler.TrailHandler;
-import eu.mcone.gameapi.listener.backpack.TrailListener;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultCategory;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
+import eu.mcone.gameapi.api.backpack.handler.TrailHandler;
+import eu.mcone.gameapi.listener.backpack.TrailListener;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -24,8 +24,8 @@ public class GameTrailHandler implements TrailHandler {
 
     private final GamePlugin plugin;
 
-    private BukkitTask task;
-    private HashMap<Player, DefaultItem> trails = new HashMap<>();
+    private final BukkitTask task;
+    private final HashMap<Player, DefaultItem> trails = new HashMap<>();
 
     public GameTrailHandler(GamePlugin plugin) {
         plugin.registerEvents(new TrailListener(this));
@@ -85,7 +85,7 @@ public class GameTrailHandler implements TrailHandler {
         } else {
             if (choosed != null) {
                 this.trails.put(p, choosed);
-                p.playSound(p.getLocation(), Sound.LEVEL_UP, 1.0F, 1.0F);
+                Sound.done(p);
                 p.closeInventory();
             } else {
                 throw new IllegalStateException("Could not set Trail from item "+trail.getName()+". Item is not a trail!");
