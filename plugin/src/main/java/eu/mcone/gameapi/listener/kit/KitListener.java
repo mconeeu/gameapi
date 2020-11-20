@@ -2,9 +2,13 @@ package eu.mcone.gameapi.listener.kit;
 
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GameAPI;
+import eu.mcone.gameapi.api.GamePlugin;
+import eu.mcone.gameapi.api.Option;
 import eu.mcone.gameapi.api.event.player.GamePlayerLoadedEvent;
+import eu.mcone.gameapi.api.kit.Kit;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.kit.GameKitManager;
+import eu.mcone.gameapi.player.GameAPIPlayer;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -26,12 +30,22 @@ public class KitListener implements Listener {
         Player p = e.getBukkitPlayer();
         GamePlayer gp = e.getPlayer();
 
+        final Kit kit;
         if (gp.getCurrentKit() == null && manager.getDefaultKit() != null) {
-            Bukkit.getScheduler().runTaskLater(GameAPIPlugin.getSystem(), () -> {
-                p.getInventory().clear();
-                p.getInventory().setArmorContents(null);
+            kit = manager.getDefaultKit();
 
-                gp.setKit(manager.getDefaultKit());
+            GamePlugin.getGamePlugin().getMessenger().sendInfo(e.getBukkitPlayer(), "Du scheinst neu auf KnockIT zu sein! Du bekommst das ![Standart-Kit]!");
+            p.getInventory().clear();
+            p.getInventory().setArmorContents(null);
+        } else if (gp.getCurrentKit() != null && GamePlugin.getGamePlugin().hasOption(Option.KIT_MANAGER_SET_CURRENT_KIT_ON_JOIN)) {
+            kit = gp.getCurrentKit();
+        } else {
+            kit = null;
+        }
+
+        if (kit != null) {
+            Bukkit.getScheduler().runTaskLater(GameAPIPlugin.getSystem(), () -> {
+                gp.setKit(kit, true);
             }, 20);
         }
     }
@@ -46,7 +60,7 @@ public class KitListener implements Listener {
                     GamePlayer gp = GameAPI.getInstance().getGamePlayer(p);
 
                     if (gp.isAutoBuyKit()) {
-                        gp.buyKit(gp.getCurrentKit());
+                        ((GameAPIPlayer) gp).buyKit(gp.getCurrentKit(), true);
                     } else {
                         manager.setKit(manager.getDefaultKit(), p);
                     }
@@ -61,7 +75,7 @@ public class KitListener implements Listener {
             Inventory inv = e.getClickedInventory();
 
             if (inv != null && !e.getSlotType().equals(InventoryType.SlotType.OUTSIDE) && e.getRawSlot() < inv.getSize() && e.getCurrentItem() != null) {
-                if (inv.getTitle().endsWith(" §8| §7Kit sortieren") && e.getRawSlot() < 9) {
+                if (inv.getTitle().equals("§8» §c§lKits §8| §7Sortieren") && e.getRawSlot() < 9) {
                     e.setCancelled(false);
                 }
             }

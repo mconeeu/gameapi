@@ -6,6 +6,7 @@ import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Option;
+import eu.mcone.gameapi.api.event.kit.KitSetEvent;
 import eu.mcone.gameapi.api.kit.Kit;
 import eu.mcone.gameapi.api.kit.KitManager;
 import eu.mcone.gameapi.api.kit.ModifiedKit;
@@ -131,6 +132,8 @@ public class GameKitManager implements KitManager {
         if (kit != null) {
             GameAPIPlayer gp = system.getGamePlayer(p);
             Kit currentKit = gp.getCurrentKit();
+
+            Bukkit.getPluginManager().callEvent(new KitSetEvent(gp, kit));
 
             if (clearInvOnKitSet && currentKit != null) {
                 for (ItemStack item : currentKit.getKitItems().values()) {

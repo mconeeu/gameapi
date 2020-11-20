@@ -35,7 +35,7 @@ public class KitSortInventory extends CoreInventory {
         }
 
         for (int i = InventorySlot.ROW_2_SLOT_1; i <= InventorySlot.ROW_3_SLOT_9; i++) {
-            setItem(i, PLACEHOLDER_ITEM, e -> e.setCancelled(false));
+            setItem(i, PLACEHOLDER_ITEM);
         }
 
         setItem(InventorySlot.ROW_3_SLOT_1, new ItemBuilder(Material.INK_SACK, 1, DyeColor.LIME.getDyeData()).displayName("§a§lZurück und Speichern").create(), e -> {

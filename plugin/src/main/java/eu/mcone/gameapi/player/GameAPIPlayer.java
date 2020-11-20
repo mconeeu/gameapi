@@ -19,6 +19,7 @@ import eu.mcone.gameapi.api.backpack.BackpackItem;
 import eu.mcone.gameapi.api.backpack.BackpackSimpleItem;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultCategory;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
+import eu.mcone.gameapi.api.event.kit.KitBuyEvent;
 import eu.mcone.gameapi.api.event.onepass.LevelChangeEvent;
 import eu.mcone.gameapi.api.event.onepass.XpChangeEvent;
 import eu.mcone.gameapi.api.event.stats.PlayerRoundStatsChangeEvent;
@@ -439,7 +440,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
 
     @Override
     public boolean setKit(Kit kit, boolean force) {
-        if (kit.equals(getCurrentKit()) || force) {
+        if (!kit.equals(getCurrentKit()) || force) {
             ((GameKitManager) GamePlugin.getGamePlugin().getKitManager()).setKit(kit, bukkit());
             return true;
         } else return false;
@@ -461,12 +462,17 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
 
     @Override
     public boolean buyKit(Kit kit) {
+        return buyKit(kit, false);
+    }
+
+    public boolean buyKit(Kit kit, boolean autoBuy) {
         if (!hasKit(kit) && kit.getCoinsPrice() > 0) {
             if ((getCorePlayer().getCoins() - kit.getCoinsPrice()) < 0) {
                 GamePlugin.getGamePlugin().getMessenger().send(bukkit(), "§4Du hast nicht genügend Coins!");
                 return false;
             }
 
+            Bukkit.getPluginManager().callEvent(new KitBuyEvent(this, kit, autoBuy));
             getCorePlayer().removeCoins(kit.getCoinsPrice());
         }
 

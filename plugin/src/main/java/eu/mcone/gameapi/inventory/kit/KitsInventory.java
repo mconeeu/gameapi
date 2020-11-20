@@ -51,7 +51,7 @@ public class KitsInventory extends CoreInventory {
             slot++;
         }
 
-        if (!gp.getCurrentKit().equals(GamePlugin.getGamePlugin().getKitManager().getDefaultKit())) {
+        if (gp.getCurrentKit() != GamePlugin.getGamePlugin().getKitManager().getDefaultKit()) {
             setAutoBuyKitItem(getInventory().getSize()-3, p, gp);
         }
         setItem(

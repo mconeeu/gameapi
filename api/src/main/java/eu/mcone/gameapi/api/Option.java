@@ -62,6 +62,10 @@ public enum Option {
      * Enables auto buy kit function in Kits Inventory. This allows the player to enable automatic buying of the last kit that the player had before death on respawn.
      */
     KIT_MANAGER_ALLOW_AUTO_BUY_KIT,
+    /**
+     * As the players current kit gets saved on kit set, the last choosed kit can be set again after a rejoin to the server if its not save to store the player items elsewhere.
+     */
+    KIT_MANAGER_SET_CURRENT_KIT_ON_JOIN,
 
     //AchievementManager
     /**
