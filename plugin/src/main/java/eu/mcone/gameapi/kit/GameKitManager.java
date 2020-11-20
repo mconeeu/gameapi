@@ -4,6 +4,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.UpdateOptions;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.gameapi.GameAPIPlugin;
+import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Option;
 import eu.mcone.gameapi.api.event.kit.KitSetEvent;
@@ -179,12 +180,9 @@ public class GameKitManager implements KitManager {
     public void modifyKit(Player p, Kit kit, Map<ItemStack, Integer> items) {
         Map<Integer, Integer> customItems = new HashMap<>();
 
-        p.getInventory().clear();
         for (Map.Entry<Integer, ItemStack> kitItem : kit.getKitItems().entrySet()) {
             if (items.containsKey(kitItem.getValue())) {
                 int newSlot = items.get(kitItem.getValue());
-
-                p.getInventory().setItem(newSlot, kitItem.getValue());
                 customItems.put(kitItem.getKey(), newSlot);
             }
         }
@@ -199,6 +197,27 @@ public class GameKitManager implements KitManager {
             modifiedKits.get(p.getUniqueId()).add(modifiedKit);
         } else {
             modifiedKits.put(p.getUniqueId(), new ArrayList<>(Collections.singleton(modifiedKit)));
+        }
+
+        if (GameAPI.getInstance().getGamePlayer(p).getCurrentKit().equals(kit)) {
+            for (ItemStack item : kit.getKitItems().values()) {
+                p.getInventory().remove(item);
+            }
+
+            Set<ItemStack> blockingItems = new HashSet<>();
+            for (Map.Entry<Integer, ItemStack> item : kit.getKitItems().entrySet()) {
+                if (items.containsKey(item.getValue())) {
+                    int slot = items.get(item.getValue());
+                    ItemStack currentItem = p.getInventory().getItem(slot);
+
+                    if (currentItem != null && !currentItem.getType().equals(Material.AIR)) {
+                        blockingItems.add(currentItem);
+                    }
+
+                    p.getInventory().setItem(slot, item.getValue());
+                }
+            }
+            p.getInventory().addItem(blockingItems.toArray(new ItemStack[0]));
         }
 
         Bukkit.getScheduler().runTaskAsynchronously(
