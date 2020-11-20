@@ -34,7 +34,7 @@ public class KitListener implements Listener {
         if (gp.getCurrentKit() == null && manager.getDefaultKit() != null) {
             kit = manager.getDefaultKit();
 
-            GamePlugin.getGamePlugin().getMessenger().sendInfo(e.getBukkitPlayer(), "Du scheinst neu auf KnockIT zu sein! Du bekommst das ![Standart-Kit]!");
+            GamePlugin.getGamePlugin().getMessenger().sendInfo(e.getBukkitPlayer(), "Du scheinst neu auf "+GamePlugin.getGamePlugin().getPluginName()+" zu sein! Du bekommst das ![Standart-Kit]!");
             p.getInventory().clear();
             p.getInventory().setArmorContents(null);
         } else if (gp.getCurrentKit() != null && GamePlugin.getGamePlugin().hasOption(Option.KIT_MANAGER_SET_CURRENT_KIT_ON_JOIN)) {
