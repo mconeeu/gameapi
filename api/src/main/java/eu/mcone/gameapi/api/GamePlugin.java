@@ -1,6 +1,5 @@
 package eu.mcone.gameapi.api;
 
-import com.sun.org.apache.xml.internal.security.signature.ReferenceNotInitializedException;
 import eu.mcone.coresystem.api.bukkit.CorePlugin;
 import eu.mcone.coresystem.api.bukkit.config.CoreJsonConfig;
 import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;

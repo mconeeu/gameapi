@@ -112,7 +112,9 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
 
     @Override
     public void saveData() {
-        CoreSystem.getInstance().getCoreStatsManager().save(stats);
+        if (stats != null) {
+            CoreSystem.getInstance().getCoreStatsManager().save(stats);
+        }
 
         if (GamePlugin.getGamePlugin().hasModule(Module.GAME_HISTORY_MANAGER)) {
             if (GamePlugin.getGamePlugin().hasOption(Option.GAME_HISTORY_HISTORY_MODE)) {
