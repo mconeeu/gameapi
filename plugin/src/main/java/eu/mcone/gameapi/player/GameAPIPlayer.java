@@ -91,7 +91,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
         GameAPIPlayerProfile systemProfile = super.reload();
         this.backpackItems = systemProfile.getItemMap();
         this.kitSettings = systemProfile.getKitSettings();
-        if (getGameKitSettings() == null) {
+        if (getGameKitSettings() == null && GamePlugin.isGamePluginInitialized()) {
             kitSettings.put(GamePlugin.getGamePlugin().getPluginSlug(), new KitSettings());
         }
         this.achievements = systemProfile.getAchievementMap();
@@ -451,7 +451,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
         Kit currentKit = getCurrentKit();
 
         if (!setKit(currentKit != null ? currentKit : defaultKit, true)) {
-            throw new IllegalStateException("Could not set current kit again for player "+getCorePlayer().getName()+". setKit returns false with force == true");
+            throw new IllegalStateException("Could not set current kit again for player " + getCorePlayer().getName() + ". setKit returns false with force == true");
         }
     }
 
@@ -618,7 +618,7 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
     }
 
     private KitSettings getGameKitSettings() {
-        return kitSettings.getOrDefault(GamePlugin.getGamePlugin().getPluginSlug(), null);
+        return GamePlugin.isGamePluginInitialized() ? kitSettings.getOrDefault(GamePlugin.getGamePlugin().getPluginSlug(), null) : null;
     }
 
 }
