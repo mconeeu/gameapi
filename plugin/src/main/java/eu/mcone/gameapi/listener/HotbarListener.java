@@ -44,7 +44,7 @@ public class HotbarListener implements Listener {
     public void onInteract(PlayerInteractEvent e) {
         Player p = e.getPlayer();
 
-        if (GamePlugin.getGamePlugin().hasOption(Option.HOTBAR_SET_ITEMS) && e.getAction().equals(Action.RIGHT_CLICK_BLOCK) || e.getAction().equals(Action.RIGHT_CLICK_AIR)) {
+        if (GamePlugin.isGamePluginInitialized() && GamePlugin.getGamePlugin().hasOption(Option.HOTBAR_SET_ITEMS) && e.getAction().equals(Action.RIGHT_CLICK_BLOCK) || e.getAction().equals(Action.RIGHT_CLICK_AIR)) {
             ItemStack i = e.getItem();
             if ((i == null) || (!i.hasItemMeta()) || (!i.getItemMeta().hasDisplayName())) {
                 return;
