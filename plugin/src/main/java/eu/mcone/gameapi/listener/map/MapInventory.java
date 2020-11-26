@@ -24,9 +24,9 @@ public class MapInventory extends CoreInventory {
             if (mapManager.isRotationHandlerLoaded()) {
                 ((GameMapRotationHandler) mapManager.getMapRotationHandler()).rotate();
                 GameAPI.getInstance().getMessenger().broadcast(new SimpleBroadcast("§fDie Map wird gewechselt!"));
-                GameAPI.getInstance().getMessenger().sendSender(player, "§2Du hast die Map erfolgreich rotiert!");
+                GameAPI.getInstance().getMessenger().send(player, "§2Du hast die Map erfolgreich rotiert!");
             } else {
-                GameAPI.getInstance().getMessenger().sendSender(player, "§4Der RotationHandler wurde nicht initialisiert!");
+                GameAPI.getInstance().getMessenger().send(player, "§4Der RotationHandler wurde nicht initialisiert!");
             }
             player.closeInventory();
         });
@@ -40,7 +40,7 @@ public class MapInventory extends CoreInventory {
             }
             sb.append("\n");
 
-            GameAPI.getInstance().getMessenger().sendSender(player, sb.toString());
+            GameAPI.getInstance().getMessenger().send(player, sb.toString());
             player.closeInventory();
         });
 

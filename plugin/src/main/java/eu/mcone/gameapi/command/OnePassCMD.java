@@ -8,12 +8,15 @@ import eu.mcone.gameapi.api.player.GamePlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class OnePassCMD extends CorePlayerCommand {
+
     public OnePassCMD() {
         super("OnePass");
     }
-
-    //onepass add/remove <name> int
 
     @Override
     public boolean onPlayerCommand(Player player, String[] args) {
@@ -56,4 +59,39 @@ public class OnePassCMD extends CorePlayerCommand {
 
         return false;
     }
+
+    @Override
+    public List<String> onPlayerTabComplete(Player p, String[] args) {
+        if (args.length == 1) {
+            String search = args[0];
+            List<String> matches = new ArrayList<>();
+
+            for (String arg : new String[]{"add", "remove"}) {
+                if (arg.startsWith(search)) {
+                    matches.add(arg);
+                }
+            }
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (player.getName().startsWith(search)) {
+                    matches.add(player.getName());
+                }
+            }
+
+            return matches;
+        } else if (args.length == 2) {
+            String search = args[1];
+            List<String> matches = new ArrayList<>();
+
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (player.getName().startsWith(search)) {
+                    matches.add(player.getName());
+                }
+            }
+
+            return matches;
+        }
+
+        return Collections.emptyList();
+    }
+
 }

@@ -21,18 +21,18 @@ public class ForceStartCMD extends CoreCommand {
                     || GamePlugin.getGamePlugin().getPlayerManager().getPlayers(GamePlayerState.PLAYING).size() >= GamePlugin.getGamePlugin().getPlayerManager().getMinPlayers()) {
                 if (GamePlugin.getGamePlugin().getGameStateManager().isCountdownRunning()) {
                     if (LobbyGameState.forceStart()) {
-                        GameAPIPlugin.getSystem().getMessenger().sendSender(sender, "§2Du hast den Lobby Countdown übersprungen!");
+                        GameAPIPlugin.getSystem().getMessenger().send(sender, "§2Du hast den Lobby Countdown übersprungen!");
                     } else {
-                        GameAPIPlugin.getSystem().getMessenger().sendSender(sender, "§4Du kannst den Countdown nicht mehr überspringen, das Spiel startet gleich!");
+                        GameAPIPlugin.getSystem().getMessenger().send(sender, "§4Du kannst den Countdown nicht mehr überspringen, das Spiel startet gleich!");
                     }
                 } else {
-                    GameAPIPlugin.getSystem().getMessenger().sendSender(sender, "§4Zurzeit läuft kein Lobby Countdown!");
+                    GameAPIPlugin.getSystem().getMessenger().send(sender, "§4Zurzeit läuft kein Lobby Countdown!");
                 }
             } else {
-                GameAPIPlugin.getSystem().getMessenger().sendSender(sender, "§4Es sind nicht genügend Spieler online, um das Spiel zu starten!");
+                GameAPIPlugin.getSystem().getMessenger().send(sender, "§4Es sind nicht genügend Spieler online, um das Spiel zu starten!");
             }
         } else {
-            GameAPIPlugin.getSystem().getMessenger().sendSender(sender, "§4Du kannst den Start Befehl nur während der Lobby-Phase benutzen!");
+            GameAPIPlugin.getSystem().getMessenger().send(sender, "§4Du kannst den Start Befehl nur während der Lobby-Phase benutzen!");
         }
 
         return false;

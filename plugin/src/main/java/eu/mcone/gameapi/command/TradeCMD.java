@@ -1,24 +1,24 @@
 package eu.mcone.gameapi.command;
 
-import eu.mcone.coresystem.api.bukkit.command.CoreCommand;
+import eu.mcone.coresystem.api.bukkit.command.CorePlayerCommand;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.backpack.GameBackpackManager;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class TradeCMD extends CoreCommand {
+import java.util.ArrayList;
+import java.util.List;
+
+public class TradeCMD extends CorePlayerCommand {
 
     public TradeCMD() {
         super("trading", null, "trade");
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, String[] args) {
-        Player player = (Player) sender;
-
+    public boolean onPlayerCommand(Player player, String[] args) {
         if (args.length == 1) {
             Player target = Bukkit.getPlayer(args[0]);
             GamePlayer gt = GameAPI.getInstance().getGamePlayer(target);
@@ -72,7 +72,25 @@ public class TradeCMD extends CoreCommand {
             }
         }
 
-        GameAPI.getInstance().getMessenger().send(player, "§4Bitte benutze: §c/trade [<Spieler>]");
+        GameAPI.getInstance().getMessenger().send(player, "§4Bitte benutze: §c/trade [<accept>] <Spieler>");
         return false;
     }
+
+    @Override
+    public List<String> onPlayerTabComplete(Player p, String[] args) {
+        String search = args[args.length - 1];
+        List<String> matches = new ArrayList<>();
+
+        if (args.length == 1 && "accept".startsWith(search)) {
+            matches.add("accept");
+        }
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (player != p && player.getName().startsWith(search)) {
+                matches.add(player.getName());
+            }
+        }
+
+        return matches;
+    }
+
 }
