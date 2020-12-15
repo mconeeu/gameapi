@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2017 - 2021 Dominik Lippl, Rufus Maiwald and the MC ONE Minecraftnetwork. All rights reserved
+ * You are not allowed to decompile the code
+ */
+
 package eu.mcone.gameapi.listener;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
@@ -10,6 +15,7 @@ import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Module;
 import eu.mcone.gameapi.api.Option;
 import eu.mcone.gameapi.api.event.player.GamePlayerLoadedEvent;
+import eu.mcone.gameapi.api.player.GamePlayer;
 import eu.mcone.gameapi.api.player.GamePlayerState;
 import eu.mcone.gameapi.player.GameAPIPlayer;
 import org.bukkit.Bukkit;
@@ -45,7 +51,11 @@ public class GamePlayerListener implements Listener {
         Player player = e.getPlayer();
 
         if (GamePlugin.isGamePluginInitialized()) {
-            GameAPI.getInstance().getGamePlayer(e.getPlayer()).removeFromGame(true);
+            GamePlayer gamePlayer = GameAPI.getInstance().getGamePlayer(e.getPlayer());
+
+            if (gamePlayer != null) {
+                gamePlayer.removeFromGame(true);
+            }
 
             if (GamePlugin.getGamePlugin().hasModule(Module.GAME_HISTORY_MANAGER)) {
                 if (GamePlugin.getGamePlugin().hasOption(Option.GAME_HISTORY_HISTORY_MODE)) {
@@ -80,10 +90,10 @@ public class GamePlayerListener implements Listener {
                 if (respawnLocation != null) {
                     e.setRespawnLocation(respawnLocation);
                 } else {
-                    GameAPIPlugin.getSystem().sendConsoleMessage("§cCould not set Respawn Location for Spectator "+e.getPlayer().getName()+". Location game.spectator is not set in GameWorld!");
+                    GameAPIPlugin.getSystem().sendConsoleMessage("§cCould not set Respawn Location for Spectator " + e.getPlayer().getName() + ". Location game.spectator is not set in GameWorld!");
                 }
             } else {
-                GameAPIPlugin.getSystem().sendConsoleMessage("§cCould not set Respawn Location for Spectator "+e.getPlayer().getName()+". GameWorld from Config is null!");
+                GameAPIPlugin.getSystem().sendConsoleMessage("§cCould not set Respawn Location for Spectator " + e.getPlayer().getName() + ". GameWorld from Config is null!");
             }
         }
     }

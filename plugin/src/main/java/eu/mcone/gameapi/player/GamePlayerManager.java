@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2017 - 2021 Dominik Lippl, Rufus Maiwald and the MC ONE Minecraftnetwork. All rights reserved
+ * You are not allowed to decompile the code
+ */
+
 package eu.mcone.gameapi.player;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
@@ -82,7 +87,7 @@ public class GamePlayerManager implements PlayerManager {
 
     @Override
     public boolean maxPlayersReached() {
-        return Bukkit.getOnlinePlayers().size() >= maxPlayers;
+        return Bukkit.getOnlinePlayers().size() > maxPlayers;
     }
 
     @Override

@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2017 - 2021 Dominik Lippl, Rufus Maiwald and the MC ONE Minecraftnetwork. All rights reserved
+ * You are not allowed to decompile the code
+ */
+
 package eu.mcone.gameapi.listener.players;
 
 import eu.mcone.gameapi.api.GamePlugin;
@@ -18,9 +23,9 @@ public class PlayerManagerListener implements Listener {
     private final GamePlayerManager manager;
 
     @EventHandler(priority = EventPriority.LOW)
-    public void onJoin(PlayerJoinEvent e) {
+    public void onJoin(GamePlayerLoadedEvent e) {
         if (manager.maxPlayersReached()) {
-            e.getPlayer().kickPlayer("Max Players reached");
+            e.getBukkitPlayer().kickPlayer("Max Players reached");
         }
     }
 
