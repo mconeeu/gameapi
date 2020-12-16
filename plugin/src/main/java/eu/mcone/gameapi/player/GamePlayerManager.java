@@ -7,6 +7,7 @@ package eu.mcone.gameapi.player;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
 import eu.mcone.coresystem.api.bukkit.inventory.PlayerInventorySlot;
+import eu.mcone.coresystem.api.bukkit.world.CoreWorld;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
@@ -21,6 +22,7 @@ import net.minecraft.server.v1_8_R3.PacketPlayOutCamera;
 import net.minecraft.server.v1_8_R3.PlayerAbilities;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
@@ -43,7 +45,7 @@ public class GamePlayerManager implements PlayerManager {
                 new PlayerManagerListener(this)
         );
 
-        CoreSystem.getInstance().getVanishManager().registerVanishRule(Integer.MAX_VALUE-10, (player, playerCanSee) -> {
+        CoreSystem.getInstance().getVanishManager().registerVanishRule(Integer.MAX_VALUE - 10, (player, playerCanSee) -> {
             GamePlayer gp = GameAPI.getInstance().getGamePlayer(player);
 
             if (gp.getState().equals(GamePlayerState.PLAYING)) {
@@ -114,7 +116,7 @@ public class GamePlayerManager implements PlayerManager {
                 p.setWalkSpeed(0.2F);
 
                 p.getInventory().setItem(PlayerInventorySlot.HOTBAR_SLOT_9, SpectatorInventory.NAVIGATOR);
-                p.teleport(CoreSystem.getInstance().getWorldManager().getWorld(GamePlugin.getGamePlugin().getGameConfig().parseConfig().getGameWorld()).getLocation("game.spectator"));
+                teleportPlayerToSpectator(p);
             } else if (state.equals(GamePlayerState.PLAYING)) {
                 Player p = player.bukkit();
 
@@ -128,7 +130,7 @@ public class GamePlayerManager implements PlayerManager {
                 CoreSystem.getInstance().getVanishManager().recalculateVanishes();
 
                 p.getInventory().remove(SpectatorInventory.NAVIGATOR);
-                p.teleport(CoreSystem.getInstance().getWorldManager().getWorld(GamePlugin.getGamePlugin().getGameConfig().parseConfig().getLobby()).getLocation("game.spectator"));
+                teleportPlayerToSpectator(p);
             }
         }
     }
@@ -176,5 +178,24 @@ public class GamePlayerManager implements PlayerManager {
         PacketPlayOutCamera camera = new PacketPlayOutCamera();
         camera.a = t.getEntityId();
         ((CraftPlayer) p).getHandle().playerConnection.sendPacket(camera);
+    }
+
+    private void teleportPlayerToSpectator(Player player) {
+        String worldName = GamePlugin.getGamePlugin().getGameConfig().parseConfig().getLobby();
+        if (worldName != null) {
+            CoreWorld coreWorld = CoreSystem.getInstance().getWorldManager().getWorld(worldName);
+            if (coreWorld != null) {
+                Location location = coreWorld.getLocation("game.spectator");
+                if (location != null) {
+                    player.teleport(location);
+                } else {
+                    throw new NullPointerException("Could not find location game.spectator");
+                }
+            } else {
+                throw new NullPointerException("Could not find core world " + worldName);
+            }
+        } else {
+            throw new NullPointerException("GameWorld is null!");
+        }
     }
 }

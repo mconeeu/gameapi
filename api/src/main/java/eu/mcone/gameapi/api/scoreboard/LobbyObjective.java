@@ -33,7 +33,7 @@ public class LobbyObjective extends GameObjective {
 
             entry.setScore(2, "");
             entry.setScore(1, "§8» §7Benötigte Spieler:");
-            entry.setScore(0, " §f" + playerManager.getPlayers(GamePlayerState.PLAYING).size() + "§7 von §f" + playerManager.getMinPlayers());
+            entry.setScore(0, "   §f" + playerManager.getPlayers(GamePlayerState.PLAYING).size() + "§7 von §f" + playerManager.getMinPlayers());
         }
 
         inGameEntry.getScores().forEach((score, value) -> entry.setScore(score + (isPlayerManager ? 3 : 0), value));

@@ -25,14 +25,15 @@ public class GameObjective extends CoreSidebarObjective {
         CoreSidebarObjectiveEntry lobbyEntry = new CoreSidebarObjectiveEntry();
         onGameObjectiveRegister(player, lobbyEntry);
 
-        entry.setTitle(lobbyEntry.getTitle() != null ? lobbyEntry.getTitle() : "§7§l⚔ "+ GamePlugin.getGamePlugin().getPluginColor()+"§l§n"+GamePlugin.getGamePlugin().getGameName()+"§7§l ⚔");
+        entry.setTitle(lobbyEntry.getTitle() != null ? lobbyEntry.getTitle() : "§7§l⚔ " + GamePlugin.getGamePlugin().getPluginColor() + "§l§n" + GamePlugin.getGamePlugin().getGameName() + "§7§l ⚔");
         lobbyEntry.getScores().forEach((score, value) -> entry.setScore(score + 2, value));
 
         entry.setScore(1, "");
         entry.setScore(0, "§f§lMCONE.EU");
     }
 
-    protected void onGameObjectiveRegister(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry) {}
+    protected void onGameObjectiveRegister(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry) {
+    }
 
     @Override
     protected void onReload(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry) {
@@ -46,5 +47,6 @@ public class GameObjective extends CoreSidebarObjective {
         lobbyEntry.getScores().forEach((score, value) -> entry.setScore(score + 2, value));
     }
 
-    protected void onGameObjectiveReload(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry) {}
+    protected void onGameObjectiveReload(CorePlayer corePlayer, CoreSidebarObjectiveEntry entry) {
+    }
 }
