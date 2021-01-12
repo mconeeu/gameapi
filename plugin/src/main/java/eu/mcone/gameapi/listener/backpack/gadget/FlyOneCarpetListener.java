@@ -39,10 +39,10 @@ public class FlyOneCarpetListener extends GadgetListener {
         super(plugin, handler);
     }
 
-    public static HashSet<Player> isRiding = new HashSet<>();
-    public static HashMap<Player, ArmorStand> armorStandMap = new HashMap<>();
-    public static HashMap<Player, Integer> armorstandId = new HashMap<>();
-    public static HashMap<Player, Integer> horseId = new HashMap<>();
+    private final HashSet<Player> isRiding = new HashSet<>();
+    private final HashMap<Player, ArmorStand> armorStandMap = new HashMap<>();
+    private final HashMap<Player, Integer> armorstandId = new HashMap<>();
+    private final HashMap<Player, Integer> horseId = new HashMap<>();
 
     @EventHandler
     public void on(PlayerInteractEvent e) {
@@ -126,7 +126,7 @@ public class FlyOneCarpetListener extends GadgetListener {
         for (Player all : Bukkit.getOnlinePlayers()) {
             World world = all.getWorld();
 
-            if (FlyOneCarpetListener.isRiding.contains(all)) {
+            if (isRiding.contains(all)) {
                 for (Horse horse : world.getEntitiesByClass(Horse.class)) {
                     if (horse != null) {
                         if (horseId.get(all).equals(horse.getEntityId())) {
@@ -313,21 +313,7 @@ public class FlyOneCarpetListener extends GadgetListener {
         ItemStack i = new ItemStack(Material.BANNER, 1);
         BannerMeta m = (BannerMeta) i.getItemMeta();
 
-
         m.setBaseColor(getRank(p));
-
-     /*   List<Pattern> patterns = new ArrayList<Pattern>(); //Create a new List called 'patterns'
-
-        patterns.add(new Pattern(DyeColor.WHITE, PatternType.HALF_HORIZONTAL));
-        patterns.add(new Pattern(DyeColor.BLACK, PatternType.RHOMBUS_MIDDLE));
-        patterns.add(new Pattern(DyeColor.BLUE, PatternType.STRIPE_TOP));
-        patterns.add(new Pattern(DyeColor.BLACK, PatternType.FLOWER));
-        patterns.add(new Pattern(DyeColor.LIGHT_BLUE, PatternType.GRADIENT_UP));
-        patterns.add(new Pattern(DyeColor.WHITE, PatternType.CIRCLE_MIDDLE));
-        m.setPatterns(patterns);
-
-      */
-
         i.setItemMeta(m);
 
         return i;

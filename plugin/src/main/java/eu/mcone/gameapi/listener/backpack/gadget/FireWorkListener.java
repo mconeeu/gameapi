@@ -27,7 +27,7 @@ public class FireWorkListener extends GadgetListener {
     public boolean isExploding = false;
 
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void on(BlockPlaceEvent e) {
 
         if (e.getItemInHand().equals(DefaultItem.FIREWORK.getItemStack())) {

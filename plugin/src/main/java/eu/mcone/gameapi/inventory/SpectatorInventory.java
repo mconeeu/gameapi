@@ -19,6 +19,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Objects;
+
 public class SpectatorInventory extends CoreInventory {
 
     public final static ItemStack NAVIGATOR = new ItemBuilder(Material.COMPASS).displayName("§7Navigator").create();
@@ -28,7 +30,7 @@ public class SpectatorInventory extends CoreInventory {
 
         int slot = 0;
         for (Player playing : playerManager.getPlayers(GamePlayerState.PLAYING)) {
-            GamePlayer gamePlayer = GamePlugin.getGamePlugin().getGamePlayer(playing.getUniqueId());
+            GamePlayer gamePlayer = Objects.requireNonNull(GamePlugin.getGamePlugin()).getGamePlayer(playing.getUniqueId());
 
             setItem(slot, new Skull(playing.getName()).setDisplayName("§7" + playing.getName()).lore(
 //                    "§8» §7§oRanking Platz: §f§l" + gamePlayer.getStats().getUserRanking(),
