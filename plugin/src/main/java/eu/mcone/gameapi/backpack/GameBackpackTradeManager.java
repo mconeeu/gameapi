@@ -5,8 +5,7 @@
 
 package eu.mcone.gameapi.backpack;
 
-import eu.mcone.gameapi.GameAPIPlugin;
-import eu.mcone.gameapi.api.GameAPI;
+import eu.mcone.coresystem.api.bukkit.facades.Msg;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
 import eu.mcone.gameapi.api.backpack.BackpackTradeManager;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultCategory;
@@ -64,13 +63,13 @@ public class GameBackpackTradeManager implements BackpackTradeManager {
             Player partner = getTraidingPartner(player);
 
             if (partner != null) {
-                GameAPIPlugin.getSystem().getMessenger().send(partner, "§4Dein Traiding Partner hat das Handeln abgebrochen. Es wurden keine Items verkauft.");
+                Msg.send(partner, "§4Dein Traiding Partner hat das Handeln abgebrochen. Es wurden keine Items verkauft.");
                 inTrade.remove(inTrade.containsKey(player) ? player : partner);
             } else {
                 inTrade.remove(player);
             }
 
-            GameAPIPlugin.getSystem().getMessenger().send(player, "§4Du hast das Traiding abgebrochen, da du das Inventar geschlossen hast. Es wurden keine Items verkauft.");
+            Msg.send(player, "§4Du hast das Traiding abgebrochen, da du das Inventar geschlossen hast. Es wurden keine Items verkauft.");
         } else {
             throw new IllegalStateException("Player is not traiding!");
         }
@@ -99,13 +98,13 @@ public class GameBackpackTradeManager implements BackpackTradeManager {
                     inTrade.put(p, target);
                     openBackpackTraidInventory(p);
                 } else {
-                    GameAPI.getInstance().getMessenger().send(p, "§cDer Spieler ist bereits in einem Tausch!");
+                    Msg.send(p, "§cDer Spieler ist bereits in einem Tausch!");
                 }
             } else {
-                GameAPI.getInstance().getMessenger().send(p, "§cDu bist bereits in einem §4Tausch!");
+                Msg.send(p, "§cDu bist bereits in einem §4Tausch!");
             }
         } else {
-            GameAPI.getInstance().getMessenger().send(p, "§4Du hast §c"+target.getName()+"§4 schon eine Anfrage geschickt");
+            Msg.send(p, "§4Du hast §c"+target.getName()+"§4 schon eine Anfrage geschickt");
         }
     }
 

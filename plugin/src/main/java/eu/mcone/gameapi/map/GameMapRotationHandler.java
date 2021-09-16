@@ -6,6 +6,7 @@
 package eu.mcone.gameapi.map;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
+import eu.mcone.coresystem.api.bukkit.facades.Msg;
 import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.coresystem.api.bukkit.util.CoreActionBar;
 import eu.mcone.coresystem.api.bukkit.util.CoreTitle;
@@ -93,12 +94,12 @@ public class GameMapRotationHandler implements MapRotationHandler {
     private void resumeRotation(long doRotationIn) {
         currentTask = Bukkit.getScheduler().runTaskLaterAsynchronously(mapManager.getSystem(), () -> {
             for (Player p : Bukkit.getOnlinePlayers()) {
-                mapManager.getSystem().getMessenger().send(p, "§fDie Map wird in §n1 Minute§r§f gewechselt!");
+                Msg.send(p, "§fDie Map wird in §n1 Minute§r§f gewechselt!");
             }
 
             Bukkit.getScheduler().runTaskLaterAsynchronously(mapManager.getSystem(), () -> {
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    mapManager.getSystem().getMessenger().send(p, "§fDie Map wird in §n10 Sekunden§r§f gewechselt!");
+                    Msg.send(p, "§fDie Map wird in §n10 Sekunden§r§f gewechselt!");
                 }
 
                 countdown = 10;

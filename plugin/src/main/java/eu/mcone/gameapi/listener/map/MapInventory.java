@@ -5,13 +5,13 @@
 
 package eu.mcone.gameapi.listener.map;
 
-import eu.mcone.coresystem.api.bukkit.broadcast.SimpleBroadcast;
+import eu.mcone.coresystem.api.bukkit.chat.SimpleBroadcast;
+import eu.mcone.coresystem.api.bukkit.facades.Msg;
 import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.coresystem.api.bukkit.inventory.InventoryOption;
 import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
 import eu.mcone.coresystem.api.bukkit.inventory.category.CategoryInventory;
 import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
-import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.map.GameAPIMap;
 import eu.mcone.gameapi.map.GameMapManager;
 import eu.mcone.gameapi.map.GameMapRotationHandler;
@@ -28,10 +28,10 @@ public class MapInventory extends CoreInventory {
         setItem(InventorySlot.ROW_2_SLOT_3, CategoryInventory.REFRESH_ITEM, e -> {
             if (mapManager.isRotationHandlerLoaded()) {
                 ((GameMapRotationHandler) mapManager.getMapRotationHandler()).rotate();
-                GameAPI.getInstance().getMessenger().broadcast(new SimpleBroadcast("§fDie Map wird gewechselt!"));
-                GameAPI.getInstance().getMessenger().send(player, "§2Du hast die Map erfolgreich rotiert!");
+                Msg.broadcast(new SimpleBroadcast("§fDie Map wird gewechselt!"));
+                Msg.send(player, "§2Du hast die Map erfolgreich rotiert!");
             } else {
-                GameAPI.getInstance().getMessenger().send(player, "§4Der RotationHandler wurde nicht initialisiert!");
+                Msg.send(player, "§4Der RotationHandler wurde nicht initialisiert!");
             }
             player.closeInventory();
         });
@@ -45,7 +45,7 @@ public class MapInventory extends CoreInventory {
             }
             sb.append("\n");
 
-            GameAPI.getInstance().getMessenger().send(player, sb.toString());
+            Msg.send(player, sb.toString());
             player.closeInventory();
         });
 

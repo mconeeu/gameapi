@@ -7,7 +7,7 @@ package eu.mcone.gameapi.api.gamestate.common;
 
 import eu.mcone.coresystem.api.bukkit.CorePlugin;
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
-import eu.mcone.coresystem.api.bukkit.broadcast.SimpleBroadcast;
+import eu.mcone.coresystem.api.bukkit.chat.SimpleBroadcast;
 import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.coresystem.api.bukkit.world.CoreWorld;
 import eu.mcone.gameapi.api.GamePlugin;

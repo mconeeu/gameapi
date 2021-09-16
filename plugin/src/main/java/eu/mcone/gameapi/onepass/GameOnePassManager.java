@@ -5,6 +5,7 @@
 
 package eu.mcone.gameapi.onepass;
 
+import eu.mcone.coresystem.api.bukkit.facades.Msg;
 import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
@@ -29,14 +30,14 @@ public class GameOnePassManager implements OnePassManager {
 
                 if (newLevel > oldLevel) {
                     if (!gp.hasBackpackItem(award.getBackpackItemCategory(), award.getBackpackItem())) {
-                        GameAPI.getInstance().getMessenger().send(gp.bukkit(), "§2Dir wurde das Item §a" + award.getBackpackItem().getName() + "§2 wegen deiner neuen §aOnePass Stufe " + newLevel + " §2hinzugefügt");
+                        Msg.send(gp.bukkit(), "§2Dir wurde das Item §a" + award.getBackpackItem().getName() + "§2 wegen deiner neuen §aOnePass Stufe " + newLevel + " §2hinzugefügt");
                         Sound.done(gp.bukkit());
                         gp.addBackpackItem(
                                 award.getBackpackItemCategory(),
                                 item
                         );
                     } else {
-                        GameAPI.getInstance().getMessenger().send(gp.bukkit(), "§2Du hast die OnePass §aStufe " + newLevel + " §2erreicht");
+                        Msg.send(gp.bukkit(), "§2Du hast die OnePass §aStufe " + newLevel + " §2erreicht");
                     }
                 } else if (newLevel < oldLevel) {
                     gp.removeBackpackItem(

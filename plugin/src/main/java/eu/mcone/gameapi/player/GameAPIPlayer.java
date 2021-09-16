@@ -6,6 +6,7 @@
 package eu.mcone.gameapi.player;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
+import eu.mcone.coresystem.api.bukkit.facades.Msg;
 import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.coresystem.api.bukkit.gamemode.Gamemode;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
@@ -534,12 +535,12 @@ public class GameAPIPlayer extends eu.mcone.coresystem.api.bukkit.player.plugin.
                 saveData();
             } else {
                 player.closeInventory();
-                GameAPI.getInstance().getMessenger().send(player, "§4Du hast nicht genügend Emeralds!");
+                Msg.send(player, "§4Du hast nicht genügend Emeralds!");
                 throw new IllegalStateException("Could not buy OnePass for " + corePlayer.getName() + ". Player has not enough emeralds!");
             }
         } else {
             player.closeInventory();
-            GameAPI.getInstance().getMessenger().send(player, "§4Du hast den OnePass bereits gekauft!");
+            Msg.send(player, "§4Du hast den OnePass bereits gekauft!");
             throw new IllegalStateException("Could not buy OnePass for " + corePlayer.getName() + ". Player already has OnePass!");
         }
     }

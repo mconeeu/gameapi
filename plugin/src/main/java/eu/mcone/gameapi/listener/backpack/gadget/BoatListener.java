@@ -6,6 +6,7 @@
 package eu.mcone.gameapi.listener.backpack.gadget;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
+import eu.mcone.coresystem.api.bukkit.facades.Msg;
 import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
@@ -60,7 +61,7 @@ public class BoatListener extends GadgetListener {
                         handler.cleanup(e);
                     }, 1L));
                 } else {
-                    GameAPI.getInstance().getMessenger().send(p, "§4Du kannst das §cGadget§4 nur im §cWasser §4benutzen!");
+                    Msg.send(p, "§4Du kannst das §cGadget§4 nur im §cWasser §4benutzen!");
                 }
             }
         }

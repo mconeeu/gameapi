@@ -6,12 +6,12 @@
 package eu.mcone.gameapi.inventory.backpack;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
+import eu.mcone.coresystem.api.bukkit.facades.Msg;
 import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.coresystem.api.bukkit.inventory.InventoryOption;
 import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
 import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
-import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.backpack.BackpackItem;
 import eu.mcone.gameapi.api.backpack.Category;
 import eu.mcone.gameapi.player.GameAPIPlayer;
@@ -34,7 +34,7 @@ public class VendorSellInventory extends CoreInventory {
             gp.removeBackpackItem(category.getName(), item);
             corePlayer.addEmeralds(item.getSellPrice());
 
-            GameAPIPlugin.getSystem().getMessenger().send(p, "§2Du hast das Item §a" + item.getName() + " §2für §f" + item.getSellPrice() + " Emeralds §2erfolgreich verkauft!");
+            Msg.send(p, "§2Du hast das Item §a" + item.getName() + " §2für §f" + item.getSellPrice() + " Emeralds §2erfolgreich verkauft!");
             new BackpackSellInventory(p, category);
         });
 

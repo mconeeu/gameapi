@@ -5,6 +5,7 @@
 
 package eu.mcone.gameapi.inventory.backpack.trade;
 
+import eu.mcone.coresystem.api.bukkit.facades.Msg;
 import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.coresystem.api.bukkit.inventory.InventoryOption;
 import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
@@ -74,8 +75,8 @@ public class TradingFinishInventory extends CoreInventory {
                                 selfChoosedItem
                         );
 
-                        GameAPIPlugin.getSystem().getMessenger().send(p, "§2Du hast das Item §a" + selfChoosedItem.getName() + " §2für §f" + partnerChoosedItem.getName() + " §2erfolgreich ausgetauscht!");
-                        GameAPIPlugin.getSystem().getMessenger().send(partner, "§2Du hast das Item §a" + partnerChoosedItem.getName() + " §2für §f" + selfChoosedItem.getName() + " §2erfolgreich ausgetauscht!");
+                        Msg.send(p, "§2Du hast das Item §a" + selfChoosedItem.getName() + " §2für §f" + partnerChoosedItem.getName() + " §2erfolgreich ausgetauscht!");
+                        Msg.send(partner, "§2Du hast das Item §a" + partnerChoosedItem.getName() + " §2für §f" + selfChoosedItem.getName() + " §2erfolgreich ausgetauscht!");
                     } else if (!accpeted) {
                         backpackManager.getTradeManager().getTradeItemAccepted().add(p);
                         new TradingFinishInventory(gp, selfChoosedItem, partnerChoosedItem, true);

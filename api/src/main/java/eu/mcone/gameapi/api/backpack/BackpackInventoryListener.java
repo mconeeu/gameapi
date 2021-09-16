@@ -5,10 +5,10 @@
 
 package eu.mcone.gameapi.api.backpack;
 
+import eu.mcone.coresystem.api.bukkit.facades.Msg;
 import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
 import eu.mcone.coresystem.api.bukkit.inventory.category.CategoryInventory;
 import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
-import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Option;
 import eu.mcone.gameapi.api.event.backpack.BackpackItemRemoveEvent;
@@ -54,7 +54,7 @@ public abstract class BackpackInventoryListener {
                             click(item, gp, p, true);
                         } else {
                             p.closeInventory();
-                            GameAPI.getInstance().getMessenger().send(p, "§4Du kannst keine Effekte benutzen, da Effekte von anderen für dich unsichtbar sind");
+                            Msg.send(p, "§4Du kannst keine Effekte benutzen, da Effekte von anderen für dich unsichtbar sind");
                         }
                     });
                 }

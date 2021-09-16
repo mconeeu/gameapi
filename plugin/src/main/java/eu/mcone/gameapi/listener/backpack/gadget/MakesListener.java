@@ -5,6 +5,7 @@
 
 package eu.mcone.gameapi.listener.backpack.gadget;
 
+import eu.mcone.coresystem.api.bukkit.facades.Msg;
 import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
@@ -99,15 +100,15 @@ public class MakesListener extends GadgetListener {
                                     }
                                 }
                             } else {
-                                GameAPI.getInstance().getMessenger().send(p, "§4Bitte warte ein paar Sekunden...");
+                                Msg.send(p, "§4Bitte warte ein paar Sekunden...");
                             }
                         }
                     } else {
-                        GameAPI.getInstance().getMessenger().send(p, "§4Es ist kein anderer §cSpieler§4 Online!");
+                        Msg.send(p, "§4Es ist kein anderer §cSpieler§4 Online!");
                     }
                 }
             } else {
-                GameAPI.getInstance().getMessenger().send(p, "§4Es ist kein anderer §cSpieler§4 Online!");
+                Msg.send(p, "§4Es ist kein anderer §cSpieler§4 Online!");
             }
         }
     }

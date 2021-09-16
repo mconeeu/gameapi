@@ -5,6 +5,7 @@
 
 package eu.mcone.gameapi.listener.backpack.gadget;
 
+import eu.mcone.coresystem.api.bukkit.facades.Msg;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
@@ -39,7 +40,7 @@ public class FireWorkListener extends GadgetListener {
             GameAPIPlayer gp = GameAPIPlugin.getSystem().getGamePlayer(p);
 
             if (isExploding) {
-                GameAPI.getInstance().getMessenger().send(p, "§4Bitte warte kurz..");
+                Msg.send(p, "§4Bitte warte kurz..");
                 e.setCancelled(true);
                 return;
             }

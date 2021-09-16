@@ -5,6 +5,7 @@
 
 package eu.mcone.gameapi.inventory.onepass;
 
+import eu.mcone.coresystem.api.bukkit.facades.Msg;
 import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.coresystem.api.bukkit.inventory.InventoryOption;
 import eu.mcone.coresystem.api.bukkit.inventory.InventorySlot;
@@ -29,7 +30,7 @@ public class QuestInventory extends CoreInventory {
         for (Quests quests : Quests.values()) {
             if (!gamePlayer.hasBackpackItem(quests.getBackpackItemCategory(), quests.getWinItem())) {
                 setItem(i, quests.getItemStack(), e -> {
-                    GameAPI.getInstance().getMessenger().send(player, quests.getQuestTask());
+                    Msg.send(player, quests.getQuestTask());
                 });
                 i++;
             }

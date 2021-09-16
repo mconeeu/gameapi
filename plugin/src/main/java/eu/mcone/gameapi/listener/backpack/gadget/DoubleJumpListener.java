@@ -5,8 +5,8 @@
 
 package eu.mcone.gameapi.listener.backpack.gadget;
 
+import eu.mcone.coresystem.api.bukkit.facades.Msg;
 import eu.mcone.coresystem.api.bukkit.facades.Sound;
-import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.backpack.defaults.DefaultItem;
 import eu.mcone.gameapi.listener.backpack.handler.GameGadgetHandler;
@@ -32,7 +32,7 @@ public class DoubleJumpListener extends GadgetListener {
             Player p = e.getPlayer();
 
             if (isJumping) {
-                GameAPI.getInstance().getMessenger().send(p, "§4Bitte warte kurz..");
+                Msg.send(p, "§4Bitte warte kurz..");
                 return;
             }
             isJumping = true;

@@ -6,11 +6,11 @@
 package eu.mcone.gameapi.inventory;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
+import eu.mcone.coresystem.api.bukkit.facades.Msg;
 import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.coresystem.api.bukkit.inventory.InventoryOption;
 import eu.mcone.coresystem.api.bukkit.item.ItemBuilder;
-import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Module;
 import eu.mcone.gameapi.api.player.GamePlayer;
@@ -77,7 +77,7 @@ public class TeamInventory extends CoreInventory {
                         }
                     }
                 } else {
-                    GameAPI.getInstance().getMessenger().send(p, "§4Du kannst dein Team nicht mehr ändern!");
+                    Msg.send(p, "§4Du kannst dein Team nicht mehr ändern!");
                 }
             });
         }

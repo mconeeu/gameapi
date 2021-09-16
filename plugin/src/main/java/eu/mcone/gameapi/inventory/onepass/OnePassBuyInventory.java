@@ -5,6 +5,7 @@
 
 package eu.mcone.gameapi.inventory.onepass;
 
+import eu.mcone.coresystem.api.bukkit.facades.Msg;
 import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.coresystem.api.bukkit.inventory.CoreInventory;
 import eu.mcone.coresystem.api.bukkit.inventory.InventoryOption;
@@ -29,7 +30,7 @@ public class OnePassBuyInventory extends CoreInventory {
 
             Bukkit.getScheduler().runTaskLater(GameAPIPlugin.getSystem(), () -> {
                 Sound.equip(p);
-                GameAPI.getInstance().getMessenger().send(player, "§aDu hast den §3OnePass §agekauft!");
+                Msg.send(player, "§aDu hast den §3OnePass §agekauft!");
 
                 setItem(InventorySlot.ROW_3_SLOT_9, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 7).displayName("§8//§oMCONE§8//").create());
                 setItem(InventorySlot.ROW_2_SLOT_4, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 7).displayName("§8//§oMCONE§8//").create());
@@ -73,7 +74,7 @@ public class OnePassBuyInventory extends CoreInventory {
 
             Bukkit.getScheduler().runTaskLater(GameAPIPlugin.getSystem(), () -> {
                 Sound.equip(p);
-                GameAPI.getInstance().getMessenger().send(player, "§aDu hast den §3OnePass-Premium §agekauft!");
+                Msg.send(player, "§aDu hast den §3OnePass-Premium §agekauft!");
 
                 setItem(InventorySlot.ROW_3_SLOT_9, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 7).displayName("§8//§oMCONE§8//").create());
                 setItem(InventorySlot.ROW_2_SLOT_4, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, 7).displayName("§8//§oMCONE§8//").create());

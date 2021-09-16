@@ -28,6 +28,7 @@ import java.util.*;
 
 public abstract class GamePlugin extends CorePlugin {
 
+    @Getter
     private static GamePlugin gamePlugin;
 
     private final List<Module> modules;
@@ -95,20 +96,6 @@ public abstract class GamePlugin extends CorePlugin {
     public abstract void onGameEnable();
 
     public abstract void onGameDisable();
-
-    public static GamePlugin getGamePlugin() {
-        try {
-            if (gamePlugin != null) {
-                return gamePlugin;
-            } else {
-                throw new NullPointerException("The GamePlugin was not initialised!");
-            }
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
 
     public MapManager getMapManager() {
         modules.add(Module.MAP_MANAGER);

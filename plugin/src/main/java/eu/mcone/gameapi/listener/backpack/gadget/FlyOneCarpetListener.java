@@ -6,6 +6,7 @@
 package eu.mcone.gameapi.listener.backpack.gadget;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
+import eu.mcone.coresystem.api.bukkit.facades.Msg;
 import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
@@ -59,13 +60,13 @@ public class FlyOneCarpetListener extends GadgetListener {
                         spawnHorse(p);
                         Sound.save(p);
                     } else {
-                        GameAPI.getInstance().getMessenger().send(p, "§4Bitte warte ein paar Sekunden...");
+                        Msg.send(p, "§4Bitte warte ein paar Sekunden...");
                     }
                 } else {
-                    GameAPI.getInstance().getMessenger().send(p, "§4Du darfst dabei nicht in der Luft sein!");
+                    Msg.send(p, "§4Du darfst dabei nicht in der Luft sein!");
                 }
             } else {
-                GameAPI.getInstance().getMessenger().send(p, "§4Du darfst dabei nicht sprinten!");
+                Msg.send(p, "§4Du darfst dabei nicht sprinten!");
             }
         }
     }

@@ -5,6 +5,7 @@
 
 package eu.mcone.gameapi.listener.backpack.gadget;
 
+import eu.mcone.coresystem.api.bukkit.facades.Msg;
 import eu.mcone.coresystem.api.bukkit.facades.Sound;
 import eu.mcone.gameapi.GameAPIPlugin;
 import eu.mcone.gameapi.api.GameAPI;
@@ -50,7 +51,7 @@ public class CoinBombListener extends GadgetListener {
 
 
             if (isExploding) {
-                GameAPI.getInstance().getMessenger().send(p, "§4Bitte warte kurz..");
+                Msg.send(p, "§4Bitte warte kurz..");
                 return;
             }
             isExploding = true;
@@ -202,15 +203,15 @@ public class CoinBombListener extends GadgetListener {
             if (item.getItemStack().getType().equals(Material.IRON_INGOT) || item.getItemStack().getType().equals(Material.IRON_BLOCK)) {
                 GamePlayer gamePlayer = GameAPI.getInstance().getGamePlayer(player);
                 gamePlayer.getCorePlayer().addCoins(100);
-                GameAPI.getInstance().getMessenger().send(player, "§7Du hast ein §fCoin Bomben§7 Item aufgesammelt §8[§a+100 Coins§8]");
+                Msg.send(player, "§7Du hast ein §fCoin Bomben§7 Item aufgesammelt §8[§a+100 Coins§8]");
             } else if (item.getItemStack().getType().equals(Material.EMERALD) || item.getItemStack().getType().equals(Material.EMERALD_BLOCK)) {
                 GamePlayer gamePlayer = GameAPI.getInstance().getGamePlayer(player);
                 gamePlayer.getCorePlayer().addEmeralds(5);
-                GameAPI.getInstance().getMessenger().send(player, "§7Du hast ein §fCoin Bomben§7 Item aufgesammelt §8[§a+5 Emeralds§8]");
+                Msg.send(player, "§7Du hast ein §fCoin Bomben§7 Item aufgesammelt §8[§a+5 Emeralds§8]");
             } else if (item.getItemStack().getType().equals(Material.GOLD_BLOCK) || item.getItemStack().getType().equals(Material.GOLD_INGOT) || item.getItemStack().getType().equals(Material.DIAMOND_BLOCK)) {
                 GamePlayer gamePlayer = GameAPI.getInstance().getGamePlayer(player);
                 gamePlayer.getCorePlayer().addCoins(150);
-                GameAPI.getInstance().getMessenger().send(player, "§7Du hast ein §fCoin Bomben§7 Item aufgesammelt §8[§a+150 Coins§8]");
+                Msg.send(player, "§7Du hast ein §fCoin Bomben§7 Item aufgesammelt §8[§a+150 Coins§8]");
             }
             Sound.done(player);
             player.playEffect(player.getLocation(), Effect.FLAME, 5);

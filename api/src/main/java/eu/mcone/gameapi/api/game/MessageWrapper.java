@@ -5,7 +5,7 @@
 
 package eu.mcone.gameapi.api.game;
 
-import eu.mcone.coresystem.api.bukkit.broadcast.Broadcast;
+import eu.mcone.coresystem.api.bukkit.chat.Broadcast;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

@@ -6,8 +6,12 @@
 package eu.mcone.gameapi.listener;
 
 import eu.mcone.coresystem.api.bukkit.CoreSystem;
+import eu.mcone.coresystem.api.bukkit.facades.Msg;
 import eu.mcone.coresystem.api.bukkit.player.CorePlayer;
-import eu.mcone.gameapi.api.*;
+import eu.mcone.gameapi.api.GamePlugin;
+import eu.mcone.gameapi.api.HotbarItem;
+import eu.mcone.gameapi.api.Module;
+import eu.mcone.gameapi.api.Option;
 import eu.mcone.gameapi.api.backpack.BackpackManager;
 import eu.mcone.gameapi.api.event.player.GamePlayerLoadedEvent;
 import eu.mcone.gameapi.api.gamestate.common.LobbyGameState;
@@ -67,7 +71,7 @@ public class HotbarListener implements Listener {
                 if (!GamePlugin.getGamePlugin().getTeamManager().isTeamsFinallySet()) {
                     GamePlugin.getGamePlugin().getTeamManager().openTeamInventory(p);
                 } else {
-                    GameAPI.getInstance().getMessenger().send(p, "§4Du kannst dein Team nicht mehr ändern!");
+                    Msg.send(p, "§4Du kannst dein Team nicht mehr ändern!");
                 }
             }
         }

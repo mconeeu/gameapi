@@ -6,7 +6,7 @@
 package eu.mcone.gameapi.command;
 
 import eu.mcone.coresystem.api.bukkit.command.CorePlayerCommand;
-import eu.mcone.gameapi.GameAPIPlugin;
+import eu.mcone.coresystem.api.bukkit.facades.Msg;
 import eu.mcone.gameapi.api.GameAPI;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.player.GamePlayer;
@@ -36,30 +36,30 @@ public class OnePassCMD extends CorePlayerCommand {
                 int amount = Integer.parseInt(args[2]);
                 if (target != null) {
                     if (args[0].equalsIgnoreCase("add")) {
-                        GameAPI.getInstance().getMessenger().send(player, "§2Du hast " + target.getName() + " §a" + amount + "§2 Level hinzugefügt!");
+                        Msg.send(player, "§2Du hast " + target.getName() + " §a" + amount + "§2 Level hinzugefügt!");
                         gameTarget.addOnePassLevel(amount);
                     } else if (args[0].equalsIgnoreCase("remove")) {
-                        GameAPI.getInstance().getMessenger().send(player, "§2Du hast " + target.getName() + "§a " + amount + "§2 Level entfernt!");
+                        Msg.send(player, "§2Du hast " + target.getName() + "§a " + amount + "§2 Level entfernt!");
                         gameTarget.removeOnePassLevel(amount);
                     } else {
-                        GameAPIPlugin.getInstance().getMessenger().send(player, "§4Bitte benutze: §c/onepass <add|remove> [<Spieler>] [Anzahl]");
+                        Msg.send(player, "§4Bitte benutze: §c/onepass <add|remove> [<Spieler>] [Anzahl]");
                     }
                 } else {
-                    GameAPI.getInstance().getMessenger().send(player, "§4Der Spieler befindet sich nicht auf deinem Server");
+                    Msg.send(player, "§4Der Spieler befindet sich nicht auf deinem Server");
                 }
             } else if (args.length == 1) {
                 Player target = Bukkit.getPlayer(args[0]);
                 if (target != null) {
                     GamePlayer gameTarget = GameAPI.getInstance().getGamePlayer(target);
-                    GameAPIPlugin.getInstance().getMessenger().send(player, "§2Der Spieler hat §a" + gameTarget.getOneLevel() + "§2 Level und§a " + (gameTarget.getOneXp() + 1) + "§2 Xp");
+                    Msg.send(player, "§2Der Spieler hat §a" + gameTarget.getOneLevel() + "§2 Level und§a " + (gameTarget.getOneXp() + 1) + "§2 Xp");
                 } else {
-                    GameAPI.getInstance().getMessenger().send(player, "§4Der Spieler befindet sich nicht auf deinem Server");
+                    Msg.send(player, "§4Der Spieler befindet sich nicht auf deinem Server");
                 }
             } else {
-                GameAPIPlugin.getInstance().getMessenger().send(player, "§4Bitte benutze: §c/onepass [<Spieler>] §4oder §c/onepass <add|remove> [<Spieler>] [Anzahl]");
+                Msg.send(player, "§4Bitte benutze: §c/onepass [<Spieler>] §4oder §c/onepass <add|remove> [<Spieler>] [Anzahl]");
             }
         } else {
-            GameAPI.getInstance().getMessenger().send(player, "§4Du hast nicht genügend Rechte für diesen Befehl!");
+            Msg.send(player, "§4Du hast nicht genügend Rechte für diesen Befehl!");
         }
 
         return false;

@@ -6,7 +6,7 @@
 package eu.mcone.gameapi.command;
 
 import eu.mcone.coresystem.api.bukkit.command.CoreCommand;
-import eu.mcone.gameapi.GameAPIPlugin;
+import eu.mcone.coresystem.api.bukkit.facades.Msg;
 import eu.mcone.gameapi.api.GamePlugin;
 import eu.mcone.gameapi.api.Module;
 import eu.mcone.gameapi.api.gamestate.common.LobbyGameState;
@@ -21,23 +21,27 @@ public class ForceStartCMD extends CoreCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, String[] args) {
-        if (GamePlugin.getGamePlugin().getGameStateManager().getRunning() instanceof LobbyGameState) {
-            if (!GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)
-                    || GamePlugin.getGamePlugin().getPlayerManager().getPlayers(GamePlayerState.PLAYING).size() >= GamePlugin.getGamePlugin().getPlayerManager().getMinPlayers()) {
-                if (GamePlugin.getGamePlugin().getGameStateManager().isCountdownRunning()) {
-                    if (LobbyGameState.forceStart()) {
-                        GameAPIPlugin.getSystem().getMessenger().send(sender, "§2Du hast den Lobby Countdown übersprungen!");
+        if (GamePlugin.getGamePlugin().hasModule(Module.GAME_STATE_MANAGER)) {
+            if (GamePlugin.getGamePlugin().getGameStateManager().getRunning() instanceof LobbyGameState) {
+                if (!GamePlugin.getGamePlugin().hasModule(Module.PLAYER_MANAGER)
+                        || GamePlugin.getGamePlugin().getPlayerManager().getPlayers(GamePlayerState.PLAYING).size() >= GamePlugin.getGamePlugin().getPlayerManager().getMinPlayers()) {
+                    if (GamePlugin.getGamePlugin().getGameStateManager().isCountdownRunning()) {
+                        if (LobbyGameState.forceStart()) {
+                            Msg.sendSuccess(sender, "Du hast den Lobby Countdown übersprungen!");
+                        } else {
+                            Msg.sendError(sender, "Du kannst den Countdown nicht mehr überspringen, das Spiel startet gleich!");
+                        }
                     } else {
-                        GameAPIPlugin.getSystem().getMessenger().send(sender, "§4Du kannst den Countdown nicht mehr überspringen, das Spiel startet gleich!");
+                        Msg.sendError(sender, "Zurzeit läuft kein Lobby Countdown!");
                     }
                 } else {
-                    GameAPIPlugin.getSystem().getMessenger().send(sender, "§4Zurzeit läuft kein Lobby Countdown!");
+                    Msg.sendError(sender, "Es sind nicht genügend Spieler online, um das Spiel zu starten!");
                 }
             } else {
-                GameAPIPlugin.getSystem().getMessenger().send(sender, "§4Es sind nicht genügend Spieler online, um das Spiel zu starten!");
+                Msg.sendError(sender, "Du kannst den Start Befehl nur während der Lobby-Phase benutzen!");
             }
         } else {
-            GameAPIPlugin.getSystem().getMessenger().send(sender, "§4Du kannst den Start Befehl nur während der Lobby-Phase benutzen!");
+            Msg.sendError(sender, "In diesem Spielmodus kann keine Lobby-Phase übersprungen werden!");
         }
 
         return false;
